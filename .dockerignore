@@ -1,0 +1,8 @@
+.gitignore
+.git
+.github
+.env
+docker-compose.yaml
+LICENSE
+*.md
+.venv
