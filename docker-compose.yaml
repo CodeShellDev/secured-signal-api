@@ -1,4 +1,32 @@
 ---
 services:
-  myservice:
-    container_name: myservice
+  signal-api:
+    image: bbernhard/signal-cli-rest-api
+    container_name: signal-api
+    environment:
+      - MODE=normal
+    volumes:
+      - ./data:/home/.local/share/signal-cli
+    networks:
+      backend:
+        aliases:
+          - signal-api
+    restart: unless-stopped
+
+  secured-signal:
+    image: ghcr.io/codeshelldev/secured-signal-api
+    container_name: secured-signal
+    networks:
+      backend:
+        aliases:
+          - secured-signal-api
+    environment:
+      SIGNAL_API_URL: http://signal-api:8080
+      DEFAULT_RECIPIENTS: '[ "000", "001", "002" ]'
+      SENDER: 123456789
+    ports:
+      - "8880:8880"
+    restart: unless-stopped
+
+networks:
+  backend:
