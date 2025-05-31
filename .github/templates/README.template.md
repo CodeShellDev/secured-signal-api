@@ -15,7 +15,7 @@ Get the latest version of the `docker-compose.yaml` file:
 Take a look at traefik implementation:
 
 ```yaml
-{ { file.example/traefik.docker-compose.yaml } }
+{ { file.examples/traefik.docker-compose.yaml } }
 ```
 
 ## Setup
