@@ -33,15 +33,15 @@ VARIABLES = os.getenv("VARIABLES")
 secure = False
 
 def fillInVars(obj):
-    if isinstance(obj, dict):
+	if isinstance(obj, dict):
         for key, value in obj.items():
             obj[key] = fillInVars(value)
     elif isinstance(obj, list):
         for i in range(len(obj)):
             obj[i] = fillInVars(obj[i])
     elif isinstance(obj, str):
-        matches = re.findall(r"\${(.*?)}", obj)
-        for match in matches:
+		matches = re.findall(r"\${(.*?)}", obj)
+		for match in matches:
             if match in VARIABLES:
                 value = VARIABLES[match]
 
