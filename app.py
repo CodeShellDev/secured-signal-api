@@ -44,7 +44,7 @@ def fillInVars(obj):
         for match in matches:
             if match in VARIABLES:
                 value = VARIABLES[match]
-            
+
                 if isinstance(value, str):
                     newValue = obj.replace(f"${{{match}}}", str(value))
                     return newValue
