@@ -40,7 +40,7 @@ def fillInVars(obj):
         for i in range(len(obj)):
             obj[i] = fillInVars(obj[i])
     elif isinstance(obj, str):
-		matches = re.findall(r"\${(.*?)}", obj)
+        matches = re.findall(r"\${(.*?)}", obj)
 		for match in matches:
             if match in VARIABLES:
                 value = VARIABLES[match]
