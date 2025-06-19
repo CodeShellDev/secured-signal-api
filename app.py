@@ -5,6 +5,7 @@ import requests
 import re
 import base64
 import logging
+from urllib.parse import unquote
 
 app = Flask("Secured Signal Api")
 
@@ -39,7 +40,7 @@ def fillInVars(obj):
         for i in range(len(obj)):
             obj[i] = fillInVars(obj[i])
     elif isinstance(obj, str):
-        matches = re.findall(r"\${(.*?)}", obj)
+    	matches = re.findall(r"\${(.*?)}", obj)
         for match in matches:
             if match in VARIABLES:
                 value = VARIABLES[match]
@@ -76,14 +77,19 @@ def middlewares():
         
         if auth_header.startswith("Bearer "):
             token = auth_header.split(" ", 1)[1]
-            if token != API_TOKEN:
+            
+            token = unquote(token)
+        	if token != API_TOKEN:
                 infoLog(f"Client failed Bearer Auth [token: {token}]")
                 return UnauthorizedResponse()
-        elif auth_header.startswith("Basic "):
-            try:
-                decoded = base64.b64decode(auth_header.split(" ", 1)[1]).decode()
-                username, password = decoded.split(":", 1)
-                if username != "api" or password != API_TOKEN:
+    	elif auth_header.startswith("Basic "):
+        	try:
+            	decoded = base64.b64decode(auth_header.split(" ", 1)[1]).decode()
+            	username, password = decoded.split(":", 1)
+                
+                username = unquote(username)
+                password = unquote(password)
+            	if username != "api" or password != API_TOKEN:
                     infoLog(f"Client failed Basic Auth [user: {username}, pw:{password}]")
                     return UnauthorizedResponse()
             except Exception as error:
