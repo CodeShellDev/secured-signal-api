@@ -79,7 +79,7 @@ def middlewares():
             token = auth_header.split(" ", 1)[1]
 
             token = unquote(token)
-            
+
             if token != API_TOKEN:
                 infoLog(f"Client failed Bearer Auth [token: {token}]")
                 return UnauthorizedResponse()
@@ -122,8 +122,6 @@ def proxy(path):
         query_string= "?" + request.query_string.decode()
 
     targetURL = f"{SIGNAL_API_URL}/{path}{query_string}"
-
-    infoLog(json.dumps(jsonData))
 
     resp = requests.request(
         method=method,
