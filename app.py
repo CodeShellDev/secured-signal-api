@@ -5,7 +5,7 @@ import requests
 import re
 import base64
 import logging
-from urllib.parse import unquote
+from urllib.parse import unquote, urlencode, parse_qs
 
 app = Flask("Secured Signal Api")
 
@@ -72,6 +72,8 @@ def middlewares():
             infoLog(f"Client tried to access Blocked Endpoint [{blockedPath}]")
             return Response("Forbidden", 401)
 
+    query_string = request.query_string.decode()
+
     if secure:
         auth_header = request.headers.get("Authorization", "")
         
@@ -97,10 +99,24 @@ def middlewares():
             except Exception as error:
                 errorLog(f"Unexpected Error during Basic Auth: {error}")
                 return UnauthorizedResponse()
+        elif request.args.get("authorization", None):
+            token = request.args.get("authorization", "")
+
+            token = unquote(token)
+
+            if token != API_TOKEN:
+                infoLog(f"Client failed Query Auth [query: {token}]")
+                return UnauthorizedResponse()
+
+            args = parse_qs(query_string)
+
+            args.pop('authorization', None)
+            query_string = urlencode(args, doseq=True)
         else:
             infoLog(f"Client did not provide any Auth Method")
             return UnauthorizedResponse(True)
-        
+
+    g.query_string = query_string  
 
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'PUT'])
 @app.route('/<path:path>', methods=['GET', 'POST', 'PUT'])
@@ -116,10 +132,10 @@ def proxy(path):
     if "${NUMBER}" in path:
         path = path.replace("${NUMBER}", SENDER)
 
-    query_string = request.query_string.decode()
+    query_string = g.query_string
 
-    if request.query_string.decode():
-        query_string= "?" + request.query_string.decode()
+    if query_string:
+        query_string = "?" + query_string
 
     targetURL = f"{SIGNAL_API_URL}/{path}{query_string}"
 
