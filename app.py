@@ -33,7 +33,7 @@ VARIABLES = os.getenv("VARIABLES")
 secure = False
 
 def fillInVars(obj):
-	if isinstance(obj, dict):
+    if isinstance(obj, dict):
         for key, value in obj.items():
             obj[key] = fillInVars(value)
     elif isinstance(obj, list):
@@ -41,10 +41,10 @@ def fillInVars(obj):
             obj[i] = fillInVars(obj[i])
     elif isinstance(obj, str):
         matches = re.findall(r"\${(.*?)}", obj)
-		for match in matches:
+        for match in matches:
             if match in VARIABLES:
                 value = VARIABLES[match]
-
+            
                 if isinstance(value, str):
                     newValue = obj.replace(f"${{{match}}}", str(value))
                     return newValue
@@ -77,8 +77,9 @@ def middlewares():
         
         if auth_header.startswith("Bearer "):
             token = auth_header.split(" ", 1)[1]
-            
+
             token = unquote(token)
+            
             if token != API_TOKEN:
                 infoLog(f"Client failed Bearer Auth [token: {token}]")
                 return UnauthorizedResponse()
@@ -86,9 +87,10 @@ def middlewares():
             try:
                 decoded = base64.b64decode(auth_header.split(" ", 1)[1]).decode()
                 username, password = decoded.split(":", 1)
-                
+
                 username = unquote(username)
                 password = unquote(password)
+
                 if username != "api" or password != API_TOKEN:
                     infoLog(f"Client failed Basic Auth [user: {username}, pw:{password}]")
                     return UnauthorizedResponse()
