@@ -5,6 +5,7 @@ on:
     paths:
       - "docker-compose.yaml"
       - ".github/templates/README.template.md"
+      - "examples/*"
 
 jobs:
   update-readme:

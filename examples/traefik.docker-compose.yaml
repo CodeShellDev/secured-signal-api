@@ -1,0 +1,29 @@
+services:
+  # ...
+  secured-signal:
+    image: ghcr.io/codeshelldev/secured-signal-api
+    container_name: secured-signal
+    networks:
+      proxy:
+      backend:
+        aliases:
+          - secured-signal-api
+    environment:
+      SIGNAL_API_URL: http://signal-api:8080
+      DEFAULT_RECIPIENTS: '[ "000", "001", "002" ]'
+      SENDER: 123456789
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.signal-api.rule=Host(`signal-api.mydomain.com`)
+      - traefik.http.routers.signal-api.entrypoints=websecure
+      - traefik.http.routers.signal-api.tls=true
+      - traefik.http.routers.signal-api.tls.certresolver=cloudflare
+      - traefik.http.routers.signal-api.service=signal-api-svc
+      - traefik.http.services.signal-api-svc.loadbalancer.server.port=8880
+      - traefik.docker.network=proxy
+    restart: unless-stopped
+
+networks:
+  backend:
+  proxy:
+    external: true
