@@ -40,7 +40,7 @@ def fillInVars(obj):
         for i in range(len(obj)):
             obj[i] = fillInVars(obj[i])
     elif isinstance(obj, str):
-    	matches = re.findall(r"\${(.*?)}", obj)
+        matches = re.findall(r"\${(.*?)}", obj)
         for match in matches:
             if match in VARIABLES:
                 value = VARIABLES[match]
@@ -79,17 +79,17 @@ def middlewares():
             token = auth_header.split(" ", 1)[1]
             
             token = unquote(token)
-        	if token != API_TOKEN:
+            if token != API_TOKEN:
                 infoLog(f"Client failed Bearer Auth [token: {token}]")
                 return UnauthorizedResponse()
-    	elif auth_header.startswith("Basic "):
-        	try:
-            	decoded = base64.b64decode(auth_header.split(" ", 1)[1]).decode()
-            	username, password = decoded.split(":", 1)
+        elif auth_header.startswith("Basic "):
+            try:
+                decoded = base64.b64decode(auth_header.split(" ", 1)[1]).decode()
+                username, password = decoded.split(":", 1)
                 
                 username = unquote(username)
                 password = unquote(password)
-            	if username != "api" or password != API_TOKEN:
+                if username != "api" or password != API_TOKEN:
                     infoLog(f"Client failed Basic Auth [user: {username}, pw:{password}]")
                     return UnauthorizedResponse()
             except Exception as error:
