@@ -1,11 +1,11 @@
-from flask import Flask, Response, request, jsonify, make_response
+from flask import Flask, Response, request, jsonify, make_response, g
 import os
 import json
 import requests
 import re
 import base64
 import logging
-from urllib.parse import unquote
+from urllib.parse import unquote, urlencode, parse_qs
 
 app = Flask("Secured Signal Api")
 
@@ -72,13 +72,14 @@ def middlewares():
             infoLog(f"Client tried to access Blocked Endpoint [{blockedPath}]")
             return Response("Forbidden", 401)
 
+    query_string = request.query_string.decode()
+
     if secure:
         auth_header = request.headers.get("Authorization", "")
         
         if auth_header.startswith("Bearer "):
             token = auth_header.split(" ", 1)[1]
-            
-            token = unquote(token)
+
             if token != API_TOKEN:
                 infoLog(f"Client failed Bearer Auth [token: {token}]")
                 return UnauthorizedResponse()
@@ -86,19 +87,31 @@ def middlewares():
             try:
                 decoded = base64.b64decode(auth_header.split(" ", 1)[1]).decode()
                 username, password = decoded.split(":", 1)
-                
-                username = unquote(username)
-                password = unquote(password)
+
                 if username != "api" or password != API_TOKEN:
                     infoLog(f"Client failed Basic Auth [user: {username}, pw:{password}]")
                     return UnauthorizedResponse()
             except Exception as error:
                 errorLog(f"Unexpected Error during Basic Auth: {error}")
                 return UnauthorizedResponse()
+        elif request.args.get("authorization", None):
+            token = request.args.get("authorization", "")
+
+            token = unquote(token)
+
+            if token != API_TOKEN:
+                infoLog(f"Client failed Query Auth [query: {token}]")
+                return UnauthorizedResponse()
+
+            args = parse_qs(query_string)
+
+            args.pop('authorization', None)
+            query_string = urlencode(args, doseq=True)
         else:
             infoLog(f"Client did not provide any Auth Method")
             return UnauthorizedResponse(True)
-        
+
+    g.query_string = query_string  
 
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'PUT'])
 @app.route('/<path:path>', methods=['GET', 'POST', 'PUT'])
@@ -114,14 +127,12 @@ def proxy(path):
     if "${NUMBER}" in path:
         path = path.replace("${NUMBER}", SENDER)
 
-    query_string = request.query_string.decode()
+    query_string = g.query_string
 
-    if request.query_string.decode():
-        query_string= "?" + request.query_string.decode()
+    if query_string:
+        query_string = "?" + query_string
 
     targetURL = f"{SIGNAL_API_URL}/{path}{query_string}"
-
-    infoLog(json.dumps(jsonData))
 
     resp = requests.request(
         method=method,
