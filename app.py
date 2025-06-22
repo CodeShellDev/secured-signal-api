@@ -80,8 +80,6 @@ def middlewares():
         if auth_header.startswith("Bearer "):
             token = auth_header.split(" ", 1)[1]
 
-            token = unquote(token)
-
             if token != API_TOKEN:
                 infoLog(f"Client failed Bearer Auth [token: {token}]")
                 return UnauthorizedResponse()
@@ -89,9 +87,6 @@ def middlewares():
             try:
                 decoded = base64.b64decode(auth_header.split(" ", 1)[1]).decode()
                 username, password = decoded.split(":", 1)
-
-                username = unquote(username)
-                password = unquote(password)
 
                 if username != "api" or password != API_TOKEN:
                     infoLog(f"Client failed Basic Auth [user: {username}, pw:{password}]")
