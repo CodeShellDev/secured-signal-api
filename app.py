@@ -122,6 +122,9 @@ def proxy(path):
     headers = {k: v for k, v in request.headers if k.lower() != 'host'}
 
     if incomingJSON:
+        if not incomingJSON.get("recipients", None):
+            incomingJSON["recipients"] = "${RECIPIENTS}"
+
         jsonData = fillInVars(incomingJSON)
 
     if "${NUMBER}" in path:
@@ -141,7 +144,7 @@ def proxy(path):
         json=jsonData
     )
 
-    infoLog(f"Forwarded {resp.text} to {targetURL} [{method}]")
+    infoLog(f"Forwarded {jsonData} to {targetURL} [{method}]")
 
     # return Response(resp.content, status=resp.status_code, headers=dict(resp.headers))
 
