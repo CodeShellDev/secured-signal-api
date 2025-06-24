@@ -144,7 +144,7 @@ def proxy(path):
         json=jsonData
     )
 
-    infoLog(f"Forwarded {resp.text} to {targetURL} [{method}]")
+    infoLog(f"Forwarded {jsonData} to {targetURL} [{method}]")
 
     # return Response(resp.content, status=resp.status_code, headers=dict(resp.headers))
 
