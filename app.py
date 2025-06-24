@@ -122,6 +122,9 @@ def proxy(path):
     headers = {k: v for k, v in request.headers if k.lower() != 'host'}
 
     if incomingJSON:
+        if not incomingJSON.get("recipients", None):
+            incomingJSON["recipients"] = "${RECIPIENTS}"
+
         jsonData = fillInVars(incomingJSON)
 
     if "${NUMBER}" in path:
