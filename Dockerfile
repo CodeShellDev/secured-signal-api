@@ -8,4 +8,6 @@ WORKDIR /app
 
 COPY dist/${TARGETOS}/${TARGETARCH}/app .
 
+RUN ls
+
 CMD ["./app"]
