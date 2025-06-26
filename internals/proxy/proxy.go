@@ -64,8 +64,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		authQuery := req.URL.Query().Get("@authorization")
 
-		log.Debug("Auth Query: ", authQuery, "| Query: ", req.URL.RawQuery)
-
 		var authType AuthType = None
 
 		success := false
@@ -111,12 +109,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 				req.URL.RawQuery = modifiedQuery.Encode()
 			}
-		}
-
-		if success {
-			log.Debug("Finished Auth Middleware with success")
-		} else {
-			log.Debug("Finished Auth Middleware with failure")
 		}
 
 		if !success {

@@ -54,12 +54,13 @@ func main() {
 
 	handler = proxy.Create(signalUrl)
 
-	finalHandler := proxy.TemplatingMiddleware(
+	finalHandler := proxy.AuthMiddleware(
 		proxy.BlockedEndpointMiddleware(
-			proxy.AuthMiddleware(handler),
-
-			BLOCKED_ENDPOINTS),
-		VARIABLES)
+			proxy.TemplatingMiddleware(handler,
+				VARIABLES ),
+				
+		BLOCKED_ENDPOINTS ),
+	)
 
 	log.Info("Initialized Proxy Handler")
 
