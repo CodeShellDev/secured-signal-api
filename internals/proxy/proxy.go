@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -148,9 +149,12 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 			modifiedBodyBytes := []byte(modifiedBody)
 
 			req.Body = io.NopCloser(bytes.NewReader(modifiedBodyBytes))
+			req.ContentLength = int64(len(modifiedBody))
+			req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
 		}
 
 		reqPath := req.URL.Path
+		reqPath, _ = url.PathUnescape(reqPath)
 
 		modifiedReqPath, _ := renderTemplate("path", reqPath, VARIABLES)
 
