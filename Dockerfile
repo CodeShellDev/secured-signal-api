@@ -14,4 +14,4 @@ ENV PORT=8880
 
 EXPOSE ${PORT}
 
-CMD ["/docker-gs-ping"]
+CMD ["/secured-signal-api"]
