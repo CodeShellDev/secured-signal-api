@@ -113,6 +113,12 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
+		if success {
+			log.Debug("Finished Auth Middleware with success")
+		} else {
+			log.Debug("Finished Auth Middleware with failure")
+		}
+
 		if !success {
 			w.Header().Set("WWW-Authenticate", "Basic realm=\"Login Required\", Bearer realm=\"Access Token Required\"")
 
