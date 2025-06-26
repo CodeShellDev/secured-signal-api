@@ -1,17 +1,16 @@
-FROM golang:1.24
+FROM golang:1.24 AS builder
 
 WORKDIR /app
-
-COPY go.mod go.sum ./
-
-RUN go mod download
-
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /secured-signal-api
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 
-ENV PORT=8880
+FROM alpine:latest
 
-EXPOSE ${PORT}
+RUN apk --no-cache add ca-certificates
 
-CMD ["/secured-signal-api"]
+WORKDIR /root/
+
+COPY --from=builder /app/app .
+
+CMD ["./app"]
