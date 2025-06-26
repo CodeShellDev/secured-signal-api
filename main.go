@@ -38,7 +38,7 @@ func main() {
 
 	blockedEndpointJSON := os.Getenv("BLOCKED_ENDPOINTS")
 
-	log.Init("Loaded Environment Variables")
+	log.Info("Loaded Environment Variables")
 
 	if blockedEndpointJSON != "" {
 		var blockedEndpoints []string
