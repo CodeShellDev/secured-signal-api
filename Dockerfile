@@ -5,9 +5,9 @@ COPY . .
 
 RUN go mod download
 
-RUN go build -ldflags="-w -s" -o app .
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o app .
 
-FROM alpine:latest
+FROM alpine:latest AS bu
 
 RUN apk --no-cache add ca-certificates
 
