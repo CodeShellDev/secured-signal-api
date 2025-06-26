@@ -1,8 +1,8 @@
-ARG TARGETOS
-ARG TARGETARCH
-
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
+
+ARG TARGETOS
+ARG TARGETARCH
 
 WORKDIR /app
 
