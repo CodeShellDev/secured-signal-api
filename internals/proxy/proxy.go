@@ -21,7 +21,7 @@ const (
 	Bearer AuthType = "Bearer"
 	Basic AuthType = "Basic"
 	Query AuthType = "Query"
-	None AuthType = ""
+	None AuthType = "None"
 )
 
 func getAuthType(str string) AuthType {
@@ -62,7 +62,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		authQuery := req.URL.Query().Get("authorization")
 
-		var authType AuthType
+		var authType AuthType = None
 
 		success := false
 
@@ -104,6 +104,8 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		if !success {
+			w.Header().Set("WWW-Authenticate", "Basic realm=\"Login Required\", Bearer realm=\"Access Token Required\"")
+
 			log.Warn("User failed ", string(authType), " Auth")
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
