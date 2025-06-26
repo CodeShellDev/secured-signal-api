@@ -103,7 +103,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			if authToken == token {
 				success = true
 
-				req.URL.Query().Del("@authorization")
+				modifiedQuery := req.URL.Query()
+
+				modifiedQuery.Del("@authorization")
+
+				req.URL.RawQuery = modifiedQuery.Encode()
 			}
 		}
 
@@ -166,14 +170,20 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 				query, _ := renderTemplate("query", req.URL.RawQuery, VARIABLES)
 
 				queryData, _ := url.ParseQuery(query)
+
+				modifiedQuery := req.URL.Query()
 				
 				for key, value := range queryData {
 					keyWithoutPrefix, found := strings.CutPrefix(key, "@")
 	
 					if found {
 						modifiedBodyData[keyWithoutPrefix] = value
+
+						modifiedQuery.Del(key)
 					}
 				}
+
+				req.URL.RawQuery = modifiedQuery.Encode()
 
 				modifiedBodyBytes, err = json.Marshal(modifiedBodyData)
 
