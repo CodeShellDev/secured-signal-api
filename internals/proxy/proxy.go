@@ -64,6 +64,8 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		authQuery := req.URL.Query().Get("@authorization")
 
+		log.Debug("Auth Query: ", authQuery, "| Query: ", req.URL.RawQuery)
+
 		var authType AuthType = None
 
 		success := false
