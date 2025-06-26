@@ -1,16 +1,18 @@
 FROM golang:1.24 AS builder
 
-WORKDIR /app
+WORKDIR /build
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
+RUN go mod download
+
+RUN go build -ldflags="-w -s" -o app .
 
 FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
-WORKDIR /root/
+WORKDIR /app
 
-COPY --from=builder /app/app .
+COPY --from=builder /build/app .
 
 CMD ["./app"]
