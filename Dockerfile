@@ -1,6 +1,8 @@
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 
+ENV PORT=8880
+
 ARG TARGETOS
 ARG TARGETARCH
 
