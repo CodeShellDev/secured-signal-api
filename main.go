@@ -38,6 +38,8 @@ func main() {
 
 	blockedEndpointJSON := os.Getenv("BLOCKED_ENDPOINTS")
 
+	log.Init("Loaded Environment Variables")
+
 	if blockedEndpointJSON != "" {
 		var blockedEndpoints []string
 
@@ -59,5 +61,11 @@ func main() {
 			BLOCKED_ENDPOINTS),
 		VARIABLES)
 
-	http.ListenAndServe("0.0.0.0:" + port, finalHandler)
+	log.Info("Initialized Proxy Handler")
+
+	addr := "0.0.0.0:" + port
+
+	log.Info("Server Listening on ", addr)
+
+	http.ListenAndServe(addr, finalHandler)
 }
