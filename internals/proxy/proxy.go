@@ -3,6 +3,7 @@ package proxy
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httputil"
@@ -61,7 +62,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		authHeader := req.Header.Get("Authorization")
 
-		authQuery := req.URL.Query().Get("authorization")
+		authQuery := req.URL.Query().Get("@authorization")
 
 		var authType AuthType = None
 
@@ -101,6 +102,8 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 			if authToken == token {
 				success = true
+
+				req.URL.Query().Del("@authorization")
 			}
 		}
 
@@ -136,7 +139,7 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 			bodyBytes, err := io.ReadAll(req.Body)
 
 			if err != nil {
-				log.Error("Could not decode Body: ", err.Error())
+				log.Error("Could not read Body: ", err.Error())
 				http.Error(w, "Internal Error", http.StatusInternalServerError)
 				return
 			}
@@ -146,9 +149,43 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 			modifiedBody := string(bodyBytes)
 
 			modifiedBody, _ = renderTemplate("json", modifiedBody, VARIABLES)
+
 			modifiedBodyBytes := []byte(modifiedBody)
 
+			if req.URL.Query() != nil {
+				var modifiedBodyData map[string]interface{}
+
+				err = json.Unmarshal(modifiedBodyBytes, &modifiedBodyData)
+
+				if err != nil {
+					log.Error("Could not decode Body: ", err.Error())
+					http.Error(w, "Internal Error", http.StatusInternalServerError)
+					return
+				}
+
+				query, _ := renderTemplate("query", req.URL.RawQuery, VARIABLES)
+
+				queryData, _ := url.ParseQuery(query)
+				
+				for key, value := range queryData {
+					keyWithoutPrefix, found := strings.CutPrefix(key, "@")
+	
+					if found {
+						modifiedBodyData[keyWithoutPrefix] = value
+					}
+				}
+
+				modifiedBodyBytes, err = json.Marshal(modifiedBodyData)
+
+				if err != nil {
+					log.Error("Could not encode Body: ", err.Error())
+					http.Error(w, "Internal Error", http.StatusInternalServerError)
+					return
+				}
+			}
+
 			req.Body = io.NopCloser(bytes.NewReader(modifiedBodyBytes))
+
 			req.ContentLength = int64(len(modifiedBody))
 			req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
 		}
