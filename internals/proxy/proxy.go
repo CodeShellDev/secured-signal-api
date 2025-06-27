@@ -26,6 +26,40 @@ const (
 	None AuthType = "None"
 )
 
+func parseTypedQuery(q url.Values) map[string]interface{} {
+	result := make(map[string]interface{})
+
+	for key, values := range q {
+		if !strings.HasPrefix(key, "@") {
+			continue
+		}
+
+		cleanKey := strings.TrimPrefix(key, "@")
+		raw := values[0]
+
+		intValue, err := strconv.Atoi(raw)
+
+		if strings.Contains(raw, ",") {
+			parts := strings.Split(raw, ",")
+			var list []interface{}
+			for _, part := range parts {
+				if intVal, err := strconv.Atoi(part); err == nil {
+					list = append(list, intVal)
+				} else {
+					list = append(list, part)
+				}
+			}
+			result[cleanKey] = list
+		} else if err == nil {
+			result[cleanKey] = intValue
+		} else {
+			result[cleanKey] = raw
+		}
+	}
+
+	return result
+}
+
 func getAuthType(str string) AuthType {
 	switch str {
 	case "Bearer":
@@ -169,20 +203,10 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 
 				query, _ := renderTemplate("query", req.URL.RawQuery, VARIABLES)
 
-				queryData, _ := url.ParseQuery(query)
-
 				modifiedQuery := req.URL.Query()
 				
-				for key, value := range queryData {
-					keyWithoutPrefix, found := strings.CutPrefix(key, "@")
-	
-					if found {
-						modifiedBodyData[keyWithoutPrefix] = value
-
-						modifiedQuery.Del(key)
-					}
-				}
-
+				modifiedBodyData = parseTypedQuery(modifiedQuery)
+				
 				req.URL.RawQuery = modifiedQuery.Encode()
 
 				modifiedBodyBytes, err = json.Marshal(modifiedBodyData)
