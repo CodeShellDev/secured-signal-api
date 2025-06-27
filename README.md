@@ -136,8 +136,8 @@ These _Placeholders_ can be used in the Query or the Body of a Request like so:
 
 ```json
 {
-  "number": "{{ .NUMBER }}",
-  "recipients": {{ .RECIPIENTS }}
+	"number": "{{ .NUMBER }}",
+	"recipients": "{{ .RECIPIENTS }}"
 }
 ```
 
