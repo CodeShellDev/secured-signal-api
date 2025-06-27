@@ -26,35 +26,28 @@ const (
 	None AuthType = "None"
 )
 
-func parseTypedQuery(q url.Values) map[string]interface{} {
-	result := make(map[string]interface{})
+func parseTypedQuery(key string, values []string) interface{} {
+	var result interface{}
 
-	for key, values := range q {
-		if !strings.HasPrefix(key, "@") {
-			continue
-		}
+	raw := values[0]
 
-		cleanKey := strings.TrimPrefix(key, "@")
-		raw := values[0]
+	intValue, err := strconv.Atoi(raw)
 
-		intValue, err := strconv.Atoi(raw)
-
-		if strings.Contains(raw, ",") {
-			parts := strings.Split(raw, ",")
-			var list []interface{}
-			for _, part := range parts {
-				if intVal, err := strconv.Atoi(part); err == nil {
-					list = append(list, intVal)
-				} else {
-					list = append(list, part)
-				}
+	if strings.Contains(raw, ",") {
+		parts := strings.Split(raw, ",")
+		var list []interface{}
+		for _, part := range parts {
+			if intVal, err := strconv.Atoi(part); err == nil {
+				list = append(list, intVal)
+			} else {
+				list = append(list, part)
 			}
-			result[cleanKey] = list
-		} else if err == nil {
-			result[cleanKey] = intValue
-		} else {
-			result[cleanKey] = raw
 		}
+		result = list
+	} else if err == nil {
+		result = intValue
+	} else {
+		result = raw
 	}
 
 	return result
@@ -204,9 +197,19 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 				query, _ := renderTemplate("query", req.URL.RawQuery, VARIABLES)
 
 				modifiedQuery := req.URL.Query()
-				
-				modifiedBodyData = parseTypedQuery(modifiedQuery)
-				
+
+				queryData, _ := url.ParseQuery(query)
+
+				for key, value := range queryData {
+					keyWithoutPrefix, found := strings.CutPrefix(key, "@")
+	
+					if found {
+						modifiedBodyData[keyWithoutPrefix] = parseTypedQuery(key, value)
+
+						modifiedQuery.Del(key)
+					}
+				}
+
 				req.URL.RawQuery = modifiedQuery.Encode()
 
 				modifiedBodyBytes, err = json.Marshal(modifiedBodyData)
