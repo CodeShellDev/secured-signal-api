@@ -156,7 +156,7 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 
 			modifiedBodyBytes := []byte(modifiedBody)
 
-			if req.URL.Query() != nil {
+			if req.URL.RawQuery != "" {
 				var modifiedBodyData map[string]interface{}
 
 				err = json.Unmarshal(modifiedBodyBytes, &modifiedBodyData)
@@ -192,7 +192,11 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 					http.Error(w, "Internal Error", http.StatusInternalServerError)
 					return
 				}
+
+				log.Debug("Applied Query Templating: ", query)
 			}
+
+			log.Debug("Applied Body Templating")
 
 			req.Body = io.NopCloser(bytes.NewReader(modifiedBodyBytes))
 
