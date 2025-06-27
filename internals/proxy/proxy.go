@@ -66,6 +66,8 @@ func getAuthType(str string) AuthType {
 func renderTemplate(name string, tmplStr string, data any) (string, error) {
 	tmpl, err := template.New(name).Parse(tmplStr)
 
+	// TODO: Escape Arrays inside of strings "{{ .ARRAY }}" => [ 1, 2, 3 ]
+
 	if err != nil {
 		return "", err
 	}
