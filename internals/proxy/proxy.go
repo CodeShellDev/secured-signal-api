@@ -200,7 +200,7 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 
 			req.Body = io.NopCloser(bytes.NewReader(modifiedBodyBytes))
 
-			req.ContentLength = int64(len(modifiedBody))
+			req.ContentLength = int64(len(string(modifiedBodyBytes)))
 			req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
 		}
 
