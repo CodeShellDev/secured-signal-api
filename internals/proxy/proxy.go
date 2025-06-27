@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
 	"slices"
 	"strconv"
 	"strings"
@@ -26,7 +25,7 @@ const (
 	None AuthType = "None"
 )
 
-func parseTypedQuery(key string, values []string) interface{} {
+func parseTypedQuery(values []string) interface{} {
 	var result interface{}
 
 	raw := values[0]
@@ -80,12 +79,14 @@ func renderTemplate(name string, tmplStr string, data any) (string, error) {
 	return buf.String(), nil
 }
 
-func AuthMiddleware(next http.Handler) http.Handler {
+func AuthMiddleware(next http.Handler, token string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		log.Info("Request:", req.Method, req.URL.Path)
+		if token == "" {
+			next.ServeHTTP(w, req)
+			return
+		}
 
-		token := os.Getenv("API_TOKEN")
-		user := "api"
+		log.Info("Request:", req.Method, req.URL.Path)
 
 		authHeader := req.Header.Get("Authorization")
 
@@ -116,6 +117,8 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 				basicAuth := string(basicAuthBody)
 				basicAuthParams := strings.Split(basicAuth, ":")
+
+				user := "api"
 
 				if basicAuthParams[0] == user && basicAuthParams[1] == token {
 					success = true
@@ -204,7 +207,7 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 					keyWithoutPrefix, found := strings.CutPrefix(key, "@")
 	
 					if found {
-						modifiedBodyData[keyWithoutPrefix] = parseTypedQuery(key, value)
+						modifiedBodyData[keyWithoutPrefix] = parseTypedQuery(value)
 
 						modifiedQuery.Del(key)
 					}

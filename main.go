@@ -39,7 +39,17 @@ func main() {
 	blockedEndpointJSON := os.Getenv("BLOCKED_ENDPOINTS")
 	variablesJSON := os.Getenv("VARIABLES")
 
+	token := os.Getenv("API_TOKEN")
+
 	log.Info("Loaded Environment Variables")
+
+	if token == "" {
+		log.Warn("No API TOKEN provided this is NOT recommended")
+
+		log.Info("Disabling Security Features due to incomplete Congfiguration")
+
+		BLOCKED_ENDPOINTS = []string{}
+	}
 
 	if blockedEndpointJSON != "" {
 		var blockedEndpoints []string
@@ -73,7 +83,7 @@ func main() {
 				VARIABLES ),
 				
 		BLOCKED_ENDPOINTS ),
-	)
+	token )
 
 	log.Info("Initialized Proxy Handler")
 
