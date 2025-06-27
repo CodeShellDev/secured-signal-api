@@ -37,6 +37,7 @@ func main() {
 	signalUrl := os.Getenv("SIGNAL_API_URL")
 
 	blockedEndpointJSON := os.Getenv("BLOCKED_ENDPOINTS")
+	variablesJSON := os.Getenv("VARIABLES")
 
 	log.Info("Loaded Environment Variables")
 
@@ -50,6 +51,18 @@ func main() {
 		}
 
 		BLOCKED_ENDPOINTS = blockedEndpoints
+	}
+
+	if variablesJSON != "" {
+		var variables map[string]string
+
+		err := json.Unmarshal([]byte(variablesJSON), &variables)
+
+		if err != nil {
+			log.Error("Could not decode Variables ", variablesJSON)
+		}
+
+		VARIABLES = variables
 	}
 
 	handler = proxy.Create(signalUrl)
