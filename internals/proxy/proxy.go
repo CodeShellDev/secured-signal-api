@@ -194,13 +194,15 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 				}
 
 				log.Debug("Applied Query Templating: ", query)
-			}
 
-			log.Debug("Applied Body Templating")
+				modifiedBody = string(modifiedBodyBytes)
+			}
+			
+			log.Debug("Applied Body Templating: ", modifiedBody)
 
 			req.Body = io.NopCloser(bytes.NewReader(modifiedBodyBytes))
 
-			req.ContentLength = int64(len(string(modifiedBodyBytes)))
+			req.ContentLength = int64(len(modifiedBody))
 			req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
 		}
 
