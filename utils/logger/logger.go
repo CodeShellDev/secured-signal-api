@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"strings"
 
 	"go.uber.org/zap"
@@ -39,7 +40,7 @@ func Init(level string) {
 	_log, err = cfg.Build(zap.AddCaller(), zap.AddCallerSkip(1))
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Encountered Error during Log.Init(): err.Error()")
 	}
 
 	Info("Initialized Logger with Level of", logLevel.String())
