@@ -87,17 +87,18 @@ func templateJSON(data map[string]interface{}, variables map[string]interface{})
 		str, ok := v.(string)
 
 		if ok {
-			re, err := regexp.Compile(`{{\s*\.([A-Za-z_][A-Za-z0-9_]*)}}\s*`)
+			re, err := regexp.Compile(`{{\s*\.([A-Za-z_][A-Za-z0-9_]*)\s*}}`)
 
 			if err != nil {
 				log.Error("Encountered Error while Compiling Regex: ", err.Error())
 			}
 
-			matches := re.FindAllString(str, -1)
+			matches := re.FindAllStringSubmatch(str, -1)
 
 			if len(matches) > 1 {
-				for _, tmplStr := range(matches) {
-					tmplKey := tmplStr[3 : len(tmplStr)-2]
+				for i, tmplStr := range(matches) {
+					
+					tmplKey := matches[i][1]
 
 					variable, err := json.Marshal(variables[tmplKey])
 
@@ -106,10 +107,10 @@ func templateJSON(data map[string]interface{}, variables map[string]interface{})
 						break
 					}
 
-					data[k] = strings.ReplaceAll(str, string(variable), tmplStr)
+					data[k] = strings.ReplaceAll(str, string(variable), tmplStr[0])
 				}
 			} else {
-				tmplKey := matches[0][3 : len(matches[0])-2]
+				tmplKey := matches[0][1]
 
 				data[k] = variables[tmplKey]
 			}
