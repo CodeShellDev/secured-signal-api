@@ -109,7 +109,7 @@ func templateJSON(data map[string]interface{}, variables map[string]interface{})
 
 					data[k] = strings.ReplaceAll(str, string(variable), tmplStr[0])
 				}
-			} else {
+			} else if len(matches) == 1 {
 				tmplKey := matches[0][1]
 
 				data[k] = variables[tmplKey]
