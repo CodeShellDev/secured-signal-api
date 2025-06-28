@@ -1,63 +1,42 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httputil"
 	"os"
 
 	proxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
-	log "github.com/codeshelldev/secured-signal-api/utils"
+	env "github.com/codeshelldev/secured-signal-api/utils/env"
+	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 var handler *httputil.ReverseProxy
 
-var VARIABLES map[string]string = map[string]string{
-	"RECIPIENTS": os.Getenv("DEFAULT_RECIPIENTS"),
-	"NUMBER": os.Getenv("SENDER"),
-}
-
-var BLOCKED_ENDPOINTS []string = []string{
-    "/v1/about",
-    "/v1/configuration",
-    "/v1/devices",
-    "/v1/register",
-    "/v1/unregister",
-    "/v1/qrcodelink",
-    "/v1/accounts",
-    "/v1/contacts",
-}
+var ENV env.ENV_
 
 func main() {
 	logLevel := os.Getenv("LOG_LEVEL")
 
 	log.Init(logLevel)
 
-	port := os.Getenv("PORT")
-	signalUrl := os.Getenv("SIGNAL_API_URL")
+	env.Load()
 
-	blockedEndpointJSON := os.Getenv("BLOCKED_ENDPOINTS")
+	ENV = env.ENV
 
-	if blockedEndpointJSON != "" {
-		var blockedEndpoints []string
+	handler = proxy.Create(ENV.API_URL)
 
-		err := json.Unmarshal([]byte(blockedEndpointJSON), &blockedEndpoints)
-
-		if err != nil {
-			log.Error("Could not decode Blocked Endpoints: ", blockedEndpointJSON)
-		}
-
-		BLOCKED_ENDPOINTS = blockedEndpoints
-	}
-
-	handler = proxy.Create(signalUrl)
-
-	finalHandler := proxy.TemplatingMiddleware(
+	finalHandler := proxy.AuthMiddleware(
 		proxy.BlockedEndpointMiddleware(
-			proxy.AuthMiddleware(handler),
+			proxy.TemplatingMiddleware(handler,
+				ENV.VARIABLES ),
+		ENV.BLOCKED_ENDPOINTS ),
+	ENV.API_TOKEN )
 
-			BLOCKED_ENDPOINTS),
-		VARIABLES)
+	log.Info("Initialized Proxy Handler")
 
-	http.ListenAndServe("0.0.0.0:" + port, finalHandler)
+	addr := "0.0.0.0:" + ENV.PORT
+
+	log.Info("Server Listening on ", addr)
+
+	http.ListenAndServe(addr, finalHandler)
 }

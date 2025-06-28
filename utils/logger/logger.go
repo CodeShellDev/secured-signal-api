@@ -1,13 +1,14 @@
 package logger
 
 import (
+	"fmt"
 	"strings"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-var log *zap.Logger
+var _log *zap.Logger
 
 func Init(level string) {
 	logLevel := getLogLevel(level)
@@ -36,10 +37,10 @@ func Init(level string) {
 
 	var err error
 
-	log, err = cfg.Build(zap.AddCaller(), zap.AddCallerSkip(1))
+	_log, err = cfg.Build(zap.AddCaller(), zap.AddCallerSkip(1))
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Encountered Error during Log.Init(): err.Error()")
 	}
 
 	Info("Initialized Logger with Level of", logLevel.String())
@@ -61,22 +62,22 @@ func getLogLevel(level string) zapcore.Level {
 }
 
 func Info(msg ...string) {
-	log.Info(strings.Join(msg, " "))
+	_log.Info(strings.Join(msg, " "))
 }
 
 func Debug(msg ...string) {
-	log.Debug(strings.Join(msg, " "))
+	_log.Debug(strings.Join(msg, " "))
 }
 
 func Error(msg ...string) {
-	log.Error(strings.Join(msg, " "))
+	_log.Error(strings.Join(msg, " "))
 }
 
 func Warn(msg ...string) {
-	log.Warn(strings.Join(msg, " "))
+	_log.Warn(strings.Join(msg, " "))
 }
 
 
 func Sync() {
-	_ = log.Sync()
+	_ = _log.Sync()
 }
