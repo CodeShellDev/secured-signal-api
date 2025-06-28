@@ -87,7 +87,12 @@ func templateJSON(data map[string]interface{}, variables map[string]interface{})
 		str, ok := v.(string)
 
 		if ok {
-			re := regexp.MustCompile(`{{\s*\.([A-Za-z_][A-Za-z0-9_]*)}}\s*`)
+			re, err := regexp.Compile(`{{\s*\.([A-Za-z_][A-Za-z0-9_]*)}}\s*`)
+
+			if err != nil {
+				log.Error("Encountered Error while Compiling Regex: ", err.Error())
+			}
+
 			matches := re.FindAllString(str, -1)
 
 			if len(matches) > 1 {
