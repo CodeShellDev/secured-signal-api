@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -83,10 +84,29 @@ func renderTemplate(name string, tmplStr string, data any) (string, error) {
 
 func templateJSON(data map[string]interface{}, variables map[string]interface{}) map[string]interface{} {
 	for k, v := range data {
-		if str, ok := v.(string); ok && len(str) > 4 && str[:3] == "{{." {
-			key := str[3 : len(str)-2]
-			if val, found := variables[key]; found {
-				data[k] = val
+		str, ok := v.(string)
+
+		if ok {
+			re := regexp.MustCompile(`{{\s*\.([A-Za-z_][A-Za-z0-9_]*)}}\s*`)
+			matches := re.FindAllString(str, -1)
+
+			if len(matches) > 1 {
+				for _, tmplStr := range(matches) {
+					tmplKey := tmplStr[3 : len(tmplStr)-2]
+
+					variable, err := json.Marshal(variables[tmplKey])
+
+					if err != nil {
+						log.Error("Could not decode JSON: ", err.Error())
+						break
+					}
+
+					data[k] = strings.ReplaceAll(str, string(variable), tmplStr)
+				}
+			} else {
+				tmplKey := matches[0][3 : len(matches[0])-2]
+
+				data[k] = variables[tmplKey]
 			}
 		}
 	}
