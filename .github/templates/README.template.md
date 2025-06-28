@@ -55,6 +55,8 @@ Here is a simple example:
 curl -X POST http://signal-api:8880/v2/send?@authorization=TOKEN
 ```
 
+### Example
+
 To send a message to `number`: `1234567`:
 
 ```bash
