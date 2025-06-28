@@ -13,7 +13,7 @@ import (
 	"strings"
 	"text/template"
 
-	log "github.com/codeshelldev/secured-signal-api/utils"
+	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 type AuthType string
@@ -79,6 +79,19 @@ func renderTemplate(name string, tmplStr string, data any) (string, error) {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+func templateJSON(data map[string]interface{}, variables map[string]interface{}) map[string]interface{} {
+	for k, v := range data {
+		if str, ok := v.(string); ok && len(str) > 4 && str[:3] == "{{." {
+			key := str[3 : len(str)-2]
+			if val, found := variables[key]; found {
+				data[k] = val
+			}
+		}
+	}
+
+	return data
 }
 
 func AuthMiddleware(next http.Handler, token string) http.Handler {
@@ -169,7 +182,7 @@ func BlockedEndpointMiddleware(next http.Handler, BLOCKED_ENDPOINTS []string) ht
 	})
 }
 
-func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.Handler {
+func TemplatingMiddleware(next http.Handler, VARIABLES map[string]interface{}) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.Body != nil {
 			bodyBytes, err := io.ReadAll(req.Body)
@@ -182,23 +195,19 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 
 			req.Body.Close()
 
-			modifiedBody := string(bodyBytes)
+			var modifiedBodyData map[string]interface{}
 
-			modifiedBody, _ = renderTemplate("json", modifiedBody, VARIABLES)
+			err = json.Unmarshal(bodyBytes, &modifiedBodyData)
 
-			modifiedBodyBytes := []byte(modifiedBody)
+			if err != nil {
+				log.Error("Could not decode Body: ", err.Error())
+				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				return
+			}
+
+			modifiedBodyData = templateJSON(modifiedBodyData, VARIABLES)
 
 			if req.URL.RawQuery != "" {
-				var modifiedBodyData map[string]interface{}
-
-				err = json.Unmarshal(modifiedBodyBytes, &modifiedBodyData)
-
-				if err != nil {
-					log.Error("Could not decode Body: ", err.Error())
-					http.Error(w, "Internal Error", http.StatusInternalServerError)
-					return
-				}
-
 				query, _ := renderTemplate("query", req.URL.RawQuery, VARIABLES)
 
 				modifiedQuery := req.URL.Query()
@@ -217,19 +226,19 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]string) http.H
 
 				req.URL.RawQuery = modifiedQuery.Encode()
 
-				modifiedBodyBytes, err = json.Marshal(modifiedBodyData)
-
-				if err != nil {
-					log.Error("Could not encode Body: ", err.Error())
-					http.Error(w, "Internal Error", http.StatusInternalServerError)
-					return
-				}
-
 				log.Debug("Applied Query Templating: ", query)
-
-				modifiedBody = string(modifiedBodyBytes)
 			}
-			
+
+			modifiedBodyBytes, err := json.Marshal(modifiedBodyData)
+
+			if err != nil {
+				log.Error("Could not encode Body: ", err.Error())
+				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				return
+			}
+
+			modifiedBody := string(modifiedBodyBytes)
+
 			log.Debug("Applied Body Templating: ", modifiedBody)
 
 			req.Body = io.NopCloser(bytes.NewReader(modifiedBodyBytes))
