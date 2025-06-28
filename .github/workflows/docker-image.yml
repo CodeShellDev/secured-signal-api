@@ -6,7 +6,7 @@ on:
 
 jobs:
   update:
-    uses: codeshelldev/gh-actions/.github/workflows/docker-image.yml@main
+    uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
     with:
       registry: ghcr.io
     secrets:
