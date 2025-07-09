@@ -238,7 +238,11 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]interface{}) h
 			modifiedBodyData = templateJSON(modifiedBodyData, VARIABLES)
 
 			if req.URL.RawQuery != "" {
-				query, _ := renderTemplate("query", req.URL.RawQuery, VARIABLES)
+				decodedQuery, _ := url.QueryUnescape(req.URL.RawQuery)
+
+				log.Debug("Decoded Query: ", decodedQuery)
+
+				query, _ := renderTemplate("query", decodedQuery, VARIABLES)
 
 				modifiedQuery := req.URL.Query()
 
