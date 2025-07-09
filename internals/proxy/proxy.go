@@ -21,9 +21,9 @@ type AuthType string
 
 const (
 	Bearer AuthType = "Bearer"
-	Basic AuthType = "Basic"
-	Query AuthType = "Query"
-	None AuthType = "None"
+	Basic  AuthType = "Basic"
+	Query  AuthType = "Query"
+	None   AuthType = "None"
 )
 
 func parseTypedQuery(values []string) interface{} {
@@ -96,8 +96,8 @@ func templateJSON(data map[string]interface{}, variables map[string]interface{})
 			matches := re.FindAllStringSubmatch(str, -1)
 
 			if len(matches) > 1 {
-				for i, tmplStr := range(matches) {
-					
+				for i, tmplStr := range matches {
+
 					tmplKey := matches[i][1]
 
 					variable, err := json.Marshal(variables[tmplKey])
@@ -234,7 +234,11 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]interface{}) h
 			modifiedBodyData = templateJSON(modifiedBodyData, VARIABLES)
 
 			if req.URL.RawQuery != "" {
-				query, _ := renderTemplate("query", req.URL.RawQuery, VARIABLES)
+				decodedQuery, _ := url.QueryUnescape(req.URL.RawQuery)
+
+				log.Debug("Decoded Query: ", decodedQuery)
+
+				query, _ := renderTemplate("query", decodedQuery, VARIABLES)
 
 				modifiedQuery := req.URL.Query()
 
@@ -242,7 +246,7 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]interface{}) h
 
 				for key, value := range queryData {
 					keyWithoutPrefix, found := strings.CutPrefix(key, "@")
-	
+
 					if found {
 						modifiedBodyData[keyWithoutPrefix] = parseTypedQuery(value)
 
