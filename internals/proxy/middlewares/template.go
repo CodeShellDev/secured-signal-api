@@ -79,16 +79,15 @@ func (data TemplateMiddleware) Use() http.Handler {
 	VARIABLES := data.Variables
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.Body != nil {
-			bodyBytes, err := io.ReadAll(req.Body)
+		bodyBytes, err := io.ReadAll(req.Body)
+		if err != nil {
+			log.Error("Could not read body:", err.Error())
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		}
+		defer req.Body.Close()
 
-			if err != nil {
-				log.Error("Could not read Body: ", err.Error())
-				http.Error(w, "Internal Error", http.StatusInternalServerError)
-				return
-			}
-
-			req.Body.Close()
+		if len(bodyBytes) > 0 {
 
 			var modifiedBodyData map[string]interface{}
 
@@ -144,6 +143,8 @@ func (data TemplateMiddleware) Use() http.Handler {
 
 			req.ContentLength = int64(len(modifiedBody))
 			req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
+		} else {
+			req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 		}
 
 		reqPath := req.URL.Path
