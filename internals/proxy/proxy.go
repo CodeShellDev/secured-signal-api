@@ -33,11 +33,15 @@ func parseTypedQuery(values []string) interface{} {
 
 	intValue, err := strconv.Atoi(raw)
 
-	if strings.Contains(raw, ",") {
+	if strings.Contains(raw, ",") || (strings.Contains(raw, "[") && strings.Contains(raw, "]")) {
 		parts := strings.Split(raw, ",")
+
 		var list []interface{}
+
 		for _, part := range parts {
-			if intVal, err := strconv.Atoi(part); err == nil {
+			intVal, err := strconv.Atoi(part)
+
+			if err == nil {
 				list = append(list, intVal)
 			} else {
 				list = append(list, part)
@@ -234,11 +238,7 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]interface{}) h
 			modifiedBodyData = templateJSON(modifiedBodyData, VARIABLES)
 
 			if req.URL.RawQuery != "" {
-				decodedQuery, _ := url.QueryUnescape(req.URL.RawQuery)
-
-				log.Debug("Decoded Query: ", decodedQuery)
-
-				query, _ := renderTemplate("query", decodedQuery, VARIABLES)
+				query, _ := renderTemplate("query", req.URL.RawQuery, VARIABLES)
 
 				modifiedQuery := req.URL.Query()
 
