@@ -26,8 +26,50 @@ func main() {
 
 	initHandler = proxy.Create(ENV.API_URL)
 
+	body_m4 := BodyMiddleware{
+		Next: initHandler,
+		MessageAliases: []MessageAlias{
+			{
+				Alias:    "msg",
+				Priority: 100,
+			},
+			{
+				Alias:    "content",
+				Priority: 99,
+			},
+			{
+				Alias:    "description",
+				Priority: 98,
+			},
+			{
+				Alias:    "text",
+				Priority: 20,
+			},
+			{
+				Alias:    "body",
+				Priority: 15,
+			},
+			{
+				Alias:    "summary",
+				Priority: 10,
+			},
+			{
+				Alias:    "details",
+				Priority: 9,
+			},
+			{
+				Alias:    "payload",
+				Priority: 2,
+			},
+			{
+				Alias:    "data",
+				Priority: 1,
+			},
+		},
+	}
+
 	temp_m3 := TemplateMiddleware{
-		Next:      initHandler,
+		Next:      body_m4.Use(),
 		Variables: ENV.VARIABLES,
 	}
 
