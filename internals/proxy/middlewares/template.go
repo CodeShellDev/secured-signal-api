@@ -127,7 +127,7 @@ func (data TemplateMiddleware) Use() http.Handler {
 				log.Debug("Applied Query Templating: ", templatedQuery)
 			}
 
-			modifiedBodyBytes, err := json.Marshal(modifiedBodyData)
+			bodyBytes, err = json.Marshal(modifiedBodyData)
 
 			if err != nil {
 				log.Error("Could not encode Body: ", err.Error())
@@ -135,17 +135,15 @@ func (data TemplateMiddleware) Use() http.Handler {
 				return
 			}
 
-			modifiedBody := string(modifiedBodyBytes)
+			modifiedBody := string(bodyBytes)
 
 			log.Debug("Applied Body Templating: ", modifiedBody)
 
-			req.Body = io.NopCloser(bytes.NewReader(modifiedBodyBytes))
-
 			req.ContentLength = int64(len(modifiedBody))
 			req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
-		} else {
-			req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 		}
+
+		req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 
 		reqPath := req.URL.Path
 		reqPath, _ = url.PathUnescape(reqPath)

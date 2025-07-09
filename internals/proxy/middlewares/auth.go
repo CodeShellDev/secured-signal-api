@@ -44,8 +44,6 @@ func (data AuthMiddleware) Use() http.Handler {
 			return
 		}
 
-		log.Info("Request:", req.Method, req.URL.Path)
-
 		authHeader := req.Header.Get("Authorization")
 
 		authQuery := req.URL.Query().Get("@authorization")

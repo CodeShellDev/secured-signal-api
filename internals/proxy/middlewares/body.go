@@ -74,17 +74,15 @@ func (data BodyMiddleware) Use() http.Handler {
 					http.Error(w, "Internal Error", http.StatusInternalServerError)
 					return
 				}
+
+				modifiedBody := string(bodyBytes)
+
+				req.ContentLength = int64(len(modifiedBody))
+				req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
 			}
-
-			modifiedBody := string(bodyBytes)
-
-			req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-
-			req.ContentLength = int64(len(modifiedBody))
-			req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
-		} else {
-			req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 		}
+
+		req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 
 		next.ServeHTTP(w, req)
 	})
