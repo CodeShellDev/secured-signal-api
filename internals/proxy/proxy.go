@@ -27,7 +27,7 @@ const (
 )
 
 func tryParseInt(str string) (int, bool) {
-	isInt, err := regexp.MatchString(`[0-9_]*`, str)
+	isInt, err := regexp.MatchString(`^\d+$`, str)
 
 	if err != nil {
 		log.Error("Encountered Error while Parsing Int", err.Error())
