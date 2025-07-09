@@ -34,6 +34,8 @@ func tryParseInt(str string) (int, bool) {
 	}
 
 	if isInt && err == nil {
+		log.Debug("Parsed Int from ", str)
+
 		intValue, err := strconv.Atoi(str)
 
 		if err == nil {
