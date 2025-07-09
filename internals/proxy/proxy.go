@@ -34,6 +34,12 @@ func parseTypedQuery(values []string) interface{} {
 	intValue, err := strconv.Atoi(raw)
 
 	if strings.Contains(raw, ",") || (strings.Contains(raw, "[") && strings.Contains(raw, "]")) {
+		if strings.Contains(raw, "[") && strings.Contains(raw, "]") {
+			escapedStr := strings.ReplaceAll(raw, "[", "")
+			escapedStr = strings.ReplaceAll(escapedStr, "]", "")
+			raw = escapedStr
+		}
+
 		parts := strings.Split(raw, ",")
 
 		var list []interface{}
