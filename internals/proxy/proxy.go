@@ -26,24 +26,28 @@ const (
 	None   AuthType = "None"
 )
 
-func tryParseInt(str string) (int, bool) {
-	isInt, err := regexp.MatchString(`^\d+$`, str)
+func parseRawQuery(raw string) map[string][]string {
+	result := make(map[string][]string)
+	pairs := strings.Split(raw, "&")
 
-	if err != nil {
-		log.Error("Encountered Error while Parsing Int", err.Error())
-	}
-
-	if isInt && err == nil {
-		log.Debug("Parsed Int from ", str)
-
-		intValue, err := strconv.Atoi(str)
-
-		if err == nil {
-			return intValue, true
+	for _, pair := range pairs {
+		if pair == "" {
+			continue
 		}
+
+		parts := strings.SplitN(pair, "=", 2)
+
+		key := parts[0]
+		val := ""
+
+		if len(parts) == 2 {
+			val = parts[1]
+		}
+
+		result[key] = append(result[key], val)
 	}
 
-	return 0, false
+	return result
 }
 
 func parseTypedQuery(values []string) interface{} {
@@ -51,7 +55,7 @@ func parseTypedQuery(values []string) interface{} {
 
 	raw := values[0]
 
-	intValue, isInt := tryParseInt(raw)
+	intValue, err := strconv.Atoi(raw)
 
 	if strings.Contains(raw, ",") || (strings.Contains(raw, "[") && strings.Contains(raw, "]")) {
 		if strings.Contains(raw, "[") && strings.Contains(raw, "]") {
@@ -65,16 +69,16 @@ func parseTypedQuery(values []string) interface{} {
 		var list []interface{}
 
 		for _, part := range parts {
-			_intValue, _isInt := tryParseInt(part)
+			intVal, err := strconv.Atoi(part)
 
-			if _isInt {
-				list = append(list, _intValue)
+			if err == nil {
+				list = append(list, intVal)
 			} else {
 				list = append(list, part)
 			}
 		}
 		result = list
-	} else if isInt {
+	} else if err == nil {
 		result = intValue
 	} else {
 		result = raw
@@ -272,7 +276,7 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]interface{}) h
 
 				modifiedQuery := req.URL.Query()
 
-				queryData, _ := url.ParseQuery(query)
+				queryData := parseRawQuery(query)
 
 				for key, value := range queryData {
 					keyWithoutPrefix, found := strings.CutPrefix(key, "@")
