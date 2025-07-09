@@ -26,12 +26,30 @@ const (
 	None   AuthType = "None"
 )
 
+func tryParseInt(str string) (int, bool) {
+	isInt, err := regexp.MatchString(`[0-9_]*`, str)
+
+	if err != nil {
+		log.Error("Encountered Error while Parsing Int", err.Error())
+	}
+
+	if isInt && err == nil {
+		intValue, err := strconv.Atoi(str)
+
+		if err == nil {
+			return intValue, true
+		}
+	}
+
+	return 0, false
+}
+
 func parseTypedQuery(values []string) interface{} {
 	var result interface{}
 
 	raw := values[0]
 
-	intValue, err := strconv.Atoi(raw)
+	intValue, isInt := tryParseInt(raw)
 
 	if strings.Contains(raw, ",") || (strings.Contains(raw, "[") && strings.Contains(raw, "]")) {
 		if strings.Contains(raw, "[") && strings.Contains(raw, "]") {
@@ -45,16 +63,16 @@ func parseTypedQuery(values []string) interface{} {
 		var list []interface{}
 
 		for _, part := range parts {
-			intVal, err := strconv.Atoi(part)
+			_intValue, _isInt := tryParseInt(part)
 
-			if err == nil {
-				list = append(list, intVal)
+			if _isInt {
+				list = append(list, _intValue)
 			} else {
 				list = append(list, part)
 			}
 		}
 		result = list
-	} else if err == nil {
+	} else if isInt {
 		result = intValue
 	} else {
 		result = raw
