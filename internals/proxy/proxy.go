@@ -26,25 +26,77 @@ const (
 	None   AuthType = "None"
 )
 
+func parseRawQuery(raw string) map[string][]string {
+	result := make(map[string][]string)
+	pairs := strings.SplitSeq(raw, "&")
+
+	for pair := range pairs {
+		if pair == "" {
+			continue
+		}
+
+		parts := strings.SplitN(pair, "=", 2)
+
+		key := parts[0]
+		val := ""
+
+		if len(parts) == 2 {
+			val = parts[1]
+		}
+
+		result[key] = append(result[key], val)
+	}
+
+	return result
+}
+
+func tryParseInt(str string) (int, bool) {
+	isInt, err := regexp.MatchString(`^\d+$`, str)
+
+	if err != nil {
+		log.Error("Encountered Error while Parsing Int", err.Error())
+	}
+
+	if isInt && err == nil {
+		intValue, err := strconv.Atoi(str)
+
+		if err == nil {
+			return intValue, true
+		}
+	}
+
+	return 0, false
+}
+
 func parseTypedQuery(values []string) interface{} {
 	var result interface{}
 
 	raw := values[0]
 
-	intValue, err := strconv.Atoi(raw)
+	intValue, isInt := tryParseInt(raw)
 
-	if strings.Contains(raw, ",") {
+	if strings.Contains(raw, ",") || (strings.Contains(raw, "[") && strings.Contains(raw, "]")) {
+		if strings.Contains(raw, "[") && strings.Contains(raw, "]") {
+			escapedStr := strings.ReplaceAll(raw, "[", "")
+			escapedStr = strings.ReplaceAll(escapedStr, "]", "")
+			raw = escapedStr
+		}
+
 		parts := strings.Split(raw, ",")
+
 		var list []interface{}
+
 		for _, part := range parts {
-			if intVal, err := strconv.Atoi(part); err == nil {
-				list = append(list, intVal)
+			_intValue, _isInt := tryParseInt(part)
+
+			if _isInt {
+				list = append(list, _intValue)
 			} else {
 				list = append(list, part)
 			}
 		}
 		result = list
-	} else if err == nil {
+	} else if isInt {
 		result = intValue
 	} else {
 		result = raw
@@ -242,7 +294,7 @@ func TemplatingMiddleware(next http.Handler, VARIABLES map[string]interface{}) h
 
 				modifiedQuery := req.URL.Query()
 
-				queryData, _ := url.ParseQuery(query)
+				queryData := parseRawQuery(query)
 
 				for key, value := range queryData {
 					keyWithoutPrefix, found := strings.CutPrefix(key, "@")
