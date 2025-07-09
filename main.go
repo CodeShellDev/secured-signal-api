@@ -83,11 +83,15 @@ func main() {
 		Token: ENV.API_TOKEN,
 	}
 
+	log_m0 := LogMiddleware{
+		Next: auth_m1.Use(),
+	}
+
 	log.Info("Initialized Proxy Handler")
 
 	addr := "0.0.0.0:" + ENV.PORT
 
 	log.Info("Server Listening on ", addr)
 
-	http.ListenAndServe(addr, auth_m1.Use())
+	http.ListenAndServe(addr, log_m0.Use())
 }
