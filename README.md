@@ -232,6 +232,31 @@ environment:
   DEFAULT_RECIPIENTS: ' [ "user.id", "000", "001", "group.id" ] '
 ```
 
+#### Message Aliases
+
+To improve compatibility with other services Secured Signal API provides aliases for the `message` attribute by default:
+
+| Alias       | Priority    |
+| ----------- | ----------- |
+| msg         | 100         |
+| content     | 99          |
+| description | 98          |
+| text        | 20          |
+| body        | 15          |
+| summary     | 10          |
+| details     | 9           |
+| payload     | 2           |
+| data        | 1           |
+
+Secured Signal API will use the highest priority Message Alias to get the correct message from the Request Body.
+
+If you are missing a Message Alias to have Secured Signal API integrated with a Service you can simply set `MESSAGE_ALIASES` in ENV:
+
+```yaml
+environment:
+  MESSAGE_ALIASES: ' [{ "alias": "note", "priority": 4 }, { "alias": "test", "priority": 3 }] '
+```
+
 ## Contributing
 
 Found a bug? Want to change or add something?
