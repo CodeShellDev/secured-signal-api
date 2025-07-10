@@ -14,7 +14,7 @@ func (data LogMiddleware) Use() http.Handler {
 	next := data.Next
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		log.Info("Request:", req.Method, req.URL.Path)
+		log.Info(req.Method, req.URL.Path, "?", req.URL.RawQuery)
 		
 		next.ServeHTTP(w, req)
 	})

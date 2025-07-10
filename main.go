@@ -28,44 +28,7 @@ func main() {
 
 	body_m4 := BodyMiddleware{
 		Next: initHandler,
-		MessageAliases: []MessageAlias{
-			{
-				Alias:    "msg",
-				Priority: 100,
-			},
-			{
-				Alias:    "content",
-				Priority: 99,
-			},
-			{
-				Alias:    "description",
-				Priority: 98,
-			},
-			{
-				Alias:    "text",
-				Priority: 20,
-			},
-			{
-				Alias:    "body",
-				Priority: 15,
-			},
-			{
-				Alias:    "summary",
-				Priority: 10,
-			},
-			{
-				Alias:    "details",
-				Priority: 9,
-			},
-			{
-				Alias:    "payload",
-				Priority: 2,
-			},
-			{
-				Alias:    "data",
-				Priority: 1,
-			},
-		},
+		MessageAliases: ENV.MESSAGE_ALIASES,
 	}
 
 	temp_m3 := TemplateMiddleware{
