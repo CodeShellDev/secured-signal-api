@@ -6,11 +6,12 @@ import (
 	"os"
 
 	proxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
 	env "github.com/codeshelldev/secured-signal-api/utils/env"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
-var handler *httputil.ReverseProxy
+var initHandler *httputil.ReverseProxy
 
 var ENV env.ENV_
 
@@ -23,14 +24,31 @@ func main() {
 
 	ENV = env.ENV
 
-	handler = proxy.Create(ENV.API_URL)
+	initHandler = proxy.Create(ENV.API_URL)
 
-	finalHandler := proxy.AuthMiddleware(
-		proxy.BlockedEndpointMiddleware(
-			proxy.TemplatingMiddleware(handler,
-				ENV.VARIABLES ),
-		ENV.BLOCKED_ENDPOINTS ),
-	ENV.API_TOKEN )
+	body_m4 := BodyMiddleware{
+		Next: initHandler,
+		MessageAliases: ENV.MESSAGE_ALIASES,
+	}
+
+	temp_m3 := TemplateMiddleware{
+		Next:      body_m4.Use(),
+		Variables: ENV.VARIABLES,
+	}
+
+	endp_m2 := EndpointsMiddleware{
+		Next:             temp_m3.Use(),
+		BlockedEndpoints: ENV.BLOCKED_ENDPOINTS,
+	}
+
+	auth_m1 := AuthMiddleware{
+		Next:  endp_m2.Use(),
+		Token: ENV.API_TOKEN,
+	}
+
+	log_m0 := LogMiddleware{
+		Next: auth_m1.Use(),
+	}
 
 	log.Info("Initialized Proxy Handler")
 
@@ -38,5 +56,5 @@ func main() {
 
 	log.Info("Server Listening on ", addr)
 
-	http.ListenAndServe(addr, finalHandler)
+	http.ListenAndServe(addr, log_m0.Use())
 }
