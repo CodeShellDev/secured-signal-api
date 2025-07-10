@@ -62,19 +62,19 @@ func getLogLevel(level string) zapcore.Level {
 }
 
 func Info(msg ...string) {
-	_log.Info(strings.Join(msg, " "))
+	_log.Info(strings.Join(msg, ""))
 }
 
 func Debug(msg ...string) {
-	_log.Debug(strings.Join(msg, " "))
+	_log.Debug(strings.Join(msg, ""))
 }
 
 func Error(msg ...string) {
-	_log.Error(strings.Join(msg, " "))
+	_log.Error(strings.Join(msg, ""))
 }
 
 func Warn(msg ...string) {
-	_log.Warn(strings.Join(msg, " "))
+	_log.Warn(strings.Join(msg, ""))
 }
 
 

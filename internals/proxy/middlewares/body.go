@@ -27,7 +27,7 @@ func (data BodyMiddleware) Use() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		bodyBytes, err := io.ReadAll(req.Body)
 		if err != nil {
-			log.Error("Could not read body:", err.Error())
+			log.Error("Could not read Body: ", err.Error())
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
