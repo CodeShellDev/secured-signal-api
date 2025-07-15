@@ -39,7 +39,7 @@ services:
     environment:
       SIGNAL_API_URL: http://signal-api:8080
       DEFAULT_RECIPIENTS: '[ "000", "001", "002" ]'
-      SENDER: 123456789
+      NUMBER: 123456789
       API_TOKEN: LOOOOOONG_STRING
     ports:
       - "8880:8880"
@@ -67,7 +67,7 @@ services:
     environment:
       SIGNAL_API_URL: http://signal-api:8080
       DEFAULT_RECIPIENTS: '[ "000", "001", "002" ]'
-      SENDER: 123456789
+      NUMBER: 123456789
       API_TOKEN: LOOOOOONG_STRING
     labels:
       - traefik.enable=true
