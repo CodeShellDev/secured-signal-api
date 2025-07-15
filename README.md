@@ -93,7 +93,7 @@ OR
 
 - **link Signal API to an already registered Signal Device**
 
-> [!Hint]
+> [!HINT]
 > It is advised to do this by directly accessing `signal-api`
 > As Secured Signal API blocks the `/register` and `/qrcodelink` by default.
 > If you really want to you can do this with Secured Signal API by removing these endpoints from the Blocklist
