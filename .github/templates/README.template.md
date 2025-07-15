@@ -24,13 +24,18 @@ Take a look at traefik implementation:
 
 Before you can send messages via `secured-signal-api` you must first setup [`signal-api`](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md),
 
-to send messages you have to either:
+to be able to use the API you have to either:
 
 - **register a Signal Account**
 
 OR
 
 - **link Signal API to an already registered Signal Device**
+
+> [!Hint]
+> It is advised to do this by directly accessing `signal-api`
+> As Secured Signal API blocks the `/register` and `/qrcodelink` by default.
+> If you really want to you can do this with Secured Signal API by removing these endpoints from the Blocklist
 
 ## Usage
 
