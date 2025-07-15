@@ -30,7 +30,7 @@ var ENV ENV_ = ENV_{
 	},
 	VARIABLES: map[string]any {
 		"RECIPIENTS": []string{},
-		"NUMBER": os.Getenv("SENDER"),
+		"NUMBER": os.Getenv("NUMBER"),
 	},
 	MESSAGE_ALIASES: []middlewares.MessageAlias{
 		{
@@ -79,7 +79,7 @@ func Load() {
 	ENV.API_TOKEN = os.Getenv("API_TOKEN")
 
 	blockedEndpointJSON := os.Getenv("BLOCKED_ENDPOINTS")
-	recipientsJSON := os.Getenv("DEFAULT_RECIPIENTS")
+	recipientsJSON := os.Getenv("RECIPIENTS")
 	messageAliasesJSON := os.Getenv("MESSAGE_ALIASES")
 	variablesJSON := os.Getenv("VARIABLES")
 

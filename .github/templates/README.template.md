@@ -176,8 +176,8 @@ environment:
 
 By default Secured Signal API provides the following Placeholders:
 
-- **NUMBER** = _ENV_: `SENDER`
-- **RECIPIENTS** = _ENV_: `DEFAULT_RECIPIENTS`
+- **NUMBER** = _ENV_: `NUMBER`
+- **RECIPIENTS** = _ENV_: `RECIPIENTS`
 
 #### Customization
 
@@ -188,17 +188,14 @@ environment:
   VARIABLES: ' "NUMBER2": "002", "GROUP_CHAT_1": [ "user.id", "000", "001", "group.id" ] '
 ```
 
-#### Default Recipients
+#### Recipients
 
 Set this Environment Variable to automatically provide default Recipients:
 
 ```yaml
 environment:
-  DEFAULT_RECIPIENTS: ' [ "user.id", "000", "001", "group.id" ] '
+  RECIPIENTS: ' [ "user.id", "000", "001", "group.id" ] '
 ```
-
-> [!NOTE] > `DEFAULT_RECIPIENTS` becomes `RECIPIENTS`
-> But this will change...
 
 example:
 
