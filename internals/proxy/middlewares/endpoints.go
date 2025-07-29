@@ -21,7 +21,7 @@ func (data EndpointsMiddleware) Use() http.Handler {
 
 		if slices.Contains(BLOCKED_ENDPOINTS, reqPath) {
 			log.Warn("User tried to access blocked endpoint: ", reqPath)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 
