@@ -101,9 +101,19 @@ func Load() {
 		ENV.API_TOKENS = apiTokens
 	}
 
-	ENV.BLOCKED_ENDPOINTS = utils.GetJson[[]string](blockedEndpointJSON)
-	ENV.MESSAGE_ALIASES = utils.GetJson[[]middlewares.MessageAlias](messageAliasesJSON)
+	if blockedEndpointJSON != "" {
+		ENV.BLOCKED_ENDPOINTS = utils.GetJson[[]string](blockedEndpointJSON)
+	}
 
-	ENV.VARIABLES = utils.GetJson[map[string]any](variablesJSON)
-	ENV.VARIABLES["RECIPIENTS"] = utils.GetJson[[]string](recipientsJSON)
+	if messageAliasesJSON != "" {
+		ENV.MESSAGE_ALIASES = utils.GetJson[[]middlewares.MessageAlias](messageAliasesJSON)
+	}
+
+	if variablesJSON != "" {
+		ENV.VARIABLES = utils.GetJson[map[string]any](variablesJSON)
+	}
+
+	if recipientsJSON != "" {
+		ENV.VARIABLES["RECIPIENTS"] = utils.GetJson[[]string](recipientsJSON)
+	}
 }
