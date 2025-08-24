@@ -138,9 +138,9 @@ Supported types include **strings**, **ints** and **arrays**
 In order to differentiate Injection Queries and _regular_ Queries
 you have to add `@` in front of any KeyValue Pair assignment.
 
-### Environment Variables
+## Environment Variables
 
-#### API Token(s)
+### API Token(s)
 
 Both `API_TOKEN` and `API_TOKENS` support multiple Tokens seperated by a `,` **Comma**.
 During Authentication Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
@@ -162,7 +162,7 @@ like Blocked Endpoints and any sort of Auth.
 > [!NOTE]
 > Blocked Endpoints can be reactivated by manually setting them in the Environment
 
-#### Blocked Endpoints
+### Blocked Endpoints
 
 Because Secured Signal API is just a Proxy you can use all of the [Signal REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md) endpoints except for...
 
@@ -191,7 +191,7 @@ By default Secured Signal API provides the following Placeholders:
 - **NUMBER** = _ENV_: `NUMBER`
 - **RECIPIENTS** = _ENV_: `RECIPIENTS`
 
-#### Customization
+### Customization
 
 Placeholders can be added by setting `VARIABLES` inside your Environment.
 
@@ -200,7 +200,7 @@ environment:
   VARIABLES: ' "NUMBER2": "002", "GROUP_CHAT_1": [ "user.id", "000", "001", "group.id" ] '
 ```
 
-#### Recipients
+### Recipients
 
 Set this Environment Variable to automatically provide default Recipients:
 
@@ -217,7 +217,7 @@ example:
 }
 ```
 
-#### Message Aliases
+### Message Aliases
 
 To improve compatibility with other services Secured Signal API provides aliases for the `message` attribute by default:
 
