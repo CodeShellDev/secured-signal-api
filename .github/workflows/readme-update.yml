@@ -3,6 +3,7 @@ name: Update README
 on:
   push:
     paths:
+      - examples/**
       - docker-compose.yaml
       - .github/templates/README.template.md
 

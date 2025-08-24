@@ -43,7 +43,7 @@ func Init(level string) {
 		fmt.Println("Encountered Error during Log.Init(): err.Error()")
 	}
 
-	Info("Initialized Logger with Level of", logLevel.String())
+	Info("Initialized Logger with Level of ", logLevel.String())
 }
 
 func getLogLevel(level string) zapcore.Level {

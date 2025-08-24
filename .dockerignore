@@ -1,1 +1,6 @@
-!*.py
+.gitignore
+.git
+.github
+*.yaml
+LICENSE
+*.md
