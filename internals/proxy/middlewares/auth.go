@@ -36,6 +36,12 @@ func getAuthType(str string) authType {
 }
 
 func isValidToken(tokens []string, match string) (bool) {
+	for _, token := range tokens {
+		log.Debug("Checking Token: " + token[:2] + strings.Repeat("X", len(token) - 2))
+	}
+
+	log.Debug("Against: " + match[:2] + strings.Repeat("X", len(match) - 2))
+
 	return slices.Contains(tokens, match)
 }
 
