@@ -143,7 +143,7 @@ you have to add `@` in front of any KeyValue Pair assignment.
 #### API Token(s)
 
 Both `API_TOKEN` and `API_TOKENS` support multiple Tokens seperated by a `,` **Comma**.
-During Authentikcation Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
+During Authentication Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
 
 ```yaml
 environment:
