@@ -54,9 +54,8 @@ Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 
 ```yaml
 services:
-  # ...
   secured-signal:
-    image: ghcr.io/codeshelldev/secured-signal-api
+    image: ghcr.io/codeshelldev/secured-signal-api:latest
     container_name: secured-signal
     networks:
       proxy:
