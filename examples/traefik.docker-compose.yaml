@@ -1,5 +1,4 @@
 services:
-  # ...
   secured-signal:
     image: ghcr.io/codeshelldev/secured-signal-api
     container_name: secured-signal
