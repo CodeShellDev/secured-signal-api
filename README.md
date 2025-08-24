@@ -14,7 +14,6 @@ And set `API_TOKEN` to a long secure string.
 > Or a hostname if applicable. See [Reverse Proxy](#reverse-proxy)
 
 ```yaml
----
 services:
   signal-api:
     image: bbernhard/signal-cli-rest-api
