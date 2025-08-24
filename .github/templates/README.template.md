@@ -6,7 +6,7 @@ Secured Signal API acts as a secure proxy for [Signal rAPI](https://github.com/b
 
 Get the latest version of the `docker-compose.yaml` file:
 
-And set `API_TOKEN` to a long secure string.
+And add secure Token(s) to `API_TOKEN` / `API_TOKENS`. See [API_TOKEN(s)](#api-tokens)
 
 > [!IMPORTANT]
 > This Documentation will be using `sec-signal-api:8880` as the service host,
@@ -140,9 +140,9 @@ you have to add `@` in front of any KeyValue Pair assignment.
 
 ### Environment Variables
 
-#### API Token/s
+#### API Token(s)
 
-Both `API_TOKEN` and `API_TOKENS` support multiple Tokens seperated by **,**.
+Both `API_TOKEN` and `API_TOKENS` support multiple Tokens seperated by a `,` **Comma**.
 During Authentikcation Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
 
 ```yaml
