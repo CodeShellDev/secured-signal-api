@@ -2,6 +2,7 @@ package env
 
 import (
 	"os"
+	"strconv"
 
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
 	"github.com/codeshelldev/secured-signal-api/utils"
@@ -98,6 +99,8 @@ func Load() {
 
 		ENV.BLOCKED_ENDPOINTS = []string{}
 	} else {
+		log.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")
+
 		ENV.API_TOKENS = apiTokens
 	}
 
