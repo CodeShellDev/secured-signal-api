@@ -16,7 +16,7 @@ And set `API_TOKEN` to a long secure string.
 ```yaml
 services:
   signal-api:
-    image: bbernhard/signal-cli-rest-api
+    image: bbernhard/signal-cli-rest-api:latest
     container_name: signal-api
     environment:
       - MODE=normal
@@ -29,7 +29,7 @@ services:
     restart: unless-stopped
 
   secured-signal:
-    image: ghcr.io/codeshelldev/secured-signal-api
+    image: ghcr.io/codeshelldev/secured-signal-api:latest
     container_name: secured-signal
     networks:
       backend:
