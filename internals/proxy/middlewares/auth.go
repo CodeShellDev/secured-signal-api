@@ -4,9 +4,9 @@ import (
 	"encoding/base64"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 
-	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
@@ -36,7 +36,7 @@ func getAuthType(str string) authType {
 }
 
 func isValidToken(tokens []string, match string) (bool) {
-	return utils.Contains(tokens, match)
+	return slices.Contains(tokens, match)
 }
 
 func (data AuthMiddleware) Use() http.Handler {

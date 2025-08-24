@@ -30,16 +30,6 @@ func StringToArray(sliceStr string) ([]string, error) {
 	return tokens, nil
 }
 
-func Contains[T comparable](list []T, item T) (bool){
-    for _, match := range list {
-        if match == item {
-            return true
-        }
-    }
-	
-    return false
-}
-
 func GetJsonSafe[T any](jsonStr string) (T, error) {
 	var result T
 
