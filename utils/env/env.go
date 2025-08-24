@@ -101,7 +101,7 @@ func Load() {
 		ENV.BLOCKED_ENDPOINTS = []string{}
 	} else {
 		for _, token := range apiTokens {
-			log.Debug("Found Token: " + token[:2] + strings.Repeat("X", len(token)))
+			log.Debug("Found Token: " + token[:2] + strings.Repeat("X", len(token) - 2))
 		}
 
 		log.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")
