@@ -1,17 +1,19 @@
 package env
 
 import (
-	"encoding/json"
 	"os"
+	"strconv"
+	"strings"
 
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
+	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 type ENV_ struct {
 	PORT 				string
 	API_URL 			string
-	API_TOKEN 			string
+	API_TOKENS 			[]string
 	BLOCKED_ENDPOINTS 	[]string
 	VARIABLES 			map[string]any
 	MESSAGE_ALIASES 	[]middlewares.MessageAlias
@@ -76,7 +78,11 @@ func Load() {
 	ENV.PORT = os.Getenv("PORT")
 	ENV.API_URL = os.Getenv("SIGNAL_API_URL")
 
-	ENV.API_TOKEN = os.Getenv("API_TOKEN")
+	apiToken := os.Getenv("API_TOKENS")
+
+	if apiToken == "" {
+		apiToken = os.Getenv("API_TOKEN")
+	}
 
 	blockedEndpointJSON := os.Getenv("BLOCKED_ENDPOINTS")
 	recipientsJSON := os.Getenv("RECIPIENTS")
@@ -85,59 +91,37 @@ func Load() {
 
 	log.Info("Loaded Environment Variables")
 
-	if ENV.API_TOKEN == "" {
+	apiTokens, err := utils.StringToArray(apiToken)
+
+	if err != nil {
 		log.Warn("No API TOKEN provided this is NOT recommended")
 
 		log.Info("Disabling Security Features due to incomplete Congfiguration")
 
 		ENV.BLOCKED_ENDPOINTS = []string{}
+	} else {
+		for _, token := range apiTokens {
+			log.Debug("Found Token: " + token[:2] + strings.Repeat("X", len(token) - 2))
+		}
+
+		log.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")
+
+		ENV.API_TOKENS = apiTokens
 	}
 
 	if blockedEndpointJSON != "" {
-		var blockedEndpoints []string
-
-		err := json.Unmarshal([]byte(blockedEndpointJSON), &blockedEndpoints)
-
-		if err != nil {
-			log.Error("Could not decode Blocked Endpoints: ", blockedEndpointJSON)
-		}
-
-		ENV.BLOCKED_ENDPOINTS = blockedEndpoints
+		ENV.BLOCKED_ENDPOINTS = utils.GetJson[[]string](blockedEndpointJSON)
 	}
 
 	if messageAliasesJSON != "" {
-		var msgAliases []middlewares.MessageAlias
-
-		err := json.Unmarshal([]byte(messageAliasesJSON), &msgAliases)
-
-		if err != nil {
-			log.Error("Could not decode Message Aliases ", variablesJSON)
-		}
-
-		ENV.MESSAGE_ALIASES = msgAliases
+		ENV.MESSAGE_ALIASES = utils.GetJson[[]middlewares.MessageAlias](messageAliasesJSON)
 	}
 
 	if variablesJSON != "" {
-		var variables map[string]interface{}
-
-		err := json.Unmarshal([]byte(variablesJSON), &variables)
-
-		if err != nil {
-			log.Error("Could not decode Variables ", variablesJSON)
-		}
-
-		ENV.VARIABLES = variables
+		ENV.VARIABLES = utils.GetJson[map[string]any](variablesJSON)
 	}
 
 	if recipientsJSON != "" {
-		var recipients []string
-
-		err := json.Unmarshal([]byte(recipientsJSON), &recipients)
-
-		if err != nil {
-			log.Error("Could not decode Variables ", variablesJSON)
-		}
-
-		ENV.VARIABLES["RECIPIENTS"] = recipients
+		ENV.VARIABLES["RECIPIENTS"] = utils.GetJson[[]string](recipientsJSON)
 	}
 }

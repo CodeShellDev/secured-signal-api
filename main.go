@@ -42,8 +42,8 @@ func main() {
 	}
 
 	auth_m1 := AuthMiddleware{
-		Next:  endp_m2.Use(),
-		Token: ENV.API_TOKEN,
+		Next:   endp_m2.Use(),
+		Tokens: ENV.API_TOKENS,
 	}
 
 	log_m0 := LogMiddleware{

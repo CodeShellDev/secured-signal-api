@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
@@ -11,7 +12,7 @@ import (
 
 type AuthMiddleware struct {
 	Next  http.Handler
-	Token string
+	Tokens []string
 }
 
 type authType string
@@ -34,12 +35,16 @@ func getAuthType(str string) authType {
 	}
 }
 
+func isValidToken(tokens []string, match string) (bool) {
+	return slices.Contains(tokens, match)
+}
+
 func (data AuthMiddleware) Use() http.Handler {
 	next := data.Next
-	token := data.Token
+	tokens := data.Tokens
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if token == "" {
+		if len(tokens) <= 0 {
 			next.ServeHTTP(w, req)
 			return
 		}
@@ -60,7 +65,7 @@ func (data AuthMiddleware) Use() http.Handler {
 
 			switch authType {
 			case Bearer:
-				if authToken == token {
+				if isValidToken(tokens, authToken) {
 					success = true
 				}
 
@@ -76,7 +81,7 @@ func (data AuthMiddleware) Use() http.Handler {
 
 				user := "api"
 
-				if basicAuthParams[0] == user && basicAuthParams[1] == token {
+				if basicAuthParams[0] == user && isValidToken(tokens, basicAuthParams[1]) {
 					success = true
 				}
 			}
@@ -86,7 +91,7 @@ func (data AuthMiddleware) Use() http.Handler {
 
 			authToken, _ := url.QueryUnescape(authQuery)
 
-			if authToken == token {
+			if isValidToken(tokens, authToken) {
 				success = true
 
 				modifiedQuery := req.URL.Query()

@@ -55,12 +55,12 @@ To use Basic Auth as Authorization Method add `Authorization: Basic BASE64_STRIN
 
 User is `api` (LOWERCASE)
 
-Formatting for `BASE64_STRING` = `user:API_KEY`.
+Formatting for `BASE64_STRING` = `user:API_TOKEN`.
 
 example:
 
 ```bash
-echo "api:API_KEY" | base64
+echo "api:API_TOKEN" | base64
 ```
 
 => `YXBpOkFQSV9LRVkK`
@@ -76,7 +76,7 @@ Here is a simple example:
 curl -X POST http://sec-signal-api:8880/v2/send?@authorization=API_TOKEN
 ```
 
-Notice the `@` infront of `authorization`. See [Formatting](#format)
+Notice the `@` infront of `authorization`. See [Formatting](#format).
 
 ### Example
 
@@ -121,9 +121,17 @@ http://sec-signal-api:8880/v1/receive/{{.NUMBER}}
 
 In some cases you may not be able to access / modify the Request Body, in that case specify needed values in the Request Query:
 
-```
-http://sec-signal-api:8880/?@key=value
-```
+Supported types include **strings**, **ints** and **arrays**
+
+`http://sec-signal-api:8880/?@key=value`
+
+| type       | example |
+| :--------- | :------ |
+| string     | abc     |
+| int        | 123     |
+| array      | [1,2,3] |
+| array(int) | 1,2,3   |
+| array(str) | a,b,c   |
 
 ##### Format
 
@@ -132,14 +140,23 @@ you have to add `@` in front of any KeyValue Pair assignment.
 
 ### Environment Variables
 
-#### API Token
+#### API Token/s
+
+Both `API_TOKEN` and `API_TOKENS` support multiple Tokens seperated by **,**.
+During Authentikcation Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
+
+```yaml
+environment:
+  API_TOKEN: "token1, token2, token3"
+  API_TOKENS: "token1, token2, token3"
+```
 
 > [!IMPORTANT]
 > It is highly recommended to set this Environment Variable
 
 > _What if I just don't?_
 
-Well, Secured Signal API will still work, but important Security Features won't be available
+Secured Signal API will still work, but important Security Features won't be available
 like Blocked Endpoints and any sort of Auth.
 
 > [!NOTE]
@@ -147,23 +164,18 @@ like Blocked Endpoints and any sort of Auth.
 
 #### Blocked Endpoints
 
-Because Secured Signal API is just a secure Proxy you can use all of the [Signal REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md) endpoints except for...
+Because Secured Signal API is just a Proxy you can use all of the [Signal REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md) endpoints except for...
 
-- **/v1/about**
-
-- **/v1/configuration**
-
-- **/v1/devices**
-
-- **/v1/register**
-
-- **/v1/unregister**
-
-- **/v1/qrcodelink**
-
-- **/v1/accounts**
-
-- **/v1/contacts**
+| Endpoint              |
+| :-------------------- |
+| **/v1/about**         |
+| **/v1/configuration** |
+| **/v1/devives**       |
+| **/v1/register**      |
+| **/v1/unregister**    |
+| **/v1/qrcodelink**    |
+| **/v1/accounts**      |
+| **/v1/contacts**      |
 
 These Endpoints are blocked by default due to Security Risks, but can be modified by setting `BLOCKED_ENDPOINTS` to a valid json array string
 
