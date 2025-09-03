@@ -306,8 +306,6 @@ environment:
 Found a bug? Want to change or add something?
 Feel free to open up an issue or create a Pull Request!
 
-_This is a small project so don't expect any huge changes in the future_
-
 ## Support
 
 Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project.
