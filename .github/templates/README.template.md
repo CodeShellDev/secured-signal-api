@@ -1,6 +1,6 @@
-# Secured Signal API
+<img align="center" width="1048" height="512" alt="Secure Proxy for Signal REST API" src="https://github.com/CodeShellDev/secured-signal-api/raw/refs/heads/main/logo/landscape" />
 
-Secured Signal API acts as a secure proxy for [Signal rAPI](https://github.com/bbernhard/signal-cli-rest-api).
+<h5 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal REST API</a></h5>
 
 ## Installation
 
@@ -258,3 +258,8 @@ Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+### Legal
+
+Logo designed by [@CodeShellDev](https://github.com/codeshelldev), All Rights Reserved.
+This Project is not affiliated with the Signal Foundation.
