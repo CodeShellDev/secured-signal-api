@@ -2,6 +2,8 @@ name: Update README
 
 on:
   push:
+    branches:
+      - main
     paths:
       - examples/**
       - docker-compose.yaml
