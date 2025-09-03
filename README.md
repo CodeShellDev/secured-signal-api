@@ -1,6 +1,6 @@
-# Secured Signal API
+<img align="center" width="1048" height="512" alt="SecuredSignalAPI_Logo_Landscape" src="https://github.com/user-attachments/assets/c536f4b7-e7ae-4916-ac91-b34dfc6562e9" />
 
-Secured Signal API acts as a secure proxy for [Signal rAPI](https://github.com/bbernhard/signal-cli-rest-api).
+<h5 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal REST API</a></h5>
 
 ## Installation
 
