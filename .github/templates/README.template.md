@@ -258,3 +258,8 @@ Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+Logo designed by (@CodeShellDev)[https://github.com/codeshelldev], All Rights Reserved.
+This Project is not affiliated with the Signal Foundation.
+
+Logo designed by (@CodeShellDev[https://github.com/codeshelldev]
