@@ -236,11 +236,15 @@ Because Secured Signal API is just a Proxy you can use all of the [Signal REST A
 | **/v1/accounts**      |
 | **/v1/contacts**      |
 
-These Endpoints are blocked by default due to Security Risks, but can be modified by setting `BLOCKED_ENDPOINTS` to a valid json array string
+These Endpoints are blocked by default due to Security Risks, but can be modified by setting `BLOCKED_ENDPOINTS` to a Comma seperated List:
 
 ```yaml
 environment:
-  BLOCKED_ENDPOINTS: '[ "/v1/register","/v1/unregister","/v1/qrcodelink","/v1/contacts" ]'
+  BLOCKED_ENDPOINTS: |
+    /v1/register,
+    /v1/unregister,
+    /v1/qrcodelink,
+    /v1/contacts,
 ```
 
 #### Variables
@@ -265,7 +269,8 @@ Set this Environment Variable to automatically provide default Recipients:
 
 ```yaml
 environment:
-  RECIPIENTS: ' [ "user.id", "000", "001", "group.id" ] '
+  RECIPIENTS: |
+    user.id, 000, 001, group.id,
 ```
 
 example:
