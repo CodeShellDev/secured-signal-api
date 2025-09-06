@@ -1,6 +1,6 @@
 module github.com/codeshelldev/secured-signal-api
 
-go 1.24.5
+go 1.25.1
 
 require go.uber.org/zap v1.27.0
 
