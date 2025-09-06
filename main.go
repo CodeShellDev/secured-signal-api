@@ -7,6 +7,7 @@ import (
 
 	proxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
+	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	env "github.com/codeshelldev/secured-signal-api/utils/env"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
@@ -56,5 +57,20 @@ func main() {
 
 	log.Info("Server Listening on ", addr)
 
-	http.ListenAndServe(addr, log_m0.Use())
+	server := &http.Server{
+		Addr:    addr,
+		Handler: log_m0.Use(),
+	}
+
+	stop := docker.Run(func(){
+		err := server.ListenAndServe()
+		
+		if err != nil && err != http.ErrServerClosed {
+			log.Fatal("Server error: ", err.Error())
+		}
+	})
+
+	<-stop
+
+	docker.Shutdown(server)
 }
