@@ -102,16 +102,18 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) Body {
 	bytes, err := GetBody(req)
 
 	var isEmpty bool
-
-	isEmpty = len(bytes) > 0
-
-	if isEmpty {
-		return Body{Empty: true}
-	}
 	
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 
+		isEmpty = true
+	}
+
+	if len(bytes) <= 0 {
+		isEmpty = true
+	}
+
+	if isEmpty {
 		return Body{Empty: true}
 	}
 
