@@ -201,7 +201,14 @@ Placeholders can be added by setting `VARIABLES` inside your Environment.
 
 ```yaml
 environment:
-  VARIABLES: ' "NUMBER2": "002", "GROUP_CHAT_1": [ "user.id", "000", "001", "group.id" ] '
+  VARIABLES: |
+    "NUMBER2": "002",
+    "GROUP_CHAT_1": [
+      "user.id", 
+      "000", 
+      "001", 
+      "group.id"
+    ]
 ```
 
 ### Recipients
