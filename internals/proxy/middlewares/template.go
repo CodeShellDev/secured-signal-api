@@ -195,7 +195,7 @@ func templateQuery(reqUrl *url.URL, VARIABLES interface{}) (string, map[string]i
 
 	reqRawQuery := modifiedQuery.Encode()
 
-	if reqUrl.RawQuery != reqRawQuery {
+	if reqUrl.Query().Encode() != reqRawQuery {
 		log.Debug("Applied Query Templating: ", templatedQuery)
 
 		modified = true
