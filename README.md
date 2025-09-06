@@ -263,10 +263,7 @@ environment:
   VARIABLES: |
     "NUMBER2": "002",
     "GROUP_CHAT_1": [
-      "user.id", 
-      "000", 
-      "001", 
-      "group.id"
+      "user.id", "000", "001", "group.id"
     ]
 ```
 
@@ -310,7 +307,11 @@ Message Aliases can be added by setting `MESSAGE_ALIASES`:
 
 ```yaml
 environment:
-  MESSAGE_ALIASES: ' [{ "alias": "note", "priority": 4 }, { "alias": "test", "priority": 3 }] '
+  MESSAGE_ALIASES: |
+    [
+      { "alias": "note", "priority": 4 }, 
+      { "alias": "test", "priority": 3 }
+    ]
 ```
 
 ## Contributing
