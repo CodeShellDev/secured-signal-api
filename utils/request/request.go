@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strings"
 
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/query"
 )
 
@@ -32,14 +31,14 @@ func (body Body) ToString() string {
 func CreateBody(data map[string]interface{}) (Body, error) {
 	if len(data) <= 0 {
 		err := errors.New("empty data map")
-		log.Error("Could not encode Body: ", err.Error())
+
 		return Body{Empty: true}, err
 	}
 
 	bytes, err := json.Marshal(data)
 
 	if err != nil {
-		log.Error("Could not encode Body: ", err.Error())
+
 		return Body{Empty: true}, err
 	}
 
@@ -58,7 +57,7 @@ func GetJsonData(body []byte) (map[string]interface{}, error) {
 	err := json.Unmarshal(body, &data)
 
 	if err != nil {
-		log.Error("Could not decode Body: ", err.Error())
+
 		return nil, err
 	}
 
@@ -72,7 +71,7 @@ func GetFormData(body []byte) (map[string]interface{}, error) {
 
 	if len(queryData) <= 0 {
 		err := errors.New("invalid form data")
-		log.Error("Could not decode Body: ", err.Error())
+
 		return nil, err
 	}
 
@@ -87,8 +86,6 @@ func GetBody(req *http.Request) ([]byte, error) {
 	bodyBytes, err := io.ReadAll(req.Body)
 	
 	if err != nil {
-		log.Error("Could not read Body: ", err.Error())
-
 		req.Body.Close()
 
 		return nil, err
@@ -98,7 +95,7 @@ func GetBody(req *http.Request) ([]byte, error) {
 	return bodyBytes, nil
 }
 
-func GetReqBody(w http.ResponseWriter, req *http.Request) Body {
+func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 	bytes, err := GetBody(req)
 
 	var isEmpty bool
@@ -106,15 +103,11 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) Body {
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 
-		isEmpty = true
+		return Body{Empty: true}, err
 	}
 
 	if len(bytes) <= 0 {
-		isEmpty = true
-	}
-
-	if isEmpty {
-		return Body{Empty: true}
+		return Body{Empty: true}, errors.New("request body is empty")
 	}
 
 	var data map[string]interface{}
@@ -125,12 +118,16 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) Body {
 
 		if err != nil {
 			http.Error(w, "Bad Request: invalid JSON", http.StatusBadRequest)
+
+			return Body{Empty: true}, err
 		}
 	case Form:
 		data, err = GetFormData(bytes)
 
 		if err != nil {
 			http.Error(w, "Bad Request: invalid Form", http.StatusBadRequest)
+
+			return Body{Empty: true}, err
 		}
 	}
 
@@ -140,7 +137,7 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) Body {
 		Raw: bytes,
 		Data: data,
 		Empty: isEmpty,
-	}
+	}, nil
 }
 
 func GetBodyType(req *http.Request) BodyType {

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
@@ -24,7 +25,11 @@ func (data BodyMiddleware) Use() http.Handler {
 	messageAliases := data.MessageAliases
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		body := request.GetReqBody(w, req)
+		body, err := request.GetReqBody(w, req)
+
+		if err != nil {
+			log.Error("Could not get Request Body: ", err.Error())
+		}
 
 		var modifiedBody bool
 		var bodyData map[string]interface{}
