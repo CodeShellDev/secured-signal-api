@@ -13,6 +13,7 @@ import (
 
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	query "github.com/codeshelldev/secured-signal-api/utils/query"
+	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
 type TemplateMiddleware struct {
@@ -79,79 +80,97 @@ func (data TemplateMiddleware) Use() http.Handler {
 	VARIABLES := data.Variables
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		bodyBytes, err := io.ReadAll(req.Body)
-		if err != nil {
-			log.Error("Could not read Body: ", err.Error())
-			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
+		var body request.Body
+		body = request.GetReqBody(w, req)
+
+		bodyData := map[string]interface{}{}
+
+		var modifiedBody bool
+
+		if !body.Empty {
+			bodyData = templateJSON(body.Data, VARIABLES)
+
+			modifiedBody = true
 		}
-		defer req.Body.Close()
 
-		if len(bodyBytes) > 0 {
+		if req.URL.RawQuery != "" {
+			req.URL.RawQuery, bodyData = templateQuery(req.URL, VARIABLES)
 
-			var modifiedBodyData map[string]interface{}
+			modifiedBody = true
+		}
 
-			err = json.Unmarshal(bodyBytes, &modifiedBodyData)
+		if modifiedBody {
+			modifiedBody, err := request.CreateBody(bodyData)
 
 			if err != nil {
-				log.Error("Could not decode Body: ", err.Error())
 				http.Error(w, "Internal Error", http.StatusInternalServerError)
 				return
 			}
 
-			modifiedBodyData = templateJSON(modifiedBodyData, VARIABLES)
+			body = modifiedBody
 
-			if req.URL.RawQuery != "" {
-				decodedQuery, _ := url.QueryUnescape(req.URL.RawQuery)
+			strData := body.ToString()
 
-				log.Debug("Decoded Query: ", decodedQuery)
+			log.Debug("Applied Body Templating: ", strData)
 
-				templatedQuery, _ := renderTemplate("query", decodedQuery, VARIABLES)
-
-				modifiedQuery := req.URL.Query()
-
-				queryData := query.ParseRawQuery(templatedQuery)
-
-				for key, value := range queryData {
-					keyWithoutPrefix, found := strings.CutPrefix(key, "@")
-
-					if found {
-						modifiedBodyData[keyWithoutPrefix] = query.ParseTypedQuery(value)
-
-						modifiedQuery.Del(key)
-					}
-				}
-
-				req.URL.RawQuery = modifiedQuery.Encode()
-
-				log.Debug("Applied Query Templating: ", templatedQuery)
-			}
-
-			bodyBytes, err = json.Marshal(modifiedBodyData)
-
-			if err != nil {
-				log.Error("Could not encode Body: ", err.Error())
-				http.Error(w, "Internal Error", http.StatusInternalServerError)
-				return
-			}
-
-			modifiedBody := string(bodyBytes)
-
-			log.Debug("Applied Body Templating: ", modifiedBody)
-
-			req.ContentLength = int64(len(modifiedBody))
-			req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
+			req.ContentLength = int64(len(strData))
+			req.Header.Set("Content-Length", strconv.Itoa(len(strData)))
 		}
 
-		req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+		req.Body = io.NopCloser(bytes.NewReader(body.Raw))
 
-		reqPath := req.URL.Path
-		reqPath, _ = url.PathUnescape(reqPath)
-
-		modifiedReqPath, _ := renderTemplate("path", reqPath, VARIABLES)
-
-		req.URL.Path = modifiedReqPath
+		req.URL.Path = templatePath(req.URL, VARIABLES)
 
 		next.ServeHTTP(w, req)
 	})
+}
+
+func templatePath(reqUrl *url.URL, VARIABLES interface{}) string {
+	reqPath, err := url.PathUnescape(reqUrl.Path)
+
+	if err != nil {
+		log.Error("Error while Escaping Path: ", err.Error())
+		return reqUrl.Path
+	}
+
+	reqPath, err = renderTemplate("path", reqPath, VARIABLES)
+
+	if err != nil {
+		log.Error("Could not Template Path: ", err.Error())
+		return reqUrl.Path
+	}
+
+	log.Debug("Applied Path Templating: ", reqPath)
+
+	return reqPath
+}
+
+func templateQuery(reqUrl *url.URL, VARIABLES interface{}) (string, map[string]interface{}) {
+	data := map[string]interface{}{}
+
+	decodedQuery, _ := url.QueryUnescape(reqUrl.RawQuery)
+
+	log.Debug("Decoded Query: ", decodedQuery)
+
+	templatedQuery, _ := renderTemplate("query", decodedQuery, VARIABLES)
+
+	modifiedQuery := reqUrl.Query()
+
+	queryData := query.ParseRawQuery(templatedQuery)
+
+	for key, value := range queryData {
+		keyWithoutPrefix, found := strings.CutPrefix(key, "@")
+
+		if found {
+			data[keyWithoutPrefix] = query.ParseTypedQuery(value)
+
+			modifiedQuery.Del(key)
+		}
+	}
+
+	reqUrl.RawQuery = modifiedQuery.Encode()
+
+	log.Debug("Applied Query Templating: ", templatedQuery)
+
+	return reqUrl.RawQuery, data
 }
