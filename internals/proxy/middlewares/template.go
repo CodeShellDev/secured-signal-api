@@ -42,17 +42,17 @@ func (data TemplateMiddleware) Use() http.Handler {
 			bodyData, modified = templateJSON(body.Data, VARIABLES)
 
 			if modified {
-				modifiedBody = true 
+				modifiedBody = true
 			}
 		}
 
 		if req.URL.RawQuery != "" {
 			var modified bool
 
-			req.URL.RawQuery, bodyData, modified = templateQuery(req.URL, VARIABLES)
+			req.URL.RawQuery, bodyData, modified = templateQuery(bodyData, req.URL, VARIABLES)
 
 			if modified {
-				modifiedBody = true 
+				modifiedBody = true
 			}
 		}
 
@@ -171,10 +171,8 @@ func templatePath(reqUrl *url.URL, VARIABLES interface{}) (string, bool) {
 	return reqPath, modified
 }
 
-func templateQuery(reqUrl *url.URL, VARIABLES interface{}) (string, map[string]interface{}, bool) {
+func templateQuery(data map[string]interface{}, reqUrl *url.URL, VARIABLES interface{}) (string, map[string]interface{}, bool) {
 	var modified bool
-
-	data := map[string]interface{}{}
 
 	decodedQuery, _ := url.QueryUnescape(reqUrl.RawQuery)
 
