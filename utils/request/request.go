@@ -88,6 +88,9 @@ func GetBody(req *http.Request) ([]byte, error) {
 	
 	if err != nil {
 		log.Error("Could not read Body: ", err.Error())
+
+		req.Body.Close()
+
 		return nil, err
 	}
 	defer req.Body.Close()
@@ -97,14 +100,20 @@ func GetBody(req *http.Request) ([]byte, error) {
 
 func GetReqBody(w http.ResponseWriter, req *http.Request) Body {
 	bytes, err := GetBody(req)
+
+	var isEmpty bool
+
+	isEmpty = len(bytes) > 0
+
+	if isEmpty {
+		return Body{Empty: true}
+	}
 	
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		req.Body.Close()
 
 		return Body{Empty: true}
 	}
-	defer req.Body.Close()
 
 	var data map[string]interface{}
 
@@ -123,7 +132,7 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) Body {
 		}
 	}
 
-	isEmpty := len(data) <= 0
+	isEmpty = len(data) <= 0
 
 	return Body{
 		Raw: bytes,
