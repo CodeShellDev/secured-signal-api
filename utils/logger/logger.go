@@ -56,6 +56,8 @@ func getLogLevel(level string) zapcore.Level {
 			return zapcore.WarnLevel
 		case "error":
 			return zapcore.ErrorLevel
+		case "fatal":
+			return zapcore.FatalLevel
 		default:
 			return zapcore.InfoLevel
 	}
@@ -73,10 +75,13 @@ func Error(msg ...string) {
 	_log.Error(strings.Join(msg, ""))
 }
 
+func Fatal(msg ...string) {
+	_log.Fatal(strings.Join(msg, ""))
+}
+
 func Warn(msg ...string) {
 	_log.Warn(strings.Join(msg, ""))
 }
-
 
 func Sync() {
 	_ = _log.Sync()

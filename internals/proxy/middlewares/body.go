@@ -2,12 +2,12 @@ package middlewares
 
 import (
 	"bytes"
-	"encoding/json"
 	"io"
 	"net/http"
 	"strconv"
 
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
+	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
 type MessageAlias struct {
@@ -25,65 +25,66 @@ func (data BodyMiddleware) Use() http.Handler {
 	messageAliases := data.MessageAliases
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		bodyBytes, err := io.ReadAll(req.Body)
+		body, err := request.GetReqBody(w, req)
+
 		if err != nil {
-			log.Error("Could not read Body: ", err.Error())
-			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
+			log.Error("Could not get Request Body: ", err.Error())
 		}
-		defer req.Body.Close()
 
-		if len(bodyBytes) > 0 {
+		var modifiedBody bool
+		var bodyData map[string]interface{}
 
-			req.Body.Close()
+		if !body.Empty {
+			bodyData = body.Data
 
-			var modifiedBodyData map[string]interface{}
+			content, ok := bodyData["message"]
 
-			err = json.Unmarshal(bodyBytes, &modifiedBodyData)
+			if !ok || content == "" {
+
+				bodyData["message"], bodyData = getMessage(messageAliases, bodyData)
+
+				modifiedBody = true
+			}
+		}
+
+		if modifiedBody {
+			modifiedBody, err := request.CreateBody(bodyData)
 
 			if err != nil {
-				log.Error("Could not decode Body: ", err.Error())
 				http.Error(w, "Internal Error", http.StatusInternalServerError)
 				return
 			}
 
-			content, ok := modifiedBodyData["message"]
+			body = modifiedBody
 
-			if !ok || content == "" {
-				best := 0
+			strData := body.ToString()
 
-				for _, alias := range messageAliases {
-					aliasKey := alias.Alias
-					priority := alias.Priority
-
-					value, ok := modifiedBodyData[aliasKey]
-
-					if ok && value != "" && priority > best {
-						content = modifiedBodyData[aliasKey]
-					}
-
-					modifiedBodyData[aliasKey] = nil
-				}
-
-				modifiedBodyData["message"] = content
-
-				bodyBytes, err = json.Marshal(modifiedBodyData)
-
-				if err != nil {
-					log.Error("Could not encode Body: ", err.Error())
-					http.Error(w, "Internal Error", http.StatusInternalServerError)
-					return
-				}
-
-				modifiedBody := string(bodyBytes)
-
-				req.ContentLength = int64(len(modifiedBody))
-				req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
-			}
+			req.ContentLength = int64(len(strData))
+			req.Header.Set("Content-Length", strconv.Itoa(len(strData)))
 		}
 
-		req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+		req.Body = io.NopCloser(bytes.NewReader(body.Raw))
 
 		next.ServeHTTP(w, req)
 	})
+}
+
+func getMessage(aliases []MessageAlias, data map[string]interface{}) (string, map[string]interface{}) {
+	var content string
+	var best int
+
+	for _, alias := range aliases {
+		aliasKey := alias.Alias
+		priority := alias.Priority
+
+		value, ok := data[aliasKey]
+
+		if ok && value != "" && priority > best {
+			content = data[aliasKey].(string)
+		}
+
+		data[aliasKey] = nil
+	}
+
+	return content, data
 }

@@ -30,7 +30,7 @@ func ParseRawQuery(raw string) map[string][]string {
 	return result
 }
 
-func TryParseInt(str string) (int, bool) {
+func tryParseInt(str string) (int, bool) {
 	isInt, err := regexp.MatchString(`^\d+$`, str)
 
 	if isInt && err == nil {
@@ -49,7 +49,7 @@ func ParseTypedQuery(values []string) interface{} {
 
 	raw := values[0]
 
-	intValue, isInt := TryParseInt(raw)
+	intValue, isInt := tryParseInt(raw)
 
 	if strings.Contains(raw, ",") || (strings.Contains(raw, "[") && strings.Contains(raw, "]")) {
 		if strings.Contains(raw, "[") && strings.Contains(raw, "]") {
@@ -63,7 +63,7 @@ func ParseTypedQuery(values []string) interface{} {
 		var list []interface{}
 
 		for _, part := range parts {
-			_intValue, _isInt := TryParseInt(part)
+			_intValue, _isInt := tryParseInt(part)
 
 			if _isInt {
 				list = append(list, _intValue)

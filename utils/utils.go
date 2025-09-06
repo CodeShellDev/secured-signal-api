@@ -7,27 +7,25 @@ package utils
 
 import (
 	"encoding/json"
-	"errors"
-	"regexp"
 	"strings"
 )
 
-func StringToArray(sliceStr string) ([]string, error) {
-	if sliceStr == "" {
-		return []string{}, errors.New("sliceStr is empty")
-	}
+func StringToArray(sliceStr string) []string {
+    if sliceStr == "" {
+        return nil
+    }
 
-	re, err := regexp.Compile(`\s+`)
+    rawItems := strings.Split(sliceStr, ",")
+    items := make([]string, 0, len(rawItems))
 
-	if err != nil {
-		return []string{}, err
-	}
+    for _, item := range rawItems {
+        trimmed := strings.TrimSpace(item)
+        if trimmed != "" {
+            items = append(items, trimmed)
+        }
+    }
 
-	normalized := re.ReplaceAllString(sliceStr, "")
-
-	tokens := strings.Split(normalized, ",")
-
-	return tokens, nil
+    return items
 }
 
 func GetJsonSafe[T any](jsonStr string) (T, error) {

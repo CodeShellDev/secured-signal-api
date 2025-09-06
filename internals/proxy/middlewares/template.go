@@ -13,11 +13,73 @@ import (
 
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	query "github.com/codeshelldev/secured-signal-api/utils/query"
+	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
 type TemplateMiddleware struct {
 	Next      http.Handler
 	Variables map[string]interface{}
+}
+
+func (data TemplateMiddleware) Use() http.Handler {
+	next := data.Next
+	VARIABLES := data.Variables
+
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		body, err := request.GetReqBody(w, req)
+
+		if err != nil {
+			log.Error("Could not get Request Body: ", err.Error())
+		}
+
+		bodyData := map[string]interface{}{}
+
+		var modifiedBody bool
+
+		if !body.Empty {
+			var modified bool
+
+			bodyData, modified = templateJSON(body.Data, VARIABLES)
+
+			if modified {
+				modifiedBody = true
+			}
+		}
+
+		if req.URL.RawQuery != "" {
+			var modified bool
+
+			req.URL.RawQuery, bodyData, modified = templateQuery(bodyData, req.URL, VARIABLES)
+
+			if modified {
+				modifiedBody = true
+			}
+		}
+
+		if modifiedBody {
+			modifiedBody, err := request.CreateBody(bodyData)
+
+			if err != nil {
+				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				return
+			}
+
+			body = modifiedBody
+
+			strData := body.ToString()
+
+			log.Debug("Applied Body Templating: ", strData)
+
+			req.ContentLength = int64(len(strData))
+			req.Header.Set("Content-Length", strconv.Itoa(len(strData)))
+		}
+
+		req.Body = io.NopCloser(bytes.NewReader(body.Raw))
+
+		req.URL.Path, _ = templatePath(req.URL, VARIABLES)
+
+		next.ServeHTTP(w, req)
+	})
 }
 
 func renderTemplate(name string, tmplStr string, data any) (string, error) {
@@ -36,7 +98,9 @@ func renderTemplate(name string, tmplStr string, data any) (string, error) {
 	return buf.String(), nil
 }
 
-func templateJSON(data map[string]interface{}, variables map[string]interface{}) map[string]interface{} {
+func templateJSON(data map[string]interface{}, variables map[string]interface{}) (map[string]interface{}, bool) {
+	var modified bool
+
 	for k, v := range data {
 		str, ok := v.(string)
 
@@ -44,7 +108,7 @@ func templateJSON(data map[string]interface{}, variables map[string]interface{})
 			re, err := regexp.Compile(`{{\s*\.([A-Za-z_][A-Za-z0-9_]*)\s*}}`)
 
 			if err != nil {
-				log.Error("Encountered Error while Compiling Regex: ", err.Error())
+				log.Error("Error while Compiling Regex: ", err.Error())
 			}
 
 			matches := re.FindAllStringSubmatch(str, -1)
@@ -63,95 +127,77 @@ func templateJSON(data map[string]interface{}, variables map[string]interface{})
 
 					data[k] = strings.ReplaceAll(str, string(variable), tmplStr[0])
 				}
+
+				modified = true
 			} else if len(matches) == 1 {
 				tmplKey := matches[0][1]
 
 				data[k] = variables[tmplKey]
+
+				modified = true
 			}
 		}
 	}
 
-	return data
+	return data, modified
 }
 
-func (data TemplateMiddleware) Use() http.Handler {
-	next := data.Next
-	VARIABLES := data.Variables
+func templatePath(reqUrl *url.URL, VARIABLES interface{}) (string, bool) {
+	var modified bool
 
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		bodyBytes, err := io.ReadAll(req.Body)
-		if err != nil {
-			log.Error("Could not read Body: ", err.Error())
-			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
+	reqPath, err := url.PathUnescape(reqUrl.Path)
+
+	if err != nil {
+		log.Error("Error while Escaping Path: ", err.Error())
+		return reqUrl.Path, modified
+	}
+
+	reqPath, err = renderTemplate("path", reqPath, VARIABLES)
+
+	if err != nil {
+		log.Error("Could not Template Path: ", err.Error())
+		return reqUrl.Path, modified
+	}
+
+	if reqUrl.Path != reqPath {
+		log.Debug("Applied Path Templating: ", reqPath)
+
+		modified = true
+	}
+
+	return reqPath, modified
+}
+
+func templateQuery(data map[string]interface{}, reqUrl *url.URL, VARIABLES interface{}) (string, map[string]interface{}, bool) {
+	var modified bool
+
+	decodedQuery, _ := url.QueryUnescape(reqUrl.RawQuery)
+
+	log.Debug("Decoded Query: ", decodedQuery)
+
+	templatedQuery, _ := renderTemplate("query", decodedQuery, VARIABLES)
+
+	modifiedQuery := reqUrl.Query()
+
+	queryData := query.ParseRawQuery(templatedQuery)
+
+	for key, value := range queryData {
+		keyWithoutPrefix, found := strings.CutPrefix(key, "@")
+
+		if found {
+			data[keyWithoutPrefix] = query.ParseTypedQuery(value)
+
+			modifiedQuery.Del(key)
 		}
-		defer req.Body.Close()
+	}
 
-		if len(bodyBytes) > 0 {
+	reqRawQuery := modifiedQuery.Encode()
 
-			var modifiedBodyData map[string]interface{}
+	if reqUrl.Query().Encode() != reqRawQuery {
+		log.Debug("Applied Query Templating: ", templatedQuery)
 
-			err = json.Unmarshal(bodyBytes, &modifiedBodyData)
+		modified = true
+	}
 
-			if err != nil {
-				log.Error("Could not decode Body: ", err.Error())
-				http.Error(w, "Internal Error", http.StatusInternalServerError)
-				return
-			}
-
-			modifiedBodyData = templateJSON(modifiedBodyData, VARIABLES)
-
-			if req.URL.RawQuery != "" {
-				decodedQuery, _ := url.QueryUnescape(req.URL.RawQuery)
-
-				log.Debug("Decoded Query: ", decodedQuery)
-
-				templatedQuery, _ := renderTemplate("query", decodedQuery, VARIABLES)
-
-				modifiedQuery := req.URL.Query()
-
-				queryData := query.ParseRawQuery(templatedQuery)
-
-				for key, value := range queryData {
-					keyWithoutPrefix, found := strings.CutPrefix(key, "@")
-
-					if found {
-						modifiedBodyData[keyWithoutPrefix] = query.ParseTypedQuery(value)
-
-						modifiedQuery.Del(key)
-					}
-				}
-
-				req.URL.RawQuery = modifiedQuery.Encode()
-
-				log.Debug("Applied Query Templating: ", templatedQuery)
-			}
-
-			bodyBytes, err = json.Marshal(modifiedBodyData)
-
-			if err != nil {
-				log.Error("Could not encode Body: ", err.Error())
-				http.Error(w, "Internal Error", http.StatusInternalServerError)
-				return
-			}
-
-			modifiedBody := string(bodyBytes)
-
-			log.Debug("Applied Body Templating: ", modifiedBody)
-
-			req.ContentLength = int64(len(modifiedBody))
-			req.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
-		}
-
-		req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-
-		reqPath := req.URL.Path
-		reqPath, _ = url.PathUnescape(reqPath)
-
-		modifiedReqPath, _ := renderTemplate("path", reqPath, VARIABLES)
-
-		req.URL.Path = modifiedReqPath
-
-		next.ServeHTTP(w, req)
-	})
+	return reqRawQuery, data, modified
 }

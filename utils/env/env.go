@@ -3,9 +3,11 @@ package env
 import (
 	"os"
 	"strconv"
+	"strings"
 
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
 	"github.com/codeshelldev/secured-signal-api/utils"
+	"github.com/codeshelldev/secured-signal-api/utils/docker"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
@@ -83,16 +85,17 @@ func Load() {
 		apiToken = os.Getenv("API_TOKEN")
 	}
 
-	blockedEndpointJSON := os.Getenv("BLOCKED_ENDPOINTS")
-	recipientsJSON := os.Getenv("RECIPIENTS")
+	blockedEndpointStrArray := os.Getenv("BLOCKED_ENDPOINTS")
+	recipientsStrArray := os.Getenv("RECIPIENTS")
+
 	messageAliasesJSON := os.Getenv("MESSAGE_ALIASES")
 	variablesJSON := os.Getenv("VARIABLES")
 
 	log.Info("Loaded Environment Variables")
 
-	apiTokens, err := utils.StringToArray(apiToken)
+	apiTokens := utils.StringToArray(apiToken)
 
-	if err != nil {
+	if apiTokens == nil {
 		log.Warn("No API TOKEN provided this is NOT recommended")
 
 		log.Info("Disabling Security Features due to incomplete Congfiguration")
@@ -104,8 +107,17 @@ func Load() {
 		ENV.API_TOKENS = apiTokens
 	}
 
-	if blockedEndpointJSON != "" {
-		ENV.BLOCKED_ENDPOINTS = utils.GetJson[[]string](blockedEndpointJSON)
+	if blockedEndpointStrArray != "" {
+		if strings.Contains(blockedEndpointStrArray, "[") || strings.Contains(blockedEndpointStrArray, "]") {
+			//! Deprecated: JSON
+			//TODO: Remove this in new Version
+
+			log.Error("Invalid Blocked Endpoints: ", "JSON instead of Comma seperated String")
+
+			docker.Exit(1)
+		}
+
+		ENV.BLOCKED_ENDPOINTS = utils.StringToArray(blockedEndpointStrArray)
 	}
 
 	if messageAliasesJSON != "" {
@@ -116,7 +128,16 @@ func Load() {
 		ENV.VARIABLES = utils.GetJson[map[string]any](variablesJSON)
 	}
 
-	if recipientsJSON != "" {
-		ENV.VARIABLES["RECIPIENTS"] = utils.GetJson[[]string](recipientsJSON)
+	if recipientsStrArray != "" {
+		if strings.Contains(blockedEndpointStrArray, "[") || strings.Contains(blockedEndpointStrArray, "]") {
+			//! Deprecated: JSON
+			//TODO: Remove this in new Version
+
+			log.Error("Invalid Blocked Endpoints: ", "JSON instead of Comma seperated String")
+
+			docker.Exit(1)
+		}
+
+		ENV.VARIABLES["RECIPIENTS"] = utils.StringToArray(recipientsStrArray)
 	}
 }
