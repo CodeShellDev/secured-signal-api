@@ -159,9 +159,6 @@ func templatePath(reqUrl *url.URL, VARIABLES interface{}) (string, bool) {
 		return reqUrl.Path, modified
 	}
 
-	log.Debug("Path (before): ", reqUrl.Path)
-	log.Debug("Path (now): ", reqPath)
-
 	if reqUrl.Path != reqPath {
 		log.Debug("Applied Path Templating: ", reqPath)
 
