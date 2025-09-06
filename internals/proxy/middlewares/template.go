@@ -21,6 +21,56 @@ type TemplateMiddleware struct {
 	Variables map[string]interface{}
 }
 
+func (data TemplateMiddleware) Use() http.Handler {
+	next := data.Next
+	VARIABLES := data.Variables
+
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var body request.Body
+		body = request.GetReqBody(w, req)
+
+		bodyData := map[string]interface{}{}
+
+		var modifiedBody bool
+
+		if !body.Empty {
+			bodyData = templateJSON(body.Data, VARIABLES)
+
+			modifiedBody = true
+		}
+
+		if req.URL.RawQuery != "" {
+			req.URL.RawQuery, bodyData = templateQuery(req.URL, VARIABLES)
+
+			modifiedBody = true
+		}
+
+		if modifiedBody {
+			modifiedBody, err := request.CreateBody(bodyData)
+
+			if err != nil {
+				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				return
+			}
+
+			body = modifiedBody
+
+			strData := body.ToString()
+
+			log.Debug("Applied Body Templating: ", strData)
+
+			req.ContentLength = int64(len(strData))
+			req.Header.Set("Content-Length", strconv.Itoa(len(strData)))
+		}
+
+		req.Body = io.NopCloser(bytes.NewReader(body.Raw))
+
+		req.URL.Path = templatePath(req.URL, VARIABLES)
+
+		next.ServeHTTP(w, req)
+	})
+}
+
 func renderTemplate(name string, tmplStr string, data any) (string, error) {
 	tmpl, err := template.New(name).Parse(tmplStr)
 
@@ -73,56 +123,6 @@ func templateJSON(data map[string]interface{}, variables map[string]interface{})
 	}
 
 	return data
-}
-
-func (data TemplateMiddleware) Use() http.Handler {
-	next := data.Next
-	VARIABLES := data.Variables
-
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var body request.Body
-		body = request.GetReqBody(w, req)
-
-		bodyData := map[string]interface{}{}
-
-		var modifiedBody bool
-
-		if !body.Empty {
-			bodyData = templateJSON(body.Data, VARIABLES)
-
-			modifiedBody = true
-		}
-
-		if req.URL.RawQuery != "" {
-			req.URL.RawQuery, bodyData = templateQuery(req.URL, VARIABLES)
-
-			modifiedBody = true
-		}
-
-		if modifiedBody {
-			modifiedBody, err := request.CreateBody(bodyData)
-
-			if err != nil {
-				http.Error(w, "Internal Error", http.StatusInternalServerError)
-				return
-			}
-
-			body = modifiedBody
-
-			strData := body.ToString()
-
-			log.Debug("Applied Body Templating: ", strData)
-
-			req.ContentLength = int64(len(strData))
-			req.Header.Set("Content-Length", strconv.Itoa(len(strData)))
-		}
-
-		req.Body = io.NopCloser(bytes.NewReader(body.Raw))
-
-		req.URL.Path = templatePath(req.URL, VARIABLES)
-
-		next.ServeHTTP(w, req)
-	})
 }
 
 func templatePath(reqUrl *url.URL, VARIABLES interface{}) string {
