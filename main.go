@@ -6,7 +6,7 @@ import (
 	"os"
 
 	proxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
-	. "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
+	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
 	env "github.com/codeshelldev/secured-signal-api/utils/env"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
@@ -26,27 +26,27 @@ func main() {
 
 	initHandler = proxy.Create(ENV.API_URL)
 
-	body_m4 := BodyMiddleware{
+	body_m4 := middlewares.BodyMiddleware{
 		Next: initHandler,
 		MessageAliases: ENV.MESSAGE_ALIASES,
 	}
 
-	temp_m3 := TemplateMiddleware{
+	temp_m3 := middlewares.TemplateMiddleware{
 		Next:      body_m4.Use(),
 		Variables: ENV.VARIABLES,
 	}
 
-	endp_m2 := EndpointsMiddleware{
+	endp_m2 := middlewares.EndpointsMiddleware{
 		Next:             temp_m3.Use(),
 		BlockedEndpoints: ENV.BLOCKED_ENDPOINTS,
 	}
 
-	auth_m1 := AuthMiddleware{
+	auth_m1 := middlewares.AuthMiddleware{
 		Next:   endp_m2.Use(),
 		Tokens: ENV.API_TOKENS,
 	}
 
-	log_m0 := LogMiddleware{
+	log_m0 := middlewares.LogMiddleware{
 		Next: auth_m1.Use(),
 	}
 
