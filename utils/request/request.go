@@ -107,7 +107,7 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 	}
 
 	if len(bytes) <= 0 {
-		return Body{Empty: true}, errors.New("request body is empty")
+		return Body{Empty: true}, nil
 	}
 
 	var data map[string]interface{}
