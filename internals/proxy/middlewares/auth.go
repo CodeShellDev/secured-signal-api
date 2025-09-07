@@ -53,6 +53,8 @@ func (data AuthMiddleware) Use() http.Handler {
 
 		authQuery := req.URL.Query().Get("@authorization")
 
+		log.Debug("AuthQuery: ", authQuery)
+
 		var authType authType = None
 
 		success := false
@@ -90,6 +92,8 @@ func (data AuthMiddleware) Use() http.Handler {
 			authType = Query
 
 			authToken, _ := url.QueryUnescape(authQuery)
+
+			log.Debug("AuthToken: ", authToken)
 
 			if isValidToken(tokens, authToken) {
 				success = true
