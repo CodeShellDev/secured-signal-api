@@ -9,4 +9,4 @@ jobs:
   update:
     uses: codeshelldev/gh-actions/.github/workflows/image-cleanup.yml@main
     secrets:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
