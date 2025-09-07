@@ -38,39 +38,39 @@ var ENV ENV_ = ENV_{
 	MESSAGE_ALIASES: []middlewares.MessageAlias{
 		{
 			Alias:    "msg",
-			Priority: 100,
+			Score: 100,
 		},
 		{
 			Alias:    "content",
-			Priority: 99,
+			Score: 99,
 		},
 		{
 			Alias:    "description",
-			Priority: 98,
+			Score: 98,
 		},
 		{
 			Alias:    "text",
-			Priority: 20,
+			Score: 20,
 		},
 		{
 			Alias:    "body",
-			Priority: 15,
+			Score: 15,
 		},
 		{
 			Alias:    "summary",
-			Priority: 10,
+			Score: 10,
 		},
 		{
 			Alias:    "details",
-			Priority: 9,
+			Score: 9,
 		},
 		{
 			Alias:    "payload",
-			Priority: 2,
+			Score: 2,
 		},
 		{
 			Alias:    "data",
-			Priority: 1,
+			Score: 1,
 		},
 	},
 }
