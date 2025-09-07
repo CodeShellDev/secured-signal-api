@@ -11,4 +11,4 @@ jobs:
     with:
       registry: ghcr.io
     secrets:
-      GH_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
+      GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
