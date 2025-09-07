@@ -3,7 +3,6 @@ package middlewares
 import (
 	"encoding/base64"
 	"net/http"
-	"net/url"
 	"slices"
 	"strings"
 
@@ -64,32 +63,32 @@ func (data AuthMiddleware) Use() http.Handler {
 			authToken := authBody[1]
 
 			switch authType {
-			case Bearer:
-				if isValidToken(tokens, authToken) {
-					success = true
-				}
+				case Bearer:
+					if isValidToken(tokens, authToken) {
+						success = true
+					}
 
-			case Basic:
-				basicAuthBody, err := base64.StdEncoding.DecodeString(authToken)
+				case Basic:
+					basicAuthBody, err := base64.StdEncoding.DecodeString(authToken)
 
-				if err != nil {
-					log.Error("Could not decode Basic Auth Payload: ", err.Error())
-				}
+					if err != nil {
+						log.Error("Could not decode Basic Auth Payload: ", err.Error())
+					}
 
-				basicAuth := string(basicAuthBody)
-				basicAuthParams := strings.Split(basicAuth, ":")
+					basicAuth := string(basicAuthBody)
+					basicAuthParams := strings.Split(basicAuth, ":")
 
-				user := "api"
+					user := "api"
 
-				if basicAuthParams[0] == user && isValidToken(tokens, basicAuthParams[1]) {
-					success = true
-				}
+					if basicAuthParams[0] == user && isValidToken(tokens, basicAuthParams[1]) {
+						success = true
+					}
 			}
 
 		} else if authQuery != "" {
 			authType = Query
 
-			authToken, _ := url.QueryUnescape(authQuery)
+			authToken := strings.TrimSpace(authQuery)
 
 			if isValidToken(tokens, authToken) {
 				success = true

@@ -6,13 +6,14 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
 type MessageAlias struct {
 	Alias    string
-	Priority int
+	Score 	 int
 }
 
 type BodyMiddleware struct {
@@ -74,17 +75,28 @@ func getMessage(aliases []MessageAlias, data map[string]interface{}) (string, ma
 	var best int
 
 	for _, alias := range aliases {
-		aliasKey := alias.Alias
-		priority := alias.Priority
+		aliasValue, score, ok := processAlias(alias, data)
 
-		value, ok := data[aliasKey]
-
-		if ok && value != "" && priority > best {
-			content = data[aliasKey].(string)
+		if ok && score > best {
+			content = aliasValue
 		}
 
-		data[aliasKey] = nil
+		data[alias.Alias] = nil
 	}
 
 	return content, data
+}
+
+func processAlias(alias MessageAlias, data map[string]interface{}) (string, int, bool) {
+	aliasKey := alias.Alias
+
+	value, ok := utils.GetJsonByPath(aliasKey, data)
+
+	aliasValue, isStr := value.(string)
+
+	if isStr && ok && aliasValue != "" {
+		return aliasValue, alias.Score, true
+	} else {
+		return "", 0, false
+	}
 }

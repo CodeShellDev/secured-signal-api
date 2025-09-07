@@ -76,7 +76,7 @@ func GetFormData(body []byte) (map[string]interface{}, error) {
 	}
 
 	for key, value := range queryData {	
-		data[key] = query.ParseTypedQuery(value)
+		data[key] = query.ParseTypedQueryValues(value)
 	}
 
 	return data, nil
