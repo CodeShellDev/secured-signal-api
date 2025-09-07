@@ -261,13 +261,10 @@ Placeholders can be added by setting `VARIABLES` inside your Environment.
 ```yaml
 environment:
   VARIABLES: |
-	"NUMBER2": "002",
-	"GROUP_CHAT_1": [
-		"user.id", 
-		"000", 
-		"001", 
-		"group.id"
-	]
+    "NUMBER2": "002",
+    "GROUP_CHAT_1": [
+      "user.id", "000", "001", "group.id"
+    ]
 ```
 
 ### Recipients
@@ -292,25 +289,30 @@ example:
 
 To improve compatibility with other services Secured Signal API provides aliases for the `message` attribute by default:
 
-| Alias       | Priority |
-| ----------- | -------- |
-| msg         | 100      |
-| content     | 99       |
-| description | 98       |
-| text        | 20       |
-| body        | 15       |
-| summary     | 10       |
-| details     | 9        |
-| payload     | 2        |
-| data        | 1        |
+| Alias       | Score |
+| ----------- | ----- |
+| msg         | 100   |
+| content     | 99    |
+| description | 98    |
+| text        | 20    |
+| body        | 15    |
+| summary     | 10    |
+| details     | 9     |
+| payload     | 2     |
+| data        | 1     |
 
-Secured Signal API will use the highest priority Message Alias to extract the correct message from the Request Body.
+Secured Signal API will pick the best scoring Message Alias (if available) to extract the correct message from the Request Body.
 
-Message Aliases can be added by setting `MESSAGE_ALIASES`:
+Message Aliases can be added by setting `MESSAGE_ALIASES` to a valid json array containing dictionaries of `alias`, the json key to be used for lookup (use `.` dots for using values from a nested dictionary and `[i]` to get values from an array):
 
 ```yaml
 environment:
-  MESSAGE_ALIASES: ' [{ "alias": "note", "priority": 4 }, { "alias": "test", "priority": 3 }] '
+  MESSAGE_ALIASES: |
+    [
+      { "alias": "msg", "score": 80 }, 
+      { "alias": "data.message", "score": 79 },
+      { "alias": "array[0].message", "score": 78 },
+    ]
 ```
 
 ## Contributing
