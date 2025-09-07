@@ -1,0 +1,12 @@
+name: Cleanup Untagged Images
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  update:
+    uses: codeshelldev/gh-actions/.github/workflows/readme-update.yml@main
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
