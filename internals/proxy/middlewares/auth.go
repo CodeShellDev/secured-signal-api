@@ -3,7 +3,6 @@ package middlewares
 import (
 	"encoding/base64"
 	"net/http"
-	"net/url"
 	"slices"
 	"strings"
 
@@ -89,7 +88,7 @@ func (data AuthMiddleware) Use() http.Handler {
 		} else if authQuery != "" {
 			authType = Query
 
-			authToken, _ := url.QueryUnescape(authQuery)
+			authToken := strings.TrimSpace(authQuery)
 
 			if isValidToken(tokens, authToken) {
 				success = true
