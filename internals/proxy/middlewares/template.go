@@ -2,18 +2,16 @@ package middlewares
 
 import (
 	"bytes"
-	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strconv"
-	"strings"
-	"text/template"
 
+	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
-	query "github.com/codeshelldev/secured-signal-api/utils/query"
+	"github.com/codeshelldev/secured-signal-api/utils/query"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
+	"github.com/codeshelldev/secured-signal-api/utils/templating"
 )
 
 type TemplateMiddleware struct {
@@ -39,7 +37,11 @@ func (data TemplateMiddleware) Use() http.Handler {
 		if !body.Empty {
 			var modified bool
 
-			bodyData, modified = templateJSON(body.Data, VARIABLES)
+			bodyData, modified, err = TemplateBody(body.Data, VARIABLES)
+
+			if err != nil {
+				log.Error("Error Templating JSON: ", err.Error())
+			}
 
 			if modified {
 				modifiedBody = true
@@ -49,7 +51,11 @@ func (data TemplateMiddleware) Use() http.Handler {
 		if req.URL.RawQuery != "" {
 			var modified bool
 
-			req.URL.RawQuery, bodyData, modified = templateQuery(bodyData, req.URL, VARIABLES)
+			req.URL.RawQuery, bodyData, modified, err = TemplateQuery(req.URL, bodyData, VARIABLES)
+
+			if err != nil {
+				log.Error("Error Templating Query: ", err.Error())
+			}
 
 			if modified {
 				modifiedBody = true
@@ -76,128 +82,85 @@ func (data TemplateMiddleware) Use() http.Handler {
 
 		req.Body = io.NopCloser(bytes.NewReader(body.Raw))
 
-		req.URL.Path, _ = templatePath(req.URL, VARIABLES)
+		if req.URL.Path != "" {
+			var modified bool
+
+			req.URL.Path, modified, err = TemplatePath(req.URL, VARIABLES)
+
+			if err != nil {
+				log.Error("Error Templating Path: ", err.Error())
+			}
+
+			if modified {
+				log.Debug("Applied Path Templating: ", req.URL.Path)
+			}
+		}
 
 		next.ServeHTTP(w, req)
 	})
 }
 
-func renderTemplate(name string, tmplStr string, data any) (string, error) {
-	tmpl, err := template.New(name).Parse(tmplStr)
-
-	if err != nil {
-		return "", err
-	}
-	var buf bytes.Buffer
-
-	err = tmpl.Execute(&buf, data)
-
-	if err != nil {
-		return "", err
-	}
-	return buf.String(), nil
-}
-
-func templateJSON(data map[string]interface{}, variables map[string]interface{}) (map[string]interface{}, bool) {
+func TemplateBody(data map[string]interface{}, VARIABLES any) (map[string]interface{}, bool, error) {
 	var modified bool
 
-	for k, v := range data {
-		str, ok := v.(string)
+	templatedData, err := templating.RenderJSONTemplate("body", data, VARIABLES)
 
-		if ok {
-			re, err := regexp.Compile(`{{\s*\.([A-Za-z_][A-Za-z0-9_]*)\s*}}`)
-
-			if err != nil {
-				log.Error("Error while Compiling Regex: ", err.Error())
-			}
-
-			matches := re.FindAllStringSubmatch(str, -1)
-
-			if len(matches) > 1 {
-				for i, tmplStr := range matches {
-
-					tmplKey := matches[i][1]
-
-					variable, err := json.Marshal(variables[tmplKey])
-
-					if err != nil {
-						log.Error("Could not decode JSON: ", err.Error())
-						break
-					}
-
-					data[k] = strings.ReplaceAll(str, string(variable), tmplStr[0])
-				}
-
-				modified = true
-			} else if len(matches) == 1 {
-				tmplKey := matches[0][1]
-
-				data[k] = variables[tmplKey]
-
-				modified = true
-			}
-		}
+	if err != nil {
+		return data, false, err
 	}
 
-	return data, modified
+	beforeStr := utils.ToJson(templatedData)
+	afterStr := utils.ToJson(data)
+
+	modified = beforeStr == afterStr
+
+	return templatedData, modified, nil
 }
 
-func templatePath(reqUrl *url.URL, VARIABLES interface{}) (string, bool) {
+func TemplatePath(reqUrl *url.URL, VARIABLES any) (string, bool, error) {
 	var modified bool
 
 	reqPath, err := url.PathUnescape(reqUrl.Path)
 
 	if err != nil {
-		log.Error("Error while Escaping Path: ", err.Error())
-		return reqUrl.Path, modified
+		return reqUrl.Path, modified, err
 	}
 
-	reqPath, err = renderTemplate("path", reqPath, VARIABLES)
+	reqPath, err = templating.RenderNormalizedTemplate("path", reqPath, VARIABLES)
 
 	if err != nil {
-		log.Error("Could not Template Path: ", err.Error())
-		return reqUrl.Path, modified
+		return reqUrl.Path, modified, err
 	}
 
 	if reqUrl.Path != reqPath {
-		log.Debug("Applied Path Templating: ", reqPath)
-
 		modified = true
 	}
 
-	return reqPath, modified
+	return reqPath, modified, nil
 }
 
-func templateQuery(data map[string]interface{}, reqUrl *url.URL, VARIABLES interface{}) (string, map[string]interface{}, bool) {
+func TemplateQuery(reqUrl *url.URL, data map[string]interface{}, VARIABLES any) (string, map[string]interface{}, bool, error) {
 	var modified bool
 
 	decodedQuery, _ := url.QueryUnescape(reqUrl.RawQuery)
 
-	log.Debug("Decoded Query: ", decodedQuery)
+	templatedQuery, _ := templating.RenderNormalizedTemplate("query", decodedQuery, VARIABLES)
 
-	templatedQuery, _ := renderTemplate("query", decodedQuery, VARIABLES)
+	originalQueryData := reqUrl.Query()
 
-	modifiedQuery := reqUrl.Query()
+	addedData := query.ParseTypedQuery(templatedQuery, "@")
 
-	queryData := query.ParseRawQuery(templatedQuery)
+	for key, val := range addedData {
+		data[key] = val
 
-	for key, value := range queryData {
-		keyWithoutPrefix, found := strings.CutPrefix(key, "@")
-
-		if found {
-			data[keyWithoutPrefix] = query.ParseTypedQuery(value)
-
-			modifiedQuery.Del(key)
-		}
+		originalQueryData.Del(key)
 	}
 
-	reqRawQuery := modifiedQuery.Encode()
+	reqRawQuery := originalQueryData.Encode()
 
 	if reqUrl.Query().Encode() != reqRawQuery {
-		log.Debug("Applied Query Templating: ", templatedQuery)
-
 		modified = true
 	}
 
-	return reqRawQuery, data, modified
+	return reqRawQuery, data, modified, nil
 }
