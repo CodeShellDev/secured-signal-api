@@ -154,13 +154,11 @@ func TemplateQuery(reqUrl *url.URL, data map[string]interface{}, VARIABLES any) 
 		data[key] = val
 
 		originalQueryData.Del(key)
+
+		modified = true
 	}
 
 	reqRawQuery := originalQueryData.Encode()
-
-	if reqUrl.Query().Encode() != reqRawQuery {
-		modified = true
-	}
 
 	return reqRawQuery, data, modified, nil
 }
