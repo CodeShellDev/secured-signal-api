@@ -44,7 +44,7 @@ func tryParseInt(str string) (int, bool) {
 	return 0, false
 }
 
-func ParseTypedQuery(values []string) interface{} {
+func ParseTypedQueryValues(values []string) interface{} {
 	var result interface{}
 
 	raw := values[0]
@@ -79,4 +79,22 @@ func ParseTypedQuery(values []string) interface{} {
 	}
 
 	return result
+}
+
+func ParseTypedQuery(query string, matchPrefix string) (map[string]interface{}) {
+	addedData := map[string]interface{}{}
+
+	queryData := ParseRawQuery(query)
+
+	for key, value := range queryData {
+		keyWithoutPrefix, match := strings.CutPrefix(key, matchPrefix)
+
+		if match {
+			newValue := ParseTypedQueryValues(value)
+
+			addedData[keyWithoutPrefix] = newValue
+		}
+	}
+
+	return addedData
 }
