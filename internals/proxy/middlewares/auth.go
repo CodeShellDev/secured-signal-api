@@ -91,8 +91,6 @@ func (data AuthMiddleware) Use() http.Handler {
 
 			authToken, _ := url.QueryUnescape(authQuery)
 
-			log.Debug(tokens...)
-
 			if isValidToken(tokens, authToken) {
 				success = true
 
