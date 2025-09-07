@@ -7,6 +7,6 @@ on:
 
 jobs:
   update:
-    uses: codeshelldev/gh-actions/.github/workflows/readme-update.yml@main
+    uses: codeshelldev/gh-actions/.github/workflows/image-cleanup.yml@main
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
