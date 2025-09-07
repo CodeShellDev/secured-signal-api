@@ -8,5 +8,7 @@ on:
 jobs:
   update:
     uses: codeshelldev/gh-actions/.github/workflows/image-cleanup.yml@main
+    with:
+      registry: ghcr.io
     secrets:
       GH_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
