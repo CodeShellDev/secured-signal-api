@@ -3,11 +3,9 @@ package env
 import (
 	"os"
 	"strconv"
-	"strings"
 
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
 	"github.com/codeshelldev/secured-signal-api/utils"
-	"github.com/codeshelldev/secured-signal-api/utils/docker"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
@@ -108,15 +106,6 @@ func Load() {
 	}
 
 	if blockedEndpointStrArray != "" {
-		if strings.Contains(blockedEndpointStrArray, "[") || strings.Contains(blockedEndpointStrArray, "]") {
-			//! Deprecated: JSON
-			//TODO: Remove this in new Version
-
-			log.Error("Invalid Blocked Endpoints: ", "JSON instead of Comma seperated String")
-
-			docker.Exit(1)
-		}
-
 		ENV.BLOCKED_ENDPOINTS = utils.StringToArray(blockedEndpointStrArray)
 	}
 
@@ -129,15 +118,6 @@ func Load() {
 	}
 
 	if recipientsStrArray != "" {
-		if strings.Contains(blockedEndpointStrArray, "[") || strings.Contains(blockedEndpointStrArray, "]") {
-			//! Deprecated: JSON
-			//TODO: Remove this in new Version
-
-			log.Error("Invalid Blocked Endpoints: ", "JSON instead of Comma seperated String")
-
-			docker.Exit(1)
-		}
-
 		ENV.VARIABLES["RECIPIENTS"] = utils.StringToArray(recipientsStrArray)
 	}
 }
