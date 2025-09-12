@@ -13,12 +13,14 @@ messageAliases:
     { alias: text, score: 20 },
     { alias: summary, score: 15 },
     { alias: details, score: 14 },
+
     { alias: data.message, score: 10 },
     { alias: data.content, score: 9 },
     { alias: data.description, score: 8 },
     { alias: data.text, score: 7 },
     { alias: data.summary, score: 6 },
     { alias: data.details, score: 5 },
+
     { alias: payload, score: 3 },
     { alias: body, score: 2 },
     { alias: data, score: 1 },
