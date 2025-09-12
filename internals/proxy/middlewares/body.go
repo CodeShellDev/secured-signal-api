@@ -90,7 +90,7 @@ func getMessage(aliases []MessageAlias, data map[string]interface{}) (string, ma
 func processAlias(alias MessageAlias, data map[string]interface{}) (string, int, bool) {
 	aliasKey := alias.Alias
 
-	value, ok := utils.GetJsonByPath(aliasKey, data)
+	value, ok := utils.GetByPath(aliasKey, data)
 
 	aliasValue, isStr := value.(string)
 

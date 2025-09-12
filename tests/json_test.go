@@ -107,7 +107,7 @@ func TestJsonPath(t *testing.T) {
 		key := c.key
 		expected := c.expected
 
-		got, ok := utils.GetJsonByPath(key, data)
+		got, ok := utils.GetByPath(key, data)
 
 		if !ok || got.(string) != expected {
 			t.Error("Expected: ", key, " == ", expected, "; Got: ", got)

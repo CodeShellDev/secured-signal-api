@@ -1,7 +1,10 @@
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 
-ENV PORT=8880
+ENV SERVER_PORT=8880
+ENV CONFIG_PATH=/config/config.yml
+ENV DEFAULTS_PATH=/app/utils/config/defaults.yml
+ENV TOKENS_DIR=/config/tokens
 
 ARG TARGETOS
 ARG TARGETARCH

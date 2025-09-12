@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 func StringToArray(sliceStr string) []string {
@@ -30,7 +32,7 @@ func StringToArray(sliceStr string) []string {
     return items
 }
 
-func GetJsonByPath(path string, data interface{}) (interface{}, bool) {
+func GetByPath(path string, data any) (any, bool) {
     // Split into parts by `.` and `[]`
     re := regexp.MustCompile(`\.|\[|\]`)
 
@@ -85,6 +87,26 @@ func GetJson[T any](jsonStr string) (T) {
 	var result T
 
 	err := json.Unmarshal([]byte(jsonStr), &result)
+
+	if err != nil {
+		// JSON is empty
+	}
+
+	return result
+}
+
+func GetYmlSafe[T any](ymlStr string) (T, error) {
+	var result T
+
+	err := yaml.Unmarshal([]byte(ymlStr), &result)
+
+	return result, err
+}
+
+func GetYml[T any](ymlStr string) (T) {
+	var result T
+
+	err := yaml.Unmarshal([]byte(ymlStr), &result)
 
 	if err != nil {
 		// JSON is empty

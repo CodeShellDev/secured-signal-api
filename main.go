@@ -7,23 +7,23 @@ import (
 
 	proxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
+	config "github.com/codeshelldev/secured-signal-api/utils/config"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
-	env "github.com/codeshelldev/secured-signal-api/utils/env"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 var initHandler *httputil.ReverseProxy
 
-var ENV env.ENV_
+var ENV config.ENV_
 
 func main() {
 	logLevel := os.Getenv("LOG_LEVEL")
 
 	log.Init(logLevel)
 
-	env.Load()
+	config.Load()
 
-	ENV = env.ENV
+	ENV = config.ENV
 
 	initHandler = proxy.Create(ENV.API_URL)
 
