@@ -1,14 +1,14 @@
 package config
 
 import (
+	"errors"
+	"io/fs"
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
 	utils "github.com/codeshelldev/secured-signal-api/utils"
-	"github.com/codeshelldev/secured-signal-api/utils/docker"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 
 	"github.com/knadh/koanf/parsers/dotenv"
@@ -62,12 +62,25 @@ func LoadIntoENV() {
 }
 
 func Load() {
-	log.Debug("Loading Config ", ENV.DEFAULTS_PATH)
+	log.Debug("Loading Default Config ", ENV.DEFAULTS_PATH)
 
-	LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
+	defErr := LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
+
+	if defErr != nil {
+		log.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
+	}
 
 	log.Debug("Loading Config ", ENV.CONFIG_PATH)
-	LoadFile(ENV.CONFIG_PATH, yaml.Parser())
+
+	conErr := LoadFile(ENV.CONFIG_PATH, yaml.Parser())
+
+	if conErr != nil {
+		_, err := os.Stat(ENV.CONFIG_PATH)
+
+		if !errors.Is(err, fs.ErrNotExist) {
+			log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", conErr.Error())
+		}
+	}
 
 	log.Debug("Loading DotEnv")
 	LoadDotEnv()
@@ -79,17 +92,13 @@ func Load() {
 	log.Info("Finished Loading Configuration")
 }
 
-func LoadFile(path string, parser koanf.Parser) (*file.File) {
+func LoadFile(path string, parser koanf.Parser) error {
 	f := file.Provider(path)
 
 	err := config.Load(f, parser)
 
 	if err != nil {
-		log.Error("Error loading ", path, ": ", err.Error())
-
-		time.Sleep(10 * time.Second)
-
-		docker.Exit(1)
+		return err
 	}
 
 	f.Watch(func(event any, err error) {
@@ -102,10 +111,10 @@ func LoadFile(path string, parser koanf.Parser) (*file.File) {
 		Load()
 	})
 
-	return f
+	return err
 }
 
-func LoadDotEnv() (*env.Env) {
+func LoadDotEnv() error {
 	e := env.ProviderWithValue("", ".", normalizeEnv)
 
 	err := config.Load(e, dotenv.Parser())
@@ -114,7 +123,7 @@ func LoadDotEnv() (*env.Env) {
 		log.Fatal("Error loading env: ", err.Error())
 	}
 
-	return e
+	return err
 }
 
 func normalizeKeys() {
