@@ -4,4 +4,4 @@
 *.yaml
 LICENSE
 *.md
-!config
+!config/*.yml
