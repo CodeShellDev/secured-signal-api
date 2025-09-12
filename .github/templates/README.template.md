@@ -145,7 +145,12 @@ if you format them correctly...
 | array(int) | [1,2,3]           |
 | array(str) | [a,b,c]           |
 
-This formatting applies to almost every situation where the only (allowed) Input Type is a string and other Output Types are needed.
+> [!TIP]
+> This formatting applies to almost every situation where the only (allowed) Input Type is a string and other Output Types are needed.
+
+> [!NOTE]
+> If you have a string that should not be turned into any other type, then you will need to escape the `[]` or `{}` (also `-`) with a `\` **Backslash** > **Double Backslashes** do exist in that case you could just leave them out completly.
+> An **Odd** number of **Backslashes** **escape** the character in front of them and an **Even** number leave the character **as-is**.
 
 ### API Token(s)
 
