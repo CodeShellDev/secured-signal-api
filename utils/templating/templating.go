@@ -9,12 +9,12 @@ import (
 	"text/template"
 )
 
-func normalize(value interface{}) string {
+func normalize(value any) string {
 	switch str := value.(type) {
 		case []string:
 			return "[" + strings.Join(str, ",") + "]"
 
-		case []interface{}:
+		case []any:
 			items := make([]string, len(str))
 
 			for i, item := range str {
@@ -27,7 +27,7 @@ func normalize(value interface{}) string {
 	}
 }
 
-func normalizeJSON(value interface{}) string {
+func normalizeJSON(value any) string {
 	jsonBytes, err := json.Marshal(value)
 
 	if err != nil {
@@ -63,7 +63,7 @@ func CreateTemplateWithFunc(name string, funcMap template.FuncMap) (*template.Te
 	return template.New(name).Funcs(funcMap)
 }
 
-func RenderJSONTemplate(name string, data map[string]interface{}, variables any) (map[string]interface{}, error) {
+func RenderJSONTemplate(name string, data map[string]any, variables any) (map[string]any, error) {
 	jsonBytes, err := json.Marshal(data)
 
 	if err != nil {

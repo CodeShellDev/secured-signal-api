@@ -44,8 +44,8 @@ func tryParseInt(str string) (int, bool) {
 	return 0, false
 }
 
-func ParseTypedQueryValues(values []string) interface{} {
-	var result interface{}
+func ParseTypedQueryValues(values []string) any {
+	var result any
 
 	raw := values[0]
 
@@ -60,7 +60,7 @@ func ParseTypedQueryValues(values []string) interface{} {
 
 		parts := strings.Split(raw, ",")
 
-		var list []interface{}
+		var list []any
 
 		for _, part := range parts {
 			_intValue, _isInt := tryParseInt(part)
@@ -81,8 +81,8 @@ func ParseTypedQueryValues(values []string) interface{} {
 	return result
 }
 
-func ParseTypedQuery(query string, matchPrefix string) (map[string]interface{}) {
-	addedData := map[string]interface{}{}
+func ParseTypedQuery(query string, matchPrefix string) (map[string]any) {
+	addedData := map[string]any{}
 
 	queryData := ParseRawQuery(query)
 

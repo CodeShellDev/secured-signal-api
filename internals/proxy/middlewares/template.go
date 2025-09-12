@@ -16,7 +16,7 @@ import (
 
 type TemplateMiddleware struct {
 	Next      http.Handler
-	Variables map[string]interface{}
+	Variables map[string]any
 }
 
 func (data TemplateMiddleware) Use() http.Handler {
@@ -30,7 +30,7 @@ func (data TemplateMiddleware) Use() http.Handler {
 			log.Error("Could not get Request Body: ", err.Error())
 		}
 
-		bodyData := map[string]interface{}{}
+		bodyData := map[string]any{}
 
 		var modifiedBody bool
 
@@ -100,7 +100,7 @@ func (data TemplateMiddleware) Use() http.Handler {
 	})
 }
 
-func TemplateBody(data map[string]interface{}, VARIABLES any) (map[string]interface{}, bool, error) {
+func TemplateBody(data map[string]any, VARIABLES any) (map[string]any, bool, error) {
 	var modified bool
 
 	templatedData, err := templating.RenderJSONTemplate("body", data, VARIABLES)
@@ -139,7 +139,7 @@ func TemplatePath(reqUrl *url.URL, VARIABLES any) (string, bool, error) {
 	return reqPath, modified, nil
 }
 
-func TemplateQuery(reqUrl *url.URL, data map[string]interface{}, VARIABLES any) (string, map[string]interface{}, bool, error) {
+func TemplateQuery(reqUrl *url.URL, data map[string]any, VARIABLES any) (string, map[string]any, bool, error) {
 	var modified bool
 
 	decodedQuery, _ := url.QueryUnescape(reqUrl.RawQuery)

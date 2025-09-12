@@ -33,7 +33,7 @@ func (data BodyMiddleware) Use() http.Handler {
 		}
 
 		var modifiedBody bool
-		var bodyData map[string]interface{}
+		var bodyData map[string]any
 
 		if !body.Empty {
 			bodyData = body.Data
@@ -70,7 +70,7 @@ func (data BodyMiddleware) Use() http.Handler {
 	})
 }
 
-func getMessage(aliases []MessageAlias, data map[string]interface{}) (string, map[string]interface{}) {
+func getMessage(aliases []MessageAlias, data map[string]any) (string, map[string]any) {
 	var content string
 	var best int
 
@@ -87,7 +87,7 @@ func getMessage(aliases []MessageAlias, data map[string]interface{}) (string, ma
 	return content, data
 }
 
-func processAlias(alias MessageAlias, data map[string]interface{}) (string, int, bool) {
+func processAlias(alias MessageAlias, data map[string]any) (string, int, bool) {
 	aliasKey := alias.Alias
 
 	value, ok := utils.GetByPath(aliasKey, data)

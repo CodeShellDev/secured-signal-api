@@ -8,6 +8,7 @@ import (
 
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
 	utils "github.com/codeshelldev/secured-signal-api/utils"
+	"github.com/codeshelldev/secured-signal-api/utils/docker"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 
 	"github.com/knadh/koanf/parsers/dotenv"
@@ -88,10 +89,10 @@ func LoadFile(path string, parser koanf.Parser) (*file.File) {
 
 		time.Sleep(10 * time.Second)
 
-		os.Exit(1)
+		docker.Exit(1)
 	}
 
-	f.Watch(func(event interface{}, err error) {
+	f.Watch(func(event any, err error) {
 		if err != nil {
 			return
 		}

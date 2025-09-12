@@ -51,7 +51,7 @@ func GetByPath(path string, data any) (any, bool) {
     for _, key := range cleaned {
         switch currentDataType := current.(type) {
             // Case: Dictionary
-            case map[string]interface{}:
+            case map[string]any:
                 value, ok := currentDataType[key]
                 if !ok {
                     return nil, false
@@ -59,7 +59,7 @@ func GetByPath(path string, data any) (any, bool) {
                 current = value
 
             // Case: Array
-            case []interface{}:
+            case []any:
                 index, err := strconv.Atoi(key)
 
                 if err != nil || index < 0 || index >= len(currentDataType) {
