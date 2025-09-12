@@ -89,7 +89,7 @@ func GetJson[T any](jsonStr string) (T) {
 	err := json.Unmarshal([]byte(jsonStr), &result)
 
 	if err != nil {
-		// JSON is empty
+		// YML is empty
 	}
 
 	return result
@@ -109,7 +109,7 @@ func GetYml[T any](ymlStr string) (T) {
 	err := yaml.Unmarshal([]byte(ymlStr), &result)
 
 	if err != nil {
-		// JSON is empty
+		// YML is empty
 	}
 
 	return result
