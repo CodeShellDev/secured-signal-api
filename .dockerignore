@@ -4,3 +4,4 @@
 *.yaml
 LICENSE
 *.md
+!config
