@@ -14,7 +14,7 @@ import (
 	"github.com/knadh/koanf/parsers/dotenv"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/confmap"
-	"github.com/knadh/koanf/providers/env"
+	"github.com/knadh/koanf/providers/env/v2"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 )
@@ -62,7 +62,7 @@ func LoadIntoENV() {
 }
 
 func Load() {
-	log.Debug("Loading Default Config ", ENV.DEFAULTS_PATH)
+	log.Debug("Loading Config ", ENV.DEFAULTS_PATH)
 
 	defErr := LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
 
@@ -115,7 +115,7 @@ func LoadFile(path string, parser koanf.Parser) error {
 }
 
 func LoadDotEnv() error {
-	e := env.ProviderWithValue("", ".", normalizeEnv)
+	e := env.Provider("", ".", env.Op)
 
 	err := config.Load(e, dotenv.Parser())
 
