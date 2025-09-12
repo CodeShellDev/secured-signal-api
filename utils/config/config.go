@@ -87,7 +87,7 @@ func LoadFile(path string, parser koanf.Parser) (*file.File) {
 	if err != nil {
 		log.Error("Error loading ", path, ": ", err.Error())
 
-		time.Sleep(5*1000*1000)
+		time.Sleep(10 * time.Second)
 
 		docker.Exit(1)
 	}
