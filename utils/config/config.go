@@ -192,10 +192,13 @@ func normalizeEnv(key string, value string) (string, any) {
 		return key, items
 	}
 
-	intValue, intErr := strconv.Atoi(value)
+	// Treat `+` prefixed Values as strings
+	if !strings.HasPrefix(value, "+") {
+		intValue, intErr := strconv.Atoi(value)
 
-	if intErr == nil {
-		return key, intValue
+		if intErr == nil {
+			return key, intValue
+		}
 	}
 
 	return key, value
