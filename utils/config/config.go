@@ -115,7 +115,9 @@ func LoadFile(path string, parser koanf.Parser) error {
 }
 
 func LoadDotEnv() error {
-	e := env.Provider("", ".", env.Op)
+	e := env.Provider(".", env.Opt{
+		TransformFunc: normalizeEnv,
+	})
 
 	err := config.Load(e, dotenv.Parser())
 
