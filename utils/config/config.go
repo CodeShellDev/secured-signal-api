@@ -25,6 +25,7 @@ type ENV_ struct {
 	PORT 				string
 	API_URL 			string
 	API_TOKENS 			[]string
+	INSECURE			bool
 	BLOCKED_ENDPOINTS 	[]string
 	VARIABLES 			map[string]any
 	MESSAGE_ALIASES 	[]middlewares.MessageAlias
@@ -34,11 +35,17 @@ var ENV ENV_ = ENV_{
 	CONFIG_PATH: os.Getenv("CONFIG_PATH"),
 	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
 	TOKENS_DIR: os.Getenv("TOKENS_DIR"),
+	API_TOKENS: []string{},
+	BLOCKED_ENDPOINTS: []string{},
 	MESSAGE_ALIASES: []middlewares.MessageAlias{},
 	VARIABLES: map[string]any{},
+	INSECURE: false,
 }
 
-var config = koanf.New(".")
+var defaultsLayer = koanf.New(".")
+var userLayer = koanf.New(".")
+
+var config *koanf.Koanf
 
 func InitEnv() {
 	ENV.PORT = strconv.Itoa(config.Int("server.port"))
@@ -49,24 +56,39 @@ func InitEnv() {
 
 	if len(apiTokens) <= 0 {
 		apiTokens = config.Strings("api.token")
+
+		if len(apiTokens) <= 0 {
+			log.Warn("No API TOKEN provided this is NOT recommended")
+
+			log.Info("Disabling Security Features due to incomplete Congfiguration")
+
+			ENV.INSECURE = true
+
+			// Set Blocked Endpoints on Config to User Layer Value
+			// => effectively ignoring Default Layer
+			config.Set("blockedendpoints", userLayer.Strings("blockeendpoints"))
+		}
 	}
 
-	ENV.API_TOKENS = apiTokens
+	if len(apiTokens) > 0 {
+		log.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")	
 
-	ENV.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
+		ENV.API_TOKENS = apiTokens
+	}
 
 	config.Unmarshal("messagealiases", &ENV.MESSAGE_ALIASES)
-
 	config.Unmarshal("variables", &ENV.VARIABLES)
 
 	ENV.VARIABLES["NUMBER"] = config.String("number")
 	ENV.VARIABLES["RECIPIENTS"] = config.Strings("recipients")
+
+	ENV.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
 }
 
 func Load() {
 	log.Debug("Loading Config ", ENV.DEFAULTS_PATH)
 
-	defErr := LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
+	defPro, defErr := LoadFile(ENV.DEFAULTS_PATH, defaultsLayer, yaml.Parser())
 
 	if defErr != nil {
 		log.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
@@ -74,7 +96,7 @@ func Load() {
 
 	log.Debug("Loading Config ", ENV.CONFIG_PATH)
 
-	conErr := LoadFile(ENV.CONFIG_PATH, yaml.Parser())
+	conPro, conErr := LoadFile(ENV.CONFIG_PATH, userLayer, yaml.Parser())
 
 	if conErr != nil {
 		_, err := os.Stat(ENV.CONFIG_PATH)
@@ -85,22 +107,25 @@ func Load() {
 	}
 
 	log.Debug("Loading DotEnv")
-	LoadEnv()
 
-	normalizeKeys()
+	envPro, _ := LoadEnv(userLayer)
+
+	config = mergeLayers(defPro, conPro, envPro)
+
+	normalizeKeys(config)
 
 	InitEnv()
 
 	log.Info("Finished Loading Configuration")
 }
 
-func LoadFile(path string, parser koanf.Parser) error {
+func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Provider, error) {
 	f := file.Provider(path)
 
 	err := config.Load(f, parser)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	f.Watch(func(event any, err error) {
@@ -113,10 +138,10 @@ func LoadFile(path string, parser koanf.Parser) error {
 		Load()
 	})
 
-	return err
+	return f, err
 }
 
-func LoadEnv() error {
+func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
 	e := env.Provider(".", env.Opt{
 		TransformFunc: normalizeEnv,
 	})
@@ -127,10 +152,19 @@ func LoadEnv() error {
 		log.Fatal("Error loading env: ", err.Error())
 	}
 
-	return err
+	return e, err
 }
 
-func normalizeKeys() {
+func mergeLayers(defPro koanf.Provider, conPro koanf.Provider, envPro koanf.Provider) *koanf.Koanf {
+	final := koanf.New(".")
+	_ = final.Load(defPro, nil)
+	_ = final.Load(conPro, nil)
+	_ = final.Load(envPro, nil)
+
+	return final
+}
+
+func normalizeKeys(config *koanf.Koanf) {
     data := map[string]any{}
 
     for _, key := range config.Keys() {
