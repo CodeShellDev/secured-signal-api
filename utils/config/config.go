@@ -34,6 +34,8 @@ var ENV ENV_ = ENV_{
 	CONFIG_PATH: os.Getenv("CONFIG_PATH"),
 	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
 	TOKENS_DIR: os.Getenv("TOKENS_DIR"),
+	MESSAGE_ALIASES: []middlewares.MessageAlias{},
+	VARIABLES: map[string]any{},
 }
 
 var config = koanf.New(".")
@@ -53,19 +55,9 @@ func InitEnv() {
 
 	ENV.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
 
-	messageAliases := config.Get("messagealiases")
+	config.Unmarshal("messagealiases", &ENV.MESSAGE_ALIASES)
 
-	if messageAliases != nil {
-		ENV.MESSAGE_ALIASES = messageAliases.([]middlewares.MessageAlias)
-	}
-
-	variables := config.Get("variables")
-
-	if variables != nil {
-		ENV.VARIABLES = variables.(map[string]any)
-	} else {
-		ENV.VARIABLES = map[string]any{}
-	}
+	config.Unmarshal("variables", &ENV.VARIABLES)
 
 	ENV.VARIABLES["NUMBER"] = config.String("number")
 	ENV.VARIABLES["RECIPIENTS"] = config.Strings("recipients")
