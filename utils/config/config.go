@@ -53,8 +53,19 @@ func InitEnv() {
 
 	ENV.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
 
-	ENV.VARIABLES = config.Get("variables").(map[string]any)
-	ENV.MESSAGE_ALIASES = config.Get("messagealiases").([]middlewares.MessageAlias)
+	messageAliases := config.Get("messagealiases")
+
+	if messageAliases != nil {
+		ENV.MESSAGE_ALIASES = messageAliases.([]middlewares.MessageAlias)
+	}
+
+	variables := config.Get("variables")
+
+	if variables != nil {
+		ENV.VARIABLES = variables.(map[string]any)
+	} else {
+		ENV.VARIABLES = map[string]any{}
+	}
 
 	ENV.VARIABLES["NUMBER"] = config.String("number")
 	ENV.VARIABLES["RECIPIENTS"] = config.Strings("recipients")
