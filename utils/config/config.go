@@ -48,7 +48,7 @@ var userLayer = koanf.New(".")
 var config *koanf.Koanf
 
 func InitEnv() {
-	ENV.PORT = strconv.Itoa(config.Int("server.port"))
+	ENV.PORT = strconv.Itoa(defaultsLayer.Int("server.port"))
 	
 	ENV.API_URL = config.String("api.url")
 
