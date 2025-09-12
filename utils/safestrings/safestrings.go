@@ -21,11 +21,17 @@ func ToType(str string) any {
 	}
 
 	//* Try String Slice
-	if Contains(str, ",") && IsEnclosedBy(cleaned, `[`, `]`) {
+	if IsEnclosedBy(cleaned, `[`, `]`) {
 		bracketsless := strings.ReplaceAll(str, "[", "")
 		bracketsless = strings.ReplaceAll(bracketsless, "]", "")
 
-		data := ToArray(bracketsless)
+		var data []string
+
+		if Contains(str, ",") {
+			data = ToArray(bracketsless)
+		} else {
+			data = []string{bracketsless}
+		}
 
 		if data != nil {
 			if len(data) > 0 {
