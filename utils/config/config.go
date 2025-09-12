@@ -11,7 +11,6 @@ import (
 	utils "github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 
-	"github.com/knadh/koanf/parsers/dotenv"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/providers/env/v2"
@@ -39,7 +38,7 @@ var ENV ENV_ = ENV_{
 
 var config = koanf.New(".")
 
-func LoadIntoENV() {
+func InitEnv() {
 	ENV.PORT = strconv.Itoa(config.Int("server.port"))
 	
 	ENV.API_URL = config.String("api.url")
@@ -83,11 +82,11 @@ func Load() {
 	}
 
 	log.Debug("Loading DotEnv")
-	LoadDotEnv()
+	LoadEnv()
 
 	normalizeKeys()
 
-	LoadIntoENV()
+	InitEnv()
 
 	log.Info("Finished Loading Configuration")
 }
@@ -114,12 +113,12 @@ func LoadFile(path string, parser koanf.Parser) error {
 	return err
 }
 
-func LoadDotEnv() error {
+func LoadEnv() error {
 	e := env.Provider(".", env.Opt{
 		TransformFunc: normalizeEnv,
 	})
 
-	err := config.Load(e, dotenv.Parser())
+	err := config.Load(e, nil)
 
 	if err != nil {
 		log.Fatal("Error loading env: ", err.Error())
