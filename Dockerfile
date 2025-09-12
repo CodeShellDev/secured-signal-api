@@ -13,7 +13,7 @@ ARG TARGETARCH
 
 WORKDIR /app
 
-COPY ./config ./config/
+COPY . .
 
 COPY dist/${TARGETOS}/${TARGETARCH}/app .
 
