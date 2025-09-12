@@ -1,7 +1,6 @@
 package safestrings
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -43,8 +42,6 @@ func ToType(str string) any {
 			return intValue
 		}
 	}
-
-	fmt.Print(str)
 
     return str
 }

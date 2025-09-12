@@ -82,6 +82,8 @@ func InitEnv() {
 	ENV.VARIABLES["NUMBER"] = config.String("number")
 	ENV.VARIABLES["RECIPIENTS"] = config.Strings("recipients")
 
+	log.Debug("Recipients: ", ENV.VARIABLES["RECIPIENTS"].([]string)[0])
+
 	ENV.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
 }
 
