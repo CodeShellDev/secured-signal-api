@@ -60,14 +60,21 @@ func LoadIntoENV() {
 }
 
 func Load() {
+	log.Debug("Loading Config ", ENV.DEFAULTS_PATH)
+
 	LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
+
+	log.Debug("Loading Config ", ENV.CONFIG_PATH)
 	LoadFile(ENV.CONFIG_PATH, yaml.Parser())
 
+	log.Debug("Loading DotEnv")
 	LoadDotEnv()
 
 	normalizeKeys()
 
 	LoadIntoENV()
+
+	log.Info("Finished Loading Configuration")
 }
 
 func LoadFile(path string, parser koanf.Parser) (*file.File) {
