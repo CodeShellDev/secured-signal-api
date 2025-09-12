@@ -48,7 +48,7 @@ var userLayer = koanf.New(".")
 var config *koanf.Koanf
 
 func InitEnv() {
-	ENV.PORT = strconv.Itoa(defaultsLayer.Int("server.port"))
+	ENV.PORT = strconv.Itoa(config.Int("server.port"))
 	
 	ENV.API_URL = config.String("api.url")
 
@@ -88,7 +88,7 @@ func InitEnv() {
 func Load() {
 	log.Debug("Loading Config ", ENV.DEFAULTS_PATH)
 
-	defPro, defErr := LoadFile(ENV.DEFAULTS_PATH, defaultsLayer, yaml.Parser())
+	_, defErr := LoadFile(ENV.DEFAULTS_PATH, defaultsLayer, yaml.Parser())
 
 	if defErr != nil {
 		log.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
@@ -96,7 +96,7 @@ func Load() {
 
 	log.Debug("Loading Config ", ENV.CONFIG_PATH)
 
-	conPro, conErr := LoadFile(ENV.CONFIG_PATH, userLayer, yaml.Parser())
+	_, conErr := LoadFile(ENV.CONFIG_PATH, userLayer, yaml.Parser())
 
 	if conErr != nil {
 		_, err := os.Stat(ENV.CONFIG_PATH)
@@ -108,9 +108,9 @@ func Load() {
 
 	log.Debug("Loading DotEnv")
 
-	envPro, _ := LoadEnv(userLayer)
+	LoadEnv(userLayer)
 
-	config = mergeLayers(defPro, conPro, envPro)
+	config = mergeLayers()
 
 	normalizeKeys(config)
 
@@ -155,11 +155,11 @@ func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
 	return e, err
 }
 
-func mergeLayers(defPro koanf.Provider, conPro koanf.Provider, envPro koanf.Provider) *koanf.Koanf {
+func mergeLayers() *koanf.Koanf {
 	final := koanf.New(".")
-	_ = final.Load(defPro, nil)
-	_ = final.Load(conPro, nil)
-	_ = final.Load(envPro, nil)
+
+	final.Merge(defaultsLayer)
+	final.Merge(userLayer)
 
 	return final
 }
