@@ -2,6 +2,7 @@
 .git
 .github
 *.yaml
-LICENSE
 *.md
+!LICENSE.md
+!README.md
 !config/*.yml

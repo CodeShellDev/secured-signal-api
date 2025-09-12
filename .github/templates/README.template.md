@@ -6,7 +6,7 @@
 
 Get the latest version of the `docker-compose.yaml` file:
 
-And add secure Token(s) to `API_TOKEN` / `API_TOKENS`. See [API_TOKEN(s)](#api-tokens)
+And add secure Token(s) to `API__TOKEN` / `API__TOKENS`. See [API\_\_TOKEN(s)](#api-tokens)
 
 > [!IMPORTANT]
 > This Documentation will be using `sec-signal-api:8880` as the service host,
@@ -47,7 +47,7 @@ Secured Signal API provides 3 Ways to Authenticate
 
 ### Bearer
 
-To Authenticate add `Authorization: Bearer API_TOKEN` to your request Headers
+To Authenticate add `Authorization: Bearer API__TOKEN` to your request Headers
 
 ### Basic Auth
 
@@ -55,12 +55,12 @@ To use Basic Auth as Authorization Method add `Authorization: Basic BASE64_STRIN
 
 User is `api` (LOWERCASE)
 
-Formatting for `BASE64_STRING` = `user:API_TOKEN`.
+Formatting for `BASE64_STRING` = `user:API__TOKEN`.
 
 example:
 
 ```bash
-echo "api:API_TOKEN" | base64
+echo "api:API__TOKEN" | base64
 ```
 
 => `YXBpOkFQSV9LRVkK`
@@ -73,7 +73,7 @@ in this case you can use **Query Auth**.
 Here is a simple example:
 
 ```bash
-curl -X POST http://sec-signal-api:8880/v2/send?@authorization=API_TOKEN
+curl -X POST http://sec-signal-api:8880/v2/send?@authorization=API__TOKEN
 ```
 
 Notice the `@` infront of `authorization`. See [Formatting](#format).
@@ -83,7 +83,7 @@ Notice the `@` infront of `authorization`. See [Formatting](#format).
 To send a message to 1234567:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_TOKEN" -d '{"message": "Hello World!", "recipients": ["1234567"]}' http://sec-signal-api:8880/v2/send
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API__TOKEN" -d '{"message": "Hello World!", "recipients": ["1234567"]}' http://sec-signal-api:8880/v2/send
 ```
 
 ### Advanced
@@ -142,13 +142,13 @@ you have to add `@` in front of any KeyValue Pair assignment.
 
 ### API Token(s)
 
-Both `API_TOKEN` and `API_TOKENS` support multiple Tokens seperated by a `,` **Comma**.
+Both `API__TOKEN` and `API__TOKENS` support multiple Tokens seperated by a `,` **Comma**.
 During Authentication Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
 
 ```yaml
 environment:
-  API_TOKEN: "token1, token2, token3"
-  API_TOKENS: "token1, token2, token3"
+  API__TOKEN: "token1, token2, token3"
+  API__TOKENS: "token1, token2, token3"
 ```
 
 > [!IMPORTANT]
