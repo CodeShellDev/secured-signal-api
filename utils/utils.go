@@ -9,28 +9,9 @@ import (
 	"encoding/json"
 	"regexp"
 	"strconv"
-	"strings"
 
 	"gopkg.in/yaml.v3"
 )
-
-func StringToArray(sliceStr string) []string {
-    if sliceStr == "" {
-        return nil
-    }
-
-    rawItems := strings.Split(sliceStr, ",")
-    items := make([]string, 0, len(rawItems))
-
-    for _, item := range rawItems {
-        trimmed := strings.TrimSpace(item)
-        if trimmed != "" {
-            items = append(items, trimmed)
-        }
-    }
-
-    return items
-}
 
 func GetByPath(path string, data any) (any, bool) {
     // Split into parts by `.` and `[]`

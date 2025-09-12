@@ -6,11 +6,11 @@
 
 Get the latest version of the `docker-compose.yaml` file:
 
-And add secure Token(s) to `API__TOKEN` / `API__TOKENS`. See [API\_\_TOKEN(s)](#api-tokens)
+And add secure Token(s) to `API__TOKEN` / `API__TOKENS`. See [API TOKEN(s)](#api-tokens)
 
 > [!IMPORTANT]
 > This Documentation will be using `sec-signal-api:8880` as the service host,
-> this **won't work**, instead use your containers IP + Port.
+> this **is just for simplicty**, instead use your containers or hosts IP + Port.
 > Or a hostname if applicable. See [Reverse Proxy](#reverse-proxy)
 
 ```yaml
@@ -47,7 +47,7 @@ Secured Signal API provides 3 Ways to Authenticate
 
 ### Bearer
 
-To Authenticate add `Authorization: Bearer API__TOKEN` to your request Headers
+To Authenticate add `Authorization: Bearer API_TOKEN` to your request Headers
 
 ### Basic Auth
 
@@ -55,12 +55,12 @@ To use Basic Auth as Authorization Method add `Authorization: Basic BASE64_STRIN
 
 User is `api` (LOWERCASE)
 
-Formatting for `BASE64_STRING` = `user:API__TOKEN`.
+Formatting for `BASE64_STRING` = `user:API_TOKEN`.
 
 example:
 
 ```bash
-echo "api:API__TOKEN" | base64
+echo "api:API_TOKEN" | base64
 ```
 
 => `YXBpOkFQSV9LRVkK`
@@ -73,17 +73,17 @@ in this case you can use **Query Auth**.
 Here is a simple example:
 
 ```bash
-curl -X POST http://sec-signal-api:8880/v2/send?@authorization=API__TOKEN
+curl -X POST http://sec-signal-api:8880/v2/send?@authorization=API_TOKEN
 ```
 
-Notice the `@` infront of `authorization`. See [Formatting](#format).
+Notice the `@` infront of `authorization`. See [KeyValue Pair Injection](#keyvalue-pair-injection).
 
 ### Example
 
 To send a message to 1234567:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API__TOKEN" -d '{"message": "Hello World!", "recipients": ["1234567"]}' http://sec-signal-api:8880/v2/send
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_TOKEN" -d '{"message": "Hello World!", "recipients": ["1234567"]}' http://sec-signal-api:8880/v2/send
 ```
 
 ### Advanced
@@ -121,34 +121,41 @@ http://sec-signal-api:8880/v1/receive/{{.NUMBER}}
 
 In some cases you may not be able to access / modify the Request Body, in that case specify needed values in the Request Query:
 
-Supported types include **strings**, **ints** and **arrays**
-
 `http://sec-signal-api:8880/?@key=value`
-
-| type       | example |
-| :--------- | :------ |
-| string     | abc     |
-| int        | 123     |
-| array      | [1,2,3] |
-| array(int) | 1,2,3   |
-| array(str) | a,b,c   |
-
-##### Format
 
 In order to differentiate Injection Queries and _regular_ Queries
 you have to add `@` in front of any KeyValue Pair assignment.
 
+Supported types include **strings**, **ints** and **arrays**. See [Formatting](#string-to-type).
+
 ## Environment Variables
+
+### String To Type
+
+In the Environment the only allowed type is a string so to not have to always use a json string you can use the following types,
+if you format them correctly...
+
+| type       | example           |
+| :--------- | :---------------- |
+| string     | abc               |
+| string     | +123              |
+| int        | 123               |
+| int        | -123              |
+| json       | {"a":"b","c":"d"} |
+| array(int) | [1,2,3]           |
+| array(str) | [a,b,c]           |
+
+This formatting applies to almost every situation where the only (allowed) Input Type is a string and other Output Types are needed.
 
 ### API Token(s)
 
-Both `API__TOKEN` and `API__TOKENS` support multiple Tokens seperated by a `,` **Comma**.
+Both `API__TOKEN` and `API__TOKENS` support multiple Tokens seperated by a `,` **Comma** and `[]` **Brackets**. See [Formatting](#string-to-type).
 During Authentication Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
 
 ```yaml
 environment:
-  API__TOKEN: "token1, token2, token3"
-  API__TOKENS: "token1, token2, token3"
+  API__TOKEN: [token1, token2, token3]
+  API__TOKENS: [token1, token2, token3]
 ```
 
 > [!IMPORTANT]
@@ -215,7 +222,7 @@ Set this Environment Variable to automatically provide default Recipients:
 ```yaml
 environment:
   RECIPIENTS: |
-    user.id, 000, 001, group.id,
+    [ user.id, 000, 001, group.id ]
 ```
 
 example:

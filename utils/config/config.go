@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
-	utils "github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
+	"github.com/codeshelldev/secured-signal-api/utils/safestrings"
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/confmap"
@@ -178,28 +178,5 @@ func normalizeKeys(config *koanf.Koanf) {
 func normalizeEnv(key string, value string) (string, any) {
 	key = strings.ToLower(strings.ReplaceAll(key, "__", "."))
 
-	if strings.HasPrefix(value, "{") || strings.HasPrefix(value, "[") {
-		data, err := utils.GetJsonSafe[any](value)
-
-		if data != nil && err == nil {
-			return key, data
-		}
-	}
-
-	if strings.Contains(value, ",") {
-		items := utils.StringToArray(value)
-		
-		return key, items
-	}
-
-	// Treat `+` prefixed Values as strings
-	if !strings.HasPrefix(value, "+") {
-		intValue, intErr := strconv.Atoi(value)
-
-		if intErr == nil {
-			return key, intValue
-		}
-	}
-
-	return key, value
+	return key, safestrings.ToType(value)
 }
