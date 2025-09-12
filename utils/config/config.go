@@ -41,7 +41,14 @@ func LoadIntoENV() {
 	ENV.PORT = strconv.Itoa(config.Int("server.port"))
 	
 	ENV.API_URL = config.String("api.url")
-	ENV.API_TOKENS = config.Strings("api.tokens")
+
+	apiTokens := config.Strings("api.tokens")
+
+	if len(apiTokens) <= 0 {
+		apiTokens = config.Strings("api.token")
+	}
+
+	ENV.API_TOKENS = apiTokens
 
 	ENV.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
 
