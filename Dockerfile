@@ -1,7 +1,7 @@
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 
-ENV SERVER_PORT=8880
+ENV SERVER__PORT=8880
 
 ENV DEFAULTS_PATH=/app/config/defaults.yml
 
