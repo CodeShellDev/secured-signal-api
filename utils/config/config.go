@@ -71,7 +71,7 @@ func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) 
 			},
 		}
 
-		config.Load(confmap.Provider(wrapper, ""), nil); 
+		config.Load(confmap.Provider(wrapper, "."), nil); 
 	}
 
     return nil
