@@ -25,6 +25,12 @@ func main() {
 
 	ENV = config.ENV
 
+	logLevel = ENV.LOG_LEVEL
+
+	if logLevel != "" {
+		log.Init(logLevel)
+	}
+
 	initHandler = proxy.Create(ENV.API_URL)
 
 	body_m4 := middlewares.BodyMiddleware{

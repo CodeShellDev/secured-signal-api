@@ -22,6 +22,7 @@ type ENV_ struct {
 	CONFIG_PATH			string
 	DEFAULTS_PATH		string
 	TOKENS_DIR			string
+	LOG_LEVEL			string
 	PORT 				string
 	API_URL 			string
 	API_TOKENS 			[]string
@@ -49,6 +50,8 @@ var config *koanf.Koanf
 
 func InitEnv() {
 	ENV.PORT = strconv.Itoa(config.Int("server.port"))
+
+	ENV.LOG_LEVEL = config.String("loglevel")
 	
 	ENV.API_URL = config.String("api.url")
 
@@ -77,10 +80,12 @@ func InitEnv() {
 	}
 
 	config.Unmarshal("messagealiases", &ENV.MESSAGE_ALIASES)
-	config.Unmarshal("variables", &ENV.VARIABLES)
 
-	ENV.VARIABLES["NUMBER"] = config.String("number")
-	ENV.VARIABLES["RECIPIENTS"] = config.Strings("recipients")
+	transformChildren(config, "variables", func(key string, value any) (string, any) {
+		return strings.ToUpper(key), value
+	})
+
+	config.Unmarshal("variables", &ENV.VARIABLES)
 
 	ENV.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
 }
@@ -114,6 +119,8 @@ func Load() {
 
 	normalizeKeys(config)
 
+	templateConfig(config)
+
 	InitEnv()
 
 	log.Info("Finished Loading Configuration")
@@ -139,6 +146,20 @@ func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Prov
 	})
 
 	return f, err
+}
+
+func templateConfig(config *koanf.Koanf) {
+	data := config.All()
+
+	for key, value := range data {
+		str, isStr := value.(string)
+
+		if isStr {
+			data[key] = os.ExpandEnv(str)
+		}
+	}
+
+    config.Load(confmap.Provider(data, "."), nil)
 }
 
 func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
@@ -175,8 +196,36 @@ func normalizeKeys(config *koanf.Koanf) {
     config.Load(confmap.Provider(data, "."), nil)
 }
 
+func transformChildren(config *koanf.Koanf, prefix string, transform func(key string, value any) (string, any)) error {
+	var sub map[string]any
+	if err := config.Unmarshal(prefix, &sub); err != nil {
+		return err
+	}
+
+	transformed := make(map[string]any)
+	for key, val := range sub {
+		newKey, newVal := transform(key, val)
+
+		transformed[newKey] = newVal
+	}
+
+	// Remove the old subtree by overwriting with empty map
+	config.Load(confmap.Provider(map[string]any{
+		prefix: map[string]any{},
+	}, "."), nil)
+
+	// Load the normalized subtree back in
+	config.Load(confmap.Provider(map[string]any{
+		prefix: transformed,
+	}, "."), nil)
+
+	return nil
+}
+
 func normalizeEnv(key string, value string) (string, any) {
-	key = strings.ToLower(strings.ReplaceAll(key, "__", "."))
+	key = strings.ToLower(key)
+	key = strings.ReplaceAll(key, "__", ".")
+	key = strings.ReplaceAll(key, "_", "")
 
 	return key, safestrings.ToType(value)
 }

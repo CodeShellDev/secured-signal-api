@@ -1,9 +1,7 @@
 server:
   port: 8880
 
-api:
-  tokens:
-  url:
+logLevel: "INFO"
 
 messageAliases:
   [
@@ -25,6 +23,10 @@ messageAliases:
     { alias: body, score: 2 },
     { alias: data, score: 1 },
   ]
+
+variables:
+  recipients: ${RECIPIENTS}
+  number: ${NUMBER}
 
 blockedEndpoints:
   - /v1/about
