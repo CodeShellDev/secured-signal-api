@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	"github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 func normalize(value any) string {
@@ -67,6 +69,7 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 	jsonBytes, err := json.Marshal(data)
 
 	if err != nil {
+		logger.Dev("72"+err.Error())
 		return nil, err
 	}
 
@@ -86,6 +89,7 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 	jsonStr, err := ParseTemplate(templt, tmplStr, variables)
 
 	if err != nil {
+		logger.Dev("92:"+err.Error())
 		return nil, err
 	}
 
