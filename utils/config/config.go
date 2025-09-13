@@ -3,7 +3,6 @@ package config
 import (
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -53,28 +52,32 @@ func WatchFile(path string, f *file.File) {
 	})
 }
 
-func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) []map[string]any {
+func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) error {
     files, err := filepath.Glob(filepath.Join(dir, "*.yml"))
 
     if err != nil {
         return nil
     }
 
-	for i, f := range files {
+	var array []any
+
+	for _, f := range files {
 		tmp := koanf.New(".")
 
-		LoadFile(f, tmp, parser)
+		_, err := LoadFile(f, tmp, parser)
 
-		wrapper := map[string]any{
-			path: map[string]any{
-				strconv.Itoa(i): tmp.Raw(),
-			},
+		if err != nil {
+			return err
 		}
 
-		config.Load(confmap.Provider(wrapper, "."), nil); 
+		array = append(array, tmp.Raw())
 	}
 
-    return nil
+	wrapper := map[string]any{
+		path: array,
+	}
+
+    return config.Load(confmap.Provider(wrapper, "."), nil)
 }
 
 func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
