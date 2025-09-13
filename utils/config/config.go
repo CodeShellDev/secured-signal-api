@@ -1,10 +1,8 @@
 package config
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -139,62 +137,52 @@ func normalizeKeys(config *koanf.Koanf) {
 // Transforms Children of path
 func transformChildren(config *koanf.Koanf, path string, transform func(key string, value any) (string, any)) error {
 	var sub map[string]any
-
 	if err := config.Unmarshal(path, &sub); err != nil {
 		return err
 	}
 
 	transformed := make(map[string]any)
-
 	for key, val := range sub {
 		newKey, newVal := transform(key, val)
 
 		transformed[newKey] = newVal
 	}
-
-	parts := strings.Split(path, ".")
-	if len(parts) < 1 {
-		return errors.New("invalid path: " + path)
-	}
-
-	parentPath := strings.Join(parts[:len(parts)-1], ".")
-	lastKey := parts[len(parts)-1]
-
-	var parent map[string]any
-
-	if err := config.Unmarshal(parentPath, &parent); err != nil {
-		return err
-	}
-
-	parent[lastKey] = transformed
-
-	return config.Load(confmap.Provider(map[string]any{
-		parentPath: parent,
+	
+	config.Load(confmap.Provider(map[string]any{
+		path: map[string]any{},
 	}, "."), nil)
-}
 
+	config.Load(confmap.Provider(map[string]any{
+		path: transformed,
+	}, "."), nil)
+
+	return nil
+}
 
 // Does the same thing as transformChildren() but does it for each Array Item inside of root and transforms subPath
 func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath string, transform func(key string, value any) (string, any)) error {
-	var items []map[string]any
-
-	err := config.Unmarshal(root, &items)
-
-	if err != nil {
+	var array []map[string]any
+	if err := config.Unmarshal(root, &array); err != nil {
 		return err
 	}
 
-	for i := range items {
-		p := root + "." + strconv.Itoa(i) + "." + subPath
+	for i := range array {
+		tmp := koanf.New(".")
 
-		log.Dev(p)
+		tmp.Load(confmap.Provider(map[string]any{
+			"item": array[i],
+		}, "."), nil)
 
-		err := transformChildren(config, p, transform)
-		
-		if err != nil {
+		if err := transformChildren(tmp, "item." + subPath, transform); err != nil {
 			return err
 		}
+
+		array[i] = tmp.All()["item"].(map[string]any)
 	}
+
+	config.Load(confmap.Provider(map[string]any{
+		root: array,
+	}, "."), nil)
 
 	return nil
 }
