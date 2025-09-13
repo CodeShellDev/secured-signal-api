@@ -14,7 +14,7 @@ var tokens []map[string]any
 func LoadTokens() {
 	log.Debug("Loading Configs ", ENV.TOKENS_DIR)
 
-	LoadDir(ENV.TOKENS_DIR, yaml.Parser())
+	tokens = LoadDir(ENV.TOKENS_DIR, yaml.Parser())
 
 	log.Dev(utils.ToJson(tokens))
 }
