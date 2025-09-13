@@ -173,11 +173,29 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 			"item": array[i],
 		}, "."), nil)
 
-		if err := transformChildren(tmp, "item." + subPath, transform); err != nil {
-			return err
+		path := "item." + subPath
+
+		exists := tmp.Exists(path)
+
+		if !exists {
+			tmp.Load(confmap.Provider(map[string]any{
+				"item": map[string]any{
+					subPath: map[string]any{},
+				},
+			}, "."), nil)
 		}
 
-		array[i] = tmp.All()["item"].(map[string]any)
+		transformChildren(tmp, path, transform)
+
+		item := tmp.All()["item"]
+
+		itemMap, ok := item.(map[string]any)
+
+		if ok {
+			array[i] = itemMap
+		} else {
+			array[i] = map[string]any{}
+		}
 	}
 
 	config.Load(confmap.Provider(map[string]any{
