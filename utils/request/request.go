@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/query"
 )
 
@@ -98,6 +99,8 @@ func GetBody(req *http.Request) ([]byte, error) {
 func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 	bytes, err := GetBody(req)
 
+	logger.Dev(string(bytes))
+
 	var isEmpty bool
 	
 	if err != nil {
@@ -113,22 +116,22 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 	var data map[string]any
 
 	switch GetBodyType(req) {
-	case Json:
-		data, err = GetJsonData(bytes)
+		case Json:
+			data, err = GetJsonData(bytes)
 
-		if err != nil {
-			http.Error(w, "Bad Request: invalid JSON", http.StatusBadRequest)
+			if err != nil {
+				http.Error(w, "Bad Request: invalid JSON", http.StatusBadRequest)
 
-			return Body{Empty: true}, err
-		}
-	case Form:
-		data, err = GetFormData(bytes)
+				return Body{Empty: true}, err
+			}
+		case Form:
+			data, err = GetFormData(bytes)
 
-		if err != nil {
-			http.Error(w, "Bad Request: invalid Form", http.StatusBadRequest)
+			if err != nil {
+				http.Error(w, "Bad Request: invalid Form", http.StatusBadRequest)
 
-			return Body{Empty: true}, err
-		}
+				return Body{Empty: true}, err
+			}
 	}
 
 	isEmpty = len(data) <= 0
