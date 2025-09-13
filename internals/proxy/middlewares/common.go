@@ -23,14 +23,18 @@ type contextKey string
 
 const tokenKey contextKey = "token"
 
-func getSettings(req *http.Request) config.SETTING_ {
-	token := req.Context().Value(tokenKey).(string)
+func getSettings(req *http.Request) *config.SETTING_ {
+    token, ok := req.Context().Value(tokenKey).(string)
 
-	settings := config.ENV.SETTINGS[token]
+    if !ok {
+        token = "*"
+    }
 
-	if settings == nil {
-		settings = config.ENV.SETTINGS["*"]
-	}
+    settings, exists := config.ENV.SETTINGS[token]
 
-	return *settings
+    if !exists || settings == nil {
+        settings = config.ENV.SETTINGS["*"]
+    }
+
+    return settings
 }

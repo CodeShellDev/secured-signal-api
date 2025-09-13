@@ -24,7 +24,7 @@ func LoadTokens() {
 func InitTokens() {
 	apiTokens := config.Strings("api.tokens")
 
-	var tokenConfigs []TOKEN_CONFIG_
+	tokenConfigs := []TOKEN_CONFIG_{}
 
 	tokensLayer.Unmarshal("tokenConfigs", &tokenConfigs)
 
