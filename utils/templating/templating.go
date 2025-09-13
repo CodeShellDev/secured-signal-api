@@ -7,8 +7,6 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
-
-	"github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 func normalize(value any) string {
@@ -30,7 +28,11 @@ func normalize(value any) string {
 }
 
 func normalizeJSON(value any) string {
-    switch value.(type) {
+	if value == nil {
+		return ""
+	}
+
+	switch value.(type) {
 		case []any, []string, map[string]any, int, float64, bool:
 			object, _ := json.Marshal(value)
 
@@ -71,7 +73,6 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 	jsonBytes, err := json.Marshal(data)
 
 	if err != nil {
-		logger.Dev("72"+err.Error())
 		return nil, err
 	}
 
@@ -91,7 +92,6 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 	jsonStr, err := ParseTemplate(templt, tmplStr, variables)
 
 	if err != nil {
-		logger.Dev("92:"+err.Error())
 		return nil, err
 	}
 
@@ -99,7 +99,6 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 	re, err = regexp.Compile(`"<<(.*?)>>"`)
 
 	if err != nil {
-		logger.Dev("100:"+err.Error())
 		return nil, err
 	}
 
@@ -108,7 +107,6 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 	err = json.Unmarshal([]byte(jsonStr), &data)
 
 	if err != nil {
-		logger.Dev("109:"+err.Error())
 		return nil, err
 	}
 
