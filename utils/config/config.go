@@ -173,6 +173,8 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 	for i := range tokens {
 		p := root + "." + strconv.Itoa(i) + "." + subPath
 
+		log.Dev(p)
+
 		if err := transformChildren(config, p, transform); err != nil {
 			return err
 		}
