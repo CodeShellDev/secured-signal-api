@@ -28,6 +28,8 @@ func InitTokens() {
 
 	tokensLayer.Unmarshal("tokenConfigs", &tokenConfigs)
 
+	log.Dev(utils.ToJson(tokenConfigs))
+
 	overrides := ParseTokenConfigs(tokenConfigs)
 
 	for token, override := range overrides {
