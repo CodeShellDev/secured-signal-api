@@ -3,7 +3,6 @@ package config
 import (
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -56,7 +55,9 @@ func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) 
         return err
     }
 
-    for i, file := range files {
+	data := []map[string]any{}
+
+    for _, file := range files {
 		tmp := koanf.New(".")
 
         _, err := LoadFile(file, tmp, parser)
@@ -65,8 +66,10 @@ func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) 
 			return err
 		}
 
-		config.Set(path + "." + strconv.Itoa(i), tmp.All())
+		data = append(data, tmp.All())
     }
+
+	config.Set(path, data)
 
     return nil
 }
