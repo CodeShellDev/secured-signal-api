@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -138,27 +139,40 @@ func normalizeKeys(config *koanf.Koanf) {
 // Transforms Children of path
 func transformChildren(config *koanf.Koanf, path string, transform func(key string, value any) (string, any)) error {
 	var sub map[string]any
+
 	if err := config.Unmarshal(path, &sub); err != nil {
 		return err
 	}
 
 	transformed := make(map[string]any)
+
 	for key, val := range sub {
 		newKey, newVal := transform(key, val)
 
 		transformed[newKey] = newVal
 	}
-	
-	config.Load(confmap.Provider(map[string]any{
-		path: map[string]any{},
-	}, "."), nil)
 
-	config.Load(confmap.Provider(map[string]any{
-		path: transformed,
-	}, "."), nil)
+	parts := strings.Split(path, ".")
+	if len(parts) < 1 {
+		return errors.New("invalid path: " + path)
+	}
 
-	return nil
+	parentPath := strings.Join(parts[:len(parts)-1], ".")
+	lastKey := parts[len(parts)-1]
+
+	var parent map[string]any
+
+	if err := config.Unmarshal(parentPath, &parent); err != nil {
+		return err
+	}
+
+	parent[lastKey] = transformed
+
+	return config.Load(confmap.Provider(map[string]any{
+		parentPath: parent,
+	}, "."), nil)
 }
+
 
 // Does the same thing as transformChildren() but does it for each Array Item inside of root and transforms subPath
 func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath string, transform func(key string, value any) (string, any)) error {
