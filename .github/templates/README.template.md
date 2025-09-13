@@ -10,7 +10,7 @@ Get the latest version of the `docker-compose.yaml` file:
 { { file.docker-compose.yaml } }
 ```
 
-And add secure Token(s) to `api.tokens`. See [API TOKEN(s)](#api-tokens).
+And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 
 > [!IMPORTANT]
 > This Documentation will be using `sec-signal-api:8880` as the service host,
@@ -130,7 +130,7 @@ Supported types include **strings**, **ints** and **arrays**. See [Formatting](#
 
 There are multiple ways to configure Secured Signal API, you can optionally use `config.yml` aswell as Environment Variables to override the config.
 
-### Config File
+### Config Files
 
 Config files allow **YML** formatting and also `${ENV}` to get Environment Variables.
 
@@ -140,6 +140,18 @@ This example config shows all of the individual settings that can be applied:
 
 ```yaml
 { { file.examples/config.yml } }
+```
+
+#### Token Configs
+
+You can also override the `config.yml` file for each individual token by adding configs under `TOKENS_PATH` (default: `config/tokens/`)
+
+This way you can permission tokens by further restricting or adding [Endpoints](#blocked-endpoints), [Placeholders](#variables), etc.
+
+Here is an example:
+
+```yaml
+{ { file.examples/token.yml } }
 ```
 
 ### Environment
@@ -182,12 +194,8 @@ If you are using Environment Variables as an example you won't be able to specif
 
 During Authentication Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
 
-> [!NOTE]
-> Both `api.token` and `api.tokens` support multiple Tokens.
-
 ```yaml
 api:
-  token: [token1, token2, token3]
   tokens: [token1, token2, token3]
 ```
 

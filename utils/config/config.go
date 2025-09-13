@@ -1,137 +1,28 @@
 package config
 
 import (
-	"errors"
-	"io/fs"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 
-	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
-	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/safestrings"
 
-	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/providers/env/v2"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 )
 
-type ENV_ struct {
-	CONFIG_PATH			string
-	DEFAULTS_PATH		string
-	TOKENS_DIR			string
-	LOG_LEVEL			string
-	PORT 				string
-	API_URL 			string
-	API_TOKENS 			[]string
-	INSECURE			bool
-	BLOCKED_ENDPOINTS 	[]string
-	VARIABLES 			map[string]any
-	MESSAGE_ALIASES 	[]middlewares.MessageAlias
-}
-
-var ENV ENV_ = ENV_{
-	CONFIG_PATH: os.Getenv("CONFIG_PATH"),
-	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
-	TOKENS_DIR: os.Getenv("TOKENS_DIR"),
-	API_TOKENS: []string{},
-	BLOCKED_ENDPOINTS: []string{},
-	MESSAGE_ALIASES: []middlewares.MessageAlias{},
-	VARIABLES: map[string]any{},
-	INSECURE: false,
-}
-
 var defaultsLayer = koanf.New(".")
 var userLayer = koanf.New(".")
+var tokensLayer = koanf.New(".")
 
 var config *koanf.Koanf
 
 var configLock sync.Mutex
-
-func InitEnv() {
-	ENV.PORT = strconv.Itoa(config.Int("server.port"))
-
-	ENV.LOG_LEVEL = config.String("loglevel")
-	
-	ENV.API_URL = config.String("api.url")
-
-	apiTokens := config.Strings("api.tokens")
-
-	if len(apiTokens) <= 0 {
-		apiTokens = config.Strings("api.token")
-
-		if len(apiTokens) <= 0 {
-			log.Warn("No API TOKEN provided this is NOT recommended")
-
-			log.Info("Disabling Security Features due to incomplete Congfiguration")
-
-			ENV.INSECURE = true
-
-			// Set Blocked Endpoints on Config to User Layer Value
-			// => effectively ignoring Default Layer
-			config.Set("blockedendpoints", userLayer.Strings("blockeendpoints"))
-		}
-	}
-
-	if len(apiTokens) > 0 {
-		log.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")	
-
-		ENV.API_TOKENS = apiTokens
-	}
-
-	config.Unmarshal("messagealiases", &ENV.MESSAGE_ALIASES)
-
-	transformChildren(config, "variables", func(key string, value any) (string, any) {
-		return strings.ToUpper(key), value
-	})
-
-	config.Unmarshal("variables", &ENV.VARIABLES)
-
-	ENV.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
-}
-
-func Load() {
-	log.Debug("Loading Config ", ENV.DEFAULTS_PATH)
-
-	_, defErr := LoadFile(ENV.DEFAULTS_PATH, defaultsLayer, yaml.Parser())
-
-	if defErr != nil {
-		log.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
-	}
-
-	log.Debug("Loading Config ", ENV.CONFIG_PATH)
-
-	_, conErr := LoadFile(ENV.CONFIG_PATH, userLayer, yaml.Parser())
-
-	if conErr != nil {
-		_, err := os.Stat(ENV.CONFIG_PATH)
-
-		if !errors.Is(err, fs.ErrNotExist) {
-			log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", conErr.Error())
-		}
-	}
-
-	log.Debug("Loading DotEnv")
-
-	LoadEnv(userLayer)
-
-	config = mergeLayers()
-
-	normalizeKeys(config)
-
-	templateConfig(config)
-
-	InitEnv()
-
-	log.Info("Finished Loading Configuration")
-
-	log.Dev(utils.ToJson(config.All()))
-	log.Dev(utils.ToJson(ENV))
-}
 
 func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Provider, error) {
 	f := file.Provider(path)
@@ -147,7 +38,7 @@ func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Prov
 			return
 		}
 
-		log.Info("Config changed, Reloading...")
+		log.Info(path, " changed, Reloading...")
 
 		configLock.Lock()
 		defer configLock.Unlock()
@@ -156,6 +47,46 @@ func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Prov
 	})
 
 	return f, err
+}
+
+func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) error {
+    files, err := filepath.Glob(filepath.Join(dir, "*.yml"))
+
+    if err != nil {
+        return err
+    }
+
+    for i, file := range files {
+		tmp := koanf.New(".")
+
+        _, err := LoadFile(file, tmp, parser)
+
+		if err != nil {
+			return err
+		}
+
+		config.Set(path + "." + strconv.Itoa(i), tmp.All())
+    }
+
+    return nil
+}
+
+func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
+	e := env.Provider(".", env.Opt{
+		TransformFunc: normalizeEnv,
+	})
+
+	err := config.Load(e, nil)
+
+	if err != nil {
+		log.Fatal("Error loading env: ", err.Error())
+	}
+
+	return e, err
+}
+
+func mergeConfig(path string, mergeInto *koanf.Koanf, mergeFrom *koanf.Koanf) {
+	mergeInto.MergeAt(mergeFrom, path)
 }
 
 func templateConfig(config *koanf.Koanf) {
@@ -174,20 +105,6 @@ func templateConfig(config *koanf.Koanf) {
 	}
 
     config.Load(confmap.Provider(data, "."), nil)
-}
-
-func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
-	e := env.Provider(".", env.Opt{
-		TransformFunc: normalizeEnv,
-	})
-
-	err := config.Load(e, nil)
-
-	if err != nil {
-		log.Fatal("Error loading env: ", err.Error())
-	}
-
-	return e, err
 }
 
 func mergeLayers() *koanf.Koanf {
