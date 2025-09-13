@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -94,10 +95,6 @@ func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
 	return e, err
 }
 
-func mergeConfig(path string, mergeInto *koanf.Koanf, mergeFrom *koanf.Koanf) {
-	mergeInto.MergeAt(mergeFrom, path)
-}
-
 func templateConfig(config *koanf.Koanf) {
 	data := config.All()
 
@@ -138,9 +135,10 @@ func normalizeKeys(config *koanf.Koanf) {
     config.Load(confmap.Provider(data, "."), nil)
 }
 
-func transformChildren(config *koanf.Koanf, prefix string, transform func(key string, value any) (string, any)) error {
+// Transforms Children of path
+func transformChildren(config *koanf.Koanf, path string, transform func(key string, value any) (string, any)) error {
 	var sub map[string]any
-	if err := config.Unmarshal(prefix, &sub); err != nil {
+	if err := config.Unmarshal(path, &sub); err != nil {
 		return err
 	}
 
@@ -152,15 +150,37 @@ func transformChildren(config *koanf.Koanf, prefix string, transform func(key st
 	}
 	
 	config.Load(confmap.Provider(map[string]any{
-		prefix: map[string]any{},
+		path: map[string]any{},
 	}, "."), nil)
 
 	config.Load(confmap.Provider(map[string]any{
-		prefix: transformed,
+		path: transformed,
 	}, "."), nil)
 
 	return nil
 }
+
+// Does the same thing as transformChildren() but does it for each Array Item inside of root and transforms subPath
+func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath string, transform func(key string, value any) (string, any)) error {
+	var tokens []map[string]any
+
+	err := config.Unmarshal(root, &tokens)
+
+	if err != nil {
+		return err
+	}
+
+	for i := range tokens {
+		p := root + "." + strconv.Itoa(i) + "." + subPath
+
+		if err := transformChildren(config, p, transform); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 
 func normalizeEnv(key string, value string) (string, any) {
 	key = strings.ToLower(key)

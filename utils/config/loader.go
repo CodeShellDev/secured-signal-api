@@ -53,8 +53,6 @@ func InitEnv() {
 	
 	ENV.API_URL = config.String("api.url")
 
-	InitTokens()
-
 	defaultSettings := ENV.SETTINGS["*"]
 
 	config.Unmarshal("messagealiases", &defaultSettings.MESSAGE_ALIASES)
@@ -80,6 +78,8 @@ func Load() {
 	LoadEnv(userLayer)
 
 	config = mergeLayers()
+
+	InitTokens()
 
 	normalizeKeys(config)
 
