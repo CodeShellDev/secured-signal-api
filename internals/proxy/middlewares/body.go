@@ -20,7 +20,7 @@ func (data BodyMiddleware) Use() http.Handler {
 	next := data.Next
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		messageAliases := GetSettings(req).MESSAGE_ALIASES
+		messageAliases := getSettings(req).MESSAGE_ALIASES
 
 		body, err := request.GetReqBody(w, req)
 

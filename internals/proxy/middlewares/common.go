@@ -23,7 +23,7 @@ type contextKey string
 
 const tokenKey contextKey = "token"
 
-func GetSettings(req *http.Request) config.SETTING_ {
+func getSettings(req *http.Request) config.SETTING_ {
 	token := req.Context().Value(tokenKey).(string)
 
 	settings := config.ENV.SETTINGS[token]

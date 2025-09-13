@@ -15,7 +15,7 @@ func (data EndpointsMiddleware) Use() http.Handler {
 	next := data.Next
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		blockedEndpoints := GetSettings(req).BLOCKED_ENDPOINTS
+		blockedEndpoints := getSettings(req).BLOCKED_ENDPOINTS
 
 		reqPath := req.URL.Path
 
