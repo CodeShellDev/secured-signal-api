@@ -201,6 +201,8 @@ func normalizeKeys(config *koanf.Koanf) {
 
         data[lower] = config.Get(key)
     }
+	
+	config.Delete("")
     config.Load(confmap.Provider(data, "."), nil)
 }
 
