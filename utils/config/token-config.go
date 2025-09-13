@@ -33,11 +33,9 @@ func InitTokens() {
 
 	log.Dev(utils.ToJson(tokensLayer.All()))
 
-	err := transformChildrenUnderArray(tokensLayer, "tokenConfigs", "overrides.variables", func(key string, value any) (string, any) {
+	transformChildrenUnderArray(tokensLayer, "tokenConfigs", "overrides.variables", func(key string, value any) (string, any) {
 		return strings.ToUpper(key), value
 	})
-
-	log.Dev(err.Error())
 
 	log.Dev(utils.ToJson(tokensLayer.All()))
 
