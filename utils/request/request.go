@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/codeshelldev/secured-signal-api/utils"
 	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/query"
 )
@@ -99,8 +100,6 @@ func GetBody(req *http.Request) ([]byte, error) {
 func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 	bytes, err := GetBody(req)
 
-	logger.Dev(string(bytes))
-
 	var isEmpty bool
 	
 	if err != nil {
@@ -134,6 +133,8 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 			}
 	}
 
+	logger.Dev(utils.ToJson(data))
+
 	isEmpty = len(data) <= 0
 
 	return Body{
@@ -156,6 +157,6 @@ func GetBodyType(req *http.Request) BodyType {
 	case strings.HasPrefix(contentType, "application/x-www-form-urlencoded"):
 		return Form
 	default:
-		return Unknown
+		return Json
 	}
 }
