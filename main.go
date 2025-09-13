@@ -25,10 +25,8 @@ func main() {
 
 	ENV = config.ENV
 
-	logLevel = ENV.LOG_LEVEL
-
-	if logLevel != "" {
-		log.Init(logLevel)
+	if ENV.LOG_LEVEL != "" {
+		log.Init(ENV.LOG_LEVEL)
 	}
 
 	initHandler = proxy.Create(ENV.API_URL)

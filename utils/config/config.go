@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
+	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/safestrings"
 
@@ -124,6 +125,8 @@ func Load() {
 	InitEnv()
 
 	log.Info("Finished Loading Configuration")
+
+	log.Debug(utils.ToJson(config.All()))
 }
 
 func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Provider, error) {
