@@ -24,17 +24,19 @@ func LoadTokens() {
 func InitTokens() {
 	apiTokens := config.Strings("api.tokens")
 
-	tokensConfig := tokensLayer.Get("tokenConfigs")
+	var tokenConfigs []TOKEN_CONFIG_
 
-	log.Dev(utils.ToJson(tokensConfig))
+	tokensLayer.Unmarshal("tokenConfigs", &tokenConfigs)
 
-	/*overrides := ParseTokenConfigs(tokenConfigs)
+	log.Dev(utils.ToJson(tokenConfigs))
+
+	overrides := ParseTokenConfigs(tokenConfigs)
 
 	for token, override := range overrides {
 		apiTokens = append(apiTokens, token)
 
 		ENV.SETTINGS[token] = &override
-	}*/
+	}
 
 	if len(apiTokens) <= 0 {
 		log.Warn("No API TOKEN provided this is NOT recommended")
