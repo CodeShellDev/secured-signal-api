@@ -40,6 +40,7 @@ func normalizeJSON(value any) string {
 			return value.(string)
     }
 }
+
 func ParseTemplate(templt *template.Template, tmplStr string, variables any) (string, error) {
 	tmpl, err := templt.Parse(tmplStr)
 
