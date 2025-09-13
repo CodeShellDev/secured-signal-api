@@ -3,6 +3,4 @@
 .github
 *.yaml
 *.md
-!LICENSE.md
-!README.md
 !config/*.yml
