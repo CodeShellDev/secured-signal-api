@@ -6,26 +6,22 @@ import (
 	"net/http"
 	"strconv"
 
+	middlewareTypes "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/types"
 	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
-type MessageAlias struct {
-	Alias    string
-	Score 	 int
-}
-
 type BodyMiddleware struct {
-	Next           http.Handler
-	MessageAliases []MessageAlias
+	Next 	http.Handler
 }
 
 func (data BodyMiddleware) Use() http.Handler {
 	next := data.Next
-	messageAliases := data.MessageAliases
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		messageAliases := GetSettings(req).MESSAGE_ALIASES
+
 		body, err := request.GetReqBody(w, req)
 
 		if err != nil {
@@ -70,7 +66,7 @@ func (data BodyMiddleware) Use() http.Handler {
 	})
 }
 
-func getMessage(aliases []MessageAlias, data map[string]any) (string, map[string]any) {
+func getMessage(aliases []middlewareTypes.MessageAlias, data map[string]any) (string, map[string]any) {
 	var content string
 	var best int
 
@@ -87,7 +83,7 @@ func getMessage(aliases []MessageAlias, data map[string]any) (string, map[string
 	return content, data
 }
 
-func processAlias(alias MessageAlias, data map[string]any) (string, int, bool) {
+func processAlias(alias middlewareTypes.MessageAlias, data map[string]any) (string, int, bool) {
 	aliasKey := alias.Alias
 
 	value, ok := utils.GetByPath(aliasKey, data)

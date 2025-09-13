@@ -14,7 +14,7 @@ import (
 
 var initHandler *httputil.ReverseProxy
 
-var ENV config.ENV_
+var ENV *config.ENV_
 
 func main() {
 	logLevel := os.Getenv("LOG_LEVEL")
@@ -32,27 +32,23 @@ func main() {
 	initHandler = proxy.Create(ENV.API_URL)
 
 	body_m4 := middlewares.BodyMiddleware{
-		Next: initHandler,
-		MessageAliases: ENV.MESSAGE_ALIASES,
+		Next: 	initHandler,
 	}
 
 	temp_m3 := middlewares.TemplateMiddleware{
-		Next:      body_m4.Use(),
-		Variables: ENV.VARIABLES,
+		Next: 	body_m4.Use(),
 	}
 
 	endp_m2 := middlewares.EndpointsMiddleware{
-		Next:             temp_m3.Use(),
-		BlockedEndpoints: ENV.BLOCKED_ENDPOINTS,
+		Next: 	temp_m3.Use(),
 	}
 
 	auth_m1 := middlewares.AuthMiddleware{
 		Next:   endp_m2.Use(),
-		Tokens: ENV.API_TOKENS,
 	}
 
 	log_m0 := middlewares.LogMiddleware{
-		Next: auth_m1.Use(),
+		Next: 	auth_m1.Use(),
 	}
 
 	log.Info("Initialized Proxy Handler")

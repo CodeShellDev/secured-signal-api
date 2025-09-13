@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
+	middlewareTypes "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/types"
 	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
@@ -28,18 +28,18 @@ type ENV_ struct {
 type SETTING_ struct {
 	BLOCKED_ENDPOINTS 	[]string
 	VARIABLES 			map[string]any
-	MESSAGE_ALIASES 	[]middlewares.MessageAlias
+	MESSAGE_ALIASES 	[]middlewareTypes.MessageAlias
 }
 
-var ENV ENV_ = ENV_{
+var ENV *ENV_ = &ENV_{
 	CONFIG_PATH: os.Getenv("CONFIG_PATH"),
 	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
 	TOKENS_DIR: os.Getenv("TOKENS_DIR"),
 	API_TOKENS: []string{},
 	SETTINGS: map[string]*SETTING_{
-		"*": &SETTING_{
+		"*": {
 			BLOCKED_ENDPOINTS: []string{},
-			MESSAGE_ALIASES: []middlewares.MessageAlias{},
+			MESSAGE_ALIASES: []middlewareTypes.MessageAlias{},
 			VARIABLES: map[string]any{},
 		},
 	},

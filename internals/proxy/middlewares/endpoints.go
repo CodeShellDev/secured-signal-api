@@ -9,17 +9,17 @@ import (
 
 type EndpointsMiddleware struct {
 	Next             http.Handler
-	BlockedEndpoints []string
 }
 
 func (data EndpointsMiddleware) Use() http.Handler {
 	next := data.Next
-	BLOCKED_ENDPOINTS := data.BlockedEndpoints
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		blockedEndpoints := GetSettings(req).BLOCKED_ENDPOINTS
+
 		reqPath := req.URL.Path
 
-		if slices.Contains(BLOCKED_ENDPOINTS, reqPath) {
+		if slices.Contains(blockedEndpoints, reqPath) {
 			log.Warn("User tried to access blocked endpoint: ", reqPath)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return

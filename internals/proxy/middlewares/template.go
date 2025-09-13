@@ -16,14 +16,14 @@ import (
 
 type TemplateMiddleware struct {
 	Next      http.Handler
-	Variables map[string]any
 }
 
 func (data TemplateMiddleware) Use() http.Handler {
 	next := data.Next
-	VARIABLES := data.Variables
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		variables := GetSettings(req).VARIABLES
+
 		body, err := request.GetReqBody(w, req)
 
 		if err != nil {
@@ -37,7 +37,7 @@ func (data TemplateMiddleware) Use() http.Handler {
 		if !body.Empty {
 			var modified bool
 
-			bodyData, modified, err = TemplateBody(body.Data, VARIABLES)
+			bodyData, modified, err = TemplateBody(body.Data, variables)
 
 			if err != nil {
 				log.Error("Error Templating JSON: ", err.Error())
@@ -51,7 +51,7 @@ func (data TemplateMiddleware) Use() http.Handler {
 		if req.URL.RawQuery != "" {
 			var modified bool
 
-			req.URL.RawQuery, bodyData, modified, err = TemplateQuery(req.URL, bodyData, VARIABLES)
+			req.URL.RawQuery, bodyData, modified, err = TemplateQuery(req.URL, bodyData, variables)
 
 			if err != nil {
 				log.Error("Error Templating Query: ", err.Error())
@@ -85,7 +85,7 @@ func (data TemplateMiddleware) Use() http.Handler {
 		if req.URL.Path != "" {
 			var modified bool
 
-			req.URL.Path, modified, err = TemplatePath(req.URL, VARIABLES)
+			req.URL.Path, modified, err = TemplatePath(req.URL, variables)
 
 			if err != nil {
 				log.Error("Error Templating Path: ", err.Error())
