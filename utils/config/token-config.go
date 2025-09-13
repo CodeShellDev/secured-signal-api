@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 )
@@ -28,11 +29,15 @@ func InitTokens() {
 
 	var tokenConfigs []TOKEN_CONFIG_
 
-	transformChildrenUnderArray(tokensLayer, "tokenConfigs", "override.variables", func(key string, value any) (string, any) {
+	transformChildrenUnderArray(tokensLayer, "tokenConfigs", "overrides.variables", func(key string, value any) (string, any) {
 		return strings.ToUpper(key), value
 	})
 
+	log.Dev(utils.ToJson(tokensLayer.All()))
+
 	tokensLayer.Unmarshal("tokenConfigs", &tokenConfigs)
+
+	log.Dev(utils.ToJson(tokenConfigs))
 
 	overrides := parseTokenConfigs(tokenConfigs)
 
