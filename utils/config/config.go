@@ -155,7 +155,11 @@ func templateConfig(config *koanf.Koanf) {
 		str, isStr := value.(string)
 
 		if isStr {
-			data[key] = os.ExpandEnv(str)
+			templated := os.ExpandEnv(str)
+
+			if templated != "" {
+				data[key] = templated
+			}
 		}
 	}
 
