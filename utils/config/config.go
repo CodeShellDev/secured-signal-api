@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -167,40 +168,12 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 	}
 
 	for i := range array {
-		tmp := koanf.New(".")
+		path := root + "." + strconv.Itoa(i) + "." + subPath
 
-		tmp.Load(confmap.Provider(map[string]any{
-			"item": array[i],
-		}, "."), nil)
-
-		path := "item." + subPath
-
-		exists := tmp.Exists(path)
-
-		if !exists {
-			tmp.Load(confmap.Provider(map[string]any{
-				"item": map[string]any{
-					subPath: map[string]any{},
-				},
-			}, "."), nil)
-		}
-
-		transformChildren(tmp, path, transform)
-
-		item := tmp.All()["item"]
-
-		itemMap, ok := item.(map[string]any)
-
-		if ok {
-			array[i] = itemMap
-		} else {
-			array[i] = map[string]any{}
+		if config.Exists(path) {
+			transformChildren(config, path, transform)
 		}
 	}
-
-	config.Load(confmap.Provider(map[string]any{
-		root: array,
-	}, "."), nil)
 
 	return nil
 }
