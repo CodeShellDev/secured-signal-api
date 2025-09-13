@@ -17,7 +17,6 @@ import (
 
 var defaultsLayer = koanf.New(".")
 var userLayer = koanf.New(".")
-var tokensLayer = koanf.New(".")
 
 var config *koanf.Koanf
 
@@ -48,11 +47,11 @@ func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Prov
 	return f, err
 }
 
-func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) error {
+func LoadDir(dir string, parser koanf.Parser) []map[string]any {
     files, err := filepath.Glob(filepath.Join(dir, "*.yml"))
 
     if err != nil {
-        return err
+        return nil
     }
 
 	data := []map[string]any{}
@@ -63,15 +62,13 @@ func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) 
         _, err := LoadFile(file, tmp, parser)
 
 		if err != nil {
-			return err
+			return nil
 		}
 
 		data = append(data, tmp.All())
     }
 
-	config.Set(path, data)
-
-    return nil
+    return data
 }
 
 func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {

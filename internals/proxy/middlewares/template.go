@@ -107,8 +107,6 @@ func (data TemplateMiddleware) Use() http.Handler {
 func TemplateBody(data map[string]any, VARIABLES any) (map[string]any, bool, error) {
 	var modified bool
 
-	log.Dev(utils.ToJson(data))
-
 	templatedData, err := templating.RenderJSONTemplate("body", data, VARIABLES)
 
 	if err != nil {
