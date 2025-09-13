@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
 	"github.com/codeshelldev/secured-signal-api/utils"
@@ -48,6 +49,8 @@ var defaultsLayer = koanf.New(".")
 var userLayer = koanf.New(".")
 
 var config *koanf.Koanf
+
+var configLock sync.Mutex
 
 func InitEnv() {
 	ENV.PORT = strconv.Itoa(config.Int("server.port"))
@@ -146,6 +149,9 @@ func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Prov
 
 		log.Info("Config changed, Reloading...")
 
+		configLock.Lock()
+		defer configLock.Unlock()
+
 		Load()
 	})
 
@@ -201,7 +207,7 @@ func normalizeKeys(config *koanf.Koanf) {
 
         data[lower] = config.Get(key)
     }
-	
+
 	config.Delete("")
     config.Load(confmap.Provider(data, "."), nil)
 }
@@ -218,13 +224,11 @@ func transformChildren(config *koanf.Koanf, prefix string, transform func(key st
 
 		transformed[newKey] = newVal
 	}
-
-	// Remove the old subtree by overwriting with empty map
+	
 	config.Load(confmap.Provider(map[string]any{
 		prefix: map[string]any{},
 	}, "."), nil)
 
-	// Load the normalized subtree back in
 	config.Load(confmap.Provider(map[string]any{
 		prefix: transformed,
 	}, "."), nil)
