@@ -8,14 +8,14 @@ import (
 )
 
 type TOKEN_CONFIG_ struct {
-	TOKEN		string 		`koanf:"token"`
+	TOKENS		[]string 	`koanf:"tokens"`
 	OVERRIDES 	*SETTING_	`koanf:"overrides"`
 }
 
 func LoadTokens() {
 	log.Debug("Loading Configs ", ENV.TOKENS_DIR)
 
-	LoadDir("tokens", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
+	LoadDir("tokenConfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
 }
 
 func InitTokens() {
@@ -23,7 +23,7 @@ func InitTokens() {
 
 	var tokenConfigs []TOKEN_CONFIG_
 
-	tokensLayer.Unmarshal("tokens", &tokenConfigs)
+	tokensLayer.Unmarshal("tokenConfigs", &tokenConfigs)
 
 	overrides := ParseTokenConfigs(tokenConfigs)
 
@@ -56,7 +56,9 @@ func ParseTokenConfigs(configs []TOKEN_CONFIG_) (map[string]*SETTING_) {
 	settings := map[string]*SETTING_{}
 
 	for _, config := range configs {
-		settings[config.TOKEN] = config.OVERRIDES
+		for _, token := range config.TOKENS {
+			settings[token] = config.OVERRIDES
+		}
 	}
 
 	return settings
