@@ -35,7 +35,7 @@ func InitTokens() {
 	for token, override := range overrides {
 		apiTokens = append(apiTokens, token)
 
-		*ENV.SETTINGS[token] = override
+		ENV.SETTINGS[token] = &override
 	}
 
 	if len(apiTokens) <= 0 {
