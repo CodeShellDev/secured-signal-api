@@ -47,6 +47,8 @@ func Init(level string) {
 }
 
 func getLogLevel(level string) zapcore.Level {
+	level = strings.ToLower(level)
+
 	switch level {
 		case "info":
 			return zapcore.InfoLevel
