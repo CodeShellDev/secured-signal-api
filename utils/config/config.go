@@ -129,8 +129,8 @@ func Load() {
 
 	log.Info("Finished Loading Configuration")
 
-	log.Debug(utils.ToJson(config.All()))
-	log.Debug(utils.ToJson(ENV))
+	log.Dev(utils.ToJson(config.All()))
+	log.Dev(utils.ToJson(ENV))
 }
 
 func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Provider, error) {

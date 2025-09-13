@@ -284,6 +284,7 @@ To change the Log Level set `logLevel` to: (default: `info`)
 | `warn`  |
 | `error` |
 | `fatal` |
+| `dev`   |
 
 ## Contributing
 
