@@ -97,6 +97,7 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 	re, err = regexp.Compile(`"<<(.*?)>>"`)
 
 	if err != nil {
+		logger.Dev("100:"+err.Error())
 		return nil, err
 	}
 
@@ -105,6 +106,7 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 	err = json.Unmarshal([]byte(jsonStr), &data)
 
 	if err != nil {
+		logger.Dev("109:"+err.Error())
 		return nil, err
 	}
 
