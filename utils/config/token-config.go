@@ -37,7 +37,7 @@ func InitTokens() {
 		return strings.ToUpper(key), value
 	})
 
-	log.Error(err.Error())
+	log.Dev(err.Error())
 
 	log.Dev(utils.ToJson(tokensLayer.All()))
 
