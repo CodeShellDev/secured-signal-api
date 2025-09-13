@@ -30,15 +30,16 @@ func normalize(value any) string {
 }
 
 func normalizeJSON(value any) string {
-	jsonBytes, err := json.Marshal(value)
+    switch value.(type) {
+		case []any, []string, map[string]any, int, float64, bool:
+			object, _ := json.Marshal(value)
 
-	if err != nil {
-		return "INVALID:JSON"
-	}
+			return "<<" + string(object) + ">>"
 
-	return "<<" + string(jsonBytes) + ">>"
+		default:
+			return value.(string)
+    }
 }
-
 func ParseTemplate(templt *template.Template, tmplStr string, variables any) (string, error) {
 	tmpl, err := templt.Parse(tmplStr)
 
