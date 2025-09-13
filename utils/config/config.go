@@ -63,7 +63,7 @@ func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) 
 	for i, f := range files {
 		tmp := koanf.New(".")
 
-		LoadFile(f, config, parser)
+		LoadFile(f, tmp, parser)
 
 		wrapper := map[string]any{
 			path: map[string]any{
