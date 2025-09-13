@@ -1,6 +1,6 @@
 package middlewareTypes
 
 type MessageAlias struct {
-	Alias    string
-	Score 	 int
+	Alias    string `koanf:"alias"`
+	Score 	 int	`koanf:"score"`
 }

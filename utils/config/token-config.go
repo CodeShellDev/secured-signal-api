@@ -3,6 +3,7 @@ package config
 import (
 	"strconv"
 
+	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 )
@@ -16,6 +17,8 @@ func LoadTokens() {
 	log.Debug("Loading Configs ", ENV.TOKENS_DIR)
 
 	LoadDir("tokenConfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
+
+	log.Dev(utils.ToJson(tokensLayer.All()))
 }
 
 func InitTokens() {
