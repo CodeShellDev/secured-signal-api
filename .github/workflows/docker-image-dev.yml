@@ -6,7 +6,6 @@ on:
       - dev
     paths:
       - "**/*.go"
-      - "config/*.yml"
 
 jobs:
   update:
