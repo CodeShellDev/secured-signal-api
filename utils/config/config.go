@@ -162,20 +162,22 @@ func transformChildren(config *koanf.Koanf, path string, transform func(key stri
 
 // Does the same thing as transformChildren() but does it for each Array Item inside of root and transforms subPath
 func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath string, transform func(key string, value any) (string, any)) error {
-	var tokens []map[string]any
+	var items []map[string]any
 
-	err := config.Unmarshal(root, &tokens)
+	err := config.Unmarshal(root, &items)
 
 	if err != nil {
 		return err
 	}
 
-	for i := range tokens {
+	for i := range items {
 		p := root + "." + strconv.Itoa(i) + "." + subPath
 
 		log.Dev(p)
 
-		if err := transformChildren(config, p, transform); err != nil {
+		err := transformChildren(config, p, transform)
+		
+		if err != nil {
 			return err
 		}
 	}
