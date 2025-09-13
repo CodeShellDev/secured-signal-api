@@ -17,6 +17,10 @@ func LoadTokens() {
 	log.Debug("Loading Configs ", ENV.TOKENS_DIR)
 
 	LoadDir("tokenConfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
+
+	normalizeKeys(tokensLayer)
+
+	templateConfig(tokensLayer)
 }
 
 func InitTokens() {
@@ -24,7 +28,7 @@ func InitTokens() {
 
 	var tokenConfigs []TOKEN_CONFIG_
 
-	transformChildrenUnderArray(config, "tokenConfigs", "override.variables", func(key string, value any) (string, any) {
+	transformChildrenUnderArray(tokensLayer, "tokenConfigs", "override.variables", func(key string, value any) (string, any) {
 		return strings.ToUpper(key), value
 	})
 

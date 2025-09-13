@@ -79,11 +79,11 @@ func Load() {
 
 	config = mergeLayers()
 
-	InitTokens()
-
 	normalizeKeys(config)
 
 	templateConfig(config)
+
+	InitTokens()
 
 	InitEnv()
 
