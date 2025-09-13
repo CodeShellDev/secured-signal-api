@@ -3,28 +3,34 @@ package config
 import (
 	"strconv"
 
-	middlewareTypes "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/types"
 	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
-var tokens []map[string]any
+type TOKEN_CONFIG_ struct {
+	TOKENS		[]string 	`koanf:"tokens"`
+	OVERRIDES 	SETTING_	`koanf:"overrides"`
+}
 
 func LoadTokens() {
 	log.Debug("Loading Configs ", ENV.TOKENS_DIR)
 
-	tokens = LoadDir(ENV.TOKENS_DIR, yaml.Parser())
+	LoadDir("tokenConfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
 
-	log.Dev(utils.ToJson(tokens))
+	log.Dev(utils.ToJson(tokensLayer.All()))
 }
 
 func InitTokens() {
 	apiTokens := config.Strings("api.tokens")
 
-	log.Dev(utils.ToJson(tokens))
+	var tokenConfigs []TOKEN_CONFIG_
 
-	overrides := ParseTokenConfigs(tokens)
+	tokensLayer.Unmarshal("tokenConfigs", &tokenConfigs)
+
+	log.Dev(utils.ToJson(tokenConfigs))
+
+	overrides := ParseTokenConfigs(tokenConfigs)
 
 	for token, override := range overrides {
 		apiTokens = append(apiTokens, token)
@@ -51,16 +57,12 @@ func InitTokens() {
 	}
 }
 
-func ParseTokenConfigs(configs []map[string]any) (map[string]SETTING_) {
+func ParseTokenConfigs(configs []TOKEN_CONFIG_) (map[string]SETTING_) {
 	settings := map[string]SETTING_{}
 
 	for _, config := range configs {
-		for _, token := range config["tokens"].([]string) {
-			settings[token] = SETTING_{
-				BLOCKED_ENDPOINTS: config["override.blockedendpoints"].([]string),
-				VARIABLES: config["overrides.variables"].(map[string]any),
-				MESSAGE_ALIASES: config["overrides.messagealiases"].([]middlewareTypes.MessageAlias),
-			}
+		for _, token := range config.TOKENS {
+			settings[token] = config.OVERRIDES
 		}
 	}
 

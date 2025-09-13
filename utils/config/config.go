@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -17,6 +18,7 @@ import (
 
 var defaultsLayer = koanf.New(".")
 var userLayer = koanf.New(".")
+var tokensLayer = koanf.New(".")
 
 var config *koanf.Koanf
 
@@ -31,6 +33,12 @@ func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Prov
 		return nil, err
 	}
 
+	WatchFile(path, f)
+
+	return f, err
+}
+
+func WatchFile(path string, f *file.File) {
 	f.Watch(func(event any, err error) {
 		if err != nil {
 			return
@@ -43,32 +51,30 @@ func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Prov
 
 		Load()
 	})
-
-	return f, err
 }
 
-func LoadDir(dir string, parser koanf.Parser) []map[string]any {
+func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) []map[string]any {
     files, err := filepath.Glob(filepath.Join(dir, "*.yml"))
 
     if err != nil {
         return nil
     }
 
-	data := []map[string]any{}
-
-    for _, file := range files {
+	for i, f := range files {
 		tmp := koanf.New(".")
 
-        _, err := LoadFile(file, tmp, parser)
+		LoadFile(f, config, parser)
 
-		if err != nil {
-			return nil
+		wrapper := map[string]any{
+			path: map[string]any{
+				strconv.Itoa(i): tmp.Raw(),
+			},
 		}
 
-		data = append(data, tmp.All())
-    }
+		config.Load(confmap.Provider(wrapper, ""), nil); 
+	}
 
-    return data
+    return nil
 }
 
 func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
