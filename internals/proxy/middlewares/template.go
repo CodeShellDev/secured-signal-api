@@ -22,7 +22,11 @@ func (data TemplateMiddleware) Use() http.Handler {
 	next := data.Next
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		variables := getSettings(req).VARIABLES
+		variables := getSettingsByReq(req).VARIABLES
+
+		if variables == nil {
+			variables = getSettings("*").VARIABLES
+		}
 
 		body, err := request.GetReqBody(w, req)
 
