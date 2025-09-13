@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/codeshelldev/secured-signal-api/utils"
 	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/query"
 )
@@ -54,6 +53,8 @@ func CreateBody(data map[string]any) (Body, error) {
 }
 
 func GetJsonData(body []byte) (map[string]any, error) {
+	logger.Dev(string(body))
+
 	var data map[string]any
 
 	err := json.Unmarshal(body, &data)
@@ -132,8 +133,6 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 				return Body{Empty: true}, err
 			}
 	}
-
-	logger.Dev(utils.ToJson(data))
 
 	isEmpty = len(data) <= 0
 
