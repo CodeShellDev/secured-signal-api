@@ -197,7 +197,15 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 
 		log.Dev(utils.ToJson(tmp.All()))
 
-		transformed = append(transformed, tmp.All()["item"].(map[string]any))
+		item := tmp.Get("item")
+
+		if item != nil {
+			itemMap, ok := item.(map[string]any)
+
+			if ok {
+				transformed = append(transformed, itemMap)
+			}
+		}
 	}
 
 	config.Load(confmap.Provider(map[string]any{
