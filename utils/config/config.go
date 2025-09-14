@@ -183,11 +183,13 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 	for _, data := range array {
 		tmp := koanf.New(".")
 
-		tmp.Load(confmap.Provider(data, "."), nil)
+		tmp.Load(confmap.Provider(map[string]any{
+			"item": data,
+		}, "."), nil)
 
 		log.Dev(utils.ToJson(tmp.All()))
 
-		err := transformChildren(tmp, subPath, transform)
+		err := transformChildren(tmp, "item." + subPath, transform)
 
 		if err != nil {
 			return err
@@ -195,7 +197,7 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 
 		log.Dev(utils.ToJson(tmp.All()))
 
-		transformed = append(transformed, tmp.All())
+		transformed = append(transformed, tmp.All()["item"].(map[string]any))
 	}
 
 	config.Load(confmap.Provider(map[string]any{
