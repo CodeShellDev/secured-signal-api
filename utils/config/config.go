@@ -139,24 +139,38 @@ func normalizeKeys(config *koanf.Koanf) {
 // Transforms Children of path
 func transformChildren(config *koanf.Koanf, path string, transform func(key string, value any) (string, any)) error {
 	var sub map[string]any
-	if err := config.Unmarshal(path, &sub); err != nil {
+	
+	err := config.Unmarshal(path, &sub)
+	
+	if err != nil {
 		return err
 	}
 
+	log.Dev(utils.ToJson(sub))
+
 	transformed := make(map[string]any)
+
 	for key, val := range sub {
 		newKey, newVal := transform(key, val)
 
 		transformed[newKey] = newVal
+
+		log.Dev(newKey)
 	}
+
+	log.Dev(utils.ToJson(transformed))
 	
 	config.Load(confmap.Provider(map[string]any{
 		path: map[string]any{},
 	}, "."), nil)
 
+	log.Dev("1:\n" + utils.ToJson(config.All()))
+
 	config.Load(confmap.Provider(map[string]any{
 		path: transformed,
 	}, "."), nil)
+
+	log.Dev("2:\n" + utils.ToJson(config.All()))
 
 	return nil
 }
@@ -170,17 +184,10 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 		return err
 	}
 
-	log.Dev("Len: " + strconv.Itoa(len(array)))
-
-	log.Dev(utils.ToJson(array))
-
 	for i := range array {
 		path := root + "." + strconv.Itoa(i) + "." + subPath
 
-		log.Dev(path)
-
 		if config.Exists(path) {
-			log.Dev("Exists")
 			transformChildren(config, path, transform)
 		}
 	}
