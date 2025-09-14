@@ -19,11 +19,9 @@ func LoadTokens() {
 
 	LoadDir("tokenConfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
 
-	/*
 	normalizeKeys(tokensLayer)
 
 	templateConfig(tokensLayer)
-	*/
 }
 
 func InitTokens() {
