@@ -92,7 +92,8 @@ func Load() {
 
 	log.Info("Finished Loading Configuration")
 
-	log.Dev(utils.ToJson(config.All()))
+	log.Dev("Loaded Config:\n" + utils.ToJson(config.All()))
+	log.Dev("Loaded Token Configs:\n" + utils.ToJson(tokensLayer.All()))
 }
 
 func LoadDefaults() {
