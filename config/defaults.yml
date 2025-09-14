@@ -19,7 +19,6 @@ messageAliases:
     { alias: data.summary, score: 6 },
     { alias: data.details, score: 5 },
 
-    { alias: payload, score: 3 },
     { alias: body, score: 2 },
     { alias: data, score: 1 },
   ]

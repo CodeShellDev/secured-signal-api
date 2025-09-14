@@ -214,16 +214,12 @@ like Blocked Endpoints and any sort of Auth.
 
 Because Secured Signal API is just a Proxy you can use all of the [Signal REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md) endpoints except for...
 
-| Endpoint              |
-| :-------------------- |
-| **/v1/about**         |
-| **/v1/configuration** |
-| **/v1/devives**       |
-| **/v1/register**      |
-| **/v1/unregister**    |
-| **/v1/qrcodelink**    |
-| **/v1/accounts**      |
-| **/v1/contacts**      |
+| Endpoint              |                    |
+| :-------------------- | ------------------ |
+| **/v1/about**         | **/v1/unregister** |
+| **/v1/configuration** | **/v1/qrcodelink** |
+| **/v1/devives**       | **/v1/contacts**   |
+| **/v1/register**      | **/v1/accounts**   |
 
 > [!NOTE]
 > Matching works by checking if the requested Endpoints startswith a Blocked or Allowed Endpoint
@@ -267,17 +263,15 @@ variables:
 
 To improve compatibility with other services Secured Signal API provides aliases for the `message` attribute by default:
 
-| Alias       | Score |
-| ----------- | ----- |
-| msg         | 100   |
-| content     | 99    |
-| description | 98    |
-| text        | 20    |
-| body        | 15    |
-| summary     | 10    |
-| details     | 9     |
-| payload     | 2     |
-| data        | 1     |
+| Alias        | Score | Alias            | Score |
+| ------------ | ----- | ---------------- | ----- |
+| msg          | 100   | data.content     | 9     |
+| content      | 99    | data.description | 8     |
+| description  | 98    | data.text        | 7     |
+| text         | 20    | data.summary     | 6     |
+| summary      | 15    | data.details     | 5     |
+| details      | 14    | body             | 2     |
+| data.message | 10    | data             | 1     |
 
 Secured Signal API will pick the best scoring Message Alias (if available) to extract the correct message from the Request Body.
 
