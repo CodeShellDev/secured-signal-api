@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/safestrings"
 
@@ -168,6 +169,10 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 	if err != nil {
 		return err
 	}
+
+	log.Dev("Len: " + strconv.Itoa(len(array)))
+
+	log.Dev(utils.ToJson(array))
 
 	for i := range array {
 		path := root + "." + strconv.Itoa(i) + "." + subPath
