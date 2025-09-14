@@ -9,12 +9,12 @@ import (
 	"text/template"
 )
 
-func normalize(value interface{}) string {
+func normalize(value any) string {
 	switch str := value.(type) {
 		case []string:
 			return "[" + strings.Join(str, ",") + "]"
 
-		case []interface{}:
+		case []any:
 			items := make([]string, len(str))
 
 			for i, item := range str {
@@ -27,14 +27,20 @@ func normalize(value interface{}) string {
 	}
 }
 
-func normalizeJSON(value interface{}) string {
-	jsonBytes, err := json.Marshal(value)
-
-	if err != nil {
-		return "INVALID:JSON"
+func normalizeJSON(value any) string {
+	if value == nil {
+		return ""
 	}
 
-	return "<<" + string(jsonBytes) + ">>"
+	switch value.(type) {
+		case []any, []string, map[string]any, int, float64, bool:
+			object, _ := json.Marshal(value)
+
+			return "<<" + string(object) + ">>"
+
+		default:
+			return value.(string)
+    }
 }
 
 func ParseTemplate(templt *template.Template, tmplStr string, variables any) (string, error) {
@@ -63,7 +69,7 @@ func CreateTemplateWithFunc(name string, funcMap template.FuncMap) (*template.Te
 	return template.New(name).Funcs(funcMap)
 }
 
-func RenderJSONTemplate(name string, data map[string]interface{}, variables any) (map[string]interface{}, error) {
+func RenderJSONTemplate(name string, data map[string]any, variables any) (map[string]any, error) {
 	jsonBytes, err := json.Marshal(data)
 
 	if err != nil {

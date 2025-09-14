@@ -1,0 +1,17 @@
+# Example Config (all configurations shown)
+
+api:
+  port: 8880
+  url: http://signal-api:8080
+  tokens: [token1, token2]
+
+logLevel: INFO
+
+variables:
+  number: "000"
+  recipients: ["001", "group.id", "user.id"]
+
+messageAliases: [{ alias: "msg", score: 100 }]
+
+blockedEndpoints:
+  - /v1/about

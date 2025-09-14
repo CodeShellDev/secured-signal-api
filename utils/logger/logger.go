@@ -9,9 +9,12 @@ import (
 )
 
 var _log *zap.Logger
+var _logLevel = ""
 
 func Init(level string) {
-	logLevel := getLogLevel(level)
+	_logLevel = strings.ToLower(level)
+
+	logLevel := getLogLevel(_logLevel)
 
 	cfg := zap.Config{
 		Level:       zap.NewAtomicLevelAt(logLevel),
@@ -52,6 +55,8 @@ func getLogLevel(level string) zapcore.Level {
 			return zapcore.InfoLevel
 		case "debug":
 			return zapcore.DebugLevel
+		case "dev":
+			return zapcore.DebugLevel
 		case "warn":
 			return zapcore.WarnLevel
 		case "error":
@@ -69,6 +74,12 @@ func Info(msg ...string) {
 
 func Debug(msg ...string) {
 	_log.Debug(strings.Join(msg, ""))
+}
+
+func Dev(msg ...string) {
+	if _logLevel == "dev" {
+		_log.Debug(strings.Join(msg, ""))
+	}
 }
 
 func Error(msg ...string) {

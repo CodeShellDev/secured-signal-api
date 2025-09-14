@@ -1,27 +1,19 @@
 package middlewares
 
 import (
+	"context"
 	"encoding/base64"
 	"net/http"
 	"slices"
 	"strings"
 
+	"github.com/codeshelldev/secured-signal-api/utils/config"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 type AuthMiddleware struct {
-	Next  http.Handler
-	Tokens []string
+	Next 	http.Handler
 }
-
-type authType string
-
-const (
-	Bearer authType = "Bearer"
-	Basic  authType = "Basic"
-	Query  authType = "Query"
-	None   authType = "None"
-)
 
 func getAuthType(str string) authType {
 	switch str {
@@ -40,7 +32,7 @@ func isValidToken(tokens []string, match string) (bool) {
 
 func (data AuthMiddleware) Use() http.Handler {
 	next := data.Next
-	tokens := data.Tokens
+	tokens := config.ENV.API_TOKENS
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if len(tokens) <= 0 {
@@ -54,13 +46,15 @@ func (data AuthMiddleware) Use() http.Handler {
 
 		var authType authType = None
 
+		var authToken string
+
 		success := false
 
 		if authHeader != "" {
 			authBody := strings.Split(authHeader, " ")
 
 			authType = getAuthType(authBody[0])
-			authToken := authBody[1]
+			authToken = authBody[1]
 
 			switch authType {
 				case Bearer:
@@ -88,7 +82,7 @@ func (data AuthMiddleware) Use() http.Handler {
 		} else if authQuery != "" {
 			authType = Query
 
-			authToken := strings.TrimSpace(authQuery)
+			authToken = strings.TrimSpace(authQuery)
 
 			if isValidToken(tokens, authToken) {
 				success = true
@@ -108,6 +102,9 @@ func (data AuthMiddleware) Use() http.Handler {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
+
+		ctx := context.WithValue(req.Context(), tokenKey, authToken)
+		req = req.WithContext(ctx)
 
 		next.ServeHTTP(w, req)
 	})

@@ -9,28 +9,11 @@ import (
 	"encoding/json"
 	"regexp"
 	"strconv"
-	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
-func StringToArray(sliceStr string) []string {
-    if sliceStr == "" {
-        return nil
-    }
-
-    rawItems := strings.Split(sliceStr, ",")
-    items := make([]string, 0, len(rawItems))
-
-    for _, item := range rawItems {
-        trimmed := strings.TrimSpace(item)
-        if trimmed != "" {
-            items = append(items, trimmed)
-        }
-    }
-
-    return items
-}
-
-func GetJsonByPath(path string, data interface{}) (interface{}, bool) {
+func GetByPath(path string, data any) (any, bool) {
     // Split into parts by `.` and `[]`
     re := regexp.MustCompile(`\.|\[|\]`)
 
@@ -49,7 +32,7 @@ func GetJsonByPath(path string, data interface{}) (interface{}, bool) {
     for _, key := range cleaned {
         switch currentDataType := current.(type) {
             // Case: Dictionary
-            case map[string]interface{}:
+            case map[string]any:
                 value, ok := currentDataType[key]
                 if !ok {
                     return nil, false
@@ -57,7 +40,7 @@ func GetJsonByPath(path string, data interface{}) (interface{}, bool) {
                 current = value
 
             // Case: Array
-            case []interface{}:
+            case []any:
                 index, err := strconv.Atoi(key)
 
                 if err != nil || index < 0 || index >= len(currentDataType) {
@@ -87,7 +70,27 @@ func GetJson[T any](jsonStr string) (T) {
 	err := json.Unmarshal([]byte(jsonStr), &result)
 
 	if err != nil {
-		// JSON is empty
+		// YML is empty
+	}
+
+	return result
+}
+
+func GetYmlSafe[T any](ymlStr string) (T, error) {
+	var result T
+
+	err := yaml.Unmarshal([]byte(ymlStr), &result)
+
+	return result, err
+}
+
+func GetYml[T any](ymlStr string) (T) {
+	var result T
+
+	err := yaml.Unmarshal([]byte(ymlStr), &result)
+
+	if err != nil {
+		// YML is empty
 	}
 
 	return result

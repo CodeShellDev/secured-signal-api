@@ -19,7 +19,7 @@ const (
 type BodyType string
 
 type Body struct {
-	Data	map[string]interface{}
+	Data	map[string]any
 	Raw     []byte
 	Empty	bool
 }
@@ -28,7 +28,7 @@ func (body Body) ToString() string {
 	return string(body.Raw)
 }
 
-func CreateBody(data map[string]interface{}) (Body, error) {
+func CreateBody(data map[string]any) (Body, error) {
 	if len(data) <= 0 {
 		err := errors.New("empty data map")
 
@@ -51,8 +51,8 @@ func CreateBody(data map[string]interface{}) (Body, error) {
 	}, nil
 }
 
-func GetJsonData(body []byte) (map[string]interface{}, error) {
-	var data map[string]interface{}
+func GetJsonData(body []byte) (map[string]any, error) {
+	var data map[string]any
 
 	err := json.Unmarshal(body, &data)
 
@@ -64,8 +64,8 @@ func GetJsonData(body []byte) (map[string]interface{}, error) {
 	return data, nil
 }
 
-func GetFormData(body []byte) (map[string]interface{}, error) {
-	data := map[string]interface{}{}
+func GetFormData(body []byte) (map[string]any, error) {
+	data := map[string]any{}
 
 	queryData := query.ParseRawQuery(string(body))
 
@@ -110,25 +110,25 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 		return Body{Empty: true}, nil
 	}
 
-	var data map[string]interface{}
+	var data map[string]any
 
 	switch GetBodyType(req) {
-	case Json:
-		data, err = GetJsonData(bytes)
+		case Json:
+			data, err = GetJsonData(bytes)
 
-		if err != nil {
-			http.Error(w, "Bad Request: invalid JSON", http.StatusBadRequest)
+			if err != nil {
+				http.Error(w, "Bad Request: invalid JSON", http.StatusBadRequest)
 
-			return Body{Empty: true}, err
-		}
-	case Form:
-		data, err = GetFormData(bytes)
+				return Body{Empty: true}, err
+			}
+		case Form:
+			data, err = GetFormData(bytes)
 
-		if err != nil {
-			http.Error(w, "Bad Request: invalid Form", http.StatusBadRequest)
+			if err != nil {
+				http.Error(w, "Bad Request: invalid Form", http.StatusBadRequest)
 
-			return Body{Empty: true}, err
-		}
+				return Body{Empty: true}, err
+			}
 	}
 
 	isEmpty = len(data) <= 0

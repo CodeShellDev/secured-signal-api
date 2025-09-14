@@ -8,7 +8,7 @@ import (
 )
 
 func TestJsonTemplating(t *testing.T) {
-	variables := map[string]interface{}{
+	variables := map[string]any{
 		"array": []string{
 			"item0",
 			"item1",
@@ -28,17 +28,17 @@ func TestJsonTemplating(t *testing.T) {
 		"key2": "{{.int}}"
 	}`
 
-	data := utils.GetJson[map[string]interface{}](json)
+	data := utils.GetJson[map[string]any](json)
 
-	expected := map[string]interface{}{
-		"dict": map[string]interface{}{
+	expected := map[string]any{
+		"dict": map[string]any{
 			"key": "val",
 		},
-		"dictArray": []interface{}{
-			map[string]interface{}{"key": "val"},
-			map[string]interface{}{"key": []interface{}{ "item0", "item1" }},
+		"dictArray": []any{
+			map[string]any{"key": "val"},
+			map[string]any{"key": []any{ "item0", "item1" }},
 		},
-		"key1": []interface{}{ "item0", "item1" },
+		"key1": []any{ "item0", "item1" },
 		"key2": 4,
 	}
 
@@ -71,7 +71,7 @@ func TestJsonPath(t *testing.T) {
 		"key": "val"
 	}`
 
-	data := utils.GetJson[map[string]interface{}](json)
+	data := utils.GetJson[map[string]any](json)
 
 	cases := []struct{
 		key 	 string
@@ -107,7 +107,7 @@ func TestJsonPath(t *testing.T) {
 		key := c.key
 		expected := c.expected
 
-		got, ok := utils.GetJsonByPath(key, data)
+		got, ok := utils.GetByPath(key, data)
 
 		if !ok || got.(string) != expected {
 			t.Error("Expected: ", key, " == ", expected, "; Got: ", got)

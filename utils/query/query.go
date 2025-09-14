@@ -1,9 +1,9 @@
 package query
 
 import (
-	"regexp"
-	"strconv"
 	"strings"
+
+	"github.com/codeshelldev/secured-signal-api/utils/safestrings"
 )
 
 func ParseRawQuery(raw string) map[string][]string {
@@ -30,59 +30,14 @@ func ParseRawQuery(raw string) map[string][]string {
 	return result
 }
 
-func tryParseInt(str string) (int, bool) {
-	isInt, err := regexp.MatchString(`^\d+$`, str)
+func ParseTypedQueryValues(values []string) any {
+	raw := values[len(values)-1]
 
-	if isInt && err == nil {
-		intValue, err := strconv.Atoi(str)
-
-		if err == nil {
-			return intValue, true
-		}
-	}
-
-	return 0, false
+	return safestrings.ToType(raw)
 }
 
-func ParseTypedQueryValues(values []string) interface{} {
-	var result interface{}
-
-	raw := values[0]
-
-	intValue, isInt := tryParseInt(raw)
-
-	if strings.Contains(raw, ",") || (strings.Contains(raw, "[") && strings.Contains(raw, "]")) {
-		if strings.Contains(raw, "[") && strings.Contains(raw, "]") {
-			escapedStr := strings.ReplaceAll(raw, "[", "")
-			escapedStr = strings.ReplaceAll(escapedStr, "]", "")
-			raw = escapedStr
-		}
-
-		parts := strings.Split(raw, ",")
-
-		var list []interface{}
-
-		for _, part := range parts {
-			_intValue, _isInt := tryParseInt(part)
-
-			if _isInt {
-				list = append(list, _intValue)
-			} else {
-				list = append(list, part)
-			}
-		}
-		result = list
-	} else if isInt {
-		result = intValue
-	} else {
-		result = raw
-	}
-
-	return result
-}
-
-func ParseTypedQuery(query string, matchPrefix string) (map[string]interface{}) {
-	addedData := map[string]interface{}{}
+func ParseTypedQuery(query string, matchPrefix string) (map[string]any) {
+	addedData := map[string]any{}
 
 	queryData := ParseRawQuery(query)
 
