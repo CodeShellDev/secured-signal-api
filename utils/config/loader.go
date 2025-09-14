@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	middlewareTypes "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/types"
+	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 )
@@ -90,6 +91,8 @@ func Load() {
 	InitEnv()
 
 	log.Info("Finished Loading Configuration")
+
+	log.Dev(utils.ToJson(config.All()))
 }
 
 func LoadDefaults() {
