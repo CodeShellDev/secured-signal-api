@@ -1,4 +1,4 @@
-token: LOOOONG_STRING
+tokens: [LOOOONG_STRING]
 
 overrides:
   variables: # Disable Placeholder
