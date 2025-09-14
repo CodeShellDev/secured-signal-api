@@ -7,7 +7,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/codeshelldev/secured-signal-api/utils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/safestrings"
 
@@ -185,15 +184,11 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 			"item": data,
 		}, "."), nil)
 
-		log.Dev(utils.ToJson(tmp.All()))
-
 		err := transformChildren(tmp, "item." + subPath, transform)
 
 		if err != nil {
 			return err
 		}
-
-		log.Dev(utils.ToJson(tmp.All()))
 
 		item := tmp.Get("item")
 
@@ -206,9 +201,7 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 		}
 	}
 
-	config.Load(confmap.Provider(map[string]any{
-		root: map[string]any{},
-	}, "."), nil)
+	config.Delete(root)
 
 	config.Load(confmap.Provider(map[string]any{
 		root: transformed,
