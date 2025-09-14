@@ -26,6 +26,7 @@ type ENV_ struct {
 
 type SETTING_ struct {
 	BLOCKED_ENDPOINTS 	[]string 						`koanf:"blockedendpoints"`
+	ALLOWED_ENDPOINTS 	[]string 						`koanf:"allowedendpoints"`
 	VARIABLES 			map[string]any 					`koanf:"variables"`
 	MESSAGE_ALIASES 	[]middlewareTypes.MessageAlias 	`koanf:"messagealiases"`
 }
@@ -38,6 +39,7 @@ var ENV *ENV_ = &ENV_{
 	SETTINGS: map[string]*SETTING_{
 		"*": {
 			BLOCKED_ENDPOINTS: []string{},
+			ALLOWED_ENDPOINTS: []string{},
 			MESSAGE_ALIASES: []middlewareTypes.MessageAlias{},
 			VARIABLES: map[string]any{},
 		},
@@ -63,6 +65,7 @@ func InitEnv() {
 	config.Unmarshal("variables", &defaultSettings.VARIABLES)
 
 	defaultSettings.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
+	defaultSettings.ALLOWED_ENDPOINTS = config.Strings("allowedendpoints")
 }
 
 func Load() {

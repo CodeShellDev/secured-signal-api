@@ -210,7 +210,7 @@ like Blocked Endpoints and any sort of Auth.
 > [!NOTE]
 > Blocked Endpoints can be reactivated by manually configuring them
 
-### Blocked Endpoints
+### Endpoints
 
 Because Secured Signal API is just a Proxy you can use all of the [Signal REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md) endpoints except for...
 
@@ -225,10 +225,27 @@ Because Secured Signal API is just a Proxy you can use all of the [Signal REST A
 | **/v1/accounts**      |
 | **/v1/contacts**      |
 
+> [!NOTE]
+> Matching works by checking if the requested Endpoints startswith a Blocked or Allowed Endpoint
+
 These Endpoints are blocked by default due to Security Risks, but can be modified by setting `blockedEndpoints` in your config:
 
 ```yaml
 blockedEndpoints: [/v1/register, /v1/unregister, /v1/qrcodelink, /v1/contacts]
+```
+
+Override Blocked Endpoints by explicitly allowing endpoints in `allowedEndpoints`.
+
+| Config (A)                  | (B)                              |   Result    |     |                |     |
+| :-------------------------- | :------------------------------- | :---------: | --- | :------------: | --- |
+| `allowedEndpoints:`         |                                  |   **all**   | 🛑  |                |     |
+| `blockedEndpoints:`         |                                  |   **all**   | ✅  |                |     |
+| `allowedEndpoints:`         | `blockedEndpoints: ["/v2/send"]` | **default** | ✅  | **`/v2/send`** | 🛑  |
+| `blockedEndpoints:`         | `allowedEndpoints: ["/v2/send"]` | **default** | 🛑  | **`/v2/send`** | ✅  |
+| `blockedEndpoints: ["/v2"]` | `allowedEndpoints: ["/v2/send"]` | **`/v2*`**  | 🛑  | **`/v2/send`** | ✅  |
+
+```yaml
+allowedEndpoints: [/v2/send]
 ```
 
 ### Variables
