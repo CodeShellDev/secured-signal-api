@@ -17,7 +17,7 @@ type TOKEN_CONFIG_ struct {
 func LoadTokens() {
 	log.Debug("Loading Configs ", ENV.TOKENS_DIR)
 
-	LoadDir("tokenConfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
+	LoadDir("tokenconfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
 
 	normalizeKeys(tokensLayer)
 
@@ -29,7 +29,9 @@ func InitTokens() {
 
 	var tokenConfigs []TOKEN_CONFIG_
 
-	log.Dev(utils.ToJson(tokensLayer.All()))
+	transformChildren(tokensLayer, "tokenconfigs.0.overrides.variables", func(key string, value any) (string, any) {
+		return strings.ToUpper(key), value
+	})
 
 	err := transformChildrenUnderArray(tokensLayer, "tokenconfigs", "overrides.variables", func(key string, value any) (string, any) {
 		return strings.ToUpper(key), value
@@ -42,8 +44,6 @@ func InitTokens() {
 	log.Dev(utils.ToJson(tokensLayer.All()))
 
 	tokensLayer.Unmarshal("tokenconfigs", &tokenConfigs)
-
-	log.Dev(utils.ToJson(tokenConfigs))
 
 	overrides := parseTokenConfigs(tokenConfigs)
 
