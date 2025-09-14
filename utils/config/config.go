@@ -158,9 +158,7 @@ func transformChildren(config *koanf.Koanf, path string, transform func(key stri
 		transformed[newKey] = newVal
 	}
 	
-	config.Load(confmap.Provider(map[string]any{
-		path: map[string]any{},
-	}, "."), nil)
+	config.Delete(path)
 
 	config.Load(confmap.Provider(map[string]any{
 		path: transformed,
