@@ -47,10 +47,12 @@ func isBlocked(endpoint string, allowed []string, blocked []string) bool {
 	}
 
 	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try string) bool {
+		log.Dev("Checking " + try +  " against " + endpoint)
 		return strings.HasPrefix(endpoint, try)
 	})
 
 	isExplictlyAllowed := slices.ContainsFunc(allowed, func(try string) bool {
+		log.Dev("Checking " + try + " against " + endpoint)
 		return strings.HasPrefix(endpoint, try)
 	})
 
