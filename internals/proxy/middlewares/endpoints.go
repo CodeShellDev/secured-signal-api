@@ -21,7 +21,7 @@ func (data EndpointsMiddleware) Use() http.Handler {
 		blockedEndpoints := settings.BLOCKED_ENDPOINTS
 		allowedEndpoints := settings.ALLOWED_ENDPOINTS
 
-		if blockedEndpoints == nil {
+		if blockedEndpoints == nil && allowedEndpoints == nil {
 			blockedEndpoints = getSettings("*").BLOCKED_ENDPOINTS
 		}
 
@@ -38,17 +38,15 @@ func (data EndpointsMiddleware) Use() http.Handler {
 }
 
 func isBlocked(endpoint string, allowed []string, blocked []string) bool {
-	var result bool
-
 	if blocked == nil {
-		return false
+		blocked = []string{}
 	}
 
 	if allowed == nil {
-		return true
+		allowed = []string{}
 	}
 
-	isBlocked := slices.ContainsFunc(blocked, func(try string) bool {
+	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try string) bool {
 		return strings.HasPrefix(endpoint, try)
 	})
 
@@ -56,7 +54,21 @@ func isBlocked(endpoint string, allowed []string, blocked []string) bool {
 		return strings.HasPrefix(endpoint, try)
 	})
 
-	result = isBlocked && !isExplictlyAllowed
+	// Block all except explicitly Allowed
+	if len(blocked) == 0 && len(allowed) != 0 {
+		return !isExplictlyAllowed
+	}
 
-	return result
+	// Allow all except explicitly Blocked
+	if len(allowed) == 0 && len(blocked) != 0{
+		return isExplicitlyBlocked
+	}
+
+	// Excplicitly Blocked except excplictly Allowed
+	if len(blocked) != 0 && len(allowed) != 0 {
+		return isExplicitlyBlocked && !isExplictlyAllowed
+	}
+
+	// Block all
+	return true
 }

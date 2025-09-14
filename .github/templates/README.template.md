@@ -236,13 +236,11 @@ blockedEndpoints: [/v1/register, /v1/unregister, /v1/qrcodelink, /v1/contacts]
 
 Override Blocked Endpoints by explicitly allowing endpoints in `allowedEndpoints`.
 
-| Config (A)                  | (B)                              |   Result    |     |                |     |
-| :-------------------------- | :------------------------------- | :---------: | --- | :------------: | --- |
-| `allowedEndpoints:`         |                                  |   **all**   | 🛑  |                |     |
-| `blockedEndpoints:`         |                                  |   **all**   | ✅  |                |     |
-| `allowedEndpoints:`         | `blockedEndpoints: ["/v2/send"]` | **default** | ✅  | **`/v2/send`** | 🛑  |
-| `blockedEndpoints:`         | `allowedEndpoints: ["/v2/send"]` | **default** | 🛑  | **`/v2/send`** | ✅  |
-| `blockedEndpoints: ["/v2"]` | `allowedEndpoints: ["/v2/send"]` | **`/v2*`**  | 🛑  | **`/v2/send`** | ✅  |
+| Config (Allow)                   | (Block)                             |   Result   |     |                   |     |
+| :------------------------------- | :---------------------------------- | :--------: | --- | :---------------: | --- |
+| `allowedEndpoints: ["/v2/send"]` | `unset`                             |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
+| `unset`                          | `blockedEndpoints: ["/v1/receive"]` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
+| `blockedEndpoints: ["/v2"]`      | `allowedEndpoints: ["/v2/send"]`    | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
 
 ```yaml
 allowedEndpoints: [/v2/send]
