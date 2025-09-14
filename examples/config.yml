@@ -15,3 +15,5 @@ messageAliases: [{ alias: "msg", score: 100 }]
 
 blockedEndpoints:
   - /v1/about
+allowedEndpoints:
+  - /v2/send
