@@ -1,9 +1,9 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -139,16 +139,16 @@ func normalizeKeys(config *koanf.Koanf) {
 // Transforms Children of path
 func transformChildren(config *koanf.Koanf, path string, transform func(key string, value any) (string, any)) error {
 	var sub map[string]any
-
-	log.Dev(utils.ToJson(config.All()) + "\nPath:" + path)
 	
+	if !config.Exists(path) {
+		return errors.New("invalid path")
+	}
+
 	err := config.Unmarshal(path, &sub)
 	
 	if err != nil {
 		return err
 	}
-
-	log.Dev(utils.ToJson(sub))
 
 	transformed := make(map[string]any)
 
@@ -156,23 +156,15 @@ func transformChildren(config *koanf.Koanf, path string, transform func(key stri
 		newKey, newVal := transform(key, val)
 
 		transformed[newKey] = newVal
-
-		log.Dev(newKey)
 	}
-
-	log.Dev(utils.ToJson(transformed))
 	
 	config.Load(confmap.Provider(map[string]any{
 		path: map[string]any{},
 	}, "."), nil)
 
-	log.Dev("1:\n" + utils.ToJson(config.All()))
-
 	config.Load(confmap.Provider(map[string]any{
 		path: transformed,
 	}, "."), nil)
-
-	log.Dev("2:\n" + utils.ToJson(config.All()))
 
 	return nil
 }
@@ -186,13 +178,33 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 		return err
 	}
 
-	for i := range array {
-		path := root + "." + strconv.Itoa(i) + "." + subPath
+	transformed := []map[string]any{}
 
-		if config.Exists(path) {
-			transformChildren(config, path, transform)
+	for _, data := range array {
+		tmp := koanf.New(".")
+
+		tmp.Load(confmap.Provider(data, "."), nil)
+
+		log.Dev(utils.ToJson(tmp.All()))
+
+		err := transformChildren(tmp, subPath, transform)
+
+		if err != nil {
+			return err
 		}
+
+		log.Dev(utils.ToJson(tmp.All()))
+
+		transformed = append(transformed, tmp.All())
 	}
+
+	config.Load(confmap.Provider(map[string]any{
+		root: map[string]any{},
+	}, "."), nil)
+
+	config.Load(confmap.Provider(map[string]any{
+		root: transformed,
+	}, "."), nil)
 
 	return nil
 }
