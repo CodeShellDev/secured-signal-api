@@ -228,7 +228,7 @@ This way you can permission tokens by further restricting or adding [Endpoints](
 Here is an example:
 
 ```yaml
-token: LOOOONG_STRING
+tokens: [LOOOONG_STRING]
 
 overrides:
   variables: # Disable Placeholder
