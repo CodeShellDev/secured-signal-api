@@ -139,6 +139,8 @@ func normalizeKeys(config *koanf.Koanf) {
 // Transforms Children of path
 func transformChildren(config *koanf.Koanf, path string, transform func(key string, value any) (string, any)) error {
 	var sub map[string]any
+
+	log.Dev(utils.ToJson(config.All()) + "\nPath:" + path)
 	
 	err := config.Unmarshal(path, &sub)
 	
