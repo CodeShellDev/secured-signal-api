@@ -11,7 +11,7 @@ services:
       API__URL: http://signal-api:8080
       VARIABLES__RECIPIENTS: 000,001,002
       VARIABLES__NUMBER: 123456789
-      API__TOKENS: LOOOOOONG_STRING
+      API__TOKENS: '[LOOOOOONG_STRING]'
     labels:
       - traefik.enable=true
       - traefik.http.routers.signal-api.rule=Host(`signal-api.mydomain.com`)
