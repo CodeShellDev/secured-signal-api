@@ -64,8 +64,8 @@ services:
           - secured-signal-api
     environment:
       API__URL: http://signal-api:8080
-      RECIPIENTS: 000,001,002
-      NUMBER: 123456789
+      VARIABLES__RECIPIENTS: 000,001,002
+      VARIABLES__NUMBER: 123456789
       API__TOKENS: LOOOOOONG_STRING
     labels:
       - traefik.enable=true
