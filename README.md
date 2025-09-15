@@ -30,9 +30,9 @@ services:
           - secured-signal-api
     environment:
       API__URL: http://signal-api:8080
-      VARIABLES__RECIPIENTS: 000,001,002
+      VARIABLES__RECIPIENTS: '[000,001,002]'
       VARIABLES__NUMBER: 123456789
-      API__TOKENS: LOOOOOONG_STRING
+      API__TOKENS: '[LOOOOOONG_STRING]'
     ports:
       - "8880:8880"
     restart: unless-stopped
