@@ -64,7 +64,7 @@ services:
           - secured-signal-api
     environment:
       API__URL: http://signal-api:8080
-      DEFAULT_RECIPIENTS: 000,001,002
+      RECIPIENTS: 000,001,002
       NUMBER: 123456789
       API__TOKENS: LOOOOOONG_STRING
     labels:
