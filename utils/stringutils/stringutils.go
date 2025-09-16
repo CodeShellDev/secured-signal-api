@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/codeshelldev/secured-signal-api/utils"
+	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 )
 
 func ToType(str string) any {
@@ -13,7 +13,7 @@ func ToType(str string) any {
 
     //* Try JSON
 	if IsEnclosedBy(cleaned, `[`, `]`) || IsEnclosedBy(cleaned, `{`, `}`) {
-		data, err := utils.GetJsonSafe[any](str)
+		data, err := jsonutils.GetJsonSafe[any](str)
 
 		if data != nil && err == nil {
 			return data
