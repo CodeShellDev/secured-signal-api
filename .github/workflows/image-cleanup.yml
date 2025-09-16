@@ -1,0 +1,14 @@
+name: Cleanup Untagged Images
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  update:
+    uses: codeshelldev/gh-actions/.github/workflows/image-cleanup.yml@main
+    with:
+      registry: ghcr.io
+    secrets:
+      GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
