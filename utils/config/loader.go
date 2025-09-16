@@ -48,20 +48,6 @@ var ENV *ENV_ = &ENV_{
 	INSECURE: false,
 }
 
-func InitEnv() {
-	ENV.PORT = strconv.Itoa(config.Int("server.port"))
-
-	ENV.LOG_LEVEL = config.String("loglevel")
-	
-	ENV.API_URL = config.String("api.url")
-
-	transformChildren(config, "variables", func(key string, value any) (string, any) {
-		return strings.ToUpper(key), value
-	})
-
-	config.Unmarshal("settings", ENV.SETTINGS["*"])
-}
-
 func Load() {
 	LoadDefaults()
 
@@ -84,6 +70,20 @@ func Load() {
 
 	log.Dev("Loaded Config:\n" + utils.ToJson(config.All()))
 	log.Dev("Loaded Token Configs:\n" + utils.ToJson(tokensLayer.All()))
+}
+
+func InitEnv() {
+	ENV.PORT = strconv.Itoa(config.Int("server.port"))
+
+	ENV.LOG_LEVEL = config.String("loglevel")
+	
+	ENV.API_URL = config.String("api.url")
+
+	transformChildren(config, "variables", func(key string, value any) (string, any) {
+		return strings.ToUpper(key), value
+	})
+
+	config.Unmarshal("settings", ENV.SETTINGS["*"])
 }
 
 func LoadDefaults() {

@@ -2,16 +2,11 @@ services:
   secured-signal:
     image: ghcr.io/codeshelldev/secured-signal-api:latest
     container_name: secured-signal
-    networks:
-      proxy:
-      backend:
-        aliases:
-          - secured-signal-api
     environment:
       API__URL: http://signal-api:8080
-      DEFAULT_RECIPIENTS: 000,001,002
-      NUMBER: 123456789
-      API__TOKENS: LOOOOOONG_STRING
+      SETTINGS__VARIABLES__RECIPIENTS: ["123400002", "123400003", "123400004"]
+      SETTINGS__VARIABLES__NUMBER: "+123400001"
+      API__TOKENS: [LOOOOOONG_STRING]
     labels:
       - traefik.enable=true
       - traefik.http.routers.signal-api.rule=Host(`signal-api.mydomain.com`)
@@ -22,6 +17,11 @@ services:
       - traefik.http.services.signal-api-svc.loadbalancer.server.port=8880
       - traefik.docker.network=proxy
     restart: unless-stopped
+    networks:
+      proxy:
+      backend:
+        aliases:
+          - secured-signal-api
 
 networks:
   backend:
