@@ -1,8 +1,47 @@
 <img align="center" width="1048" height="512" alt="Secure Proxy for Signal REST API" src="https://github.com/CodeShellDev/secured-signal-api/raw/refs/heads/main/logo/landscape" />
 
-<h5 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal Messenger REST API</a></h5>
+<h3 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal Messenger REST API</a></h3>
+
+<p align="center">
+adding token-based authentication,
+endpoint restrictions, placeholders, and flexible configuration.
+</p>
+
+<p align="center">
+⭐️ Secure · 🔒 Configurable · 🚀 Easy to Deploy with Docker
+</p>
+
+<div align="center">
+  <a href="https://github.com/codeshelldev/secured-signal-api/releases">
+    <img src="https://img.shields.io/github/v/release/codeshelldev/secured-signal-api?sort=semver&logo=github" alt="GitHub release">
+  </a>
+  <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
+    <img src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=image+size&trim=" alt="GHCR pulls">
+  </a>
+  <a href="./LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+  </a>
+  <a href="https://github.com/codeshelldev/secured-signal-api/stargazers">
+    <img src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=social" alt="GitHub stars">
+  </a>
+</div>
+
+## Contents
+
+- [Getting Started](#getting-started)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Best Practices](#security-best-practices)
+- [Configuration](#configuration)
+  - [Endpoints](#endpoints)
+  - [Variables](#variables)
+- [Contributing](#contributing)
+- [Support](#support)
+- [License](#license)
 
 ## Getting Started
+
+> **Prerequisites**: You need Docker and Docker Compose installed.
 
 Get the latest version of the `docker-compose.yaml` file:
 
@@ -13,11 +52,10 @@ Get the latest version of the `docker-compose.yaml` file:
 And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 
 > [!IMPORTANT]
-> This Documentation will be using `sec-signal-api:8880` as the service host,
-> this **is just for simplicty**, instead use your containers or hosts IP + Port.
-> Or a hostname if applicable. See [Reverse Proxy](#reverse-proxy)
+> In this documentation, we use `sec-signal-api:8880` as the host for simplicity.
+> Replace it with your actual container/host IP, port, or hostname.
 
-### Reverse proxy
+### Reverse Proxy
 
 Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 
@@ -27,7 +65,7 @@ Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 
 ## Setup
 
-Before you can send messages via Secured Signal API you must first setup [Signal rAPI](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md)
+Before you can send messages via Secured Signal API you must first set up [Signal rAPI](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md)
 
 To be able to use the API you have to either:
 
@@ -37,46 +75,27 @@ OR
 
 - **link Signal API to an already registered Signal Device**
 
+1. **Register** or **link** a Signal account with `signal-cli-rest-api`
+
+2. Deploy `secured-signal-api` with at least one API token
+
+3. Confirm you can send a test message (see [Usage](#usage))
+
 > [!TIP]
-> It is advised to do Setup directly with Signal rAPI
-> if you try to Setup with Secured Signal API you will be blocked from doing so. See [Blocked Endpoints](#blocked-endpoints).
+> Run setup directly with Signal rAPI.
+> Setup requests via Secured Signal API are blocked. See [Blocked Endpoints](#blocked-endpoints).
 
 ## Usage
 
 Secured Signal API provides 3 Ways to Authenticate
 
-### Bearer
+### Auth
 
-To Authenticate add `Authorization: Bearer API_TOKEN` to your request Headers
-
-### Basic Auth
-
-To use Basic Auth as Authorization Method add `Authorization: Basic BASE64_STRING` to your Headers
-
-User is `api` (LOWERCASE)
-
-Formatting for `BASE64_STRING` = `user:API_TOKEN`.
-
-example:
-
-```bash
-echo "api:API_TOKEN" | base64
-```
-
-=> `YXBpOkFQSV9LRVkK`
-
-### Query Auth
-
-If you are working with a limited Application you may **not** be able to modify Headers or the Request Body
-in this case you can use **Query Auth**.
-
-Here is a simple example:
-
-```bash
-curl -X POST http://sec-signal-api:8880/v2/send?@authorization=API_TOKEN
-```
-
-Notice the `@` infront of `authorization`. See [KeyValue Pair Injection](#keyvalue-pair-injection).
+| Method      | Example                                                    |
+| :---------- | :--------------------------------------------------------- |
+| Bearer Auth | Add `Authorization: Bearer API_TOKEN` to headers           |
+| Basic Auth  | Add `Authorization: Basic BASE64_STRING` (`api:API_TOKEN`) |
+| Query Auth  | Append `@authorization=API_TOKEN` to request URL           |
 
 ### Example
 
@@ -125,6 +144,13 @@ In order to differentiate Injection Queries and _regular_ Queries
 you have to add `@` in front of any KeyValue Pair assignment.
 
 Supported types include **strings**, **ints** and **arrays**. See [Formatting](#string-to-type).
+
+## Security: Best Practices
+
+- Always use API tokens in production
+- Run behind a TLS-enabled [Reverse Proxy](#reverse-proxy) (Traefik, Nginx, Caddy)
+- Be cautious when overriding Blocked Endpoints
+- Use per-token overrides to enforce least privilege
 
 ## Configuration
 
@@ -186,8 +212,7 @@ If you are using Environment Variables as an example you won't be able to specif
 | array(str) | [a,b,c]           |
 
 > [!NOTE]
-> If you have a string that should not be turned into any other type, then you will need to escape all Type Denotations, `[]` or `{}` (also `-`) with a `\` **Backslash**.
-> **Double Backslashes** do exist but you could just leave them out completly.
+> If you have a string that should not be turned into any other type, then you will need to escape all Type Denotations, `[]` or `{}` (also `-`) with a `\` **Backslash** (or Double Backslash).
 > An **Odd** number of **Backslashes** **escape** the character in front of them and an **Even** number leave the character **as-is**.
 
 ### API Token(s)
@@ -214,7 +239,7 @@ Since Secured Signal API is just a Proxy you can use all of the [Signal REST API
 | :-------------------- | ------------------ |
 | **/v1/about**         | **/v1/unregister** |
 | **/v1/configuration** | **/v1/qrcodelink** |
-| **/v1/devives**       | **/v1/contacts**   |
+| **/v1/devices**       | **/v1/contacts**   |
 | **/v1/register**      | **/v1/accounts**   |
 
 These Endpoints are blocked by default due to Security Risks.
@@ -260,7 +285,10 @@ settings:
 
 ### Message Aliases
 
-To improve compatibility with other services Secured Signal API provides aliases for the `message` attribute by default:
+To improve compatibility with other services Secured Signal API provides **Message Aliases** for the `message` attribute.
+
+<details>
+<summary><strong>Default Message Aliases</strong></summary>
 
 | Alias        | Score | Alias            | Score |
 | ------------ | ----- | ---------------- | ----- |
@@ -271,6 +299,8 @@ To improve compatibility with other services Secured Signal API provides aliases
 | summary      | 15    | data.details     | 5     |
 | details      | 14    | body             | 2     |
 | data.message | 10    | data             | 1     |
+
+</details>
 
 Secured Signal API will pick the best scoring Message Alias (if available) to extract the correct message from the Request Body.
 
