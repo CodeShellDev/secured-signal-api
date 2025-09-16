@@ -1,16 +1,9 @@
-package utils
-
-/*
- * General Functions (utils)
- * Might move Functions into seperate files
- */
+package jsonutils
 
 import (
 	"encoding/json"
 	"regexp"
 	"strconv"
-
-	"gopkg.in/yaml.v3"
 )
 
 func GetByPath(path string, data any) (any, bool) {
@@ -67,31 +60,7 @@ func GetJsonSafe[T any](jsonStr string) (T, error) {
 func GetJson[T any](jsonStr string) (T) {
 	var result T
 
-	err := json.Unmarshal([]byte(jsonStr), &result)
-
-	if err != nil {
-		// YML is empty
-	}
-
-	return result
-}
-
-func GetYmlSafe[T any](ymlStr string) (T, error) {
-	var result T
-
-	err := yaml.Unmarshal([]byte(ymlStr), &result)
-
-	return result, err
-}
-
-func GetYml[T any](ymlStr string) (T) {
-	var result T
-
-	err := yaml.Unmarshal([]byte(ymlStr), &result)
-
-	if err != nil {
-		// YML is empty
-	}
+	json.Unmarshal([]byte(jsonStr), &result)
 
 	return result
 }
@@ -103,11 +72,7 @@ func ToJsonSafe[T any](obj T) (string, error) {
 }
 
 func ToJson[T any](obj T) string {
-	bytes, err := json.Marshal(obj)
-
-	if err != nil {
-		// JSON is empty
-	}
+	bytes, _ := json.Marshal(obj)
 
 	return string(bytes)
 }
