@@ -128,14 +128,6 @@ networks:
 
 Before you can send messages via Secured Signal API you must first set up [Signal rAPI](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md)
 
-To be able to use the API you have to either:
-
-- **register with your Signal Account**
-
-OR
-
-- **link Signal API to an already registered Signal Device**
-
 1. **Register** or **link** a Signal account with `signal-cli-rest-api`
 
 2. Deploy `secured-signal-api` with at least one API token
