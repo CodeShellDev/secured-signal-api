@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
-	"github.com/codeshelldev/secured-signal-api/utils/safestrings"
+	stringutils "github.com/codeshelldev/secured-signal-api/utils/stringutils"
 
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/providers/env/v2"
@@ -218,5 +218,5 @@ func normalizeEnv(key string, value string) (string, any) {
 	key = strings.ReplaceAll(key, "__", ".")
 	key = strings.ReplaceAll(key, "_", "")
 
-	return key, safestrings.ToType(value)
+	return key, stringutils.ToType(value)
 }

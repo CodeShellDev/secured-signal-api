@@ -7,11 +7,11 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/codeshelldev/secured-signal-api/utils"
+	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
-	"github.com/codeshelldev/secured-signal-api/utils/query"
+	query "github.com/codeshelldev/secured-signal-api/utils/query"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
-	"github.com/codeshelldev/secured-signal-api/utils/templating"
+	templating "github.com/codeshelldev/secured-signal-api/utils/templating"
 )
 
 type TemplateMiddleware struct {
@@ -113,8 +113,8 @@ func TemplateBody(data map[string]any, VARIABLES any) (map[string]any, bool, err
 		return data, false, err
 	}
 
-	beforeStr := utils.ToJson(templatedData)
-	afterStr := utils.ToJson(data)
+	beforeStr := jsonutils.ToJson(templatedData)
+	afterStr := jsonutils.ToJson(data)
 
 	modified = beforeStr == afterStr
 

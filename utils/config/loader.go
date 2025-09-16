@@ -8,8 +8,9 @@ import (
 	"strings"
 
 	middlewareTypes "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/types"
-	"github.com/codeshelldev/secured-signal-api/utils"
+	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
+
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
@@ -68,8 +69,8 @@ func Load() {
 
 	log.Info("Finished Loading Configuration")
 
-	log.Dev("Loaded Config:\n" + utils.ToJson(config.All()))
-	log.Dev("Loaded Token Configs:\n" + utils.ToJson(tokensLayer.All()))
+	log.Dev("Loaded Config:\n" + jsonutils.ToJson(config.All()))
+	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokensLayer.All()))
 }
 
 func InitEnv() {

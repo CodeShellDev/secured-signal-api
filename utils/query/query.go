@@ -3,7 +3,7 @@ package query
 import (
 	"strings"
 
-	"github.com/codeshelldev/secured-signal-api/utils/safestrings"
+	stringutils "github.com/codeshelldev/secured-signal-api/utils/stringutils"
 )
 
 func ParseRawQuery(raw string) map[string][]string {
@@ -33,7 +33,7 @@ func ParseRawQuery(raw string) map[string][]string {
 func ParseTypedQueryValues(values []string) any {
 	raw := values[len(values)-1]
 
-	return safestrings.ToType(raw)
+	return stringutils.ToType(raw)
 }
 
 func ParseTypedQuery(query string, matchPrefix string) (map[string]any) {

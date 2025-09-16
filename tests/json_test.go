@@ -3,8 +3,8 @@ package tests
 import (
 	"testing"
 
-	"github.com/codeshelldev/secured-signal-api/utils"
-	"github.com/codeshelldev/secured-signal-api/utils/templating"
+	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
+	templating "github.com/codeshelldev/secured-signal-api/utils/templating"
 )
 
 func TestJsonTemplating(t *testing.T) {
@@ -28,7 +28,7 @@ func TestJsonTemplating(t *testing.T) {
 		"key2": "{{.int}}"
 	}`
 
-	data := utils.GetJson[map[string]any](json)
+	data := jsonutils.GetJson[map[string]any](json)
 
 	expected := map[string]any{
 		"dict": map[string]any{
@@ -48,8 +48,8 @@ func TestJsonTemplating(t *testing.T) {
 		t.Error("Error Templating JSON: ", err.Error())
 	}
 
-	expectedStr := utils.ToJson(expected)
-	gotStr := utils.ToJson(got)
+	expectedStr := jsonutils.ToJson(expected)
+	gotStr := jsonutils.ToJson(got)
 
 	if expectedStr != gotStr {
 		t.Error("\nExpected: ", expectedStr, "\nGot: ", gotStr)
@@ -71,7 +71,7 @@ func TestJsonPath(t *testing.T) {
 		"key": "val"
 	}`
 
-	data := utils.GetJson[map[string]any](json)
+	data := jsonutils.GetJson[map[string]any](json)
 
 	cases := []struct{
 		key 	 string
@@ -107,7 +107,7 @@ func TestJsonPath(t *testing.T) {
 		key := c.key
 		expected := c.expected
 
-		got, ok := utils.GetByPath(key, data)
+		got, ok := jsonutils.GetByPath(key, data)
 
 		if !ok || got.(string) != expected {
 			t.Error("Expected: ", key, " == ", expected, "; Got: ", got)
