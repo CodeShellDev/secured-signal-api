@@ -76,7 +76,7 @@ func Load() {
 func InitEnv() {
 	ENV.PORT = strconv.Itoa(config.Int("server.port"))
 
-	ENV.LOG_LEVEL = config.String("loglevel")
+	ENV.LOG_LEVEL = strings.ToLower(config.String("loglevel"))
 	
 	ENV.API_URL = config.String("api.url")
 
@@ -84,7 +84,11 @@ func InitEnv() {
 		return strings.ToUpper(key), value
 	})
 
-	config.Unmarshal("settings", ENV.SETTINGS["*"])
+	var settings SETTING_
+
+	config.Unmarshal("settings", &settings)
+
+	ENV.SETTINGS["*"] = &settings
 }
 
 func LoadDefaults() {
