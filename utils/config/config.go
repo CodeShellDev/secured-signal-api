@@ -25,6 +25,8 @@ var config *koanf.Koanf
 var configLock sync.Mutex
 
 func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Provider, error) {
+	log.Debug("Loading Config File: ", path)
+
 	f := file.Provider(path)
 
 	err := config.Load(f, parser)

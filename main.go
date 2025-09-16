@@ -25,9 +25,11 @@ func main() {
 
 	ENV = config.ENV
 
-	if ENV.LOG_LEVEL != "" {
+	if ENV.LOG_LEVEL != log.Level() {
 		log.Init(ENV.LOG_LEVEL)
 	}
+
+	log.Info("Initialized Logger with Level of ", log.Level())
 
 	initHandler = proxy.Create(ENV.API_URL)
 

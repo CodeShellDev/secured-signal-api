@@ -69,8 +69,6 @@ func Load() {
 
 	LoadTokens()
 
-	log.Debug("Loading DotEnv")
-
 	LoadEnv(userLayer)
 
 	config = mergeLayers()
@@ -89,8 +87,6 @@ func Load() {
 }
 
 func LoadDefaults() {
-	log.Debug("Loading Config ", ENV.DEFAULTS_PATH)
-
 	_, defErr := LoadFile(ENV.DEFAULTS_PATH, defaultsLayer, yaml.Parser())
 
 	if defErr != nil {
@@ -99,8 +95,6 @@ func LoadDefaults() {
 }
 
 func LoadConfig() {
-	log.Debug("Loading Config ", ENV.CONFIG_PATH)
-
 	_, conErr := LoadFile(ENV.CONFIG_PATH, userLayer, yaml.Parser())
 
 	if conErr != nil {
