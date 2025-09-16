@@ -77,7 +77,7 @@ func InitEnv() {
 
 	var settings SETTING_
 
-	transformChildren(config, "variables", func(key string, value any) (string, any) {
+	transformChildren(config, "settings.variables", func(key string, value any) (string, any) {
 		return strings.ToUpper(key), value
 	})
 
