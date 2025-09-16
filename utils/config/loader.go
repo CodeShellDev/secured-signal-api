@@ -39,12 +39,7 @@ var ENV *ENV_ = &ENV_{
 	TOKENS_DIR: os.Getenv("TOKENS_DIR"),
 	API_TOKENS: []string{},
 	SETTINGS: map[string]*SETTING_{
-		"*": {
-			BLOCKED_ENDPOINTS: []string{},
-			ALLOWED_ENDPOINTS: []string{},
-			MESSAGE_ALIASES: []middlewareTypes.MessageAlias{},
-			VARIABLES: map[string]any{},
-		},
+
 	},
 	INSECURE: false,
 }
@@ -80,13 +75,15 @@ func InitEnv() {
 	
 	ENV.API_URL = config.String("api.url")
 
+	var settings SETTING_
+
 	transformChildren(config, "variables", func(key string, value any) (string, any) {
 		return strings.ToUpper(key), value
 	})
 
-	var settings SETTING_
-
 	config.Unmarshal("settings", &settings)
+
+	log.Dev(jsonutils.ToJson(settings))
 
 	ENV.SETTINGS["*"] = &settings
 }
