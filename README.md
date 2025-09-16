@@ -15,27 +15,28 @@ services:
       - MODE=normal
     volumes:
       - ./data:/home/.local/share/signal-cli
+    restart: unless-stopped
     networks:
       backend:
         aliases:
           - signal-api
-    restart: unless-stopped
 
   secured-signal:
     image: ghcr.io/codeshelldev/secured-signal-api:latest
     container_name: secured-signal
+    environment:
+      API__URL: http://signal-api:8080
+      SETTINGS__VARIABLES__RECIPIENTS:
+        ["+123400002", "+123400003", "+123400004"]
+      SETTINGS__VARIABLES__NUMBER: "+123400001"
+      API__TOKENS: [LOOOOOONG_STRING]
+    ports:
+      - "8880:8880"
+    restart: unless-stopped
     networks:
       backend:
         aliases:
           - secured-signal-api
-    environment:
-      API__URL: http://signal-api:8080
-      VARIABLES__RECIPIENTS: '[000,001,002]'
-      VARIABLES__NUMBER: 123456789
-      API__TOKENS: '[LOOOOOONG_STRING]'
-    ports:
-      - "8880:8880"
-    restart: unless-stopped
 
 networks:
   backend:
@@ -57,16 +58,11 @@ services:
   secured-signal:
     image: ghcr.io/codeshelldev/secured-signal-api:latest
     container_name: secured-signal
-    networks:
-      proxy:
-      backend:
-        aliases:
-          - secured-signal-api
     environment:
       API__URL: http://signal-api:8080
-      VARIABLES__RECIPIENTS: '[000,001,002]'
-      VARIABLES__NUMBER: 123456789
-      API__TOKENS: '[LOOOOOONG_STRING]'
+      SETTINGS__VARIABLES__RECIPIENTS: ["+123400002", "+123400003", "+123400004"]
+      SETTINGS__VARIABLES__NUMBER: "+123400001"
+      API__TOKENS: [LOOOOOONG_STRING]
     labels:
       - traefik.enable=true
       - traefik.http.routers.signal-api.rule=Host(`signal-api.mydomain.com`)
@@ -77,6 +73,11 @@ services:
       - traefik.http.services.signal-api-svc.loadbalancer.server.port=8880
       - traefik.docker.network=proxy
     restart: unless-stopped
+    networks:
+      proxy:
+      backend:
+        aliases:
+          - secured-signal-api
 
 networks:
   backend:
@@ -139,10 +140,10 @@ Notice the `@` infront of `authorization`. See [KeyValue Pair Injection](#keyval
 
 ### Example
 
-To send a message to 1234567:
+To send a message to `+123400002`:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_TOKEN" -d '{"message": "Hello World!", "recipients": ["1234567"]}' http://sec-signal-api:8880/v2/send
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_TOKEN" -d '{"message": "Hello World!", "recipients": ["+123400002"]}' http://sec-signal-api:8880/v2/send
 ```
 
 ### Advanced
@@ -207,16 +208,17 @@ api:
 
 logLevel: INFO
 
-variables:
-  number: "000"
-  recipients: ["001", "group.id", "user.id"]
+settings:
+  variables:
+    number: "+123400001"
+    recipients: ["+123400002", "group.id", "user.id"]
 
-messageAliases: [{ alias: "msg", score: 100 }]
+  messageAliases: [{ alias: "msg", score: 100 }]
 
-blockedEndpoints:
-  - /v1/about
-allowedEndpoints:
-  - /v2/send
+  blockedEndpoints:
+    - /v1/about
+  allowedEndpoints:
+    - /v2/send
 ```
 
 #### Token Configs
@@ -243,10 +245,10 @@ Suppose you want to set a new [Placeholder](#placeholders) `NUMBER` in your Envi
 
 ```yaml
 environment:
-  VARIABLES__NUMBER: "000"
+  SETTINGS__VARIABLES__NUMBER: "+123400001"
 ```
 
-This would internally be converted into `variables.number` matching the config formatting.
+This would internally be converted into `settings.variables.number` matching the config formatting.
 
 > [!IMPORTANT]
 > Underscores `_` are removed during Conversion, Double Underscores `__` on the other hand convert the Variable into a nested Object (`__` replaced by `.`)
@@ -283,51 +285,47 @@ api:
 ```
 
 > [!IMPORTANT]
-> It is highly recommended use API Tokens
-
-> _What if I just don't?_
-
-Secured Signal API will still work, but important Security Features won't be available
-like Blocked Endpoints and any sort of Auth.
+> Using API Tokens is highly recommended, but not mandatory.
+> Some important Security Features won't be available (like default Blocked Endpoints).
 
 > [!NOTE]
 > Blocked Endpoints can be reactivated by manually configuring them
 
 ### Endpoints
 
-Because Secured Signal API is just a Proxy you can use all of the [Signal REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md) endpoints except for...
+Since Secured Signal API is just a Proxy you can use all of the [Signal REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md) endpoints except for...
 
-| Endpoint              |
-| :-------------------- |
-| **/v1/about**         |
-| **/v1/configuration** |
-| **/v1/devives**       |
-| **/v1/register**      |
-| **/v1/unregister**    |
-| **/v1/qrcodelink**    |
-| **/v1/accounts**      |
-| **/v1/contacts**      |
+| Endpoint              |                    |
+| :-------------------- | ------------------ |
+| **/v1/about**         | **/v1/unregister** |
+| **/v1/configuration** | **/v1/qrcodelink** |
+| **/v1/devives**       | **/v1/contacts**   |
+| **/v1/register**      | **/v1/accounts**   |
+
+These Endpoints are blocked by default due to Security Risks.
 
 > [!NOTE]
-> Matching works by checking if the requested Endpoints startswith a Blocked or Allowed Endpoint
+> Matching works by checking if the requested Endpoints starts with a Blocked or an Allowed Endpoint
 
-These Endpoints are blocked by default due to Security Risks, but can be modified by setting `blockedEndpoints` in your config:
+You can modify Blocked Endpoints by configuring `blockedEndpoints` in your config:
 
 ```yaml
-blockedEndpoints: [/v1/register, /v1/unregister, /v1/qrcodelink, /v1/contacts]
+settings:
+  blockedEndpoints: [/v1/register, /v1/unregister, /v1/qrcodelink, /v1/contacts]
 ```
 
-Override Blocked Endpoints by explicitly allowing endpoints in `allowedEndpoints`.
+You can also override Blocked Endpoints by adding Allowed Endpoints to `allowedEndpoints`.
+
+```yaml
+settings:
+  allowedEndpoints: [/v2/send]
+```
 
 | Config (Allow)                   | (Block)                             |   Result   |     |                   |     |
 | :------------------------------- | :---------------------------------- | :--------: | --- | :---------------: | --- |
 | `allowedEndpoints: ["/v2/send"]` | `unset`                             |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
 | `unset`                          | `blockedEndpoints: ["/v1/receive"]` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
 | `blockedEndpoints: ["/v2"]`      | `allowedEndpoints: ["/v2/send"]`    | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
-
-```yaml
-allowedEndpoints: [/v2/send]
-```
 
 ### Variables
 
@@ -339,40 +337,38 @@ See [Placeholders](#placeholders).
 > Example: `number` becomes `NUMBER` in `{{.NUMBER}}`
 
 ```yaml
-variables:
-  number: "001",
-  recipients: [
-    "user.id", "000", "001", "group.id"
-  ]
+settings:
+  variables:
+    number: "+123400001",
+    recipients: ["+123400002", "group.id", "user.id"]
 ```
 
 ### Message Aliases
 
 To improve compatibility with other services Secured Signal API provides aliases for the `message` attribute by default:
 
-| Alias       | Score |
-| ----------- | ----- |
-| msg         | 100   |
-| content     | 99    |
-| description | 98    |
-| text        | 20    |
-| body        | 15    |
-| summary     | 10    |
-| details     | 9     |
-| payload     | 2     |
-| data        | 1     |
+| Alias        | Score | Alias            | Score |
+| ------------ | ----- | ---------------- | ----- |
+| msg          | 100   | data.content     | 9     |
+| content      | 99    | data.description | 8     |
+| description  | 98    | data.text        | 7     |
+| text         | 20    | data.summary     | 6     |
+| summary      | 15    | data.details     | 5     |
+| details      | 14    | body             | 2     |
+| data.message | 10    | data             | 1     |
 
 Secured Signal API will pick the best scoring Message Alias (if available) to extract the correct message from the Request Body.
 
 Message Aliases can be added by setting `messageAliases` in your config:
 
 ```yaml
-messageAliases:
-  [
-    { alias: "msg", score: 80 },
-    { alias: "data.message", score: 79 },
-    { alias: "array[0].message", score: 78 },
-  ]
+settings:
+  messageAliases:
+    [
+      { alias: "msg", score: 80 },
+      { alias: "data.message", score: 79 },
+      { alias: "array[0].message", score: 78 },
+    ]
 ```
 
 ### Port
