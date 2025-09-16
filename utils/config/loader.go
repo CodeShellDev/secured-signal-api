@@ -8,8 +8,9 @@ import (
 	"strings"
 
 	middlewareTypes "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/types"
-	"github.com/codeshelldev/secured-signal-api/utils"
+	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
+
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
@@ -38,35 +39,9 @@ var ENV *ENV_ = &ENV_{
 	TOKENS_DIR: os.Getenv("TOKENS_DIR"),
 	API_TOKENS: []string{},
 	SETTINGS: map[string]*SETTING_{
-		"*": {
-			BLOCKED_ENDPOINTS: []string{},
-			ALLOWED_ENDPOINTS: []string{},
-			MESSAGE_ALIASES: []middlewareTypes.MessageAlias{},
-			VARIABLES: map[string]any{},
-		},
+
 	},
 	INSECURE: false,
-}
-
-func InitEnv() {
-	ENV.PORT = strconv.Itoa(config.Int("server.port"))
-
-	ENV.LOG_LEVEL = config.String("loglevel")
-	
-	ENV.API_URL = config.String("api.url")
-
-	defaultSettings := ENV.SETTINGS["*"]
-
-	config.Unmarshal("messagealiases", &defaultSettings.MESSAGE_ALIASES)
-
-	transformChildren(config, "variables", func(key string, value any) (string, any) {
-		return strings.ToUpper(key), value
-	})
-
-	config.Unmarshal("variables", &defaultSettings.VARIABLES)
-
-	defaultSettings.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
-	defaultSettings.ALLOWED_ENDPOINTS = config.Strings("allowedendpoints")
 }
 
 func Load() {
@@ -76,14 +51,11 @@ func Load() {
 
 	LoadTokens()
 
-	log.Debug("Loading DotEnv")
-
 	LoadEnv(userLayer)
 
 	config = mergeLayers()
 
 	normalizeKeys(config)
-
 	templateConfig(config)
 
 	InitTokens()
@@ -92,13 +64,31 @@ func Load() {
 
 	log.Info("Finished Loading Configuration")
 
-	log.Dev("Loaded Config:\n" + utils.ToJson(config.All()))
-	log.Dev("Loaded Token Configs:\n" + utils.ToJson(tokensLayer.All()))
+	log.Dev("Loaded Config:\n" + jsonutils.ToJson(config.All()))
+	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokensLayer.All()))
+}
+
+func InitEnv() {
+	ENV.PORT = strconv.Itoa(config.Int("server.port"))
+
+	ENV.LOG_LEVEL = strings.ToLower(config.String("loglevel"))
+	
+	ENV.API_URL = config.String("api.url")
+
+	var settings SETTING_
+
+	transformChildren(config, "settings.variables", func(key string, value any) (string, any) {
+		return strings.ToUpper(key), value
+	})
+
+	config.Unmarshal("settings", &settings)
+
+	log.Dev(jsonutils.ToJson(settings))
+
+	ENV.SETTINGS["*"] = &settings
 }
 
 func LoadDefaults() {
-	log.Debug("Loading Config ", ENV.DEFAULTS_PATH)
-
 	_, defErr := LoadFile(ENV.DEFAULTS_PATH, defaultsLayer, yaml.Parser())
 
 	if defErr != nil {
@@ -107,8 +97,6 @@ func LoadDefaults() {
 }
 
 func LoadConfig() {
-	log.Debug("Loading Config ", ENV.CONFIG_PATH)
-
 	_, conErr := LoadFile(ENV.CONFIG_PATH, userLayer, yaml.Parser())
 
 	if conErr != nil {

@@ -3,9 +3,9 @@ package tests
 import (
 	"testing"
 
-	"github.com/codeshelldev/secured-signal-api/utils"
-	"github.com/codeshelldev/secured-signal-api/utils/query"
-	"github.com/codeshelldev/secured-signal-api/utils/templating"
+	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
+	query "github.com/codeshelldev/secured-signal-api/utils/query"
+	templating "github.com/codeshelldev/secured-signal-api/utils/templating"
 )
 
 func TestQueryTemplating(t *testing.T) {
@@ -45,8 +45,8 @@ func TestTypedQuery(t *testing.T) {
 		},
 	}
 
-	expectedStr := utils.ToJson(expected)
-	gotStr := utils.ToJson(got)
+	expectedStr := jsonutils.ToJson(expected)
+	gotStr := jsonutils.ToJson(got)
 
 	if expectedStr != gotStr {
 		t.Error("\nExpected: ", expectedStr, "\nGot: ", gotStr)

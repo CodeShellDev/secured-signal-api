@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	middlewareTypes "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/types"
-	"github.com/codeshelldev/secured-signal-api/utils"
+	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
@@ -90,7 +90,7 @@ func getMessage(aliases []middlewareTypes.MessageAlias, data map[string]any) (st
 func processAlias(alias middlewareTypes.MessageAlias, data map[string]any) (string, int, bool) {
 	aliasKey := alias.Alias
 
-	value, ok := utils.GetByPath(aliasKey, data)
+	value, ok := jsonutils.GetByPath(aliasKey, data)
 
 	aliasValue, isStr := value.(string)
 
