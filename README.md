@@ -8,7 +8,7 @@ endpoint restrictions, placeholders, and flexible configuration.
 </p>
 
 <p align="center">
-⭐️ Secure · 🔒 Configurable · 🚀 Easy to Deploy with Docker
+🔒 Secure · ⭐️ Configurable · 🚀 Easy to Deploy with Docker
 </p>
 
 <div align="center">
@@ -410,6 +410,9 @@ To change the Port which Secured Signal API uses, you need to set `server.port` 
 
 To change the Log Level set `logLevel` to: (default: `info`)
 
+<details>
+<summary>Log Levels</summary>
+
 | Level   |
 | ------- |
 | `info`  |
@@ -418,6 +421,8 @@ To change the Log Level set `logLevel` to: (default: `info`)
 | `error` |
 | `fatal` |
 | `dev`   |
+
+</details>
 
 ## Contributing
 
