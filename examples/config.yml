@@ -7,13 +7,14 @@ api:
 
 logLevel: INFO
 
-variables:
-  number: "000"
-  recipients: ["001", "group.id", "user.id"]
+settings:
+  variables:
+    number: "000"
+    recipients: ["001", "group.id", "user.id"]
 
-messageAliases: [{ alias: "msg", score: 100 }]
+  messageAliases: [{ alias: "msg", score: 100 }]
 
-blockedEndpoints:
-  - /v1/about
-allowedEndpoints:
-  - /v2/send
+  blockedEndpoints:
+    - /v1/about
+  allowedEndpoints:
+    - /v2/send

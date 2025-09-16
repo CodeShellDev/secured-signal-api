@@ -55,18 +55,11 @@ func InitEnv() {
 	
 	ENV.API_URL = config.String("api.url")
 
-	defaultSettings := ENV.SETTINGS["*"]
-
-	config.Unmarshal("messagealiases", &defaultSettings.MESSAGE_ALIASES)
-
 	transformChildren(config, "variables", func(key string, value any) (string, any) {
 		return strings.ToUpper(key), value
 	})
 
-	config.Unmarshal("variables", &defaultSettings.VARIABLES)
-
-	defaultSettings.BLOCKED_ENDPOINTS = config.Strings("blockedendpoints")
-	defaultSettings.ALLOWED_ENDPOINTS = config.Strings("allowedendpoints")
+	config.Unmarshal("settings", &ENV.SETTINGS)
 }
 
 func Load() {
@@ -83,7 +76,6 @@ func Load() {
 	config = mergeLayers()
 
 	normalizeKeys(config)
-
 	templateConfig(config)
 
 	InitTokens()
