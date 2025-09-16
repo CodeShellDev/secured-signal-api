@@ -59,7 +59,7 @@ func InitEnv() {
 		return strings.ToUpper(key), value
 	})
 
-	config.Unmarshal("settings", &ENV.SETTINGS)
+	config.Unmarshal("settings", ENV.SETTINGS["*"])
 }
 
 func Load() {
