@@ -17,6 +17,4 @@ COPY . .
 
 COPY dist/${TARGETOS}/${TARGETARCH}/app .
 
-RUN ls
-
 CMD ["./app"]
