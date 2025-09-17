@@ -35,6 +35,7 @@ endpoint restrictions, placeholders, and flexible configuration.
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
+  - [Message Templates](#message-templates)
 - [Contributing](#contributing)
 - [Support](#support)
 - [License](#license)
