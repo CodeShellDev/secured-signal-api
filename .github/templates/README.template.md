@@ -16,13 +16,13 @@ endpoint restrictions, placeholders, and flexible configuration.
     <img src="https://img.shields.io/github/v/release/codeshelldev/secured-signal-api?sort=semver&logo=github" alt="GitHub release">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
-    <img src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=image+size&trim=" alt="GHCR pulls">
+    <img src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=image+size&trim=" alt="Docker image size">
   </a>
   <a href="./LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/stargazers">
-    <img src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=social" alt="GitHub stars">
+    <img src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=flat&logo=github" alt="GitHub stars">
   </a>
 </div>
 
