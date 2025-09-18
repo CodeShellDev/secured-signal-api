@@ -66,9 +66,9 @@ services:
     environment:
       API__URL: http://signal-api:8080
       SETTINGS__VARIABLES__RECIPIENTS:
-        ["+123400002", "+123400003", "+123400004"]
+        '[+123400002, +123400003, +123400004]'
       SETTINGS__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: [LOOOOOONG_STRING]
+      API__TOKENS: '[LOOOOOONG_STRING]'
     ports:
       - "8880:8880"
     restart: unless-stopped
