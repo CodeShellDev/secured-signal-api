@@ -230,7 +230,7 @@ logLevel: INFO
 settings:
   variables:
     number: "+123400001"
-    recipients: ["+123400002", "group.id", "user.id"]
+    recipients: [+123400002, group.id, user.id]
 
   messageAliases: [{ alias: "msg", score: 100 }]
 
