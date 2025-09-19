@@ -82,8 +82,6 @@ func InitEnv() {
 
 	config.Unmarshal("settings", &settings)
 
-	log.Dev(jsonutils.ToJson(settings))
-
 	ENV.SETTINGS["*"] = &settings
 }
 

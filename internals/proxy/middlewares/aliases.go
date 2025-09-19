@@ -44,16 +44,12 @@ func (data AliasMiddleware) Use() http.Handler {
 		if !body.Empty {
 			bodyData = body.Data
 
-			log.Dev(jsonutils.ToJson(dataAliases))
-
 			aliasData := processDataAliases(dataAliases, bodyData)
 
 			for key, value := range aliasData {
 				prefix := key[:1]
 
 				keyWithoutPrefix := key[1:]
-
-				log.Dev("Key: ", keyWithoutPrefix)
 
 				switch prefix {
 					case "@":
