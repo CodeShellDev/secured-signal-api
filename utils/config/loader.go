@@ -69,7 +69,7 @@ func Load() {
 }
 
 func InitEnv() {
-	ENV.PORT = strconv.Itoa(config.Int("server.port"))
+	ENV.PORT = strconv.Itoa(config.Int("service.port"))
 
 	ENV.LOG_LEVEL = strings.ToLower(config.String("loglevel"))
 	
