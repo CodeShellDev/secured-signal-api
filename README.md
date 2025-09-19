@@ -89,40 +89,29 @@ And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 
 ### Reverse Proxy
 
+##### Traefik
+
 Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 
 ```yaml
-services:
-  secured-signal:
-    image: ghcr.io/codeshelldev/secured-signal-api:latest
-    container_name: secured-signal
-    environment:
-      API__URL: http://signal-api:8080
-      SETTINGS__VARIABLES__RECIPIENTS:
-        '[+123400002,+123400003,+123400004]'
-      SETTINGS__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: '[LOOOOOONG_STRING]'
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.signal-api.rule=Host(`signal-api.mydomain.com`)
-      - traefik.http.routers.signal-api.entrypoints=websecure
-      - traefik.http.routers.signal-api.tls=true
-      - traefik.http.routers.signal-api.tls.certresolver=cloudflare
-      - traefik.http.routers.signal-api.service=signal-api-svc
-      - traefik.http.services.signal-api-svc.loadbalancer.server.port=8880
-      - traefik.docker.network=proxy
-    restart: unless-stopped
-    networks:
-      proxy:
-      backend:
-        aliases:
-          - secured-signal-api
-
-networks:
-  backend:
-  proxy:
-    external: true
+{ { file.examples/traefik/traefik.docker-compose.yaml } }
 ```
+
+#### NGINX Proxy
+
+This is the [NGINX](https://github.com/nginx/nginx) `docker-compose.yaml` file:
+
+```yaml
+{ { file.examples/nginx/nginx.docker-compose.yaml } }
+```
+
+Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `etc/nginx/conf.d/default.conf`:
+
+```conf
+{ { file.examples/nginx/nginx.conf } }
+```
+
+Lastly add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/nginx/ssl`.
 
 ## Setup
 
@@ -198,7 +187,7 @@ you have to add `@` in front of any KeyValue Pair assignment.
 
 Supported types include **strings**, **ints** and **arrays**. See [Formatting](#string-to-type).
 
-## Security: Best Practices
+## Best Practices
 
 - Always use API tokens in production
 - Run behind a TLS-enabled [Reverse Proxy](#reverse-proxy) (Traefik, Nginx, Caddy)
