@@ -5,14 +5,21 @@ api:
   url: http://signal-api:8080
   tokens: [token1, token2]
 
-logLevel: INFO
+logLevel: info
 
 settings:
+  messageTemplate: |
+    You've got a Notification:
+    {{@message}} 
+    At {{@data.timestamp}} on {{@data.date}}.
+    Send using {{.NUMBER}}.
+
   variables:
     number: "+123400001"
     recipients: ["+123400002", "group.id", "user.id"]
 
-  messageAliases: [{ alias: "msg", score: 100 }]
+  dataAliases: 
+    "@message": [{ alias: "msg", score: 100 }]
 
   blockedEndpoints:
     - /v1/about
