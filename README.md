@@ -89,7 +89,7 @@ And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 
 ### Reverse Proxy
 
-##### Traefik
+#### Traefik
 
 Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 
