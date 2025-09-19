@@ -110,6 +110,8 @@ func TemplateBody(data map[string]any, VARIABLES any) (map[string]any, bool, err
 
 	jsonStr := jsonutils.ToJson(data)
 
+	log.Dev("Body before @:\n", jsonStr)
+
 	if jsonStr != "" {
 		re, err := regexp.Compile(`{{\s*\@([a-zA-Z0-9_.]+)\s*}}`)
 
@@ -125,6 +127,8 @@ func TemplateBody(data map[string]any, VARIABLES any) (map[string]any, bool, err
 			data = normalizedData
 		}
 	}
+
+	log.Dev("Body after @:\n", jsonStr)
 
 	templatedData, err := templating.RenderJSON("body", data, VARIABLES)
 
