@@ -57,11 +57,29 @@ And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 
 ### Reverse Proxy
 
+##### Traefik
+
 Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 
 ```yaml
-{ { file.examples/traefik.docker-compose.yaml } }
+{ { file.examples/traefik/traefik.docker-compose.yaml } }
 ```
+
+#### NGINX Proxy
+
+This is the [NGINX](https://github.com/nginx/nginx) `docker-compose.yaml` file:
+
+```yaml
+{ { file.examples/nginx/nginx.docker-compose.yaml } }
+```
+
+Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `etc/nginx/conf.d/default.conf`:
+
+```conf
+{ { file.examples/nginx/nginx.conf } }
+```
+
+Lastly add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/nginx/ssl`.
 
 ## Setup
 
@@ -137,7 +155,7 @@ you have to add `@` in front of any KeyValue Pair assignment.
 
 Supported types include **strings**, **ints** and **arrays**. See [Formatting](#string-to-type).
 
-## Security: Best Practices
+## Best Practices
 
 - Always use API tokens in production
 - Run behind a TLS-enabled [Reverse Proxy](#reverse-proxy) (Traefik, Nginx, Caddy)
