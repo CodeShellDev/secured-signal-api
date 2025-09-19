@@ -314,7 +314,7 @@ To improve compatibility with other services Secured Signal API provides **Data 
 
 </details>
 
-Secured Signal API will pick the best scoring Data Alias (if available) to extract the correct message from the Request Body.
+Secured Signal API will pick the best scoring Data Alias (if available) to extract set the Key to the correct Value from the Request Body.
 
 Data Aliases can be added by setting `dataAliases` in your config:
 
@@ -327,13 +327,17 @@ settings:
         { alias: "data.message", score: 79 },
         { alias: "array[0].message", score: 78 },
       ]
+	".NUMBER":
+      [
+		{ alias: "phone_number", score: 100 },
+      ]
 ```
 
 Use `@` for aliasing Body Keys and `.` for aliasing Variables.
 
 ### Port
 
-To change the Port which Secured Signal API uses, you need to set `server.port` in your config. (default: `8880`)
+To change the Port which Secured Signal API uses, you need to set `service.port` in your config. (default: `8880`)
 
 ### Log Level
 
