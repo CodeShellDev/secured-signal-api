@@ -169,7 +169,34 @@ networks:
 Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `etc/nginx/conf.d/default.conf`:
 
 ```conf
-{ { file.examples/nginx/nginx.conf } }
+server {
+    # Allow SSL on Port 443
+    listen 443 ssl;
+
+    # Add allowed hostnames which nginx should respond to
+    # `_` for any
+    server_name localhost;
+
+    ssl_certificate /etc/nginx/ssl/cert.crt;
+    ssl_certificate_key /etc/nginx/ssl/cert.key;
+
+    location / {
+        # Use whatever network alias you set in the docker-compose file
+        proxy_pass http://secured-signal-api:8880;
+        proxy_set_header Host ;
+        proxy_set_header X-Real-IP ;
+        proxy_set_header X-Forwarded-For ;
+        proxy_set_header X-Forwarded-Host ;
+        proxy_set_header X-Fowarded-Proto ;
+    }
+}
+
+# Redirect HTTP to HTTPs
+server {
+    listen 80;
+    server_name localhost;
+    return 301 https://;
+}
 ```
 
 Lastly add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/nginx/ssl`.
