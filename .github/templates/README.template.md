@@ -35,6 +35,8 @@ endpoint restrictions, placeholders, and flexible configuration.
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
+  - [Data Aliases](#data-aliases)
+  - [Message Templates](#message-templates)
 - [Contributing](#contributing)
 - [Support](#support)
 - [License](#license)
@@ -293,12 +295,12 @@ settings:
     recipients: ["+123400002", "group.id", "user.id"]
 ```
 
-### Message Aliases
+### Data Aliases
 
-To improve compatibility with other services Secured Signal API provides **Message Aliases** for the `message` attribute.
+To improve compatibility with other services Secured Signal API provides **Data Aliases** and a built-in `message` Alias.
 
 <details>
-<summary><strong>Default Message Aliases</strong></summary>
+<summary><strong>Default `message` Aliases</strong></summary>
 
 | Alias        | Score | Alias            | Score |
 | ------------ | ----- | ---------------- | ----- |
@@ -312,19 +314,22 @@ To improve compatibility with other services Secured Signal API provides **Messa
 
 </details>
 
-Secured Signal API will pick the best scoring Message Alias (if available) to extract the correct message from the Request Body.
+Secured Signal API will pick the best scoring Data Alias (if available) to extract the correct message from the Request Body.
 
-Message Aliases can be added by setting `messageAliases` in your config:
+Data Aliases can be added by setting `dataAliases` in your config:
 
 ```yaml
 settings:
-  messageAliases:
-    [
-      { alias: "msg", score: 80 },
-      { alias: "data.message", score: 79 },
-      { alias: "array[0].message", score: 78 },
-    ]
+  dataAliases:
+    "@message":
+      [
+        { alias: "msg", score: 80 },
+        { alias: "data.message", score: 79 },
+        { alias: "array[0].message", score: 78 },
+      ]
 ```
+
+Use `@` for aliasing Body Keys and `.` for aliasing Variables.
 
 ### Port
 
