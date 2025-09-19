@@ -8,7 +8,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	"github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
@@ -113,15 +112,11 @@ func RenderJSON(name string, data map[string]any, variables any) (map[string]any
 		return data, err
 	}
 
-	logger.Dev("after json_path:\n" + jsonutils.ToJson(data))
-
 	data, err = RenderJSONTemplate(name + ":variables", data, variables)
 
 	if err != nil {
 		return data, err
 	}
-
-	logger.Dev("after variables:\n" + jsonutils.ToJson(data))
 
 	return data, nil
 }
@@ -151,6 +146,8 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 	if err != nil {
 		return nil, err
 	}
+
+	logger.Dev("after template:\n" + jsonStr)
 
 	jsonStr = cleanQuotedPairsJSON(jsonStr)
 
