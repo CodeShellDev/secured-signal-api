@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 
 	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
@@ -107,7 +108,25 @@ func (data TemplateMiddleware) Use() http.Handler {
 func TemplateBody(data map[string]any, VARIABLES any) (map[string]any, bool, error) {
 	var modified bool
 
-	templatedData, err := templating.RenderJSONTemplate("body", data, VARIABLES)
+	jsonStr := jsonutils.ToJson(data)
+
+	if jsonStr != "" {
+		re, err := regexp.Compile(`{{\s*(\@)[a-zA-Z0-9_.]+\s*}}`)
+
+		if err != nil {
+			return data, false, err
+		}
+
+		jsonStr = re.ReplaceAllString(jsonStr, ".")
+
+		normalizedData, err := jsonutils.GetJsonSafe[map[string]any](jsonStr)
+
+		if err == nil {
+			data = normalizedData
+		}
+	}
+
+	templatedData, err := templating.RenderJSON("body", data, VARIABLES)
 
 	if err != nil {
 		return data, false, err
