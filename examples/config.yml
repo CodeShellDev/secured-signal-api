@@ -1,7 +1,8 @@
 # Example Config (all configurations shown)
+service:
+  port: 8880
 
 api:
-  port: 8880
   url: http://signal-api:8080
   tokens: [token1, token2]
 
