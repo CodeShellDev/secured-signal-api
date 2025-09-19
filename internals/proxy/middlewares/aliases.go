@@ -46,7 +46,7 @@ func (data AliasMiddleware) Use() http.Handler {
 
 			var aliasData map[string]any
 
-			aliasData, modifiedBody = processDataAliases(dataAliases, bodyData)
+			aliasData = processDataAliases(dataAliases, bodyData)
 
 			for key, value := range aliasData {
 				prefix := key[:1]
@@ -58,6 +58,7 @@ func (data AliasMiddleware) Use() http.Handler {
 				switch prefix {
 					case "@":
 						bodyData[keyWithoutPrefix] = value
+						modifiedBody = true
 					case ".":
 						settings.VARIABLES[keyWithoutPrefix] = value
 				}
@@ -86,9 +87,7 @@ func (data AliasMiddleware) Use() http.Handler {
 	})
 }
 
-func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map[string]any) (map[string]any, bool) {
-	var modified bool
-
+func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map[string]any) (map[string]any) {
 	aliasData := map[string]any{}
 
 	for key, alias := range aliases {
@@ -97,7 +96,7 @@ func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map
 		aliasData[key] = value
 	}
 
-	return aliasData, modified
+	return aliasData
 }
 
 func getData(key string, aliases []middlewareTypes.DataAlias, data map[string]any) (string, any) {
