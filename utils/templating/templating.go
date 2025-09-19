@@ -35,6 +35,10 @@ func normalizeJSON(value any) string {
 		case []any, []string, map[string]any, int, float64, bool:
 			object, _ := json.Marshal(value)
 
+			if string(object) == "{}" {
+				return value.(string)
+			}
+
 			return "<<" + string(object) + ">>"
 
 		default:
