@@ -89,35 +89,34 @@ func (data AliasMiddleware) Use() http.Handler {
 func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map[string]any) (map[string]any, bool) {
 	var modified bool
 
+	aliasData := map[string]any{}
+
 	for key, alias := range aliases {
-		oldData := data
+		key, value := getData(key, alias, data)
 
-		data = getData(key, alias, data)
-
-		if data[key] != oldData[key] {
-			modified = true
-		}
+		aliasData[key] = value
 	}
 
-	return data, modified
+	return aliasData, modified
 }
 
-func getData(key string, aliases []middlewareTypes.DataAlias, data map[string]any) (map[string]any) {
+func getData(key string, aliases []middlewareTypes.DataAlias, data map[string]any) (string, any) {
 	var best int
+	var value any
 
 	for _, alias := range aliases {
 		aliasValue, score, ok := processAlias(alias, data)
 
 		if ok {
 			if score > best {
-				data[key] = aliasValue
+				value = aliasValue
 			}
 
 			data[alias.Alias] = nil
 		}
 	}
 
-	return data
+	return key, value
 }
 
 func processAlias(alias middlewareTypes.DataAlias, data map[string]any) (any, int, bool) {
