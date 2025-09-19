@@ -76,3 +76,5 @@ func main() {
 
 	docker.Shutdown(server)
 }
+
+// TESTING
