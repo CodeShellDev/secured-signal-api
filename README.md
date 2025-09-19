@@ -183,11 +183,11 @@ server {
     location / {
         # Use whatever network alias you set in the docker-compose file
         proxy_pass http://secured-signal-api:8880;
-        proxy_set_header Host ;
-        proxy_set_header X-Real-IP ;
-        proxy_set_header X-Forwarded-For ;
-        proxy_set_header X-Forwarded-Host ;
-        proxy_set_header X-Fowarded-Proto ;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Fowarded-Proto $scheme;
     }
 }
 
@@ -195,7 +195,7 @@ server {
 server {
     listen 80;
     server_name localhost;
-    return 301 https://;
+    return 301 https://$host$request_uri;
 }
 ```
 
@@ -500,7 +500,9 @@ Feel free to open up an issue or create a Pull Request!
 
 ## Support
 
-Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project. :)
+Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project.
+
+:)
 
 ## License
 
