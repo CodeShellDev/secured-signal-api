@@ -44,7 +44,7 @@ func (data MessageMiddleware) Use() http.Handler {
 		var modifiedBody bool
 
 		if !body.Empty {
-			log.Dev("Body at MSG Middleware:\n" + body.ToString())
+			bodyData = body.Data
 
 			templatedMessage, err := TemplateMessage(messageTemplate, bodyData, variables)
 
