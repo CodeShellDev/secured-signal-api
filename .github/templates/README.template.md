@@ -62,7 +62,7 @@ And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 
 ```yaml
-{ { file.examples/traefik/traefik.docker-compose.yaml } }
+{ { file.examples/reverse-proxy/traefik/traefik.docker-compose.yaml } }
 ```
 
 #### NGINX Proxy
@@ -70,7 +70,7 @@ Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 This is the [NGINX](https://github.com/nginx/nginx) `docker-compose.yaml` file:
 
 ```yaml
-{ { file.examples/nginx/nginx.docker-compose.yaml } }
+{ { file.examples/reverse-proxy/nginx/nginx.docker-compose.yaml } }
 ```
 
 Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `etc/nginx/conf.d/default.conf`:
