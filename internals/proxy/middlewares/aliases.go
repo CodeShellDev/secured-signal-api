@@ -53,6 +53,8 @@ func (data AliasMiddleware) Use() http.Handler {
 
 				keyWithoutPrefix := key[1:]
 
+				log.Dev("Key: ", keyWithoutPrefix)
+
 				switch prefix {
 					case "@":
 						bodyData[keyWithoutPrefix] = value
