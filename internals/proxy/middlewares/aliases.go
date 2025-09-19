@@ -44,9 +44,7 @@ func (data AliasMiddleware) Use() http.Handler {
 		if !body.Empty {
 			bodyData = body.Data
 
-			var aliasData map[string]any
-
-			aliasData = processDataAliases(dataAliases, bodyData)
+			aliasData := processDataAliases(dataAliases, bodyData)
 
 			for key, value := range aliasData {
 				prefix := key[:1]
