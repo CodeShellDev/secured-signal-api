@@ -31,7 +31,7 @@ endpoint restrictions, placeholders, and flexible configuration.
 - [Getting Started](#getting-started)
 - [Setup](#setup)
 - [Usage](#usage)
-- [Best Practices](#security-best-practices)
+- [Best Practices](#best-practices)
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
@@ -121,8 +121,9 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_T
 
 #### Placeholders
 
-If you are not comfortable / don't want to hardcode your Number for example and/or Recipients in you, may use **Placeholders** in your Request. See [Custom Variables](#variables).
+If you are not comfortable / don't want to hardcode your Number for example and/or Recipients in you, may use **Placeholders** in your Request.
 
+You can use [**Variable**](#variables) (`{{.NUMBER}}`) Placeholders and **Body** Placeholders (`{{@data.key}}`)
 These Placeholders can be used in the Request Query or the Body of a Request like so:
 
 **Body**
@@ -144,6 +145,14 @@ http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}
 
 ```
 http://sec-signal-api:8880/v1/receive/{{.NUMBER}}
+```
+
+You can also combine them:
+
+```json
+{
+	"content": "{{.NUMBER}} -> {{.RECIPIENTS}}"
+}
 ```
 
 #### KeyValue Pair Injection
@@ -295,6 +304,21 @@ settings:
     recipients: ["+123400002", "group.id", "user.id"]
 ```
 
+### Message Templates
+
+To customize the `message` attribute you can use **Message Templates** to build your message by using other Body Keys and Variables.
+Use `messageTemplate` to configure:
+
+```yaml
+settings:
+  messageTemplate: |
+    Your Message:
+    {{@message}}.
+    Sent with Secured Signal API.
+```
+
+Use `{{@data.key}}` to reference Body Keys and `{{.KEY}}` for Variables.
+
 ### Data Aliases
 
 To improve compatibility with other services Secured Signal API provides **Data Aliases** and a built-in `message` Alias.
@@ -327,9 +351,9 @@ settings:
         { alias: "data.message", score: 79 },
         { alias: "array[0].message", score: 78 },
       ]
-	".NUMBER":
+    ".NUMBER":
       [
-		{ alias: "phone_number", score: 100 },
+        { alias: "phone_number", score: 100 },
       ]
 ```
 
