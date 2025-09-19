@@ -4,8 +4,6 @@ server:
 logLevel: info
 
 settings:
-  dataAliases: ["@message": [{ alias: "data.msg", score: 100 }]]
-
   variables:
     recipients: ${RECIPIENTS}
     number: ${NUMBER}
