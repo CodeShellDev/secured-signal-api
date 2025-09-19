@@ -44,6 +44,8 @@ func (data AliasMiddleware) Use() http.Handler {
 		if !body.Empty {
 			bodyData = body.Data
 
+			log.Dev(jsonutils.ToJson(dataAliases))
+
 			aliasData := processDataAliases(dataAliases, bodyData)
 
 			for key, value := range aliasData {
