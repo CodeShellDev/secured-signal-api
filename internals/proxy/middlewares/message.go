@@ -44,6 +44,8 @@ func (data MessageMiddleware) Use() http.Handler {
 		var modifiedBody bool
 
 		if !body.Empty {
+			log.Dev(body.ToString())
+
 			templatedMessage, err := TemplateMessage(messageTemplate, bodyData, variables)
 
 			if err != nil {
@@ -68,7 +70,7 @@ func (data MessageMiddleware) Use() http.Handler {
 
 			strData := body.ToString()
 
-			log.Debug("Applied Body Templating: ", strData)
+			log.Debug("Applied Message Templating: ", strData)
 
 			req.ContentLength = int64(len(strData))
 			req.Header.Set("Content-Length", strconv.Itoa(len(strData)))
