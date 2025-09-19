@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
@@ -46,14 +45,14 @@ func (data MessageMiddleware) Use() http.Handler {
 		if !body.Empty {
 			bodyData = body.Data
 
-			templatedMessage, err := TemplateMessage(messageTemplate, bodyData, variables)
+			newData, err := TemplateMessage(messageTemplate, bodyData, variables)
 
 			if err != nil {
 				log.Error("Error Templating Message: ", err.Error())
 			}
 
-			if templatedMessage != bodyData["message"] && templatedMessage != "" {
-				bodyData["message"] = templatedMessage
+			if newData["message"] != bodyData["message"] && newData["message"] != "" {
+				bodyData = newData
 				modifiedBody = true
 			}
 		}
@@ -82,20 +81,14 @@ func (data MessageMiddleware) Use() http.Handler {
 	})
 }
 
-func TemplateMessage(template string, data map[string]any, VARIABLES any) (string, error) {
+func TemplateMessage(template string, data map[string]any, VARIABLES any) (map[string]any, error) {
 	data["message"] = template
 
 	data, ok, err := TemplateBody(data, VARIABLES)
 
 	if err != nil || !ok || data == nil {
-		return template, err
+		return data, err
 	}
 
-	jsonStr, err := jsonutils.ToJsonSafe(data)
-
-	if err != nil {
-		return template, err
-	}
-
-	return jsonStr, nil
+	return data, nil
 }
