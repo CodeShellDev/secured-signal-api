@@ -355,9 +355,7 @@ Feel free to open up an issue or create a Pull Request!
 
 ## Support
 
-Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project.
-
-:)
+Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project. :)
 
 ## License
 
