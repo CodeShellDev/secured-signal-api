@@ -106,16 +106,16 @@ func CreateTemplateWithFunc(name string, funcMap template.FuncMap) (*template.Te
 	return template.New(name).Funcs(funcMap)
 }
 
-func RenderJSON(name string, data map[string]any, variables any) (map[string]any, error) {
+func RenderJSON(name string, data map[string]any, variables map[string]any) (map[string]any, error) {
 	logger.Dev("Incoming data:\n", jsonutils.ToJson(data))
 
-	data, err := RenderJSONTemplate(name + ":json_path", data, data)
+	combinedData := data
 
-	if err != nil {
-		return data, err
+	for key, value := range variables {
+		combinedData[key] = value
 	}
 
-	data, err = RenderJSONTemplate(name + ":variables", data, variables)
+	data, err := RenderJSONTemplate(name, data, combinedData)
 
 	if err != nil {
 		return data, err
@@ -124,7 +124,7 @@ func RenderJSON(name string, data map[string]any, variables any) (map[string]any
 	return data, nil
 }
 
-func RenderJSONTemplate(name string, data map[string]any, variables any) (map[string]any, error) {
+func RenderJSONTemplate(name string, data map[string]any, variables map[string]any) (map[string]any, error) {
 	jsonBytes, err := json.Marshal(data)
 
 	if err != nil {

@@ -105,7 +105,7 @@ func (data TemplateMiddleware) Use() http.Handler {
 	})
 }
 
-func TemplateBody(data map[string]any, VARIABLES any) (map[string]any, bool, error) {
+func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
 	var modified bool
 
 	jsonStr := jsonutils.ToJson(data)
