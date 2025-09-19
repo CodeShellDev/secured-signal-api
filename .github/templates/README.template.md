@@ -3,7 +3,7 @@
 <h3 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal Messenger REST API</a></h3>
 
 <p align="center">
-adding token-based authentication,
+token-based authentication,
 endpoint restrictions, placeholders, and flexible configuration.
 </p>
 
@@ -15,14 +15,14 @@ endpoint restrictions, placeholders, and flexible configuration.
   <a href="https://github.com/codeshelldev/secured-signal-api/releases">
     <img src="https://img.shields.io/github/v/release/codeshelldev/secured-signal-api?sort=semver&logo=github" alt="GitHub release">
   </a>
+  <a href="https://github.com/codeshelldev/secured-signal-api/stargazers">
+    <img src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=flat&logo=github" alt="GitHub stars">
+  </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
-    <img src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=image+size&trim=" alt="GHCR pulls">
+    <img src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=image+size&trim=" alt="Docker image size">
   </a>
   <a href="./LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
-  </a>
-  <a href="https://github.com/codeshelldev/secured-signal-api/stargazers">
-    <img src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=social" alt="GitHub stars">
   </a>
 </div>
 
@@ -57,11 +57,29 @@ And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 
 ### Reverse Proxy
 
+#### Traefik
+
 Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 
 ```yaml
-{ { file.examples/traefik.docker-compose.yaml } }
+{ { file.examples/reverse-proxy/traefik/traefik.docker-compose.yaml } }
 ```
+
+#### NGINX Proxy
+
+This is the [NGINX](https://github.com/nginx/nginx) `docker-compose.yaml` file:
+
+```yaml
+{ { file.examples/reverse-proxy/nginx/nginx.docker-compose.yaml } }
+```
+
+Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `etc/nginx/conf.d/default.conf`:
+
+```conf
+{ { file.examples/reverse-proxy/nginx/nginx.conf } }
+```
+
+Lastly add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/nginx/ssl`.
 
 ## Setup
 
@@ -137,7 +155,7 @@ you have to add `@` in front of any KeyValue Pair assignment.
 
 Supported types include **strings**, **ints** and **arrays**. See [Formatting](#string-to-type).
 
-## Security: Best Practices
+## Best Practices
 
 - Always use API tokens in production
 - Run behind a TLS-enabled [Reverse Proxy](#reverse-proxy) (Traefik, Nginx, Caddy)
@@ -345,7 +363,8 @@ Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
-### Legal
+## Legal
 
 Logo designed by [@CodeShellDev](https://github.com/codeshelldev), All Rights Reserved.
+
 This Project is not affiliated with the Signal Foundation.
