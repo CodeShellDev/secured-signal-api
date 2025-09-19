@@ -56,6 +56,7 @@ func (data AliasMiddleware) Use() http.Handler {
 				switch prefix {
 					case "@":
 						bodyData[keyWithoutPrefix] = value
+						modifiedBody = true
 					case ".":
 						settings.VARIABLES[keyWithoutPrefix] = value
 				}
