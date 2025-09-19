@@ -33,12 +33,16 @@ func main() {
 
 	initHandler = proxy.Create(ENV.API_URL)
 
-	body_m4 := middlewares.BodyMiddleware{
+	mesg_m5 := middlewares.MessageMiddleware{
 		Next: 	initHandler,
 	}
 
+	alias_m4 := middlewares.AliasMiddleware{
+		Next: 	mesg_m5.Use(),
+	}
+
 	temp_m3 := middlewares.TemplateMiddleware{
-		Next: 	body_m4.Use(),
+		Next: 	alias_m4.Use(),
 	}
 
 	endp_m2 := middlewares.EndpointsMiddleware{
