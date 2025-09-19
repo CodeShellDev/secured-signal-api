@@ -13,7 +13,6 @@ func normalize(value any) string {
 	switch str := value.(type) {
 		case []string:
 			return "[" + strings.Join(str, ",") + "]"
-
 		case []any:
 			items := make([]string, len(str))
 
@@ -43,6 +42,37 @@ func normalizeJSON(value any) string {
     }
 }
 
+func cleanQuotedPairsJSON(s string) string {
+	quoteRe, err := regexp.Compile(`"([^"]*?)"`)
+
+	if err != nil {
+		return s
+	}
+
+	pairRe, err := regexp.Compile(`<<([^<>]+)>>`)
+
+	if err != nil {
+		return s
+	}
+
+	return quoteRe.ReplaceAllStringFunc(s, func(container string) string {
+		inner := container[1 : len(container)-1] // remove quotes
+
+		matches := pairRe.FindAllStringSubmatchIndex(inner, -1)
+
+		// ONE pair which fills whole ""
+		if len(matches) == 1 && matches[0][0] == 0 && matches[0][1] == len(inner) {
+			return container // keep <<...>> untouched
+		}
+
+		// MULTIPLE pairs || that do not fill whole ""
+		inner = pairRe.ReplaceAllString(inner, "$1")
+		inner = strings.ReplaceAll(inner, `"`, `'`)
+
+		return `"` + inner + `"`
+	})
+}
+
 func ParseTemplate(templt *template.Template, tmplStr string, variables any) (string, error) {
 	tmpl, err := templt.Parse(tmplStr)
 
@@ -69,6 +99,22 @@ func CreateTemplateWithFunc(name string, funcMap template.FuncMap) (*template.Te
 	return template.New(name).Funcs(funcMap)
 }
 
+func RenderJSON(name string, data map[string]any, variables any) (map[string]any, error) {
+	data, err := RenderJSONTemplate(name + ":json_path", data, data)
+
+	if err != nil {
+		return data, err
+	}
+
+	data, err = RenderJSONTemplate(name + ":variables", data, variables)
+
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
+}
+
 func RenderJSONTemplate(name string, data map[string]any, variables any) (map[string]any, error) {
 	jsonBytes, err := json.Marshal(data)
 
@@ -78,7 +124,7 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 
 	tmplStr := string(jsonBytes)
 
-	re, err := regexp.Compile(`{{\s*\.(\w+)\s*}}`)
+	re, err := regexp.Compile(`{{\s*\.([a-zA-Z0-9_.]+)\s*}}`)
 
 	// Add normalize() to be able to remove Quotes from Arrays
 	if err == nil {
@@ -94,6 +140,8 @@ func RenderJSONTemplate(name string, data map[string]any, variables any) (map[st
 	if err != nil {
 		return nil, err
 	}
+
+	jsonStr = cleanQuotedPairsJSON(jsonStr)
 
 	// Remove the Quotes around "<<[item1,item2]>>"
 	re, err = regexp.Compile(`"<<(.*?)>>"`)
