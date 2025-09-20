@@ -82,6 +82,8 @@ func (data MessageMiddleware) Use() http.Handler {
 }
 
 func TemplateMessage(template string, data map[string]any, VARIABLES map[string]any) (map[string]any, error) {
+	log.Dev(template)
+
 	data["message"] = template
 
 	data, ok, err := TemplateBody(data, VARIABLES)

@@ -123,10 +123,10 @@ func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any
 
 		if err == nil {
 			data = normalizedData
-		} else {
-			log.Dev(err.Error())
 		}
 	}
+
+	log.Dev(jsonStr)
 
 	templatedData, err := templating.RenderJSON("body", data, VARIABLES)
 
