@@ -1,10 +1,10 @@
-<img align="center" width="1048" height="512" alt="Secure Proxy for Signal REST API" src="https://github.com/CodeShellDev/secured-signal-api/raw/refs/heads/main/logo/landscape" />
+<img align="center" width="1048" height="512" alt="Secure Proxy for Signal REST API" src="https://github.com/CodeShellDev/secured-signal-api/raw/refs/heads/main/logo/banner.png" />
 
 <h3 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal Messenger REST API</a></h3>
 
 <p align="center">
-Adding token-based authentication,
-endpoint restrictions, placeholders, and flexible configuration.
+token-based authentication,
+endpoint restrictions, placeholders, flexible configuration
 </p>
 
 <p align="center">
@@ -125,11 +125,11 @@ If you are not comfortable / don't want to hardcode your Number for example and/
 
 You can use [**Variable**](#variables) `{{.NUMBER}}` Placeholders and **Body** Placeholders `{{@data.key}}`.
 
-| Type | Example |
-| :--- | :------ |
-| Body | `{"number": "{{ .NUMBER }}", "recipients": "{{ .RECIPIENTS }}"}` |
-| Query| `http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}` |
-| Path | `http://sec-signal-api:8880/v1/receive/{{.NUMBER}}` |
+| Type  | Example                                                          |
+| :---- | :--------------------------------------------------------------- |
+| Body  | `{"number": "{{ .NUMBER }}", "recipients": "{{ .RECIPIENTS }}"}` |
+| Query | `http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}`     |
+| Path  | `http://sec-signal-api:8880/v1/receive/{{.NUMBER}}`              |
 
 You can also combine them:
 
@@ -335,10 +335,7 @@ settings:
         { alias: "data.message", score: 79 },
         { alias: "array[0].message", score: 78 },
       ]
-    ".NUMBER":
-      [
-        { alias: "phone_number", score: 100 },
-      ]
+    ".NUMBER": [{ alias: "phone_number", score: 100 }]
 ```
 
 Use `@` for aliasing Body Keys and `.` for aliasing Variables.
@@ -363,18 +360,25 @@ To change the Log Level set `logLevel` to: (default: `info`)
 | `fatal` |
 | `dev`   |
 
-</details>
+</details
 
 ## Contributing
 
 Found a bug? Want to change or add something?
-Feel free to open up an issue or create a Pull Request!
+Feel free to open up an [Issue](https://github.com/codeshelldev/secured-signal-api/issues) or create a [Pull Request](https://github.com/codeshelldev/secured-signal-api/pulls)!
 
 ## Support
 
 Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project.
 
 :)
+
+## Help
+
+**Are you having Problems setting up Secured Signal API?**<br>
+No worries check out the [Discussions](https://github.com/codeshelldev/secured-signal-api/discussions) Tab and ask for help.
+
+**We are all Volunteers**, so please be friendly and patient.
 
 ## License
 

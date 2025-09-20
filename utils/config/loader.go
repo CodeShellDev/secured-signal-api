@@ -17,6 +17,7 @@ import (
 type ENV_ struct {
 	CONFIG_PATH			string
 	DEFAULTS_PATH		string
+	FAVICON_PATH		string
 	TOKENS_DIR			string
 	LOG_LEVEL			string
 	PORT 				string
@@ -38,6 +39,7 @@ var ENV *ENV_ = &ENV_{
 	CONFIG_PATH: os.Getenv("CONFIG_PATH"),
 	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
 	TOKENS_DIR: os.Getenv("TOKENS_DIR"),
+	FAVICON_PATH: os.Getenv("FAVICON_PATH"),
 	API_TOKENS: []string{},
 	SETTINGS: map[string]*SETTING_{
 
