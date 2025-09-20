@@ -1,7 +1,11 @@
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificate
 
-ENV SERVER__PORT=8880
+ARG IMAGE_TAG
+ENV IMAGE_TAG=$IMAGE_TAG
+LABEL org.opencontainers.image.version=$IMAGE_TAG
+
+ENV SERVICE__PORT=8880
 
 ENV DEFAULTS_PATH=/app/config/defaults.yml
 
