@@ -126,8 +126,6 @@ func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any
 		}
 	}
 
-	log.Dev(jsonStr)
-
 	templatedData, err := templating.RenderJSON("body", data, VARIABLES)
 
 	if err != nil {

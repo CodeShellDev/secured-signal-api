@@ -7,6 +7,9 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
+	"github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 func normalize(value any) string {
@@ -128,6 +131,8 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 
 	tmplStr := string(jsonBytes)
 
+	logger.Dev("1\n", tmplStr)
+
 	re, err := regexp.Compile(`{{\s*\.([a-zA-Z0-9_.]+)\s*}}`)
 
 	// Add normalize() to be able to remove Quotes from Arrays
@@ -135,17 +140,23 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
     	tmplStr = re.ReplaceAllString(tmplStr, "{{normalize .$1}}")
 	}
 
+	logger.Dev("2\n", tmplStr)
+
 	templt := CreateTemplateWithFunc(name, template.FuncMap{
         "normalize": normalizeJSON,
     })
 
 	jsonStr, err := ParseTemplate(templt, tmplStr, variables)
 
+	logger.Dev("3\n", tmplStr)
+
 	if err != nil {
 		return nil, err
 	}
 
 	jsonStr = cleanQuotedPairsJSON(jsonStr)
+
+	logger.Dev("4\n", tmplStr)
 
 	// Remove the Quotes around "<<[item1,item2]>>"
 	re, err = regexp.Compile(`"<<(.*?)>>"`)
@@ -156,7 +167,11 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 
 	jsonStr = re.ReplaceAllString(jsonStr, "$1")
 
+	logger.Dev("5\n", tmplStr)
+
 	err = json.Unmarshal([]byte(jsonStr), &data)
+
+	logger.Dev("6\n", jsonutils.ToJson(data))
 
 	if err != nil {
 		return nil, err
