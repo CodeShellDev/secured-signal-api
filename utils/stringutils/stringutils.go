@@ -1,4 +1,4 @@
-package safestrings
+package stringutils
 
 import (
 	"regexp"

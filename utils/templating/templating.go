@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/codeshelldev/secured-signal-api/utils/logger"
+	"github.com/codeshelldev/secured-signal-api/utils/stringutils"
 )
 
 func normalize(value any) string {
@@ -151,58 +151,60 @@ func RenderJSON(name string, data map[string]any, variables map[string]any) (map
 	return data, nil
 }
 
+func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any) (any) {
+	strKey, isStr := key.(string)
+
+	if !isStr {
+		strKey = "!string"
+	}
+
+	switch typedValue := value.(type) {
+		case map[string]any:
+			data := map[string]any{}
+
+			for mapKey, mapValue := range typedValue {
+				data[mapKey] = RenderDataKeyTemplateRecursive(mapKey, mapValue, variables)
+			}
+
+			return data
+
+		case []any:
+			data := []any{}
+
+			for arrayIndex, arrayValue := range typedValue {
+				data = append(data, RenderDataKeyTemplateRecursive(arrayIndex, arrayValue, variables))
+			}
+
+			return data
+		
+		case string:
+			templt := CreateTemplateWithFunc("json:" + strKey, template.FuncMap{
+				"normalize": normalize,
+			})
+
+			tmplStr, _ := AddTemplateFunc(typedValue, "normalize")
+
+			templatedValue, _ := ParseTemplate(templt, tmplStr, variables)
+
+			re, _ := regexp.Compile(`{{[^}]+}}`)
+
+			filtered := re.ReplaceAllString(tmplStr, "")
+
+			re, _ = regexp.Compile(`(\S+)`)
+
+			if !re.MatchString(filtered) {
+				return stringutils.ToType(templatedValue)
+			}
+		
+			return templatedValue
+		
+		default:
+			return typedValue
+	}
+}
+
 func RenderJSONTemplate(name string, data map[string]any, variables map[string]any) (map[string]any, error) {
-	jsonBytes, err := json.Marshal(data)
-
-	if err != nil {
-		return nil, err
-	}
-
-	tmplStr := string(jsonBytes)
-
-	tmplStr = strings.ReplaceAll(tmplStr, "\n", `
-	`)
-
-	logger.Dev("Before AddTemplateFunc: ", tmplStr)
-
-	tmplStr, err = AddTemplateFunc(tmplStr, "normalize")
-
-	logger.Dev("After AddTemplateFunc: ", tmplStr)
-
-	if err != nil {
-		return nil, err
-	}
-
-	templt := CreateTemplateWithFunc(name, template.FuncMap{
-        "normalize": normalizeJSON,
-    })
-
-	logger.Dev("Template: ", tmplStr)
-
-	jsonStr, err := ParseTemplate(templt, tmplStr, variables)
-
-	if err != nil {
-		return nil, err
-	}
-
-	jsonStr = cleanQuotedPairsJSON(jsonStr)
-
-	// Remove the Quotes around "<<[item1,item2]>>"
-	re, err := regexp.Compile(`"<<(.*?)>>"`)
-
-	if err != nil {
-		return nil, err
-	}
-
-	jsonStr = re.ReplaceAllString(jsonStr, "$1")
-
-	err = json.Unmarshal([]byte(jsonStr), &data)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
+	return RenderDataKeyTemplateRecursive("", data, variables).(map[string]any), nil
 }
 
 func RenderNormalizedTemplate(name string, tmplStr string, variables any) (string, error) {
