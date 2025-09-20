@@ -203,6 +203,7 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 			re, _ = regexp.Compile(`(\S+)`)
 
 			if !re.MatchString(filtered) {
+				logger.Dev(templatedValue)
 				return stringutils.ToType(templatedValue)
 			}
 		
