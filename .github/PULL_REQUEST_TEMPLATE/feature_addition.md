@@ -2,7 +2,7 @@
 Describe the new feature and motivation.
 
 ## Changes
-- List major additions
+* List major additions
 
 ## Checklist
 - [ ] Feature tested
