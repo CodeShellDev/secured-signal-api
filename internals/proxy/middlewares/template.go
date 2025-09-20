@@ -121,7 +121,7 @@ func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any
 
 		normalizedData, err := jsonutils.GetJsonSafe[map[string]any](jsonStr)
 		
-		log.Dev(err.Error())
+		log.Dev("Error removing @ and encoding: ", err.Error())
 
 		if err == nil {
 			data = normalizedData
