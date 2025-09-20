@@ -178,7 +178,7 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 			return data
 		
 		case string:
-			logger.Dev(typedValue)
+			logger.Dev("Raw:\n", typedValue)
 
 			templt := CreateTemplateWithFunc("json:" + strKey, template.FuncMap{
 				"normalize": normalize,
@@ -187,6 +187,8 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 			tmplStr, _ := AddTemplateFunc(typedValue, "normalize")
 
 			templatedValue, _ := ParseTemplate(templt, tmplStr, variables)
+
+			logger.Dev("Templated:\n", templatedValue)
 
 			re, _ := regexp.Compile(`{{[^}]+}}`)
 
