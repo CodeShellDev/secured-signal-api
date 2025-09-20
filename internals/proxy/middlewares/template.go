@@ -142,7 +142,7 @@ func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any
 	log.Dev(beforeStr)
 	log.Dev(afterStr)
 
-	modified = beforeStr == afterStr
+	modified = beforeStr != afterStr
 
 	return templatedData, modified, nil
 }
