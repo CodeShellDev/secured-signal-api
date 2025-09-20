@@ -91,7 +91,9 @@ func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map
 	for key, alias := range aliases {
 		key, value := getData(key, alias, data)
 
-		aliasData[key] = value
+		if value != nil {
+			aliasData[key] = value
+		}
 	}
 
 	return aliasData
