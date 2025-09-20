@@ -7,12 +7,12 @@ assignees: ''
 
 ---
 
-## Issue
+### Issue
 Fixes # (issue)
 
-## Changes
+### Changes
 * Describe the fix clearly
 * Mention root cause if known
 
-## Verification
+### Verification
 - [ ] Tested locally
