@@ -128,11 +128,11 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 
 	tmplStr := string(jsonBytes)
 
-	re, err := regexp.Compile(`{{\s*\.([a-zA-Z0-9_.]+)\s*}}`)
+	re, err := regexp.Compile(`{{.*(\.[a-zA-Z0-9_.]+).*}}`)
 
 	// Add normalize() to be able to remove Quotes from Arrays
 	if err == nil {
-    	tmplStr = re.ReplaceAllString(tmplStr, "{{normalize .$1}}")
+    	tmplStr = re.ReplaceAllString(tmplStr, "{{normalize $1}}")
 	}
 
 	templt := CreateTemplateWithFunc(name, template.FuncMap{
@@ -166,7 +166,7 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 }
 
 func RenderNormalizedTemplate(name string, tmplStr string, variables any) (string, error) {
-	re, err := regexp.Compile(`{{\s*\.(\w+)\s*}}`)
+	re, err := regexp.Compile(`{{.*\.[a-zA-Z0-9_.]+.*}}`)
 
 	// Add normalize() to normalize arrays to [item1,item2]
 	if err == nil {
