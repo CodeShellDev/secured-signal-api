@@ -12,7 +12,7 @@ import (
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
-var initHandler *httputil.ReverseProxy
+var proxy_last *httputil.ReverseProxy
 
 var ENV *config.ENV_
 
@@ -31,26 +31,30 @@ func main() {
 
 	log.Info("Initialized Logger with Level of ", log.Level())
 
-	initHandler = proxy.Create(ENV.API_URL)
+	proxy_last = proxy.Create(ENV.API_URL)
 
-	body_m4 := middlewares.BodyMiddleware{
-		Next: 	initHandler,
+	body_m5 := middlewares.BodyMiddleware{
+		Next: 	proxy_last,
 	}
 
-	temp_m3 := middlewares.TemplateMiddleware{
-		Next: 	body_m4.Use(),
+	temp_m4 := middlewares.TemplateMiddleware{
+		Next: 	body_m5.Use(),
 	}
 
-	endp_m2 := middlewares.EndpointsMiddleware{
-		Next: 	temp_m3.Use(),
+	endp_m3 := middlewares.EndpointsMiddleware{
+		Next: 	temp_m4.Use(),
 	}
 
-	auth_m1 := middlewares.AuthMiddleware{
-		Next:   endp_m2.Use(),
+	auth_m2 := middlewares.AuthMiddleware{
+		Next:   endp_m3.Use(),
+	}
+
+	serv_m1 := middlewares.ServeMiddleware{
+		Next: auth_m2.Use(),
 	}
 
 	log_m0 := middlewares.LogMiddleware{
-		Next: 	auth_m1.Use(),
+		Next: 	serv_m1.Use(),
 	}
 
 	log.Info("Initialized Proxy Handler")
