@@ -199,7 +199,11 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 }
 
 func RenderNormalizedTemplate(name string, tmplStr string, variables any) (string, error) {
+	logger.Dev("Before AddTemplateFunc: ", tmplStr)
+
 	tmplStr, err := AddTemplateFunc(tmplStr, "normalize")
+
+	logger.Dev("After AddTemplateFunc: ", tmplStr)
 
 	if err != nil {
 		return tmplStr, err
