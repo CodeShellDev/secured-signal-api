@@ -73,6 +73,8 @@ func (data AliasMiddleware) Use() http.Handler {
 
 			strData := body.ToString()
 
+			log.Debug("Applied Data Aliasing: ", strData)
+
 			req.ContentLength = int64(len(strData))
 			req.Header.Set("Content-Length", strconv.Itoa(len(strData)))
 		}
@@ -89,7 +91,9 @@ func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map
 	for key, alias := range aliases {
 		key, value := getData(key, alias, data)
 
-		aliasData[key] = value
+		if value != nil {
+			aliasData[key] = value
+		}
 	}
 
 	return aliasData
