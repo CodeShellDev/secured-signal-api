@@ -132,6 +132,8 @@ func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any
 
 	templatedData, err := templating.RenderJSON("body", data, VARIABLES)
 
+	log.Dev("After:\n",jsonutils.ToJson(templatedData))
+
 	if err != nil {
 		return data, false, err
 	}

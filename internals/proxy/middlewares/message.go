@@ -85,13 +85,13 @@ func (data MessageMiddleware) Use() http.Handler {
 func TemplateMessage(template string, data map[string]any, VARIABLES map[string]any) (map[string]any, error) {
 	data["message_template"] = template
 
-	log.Dev(jsonutils.ToJson(data))
+	log.Dev("Before:\n",jsonutils.ToJson(data))
 
-	data, ok, err := TemplateBody(data, VARIABLES)
+	data, _, err := TemplateBody(data, VARIABLES)
 
-	log.Dev(jsonutils.ToJson(data))
+	log.Dev("After:\n",jsonutils.ToJson(data))
 
-	if err != nil || !ok || data == nil {
+	if err != nil || data == nil {
 		return data, err
 	}
 
