@@ -184,7 +184,9 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 				"normalize": normalize,
 			})
 
-			tmplStr, _ := AddTemplateFunc(typedValue, "normalize")
+			//tmplStr, _ := AddTemplateFunc(typedValue, "normalize")
+
+			tmplStr := typedValue
 
 			templatedValue, err := ParseTemplate(templt, tmplStr, variables)
 
