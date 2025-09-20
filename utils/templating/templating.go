@@ -79,6 +79,36 @@ func cleanQuotedPairsJSON(s string) string {
 	})
 }
 
+func AddTemplateFunc(tmplStr string, funcName string) (string, error) {
+	return TransformTemplateKeys(tmplStr, '.', func(re *regexp.Regexp, match string) string {
+		return re.ReplaceAllStringFunc(match, func(varMatch string) string {
+			varName := re.ReplaceAllString(varMatch, "$1")
+
+			return strings.ReplaceAll(varMatch, varName, "(" + funcName + " " + varName + ")")
+		})
+	})
+}
+
+func TransformTemplateKeys(tmplStr string, tmplKey rune, transform func(varRegex *regexp.Regexp, m string) string) (string, error) {
+	re, err := regexp.Compile(`{{[^}]+}}`)
+
+	if err != nil {
+		return tmplStr, err
+	}
+
+	varRe, err := regexp.Compile(`\` + string(tmplKey) + `(\w+)`)
+
+	if err != nil {
+		return tmplStr, err
+	}
+
+	tmplStr = re.ReplaceAllStringFunc(tmplStr, func(match string) string {
+		return transform(varRe, match)
+	})
+
+	return tmplStr, nil
+}
+
 func ParseTemplate(templt *template.Template, tmplStr string, variables any) (string, error) {
 	tmpl, err := templt.Parse(tmplStr)
 
@@ -130,14 +160,10 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 
 	tmplStr := string(jsonBytes)
 
-	re, err := regexp.Compile(`{{[^}]+}}`)
+	tmplStr, err = AddTemplateFunc(tmplStr, "normalize")
 
-	// Add normalize() to be able to remove Quotes from Arrays
-	if err == nil {
-    	tmplStr = re.ReplaceAllStringFunc(tmplStr, func(tag string) string {
-			dotTag := "." + tag
-    		return strings.ReplaceAll(tag, dotTag, "(normalize " + dotTag + ")")
-		})
+	if err != nil {
+		return nil, err
 	}
 
 	templt := CreateTemplateWithFunc(name, template.FuncMap{
@@ -155,7 +181,7 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 	jsonStr = cleanQuotedPairsJSON(jsonStr)
 
 	// Remove the Quotes around "<<[item1,item2]>>"
-	re, err = regexp.Compile(`"<<(.*?)>>"`)
+	re, err := regexp.Compile(`"<<(.*?)>>"`)
 
 	if err != nil {
 		return nil, err
@@ -173,14 +199,10 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 }
 
 func RenderNormalizedTemplate(name string, tmplStr string, variables any) (string, error) {
-	re, err := regexp.Compile(`{{[^}]+}}`)
+	tmplStr, err := AddTemplateFunc(tmplStr, "normalize")
 
-	// Add normalize() to normalize arrays to [item1,item2]
-	if err == nil {
-    	tmplStr = re.ReplaceAllStringFunc(tmplStr, func(tag string) string {
-			dotTag := "." + tag
-    		return strings.ReplaceAll(tag, dotTag, "(normalize " + dotTag + ")")
-		})
+	if err != nil {
+		return tmplStr, err
 	}
 
 	templt := CreateTemplateWithFunc(name, template.FuncMap{

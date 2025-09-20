@@ -111,16 +111,17 @@ func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any
 	jsonStr := jsonutils.ToJson(data)
 
 	if jsonStr != "" {
-		re, err := regexp.Compile(`{{[^}]+}}`)
+		jsonStr, err := templating.TransformTemplateKeys(jsonStr, '@', func(re *regexp.Regexp, match string) string {
+			return re.ReplaceAllStringFunc(match, func(varMatch string) string {
+				varName := re.ReplaceAllString(varMatch, "$1")
+
+				return "." + varName
+			})
+		})
 
 		if err != nil {
 			return data, false, err
 		}
-
-		tmplStr = re.ReplaceAllStringFunc(tmplStr, func(tag string) string {
-			dotTag := "." + tag
-    		return strings.ReplaceAll(tag, dotTag, "(normalize " + dotTag + ")")
-		})
 
 		normalizedData, err := jsonutils.GetJsonSafe[map[string]any](jsonStr)
 
