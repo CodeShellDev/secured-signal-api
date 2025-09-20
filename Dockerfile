@@ -1,5 +1,5 @@
 FROM alpine:latest
-RUN apk --no-cache add ca-certificate
+RUN apk --no-cache add ca-certificates
 
 ARG IMAGE_TAG
 ENV IMAGE_TAG=$IMAGE_TAG
