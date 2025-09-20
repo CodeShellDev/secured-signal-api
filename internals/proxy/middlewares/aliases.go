@@ -107,7 +107,7 @@ func getData(key string, aliases []middlewareTypes.DataAlias, data map[string]an
 				value = aliasValue
 			}
 
-			data[alias.Alias] = nil
+			delete(data, alias.Alias)
 		}
 	}
 
