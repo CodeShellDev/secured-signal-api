@@ -45,15 +45,17 @@ func (data MessageMiddleware) Use() http.Handler {
 		if !body.Empty {
 			bodyData = body.Data
 
-			newData, err := TemplateMessage(messageTemplate, bodyData, variables)
+			if messageTemplate != "" {
+				newData, err := TemplateMessage(messageTemplate, bodyData, variables)
 
-			if err != nil {
-				log.Error("Error Templating Message: ", err.Error())
-			}
+				if err != nil {
+					log.Error("Error Templating Message: ", err.Error())
+				}
 
-			if newData["message"] != bodyData["message"] && newData["message"] != "" {
-				bodyData = newData
-				modifiedBody = true
+				if newData["message"] != bodyData["message"] && newData["message"] != "" && newData["message"] != nil {
+					bodyData = newData
+					modifiedBody = true
+				}
 			}
 		}
 
@@ -84,9 +86,9 @@ func (data MessageMiddleware) Use() http.Handler {
 func TemplateMessage(template string, data map[string]any, VARIABLES map[string]any) (map[string]any, error) {
 	data["message_template"] = template
 
-	data, ok, err := TemplateBody(data, VARIABLES)
+	data, _, err := TemplateBody(data, VARIABLES)
 
-	if err != nil || !ok || data == nil {
+	if err != nil || data == nil {
 		return data, err
 	}
 
