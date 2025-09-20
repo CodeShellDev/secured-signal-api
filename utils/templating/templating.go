@@ -82,7 +82,7 @@ func cleanQuotedPairsJSON(s string) string {
 func AddTemplateFunc(tmplStr string, funcName string) (string, error) {
 	return TransformTemplateKeys(tmplStr, '.', func(re *regexp.Regexp, match string) string {
 		return re.ReplaceAllStringFunc(match, func(varMatch string) string {
-			varName := re.ReplaceAllString(varMatch, "$1")
+			varName := re.ReplaceAllString(varMatch, ".$1")
 
 			return strings.ReplaceAll(varMatch, varName, "(" + funcName + " " + varName + ")")
 		})
