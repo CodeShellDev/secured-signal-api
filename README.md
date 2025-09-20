@@ -35,6 +35,7 @@ endpoint restrictions, placeholders, flexible configuration
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
+  - [Message Templates](#message-templates)
 - [Contributing](#contributing)
 - [Support](#support)
 - [License](#license)
@@ -65,10 +66,9 @@ services:
     container_name: secured-signal
     environment:
       API__URL: http://signal-api:8080
-      SETTINGS__VARIABLES__RECIPIENTS:
-        '[+123400002, +123400003, +123400004]'
+      SETTINGS__VARIABLES__RECIPIENTS: "[+123400002, +123400003, +123400004]"
       SETTINGS__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: '[LOOOOOONG_STRING]'
+      API__TOKENS: "[LOOOOOONG_STRING]"
     ports:
       - "8880:8880"
     restart: unless-stopped
@@ -100,10 +100,9 @@ services:
     container_name: secured-signal
     environment:
       API__URL: http://signal-api:8080
-      SETTINGS__VARIABLES__RECIPIENTS:
-        '[+123400002,+123400003,+123400004]'
+      SETTINGS__VARIABLES__RECIPIENTS: "[+123400002,+123400003,+123400004]"
       SETTINGS__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: '[LOOOOOONG_STRING]'
+      API__TOKENS: "[LOOOOOONG_STRING]"
     labels:
       - traefik.enable=true
       - traefik.http.routers.signal-api.rule=Host(`signal-api.mydomain.com`)
@@ -436,39 +435,6 @@ settings:
   variables:
     number: "+123400001",
     recipients: ["+123400002", "group.id", "user.id"]
-```
-
-### Message Aliases
-
-To improve compatibility with other services Secured Signal API provides **Message Aliases** for the `message` attribute.
-
-<details>
-<summary><strong>Default Message Aliases</strong></summary>
-
-| Alias        | Score | Alias            | Score |
-| ------------ | ----- | ---------------- | ----- |
-| msg          | 100   | data.content     | 9     |
-| content      | 99    | data.description | 8     |
-| description  | 98    | data.text        | 7     |
-| text         | 20    | data.summary     | 6     |
-| summary      | 15    | data.details     | 5     |
-| details      | 14    | body             | 2     |
-| data.message | 10    | data             | 1     |
-
-</details>
-
-Secured Signal API will pick the best scoring Message Alias (if available) to extract the correct message from the Request Body.
-
-Message Aliases can be added by setting `messageAliases` in your config:
-
-```yaml
-settings:
-  messageAliases:
-    [
-      { alias: "msg", score: 80 },
-      { alias: "data.message", score: 79 },
-      { alias: "array[0].message", score: 78 },
-    ]
 ```
 
 ### Port

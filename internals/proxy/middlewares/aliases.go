@@ -12,18 +12,24 @@ import (
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
-type BodyMiddleware struct {
+type AliasMiddleware struct {
 	Next 	http.Handler
 }
 
-func (data BodyMiddleware) Use() http.Handler {
+func (data AliasMiddleware) Use() http.Handler {
 	next := data.Next
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		messageAliases := getSettingsByReq(req).MESSAGE_ALIASES
+		settings := getSettingsByReq(req)
 
-		if messageAliases == nil {
-			messageAliases = getSettings("*").MESSAGE_ALIASES
+		dataAliases := settings.DATA_ALIASES
+
+		if dataAliases == nil {
+			dataAliases = getSettings("*").DATA_ALIASES
+		}
+
+		if settings.VARIABLES == nil {
+			settings.VARIABLES = getSettings("*").VARIABLES
 		}
 
 		body, err := request.GetReqBody(w, req)
@@ -38,13 +44,20 @@ func (data BodyMiddleware) Use() http.Handler {
 		if !body.Empty {
 			bodyData = body.Data
 
-			content, ok := bodyData["message"]
+			aliasData := processDataAliases(dataAliases, bodyData)
 
-			if !ok || content == "" {
+			for key, value := range aliasData {
+				prefix := key[:1]
 
-				bodyData["message"], bodyData = getMessage(messageAliases, bodyData)
+				keyWithoutPrefix := key[1:]
 
-				modifiedBody = true
+				switch prefix {
+					case "@":
+						bodyData[keyWithoutPrefix] = value
+						modifiedBody = true
+					case ".":
+						settings.VARIABLES[keyWithoutPrefix] = value
+				}
 			}
 		}
 
@@ -70,32 +83,44 @@ func (data BodyMiddleware) Use() http.Handler {
 	})
 }
 
-func getMessage(aliases []middlewareTypes.MessageAlias, data map[string]any) (string, map[string]any) {
-	var content string
+func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map[string]any) (map[string]any) {
+	aliasData := map[string]any{}
+
+	for key, alias := range aliases {
+		key, value := getData(key, alias, data)
+
+		aliasData[key] = value
+	}
+
+	return aliasData
+}
+
+func getData(key string, aliases []middlewareTypes.DataAlias, data map[string]any) (string, any) {
 	var best int
+	var value any
 
 	for _, alias := range aliases {
 		aliasValue, score, ok := processAlias(alias, data)
 
-		if ok && score > best {
-			content = aliasValue
-		}
+		if ok {
+			if score > best {
+				value = aliasValue
+			}
 
-		data[alias.Alias] = nil
+			data[alias.Alias] = nil
+		}
 	}
 
-	return content, data
+	return key, value
 }
 
-func processAlias(alias middlewareTypes.MessageAlias, data map[string]any) (string, int, bool) {
+func processAlias(alias middlewareTypes.DataAlias, data map[string]any) (any, int, bool) {
 	aliasKey := alias.Alias
 
 	value, ok := jsonutils.GetByPath(aliasKey, data)
 
-	aliasValue, isStr := value.(string)
-
-	if isStr && ok && aliasValue != "" {
-		return aliasValue, alias.Score, true
+	if ok && value != nil {
+		return value, alias.Score, true
 	} else {
 		return "", 0, false
 	}

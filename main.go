@@ -33,12 +33,16 @@ func main() {
 
 	proxy_last = proxy.Create(ENV.API_URL)
 
-	body_m5 := middlewares.BodyMiddleware{
+	mesg_m6 := middlewares.MessageMiddleware{
 		Next: 	proxy_last,
 	}
 
+	alias_m5 := middlewares.AliasMiddleware{
+		Next: 	mesg_m6.Use(),
+	}
+
 	temp_m4 := middlewares.TemplateMiddleware{
-		Next: 	body_m5.Use(),
+		Next: 	alias_m5.Use(),
 	}
 
 	endp_m3 := middlewares.EndpointsMiddleware{
@@ -80,3 +84,5 @@ func main() {
 
 	docker.Shutdown(server)
 }
+
+// TESTING

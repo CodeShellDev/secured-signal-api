@@ -19,6 +19,7 @@ func TestJsonTemplating(t *testing.T) {
 
 	json := `
 	{
+		"multiple": "{{.key}}, {{.int}}",
 		"dict": { "key": "{{.key}}" },
 		"dictArray": [
 			{ "key": "{{.key}}" },
@@ -31,6 +32,7 @@ func TestJsonTemplating(t *testing.T) {
 	data := jsonutils.GetJson[map[string]any](json)
 
 	expected := map[string]any{
+		"multiple": "val, 4",
 		"dict": map[string]any{
 			"key": "val",
 		},

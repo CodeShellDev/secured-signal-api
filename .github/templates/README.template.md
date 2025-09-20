@@ -31,10 +31,12 @@ endpoint restrictions, placeholders, flexible configuration
 - [Getting Started](#getting-started)
 - [Setup](#setup)
 - [Usage](#usage)
-- [Best Practices](#security-best-practices)
+- [Best Practices](#best-practices)
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
+  - [Data Aliases](#data-aliases)
+  - [Message Templates](#message-templates)
 - [Contributing](#contributing)
 - [Support](#support)
 - [License](#license)
@@ -119,29 +121,22 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_T
 
 #### Placeholders
 
-If you are not comfortable / don't want to hardcode your Number for example and/or Recipients in you, may use **Placeholders** in your Request. See [Custom Variables](#variables).
+If you are not comfortable / don't want to hardcode your Number for example and/or Recipients in you, may use **Placeholders** in your Request.
 
-These Placeholders can be used in the Request Query or the Body of a Request like so:
+You can use [**Variable**](#variables) `{{.NUMBER}}` Placeholders and **Body** Placeholders `{{@data.key}}`.
 
-**Body**
+| Type  | Example                                                          |
+| :---- | :--------------------------------------------------------------- |
+| Body  | `{"number": "{{ .NUMBER }}", "recipients": "{{ .RECIPIENTS }}"}` |
+| Query | `http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}`     |
+| Path  | `http://sec-signal-api:8880/v1/receive/{{.NUMBER}}`              |
+
+You can also combine them:
 
 ```json
 {
-	"number": "{{ .NUMBER }}",
-	"recipients": "{{ .RECIPIENTS }}"
+	"content": "{{.NUMBER}} -> {{.RECIPIENTS}}"
 }
-```
-
-**Query**
-
-```
-http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}
-```
-
-**Path**
-
-```
-http://sec-signal-api:8880/v1/receive/{{.NUMBER}}
 ```
 
 #### KeyValue Pair Injection
@@ -153,7 +148,7 @@ In some cases you may not be able to access / modify the Request Body, in that c
 In order to differentiate Injection Queries and _regular_ Queries
 you have to add `@` in front of any KeyValue Pair assignment.
 
-Supported types include **strings**, **ints** and **arrays**. See [Formatting](#string-to-type).
+Supported types include **strings**, **ints**, **arrays** and **json dictionaries**. See [Formatting](#string-to-type).
 
 ## Best Practices
 
@@ -293,12 +288,27 @@ settings:
     recipients: ["+123400002", "group.id", "user.id"]
 ```
 
-### Message Aliases
+### Message Templates
 
-To improve compatibility with other services Secured Signal API provides **Message Aliases** for the `message` attribute.
+To customize the `message` attribute you can use **Message Templates** to build your message by using other Body Keys and Variables.
+Use `messageTemplate` to configure:
+
+```yaml
+settings:
+  messageTemplate: |
+    Your Message:
+    {{@message}}.
+    Sent with Secured Signal API.
+```
+
+Use `{{@data.key}}` to reference Body Keys and `{{.KEY}}` for Variables.
+
+### Data Aliases
+
+To improve compatibility with other services Secured Signal API provides **Data Aliases** and a built-in `message` Alias.
 
 <details>
-<summary><strong>Default Message Aliases</strong></summary>
+<summary><strong>Default `message` Aliases</strong></summary>
 
 | Alias        | Score | Alias            | Score |
 | ------------ | ----- | ---------------- | ----- |
@@ -312,23 +322,27 @@ To improve compatibility with other services Secured Signal API provides **Messa
 
 </details>
 
-Secured Signal API will pick the best scoring Message Alias (if available) to extract the correct message from the Request Body.
+Secured Signal API will pick the best scoring Data Alias (if available) to extract set the Key to the correct Value from the Request Body.
 
-Message Aliases can be added by setting `messageAliases` in your config:
+Data Aliases can be added by setting `dataAliases` in your config:
 
 ```yaml
 settings:
-  messageAliases:
-    [
-      { alias: "msg", score: 80 },
-      { alias: "data.message", score: 79 },
-      { alias: "array[0].message", score: 78 },
-    ]
+  dataAliases:
+    "@message":
+      [
+        { alias: "msg", score: 80 },
+        { alias: "data.message", score: 79 },
+        { alias: "array[0].message", score: 78 },
+      ]
+    ".NUMBER": [{ alias: "phone_number", score: 100 }]
 ```
+
+Use `@` for aliasing Body Keys and `.` for aliasing Variables.
 
 ### Port
 
-To change the Port which Secured Signal API uses, you need to set `server.port` in your config. (default: `8880`)
+To change the Port which Secured Signal API uses, you need to set `service.port` in your config. (default: `8880`)
 
 ### Log Level
 
