@@ -17,6 +17,7 @@ import (
 type ENV_ struct {
 	CONFIG_PATH			string
 	DEFAULTS_PATH		string
+	FAVICON_PATH		string
 	TOKENS_DIR			string
 	LOG_LEVEL			string
 	PORT 				string
@@ -27,16 +28,18 @@ type ENV_ struct {
 }
 
 type SETTING_ struct {
-	BLOCKED_ENDPOINTS 	[]string 						`koanf:"blockedendpoints"`
-	ALLOWED_ENDPOINTS 	[]string 						`koanf:"allowedendpoints"`
-	VARIABLES 			map[string]any 					`koanf:"variables"`
-	MESSAGE_ALIASES 	[]middlewareTypes.MessageAlias 	`koanf:"messagealiases"`
+	BLOCKED_ENDPOINTS 	[]string 								`koanf:"blockedendpoints"`
+	ALLOWED_ENDPOINTS 	[]string 								`koanf:"allowedendpoints"`
+	VARIABLES 			map[string]any 							`koanf:"variables"`
+	DATA_ALIASES 	map[string][]middlewareTypes.DataAlias 		`koanf:"dataaliases"`
+	MESSAGE_TEMPLATE	string									`koanf:"messagetemplate"`
 }
 
 var ENV *ENV_ = &ENV_{
 	CONFIG_PATH: os.Getenv("CONFIG_PATH"),
 	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
 	TOKENS_DIR: os.Getenv("TOKENS_DIR"),
+	FAVICON_PATH: os.Getenv("FAVICON_PATH"),
 	API_TOKENS: []string{},
 	SETTINGS: map[string]*SETTING_{
 
@@ -69,7 +72,7 @@ func Load() {
 }
 
 func InitEnv() {
-	ENV.PORT = strconv.Itoa(config.Int("server.port"))
+	ENV.PORT = strconv.Itoa(config.Int("service.port"))
 
 	ENV.LOG_LEVEL = strings.ToLower(config.String("loglevel"))
 	
@@ -77,13 +80,9 @@ func InitEnv() {
 
 	var settings SETTING_
 
-	transformChildren(config, "settings.variables", func(key string, value any) (string, any) {
-		return strings.ToUpper(key), value
-	})
+	transformChildren(config, "settings.variables", transformVariables)
 
 	config.Unmarshal("settings", &settings)
-
-	log.Dev(jsonutils.ToJson(settings))
 
 	ENV.SETTINGS["*"] = &settings
 }
@@ -106,4 +105,8 @@ func LoadConfig() {
 			log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", conErr.Error())
 		}
 	}
+}
+
+func transformVariables(key string, value any) (string, any) {
+	return strings.ToUpper(key), value
 }

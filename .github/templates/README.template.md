@@ -1,10 +1,10 @@
-<img align="center" width="1048" height="512" alt="Secure Proxy for Signal REST API" src="https://github.com/CodeShellDev/secured-signal-api/raw/refs/heads/main/logo/landscape" />
+<img align="center" width="1048" height="512" alt="Secure Proxy for Signal REST API" src="https://github.com/CodeShellDev/secured-signal-api/raw/refs/heads/main/logo/banner.png" />
 
 <h3 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal Messenger REST API</a></h3>
 
 <p align="center">
-adding token-based authentication,
-endpoint restrictions, placeholders, and flexible configuration.
+token-based authentication,
+endpoint restrictions, placeholders, flexible configuration
 </p>
 
 <p align="center">
@@ -15,14 +15,14 @@ endpoint restrictions, placeholders, and flexible configuration.
   <a href="https://github.com/codeshelldev/secured-signal-api/releases">
     <img src="https://img.shields.io/github/v/release/codeshelldev/secured-signal-api?sort=semver&logo=github" alt="GitHub release">
   </a>
+  <a href="https://github.com/codeshelldev/secured-signal-api/stargazers">
+    <img src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=flat&logo=github" alt="GitHub stars">
+  </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
-    <img src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=image+size&trim=" alt="GHCR pulls">
+    <img src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=image+size&trim=" alt="Docker image size">
   </a>
   <a href="./LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
-  </a>
-  <a href="https://github.com/codeshelldev/secured-signal-api/stargazers">
-    <img src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=social" alt="GitHub stars">
   </a>
 </div>
 
@@ -31,10 +31,12 @@ endpoint restrictions, placeholders, and flexible configuration.
 - [Getting Started](#getting-started)
 - [Setup](#setup)
 - [Usage](#usage)
-- [Best Practices](#security-best-practices)
+- [Best Practices](#best-practices)
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
+  - [Data Aliases](#data-aliases)
+  - [Message Templates](#message-templates)
 - [Contributing](#contributing)
 - [Support](#support)
 - [License](#license)
@@ -57,11 +59,29 @@ And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 
 ### Reverse Proxy
 
+#### Traefik
+
 Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 
 ```yaml
-{ { file.examples/traefik.docker-compose.yaml } }
+{ { file.examples/reverse-proxy/traefik/traefik.docker-compose.yaml } }
 ```
+
+#### NGINX Proxy
+
+This is the [NGINX](https://github.com/nginx/nginx) `docker-compose.yaml` file:
+
+```yaml
+{ { file.examples/reverse-proxy/nginx/nginx.docker-compose.yaml } }
+```
+
+Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `etc/nginx/conf.d/default.conf`:
+
+```conf
+{ { file.examples/reverse-proxy/nginx/nginx.conf } }
+```
+
+Lastly add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/nginx/ssl`.
 
 ## Setup
 
@@ -101,29 +121,22 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_T
 
 #### Placeholders
 
-If you are not comfortable / don't want to hardcode your Number for example and/or Recipients in you, may use **Placeholders** in your Request. See [Custom Variables](#variables).
+If you are not comfortable / don't want to hardcode your Number for example and/or Recipients in you, may use **Placeholders** in your Request.
 
-These Placeholders can be used in the Request Query or the Body of a Request like so:
+You can use [**Variable**](#variables) `{{.NUMBER}}` Placeholders and **Body** Placeholders `{{@data.key}}`.
 
-**Body**
+| Type  | Example                                                          |
+| :---- | :--------------------------------------------------------------- |
+| Body  | `{"number": "{{ .NUMBER }}", "recipients": "{{ .RECIPIENTS }}"}` |
+| Query | `http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}`     |
+| Path  | `http://sec-signal-api:8880/v1/receive/{{.NUMBER}}`              |
+
+You can also combine them:
 
 ```json
 {
-	"number": "{{ .NUMBER }}",
-	"recipients": "{{ .RECIPIENTS }}"
+	"content": "{{.NUMBER}} -> {{.RECIPIENTS}}"
 }
-```
-
-**Query**
-
-```
-http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}
-```
-
-**Path**
-
-```
-http://sec-signal-api:8880/v1/receive/{{.NUMBER}}
 ```
 
 #### KeyValue Pair Injection
@@ -135,9 +148,9 @@ In some cases you may not be able to access / modify the Request Body, in that c
 In order to differentiate Injection Queries and _regular_ Queries
 you have to add `@` in front of any KeyValue Pair assignment.
 
-Supported types include **strings**, **ints** and **arrays**. See [Formatting](#string-to-type).
+Supported types include **strings**, **ints**, **arrays** and **json dictionaries**. See [Formatting](#string-to-type).
 
-## Security: Best Practices
+## Best Practices
 
 - Always use API tokens in production
 - Run behind a TLS-enabled [Reverse Proxy](#reverse-proxy) (Traefik, Nginx, Caddy)
@@ -275,12 +288,27 @@ settings:
     recipients: ["+123400002", "group.id", "user.id"]
 ```
 
-### Message Aliases
+### Message Templates
 
-To improve compatibility with other services Secured Signal API provides **Message Aliases** for the `message` attribute.
+To customize the `message` attribute you can use **Message Templates** to build your message by using other Body Keys and Variables.
+Use `messageTemplate` to configure:
+
+```yaml
+settings:
+  messageTemplate: |
+    Your Message:
+    {{@message}}.
+    Sent with Secured Signal API.
+```
+
+Use `{{@data.key}}` to reference Body Keys and `{{.KEY}}` for Variables.
+
+### Data Aliases
+
+To improve compatibility with other services Secured Signal API provides **Data Aliases** and a built-in `message` Alias.
 
 <details>
-<summary><strong>Default Message Aliases</strong></summary>
+<summary><strong>Default `message` Aliases</strong></summary>
 
 | Alias        | Score | Alias            | Score |
 | ------------ | ----- | ---------------- | ----- |
@@ -294,23 +322,27 @@ To improve compatibility with other services Secured Signal API provides **Messa
 
 </details>
 
-Secured Signal API will pick the best scoring Message Alias (if available) to extract the correct message from the Request Body.
+Secured Signal API will pick the best scoring Data Alias (if available) to extract set the Key to the correct Value from the Request Body.
 
-Message Aliases can be added by setting `messageAliases` in your config:
+Data Aliases can be added by setting `dataAliases` in your config:
 
 ```yaml
 settings:
-  messageAliases:
-    [
-      { alias: "msg", score: 80 },
-      { alias: "data.message", score: 79 },
-      { alias: "array[0].message", score: 78 },
-    ]
+  dataAliases:
+    "@message":
+      [
+        { alias: "msg", score: 80 },
+        { alias: "data.message", score: 79 },
+        { alias: "array[0].message", score: 78 },
+      ]
+    ".NUMBER": [{ alias: "phone_number", score: 100 }]
 ```
+
+Use `@` for aliasing Body Keys and `.` for aliasing Variables.
 
 ### Port
 
-To change the Port which Secured Signal API uses, you need to set `server.port` in your config. (default: `8880`)
+To change the Port which Secured Signal API uses, you need to set `service.port` in your config. (default: `8880`)
 
 ### Log Level
 
@@ -328,12 +360,12 @@ To change the Log Level set `logLevel` to: (default: `info`)
 | `fatal` |
 | `dev`   |
 
-</details>
+</details
 
 ## Contributing
 
 Found a bug? Want to change or add something?
-Feel free to open up an issue or create a Pull Request!
+Feel free to open up an [Issue](https://github.com/codeshelldev/secured-signal-api/issues) or create a [Pull Request](https://github.com/codeshelldev/secured-signal-api/pulls)!
 
 ## Support
 
@@ -341,11 +373,19 @@ Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project
 
 :)
 
+## Help
+
+**Are you having Problems setting up Secured Signal API?**<br>
+No worries check out the [Discussions](https://github.com/codeshelldev/secured-signal-api/discussions) Tab and ask for help.
+
+**We are all Volunteers**, so please be friendly and patient.
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
-### Legal
+## Legal
 
 Logo designed by [@CodeShellDev](https://github.com/codeshelldev), All Rights Reserved.
+
 This Project is not affiliated with the Signal Foundation.
