@@ -3,7 +3,7 @@
 <h3 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal Messenger REST API</a></h3>
 
 <p align="center">
-token-based authentication,
+Adding token-based authentication,
 endpoint restrictions, placeholders, and flexible configuration.
 </p>
 
