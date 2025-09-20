@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"regexp"
 	"strings"
 	"text/template"
 
+	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/stringutils"
 )
 
@@ -138,9 +140,7 @@ func CreateTemplateWithFunc(name string, funcMap template.FuncMap) (*template.Te
 func RenderJSON(name string, data map[string]any, variables map[string]any) (map[string]any, error) {
 	combinedData := data
 
-	for key, value := range variables {
-		combinedData[key] = value
-	}
+	maps.Copy(combinedData, variables)
 
 	data, err := RenderJSONTemplate(name, data, combinedData)
 
@@ -178,6 +178,8 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 			return data
 		
 		case string:
+			logger.Dev(typedValue)
+
 			templt := CreateTemplateWithFunc("json:" + strKey, template.FuncMap{
 				"normalize": normalize,
 			})
