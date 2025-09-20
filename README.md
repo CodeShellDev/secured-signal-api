@@ -4,7 +4,7 @@
 
 <p align="center">
 token-based authentication,
-endpoint restrictions, placeholders, and flexible configuration.
+endpoint restrictions, placeholders, flexible configuration
 </p>
 
 <p align="center">
@@ -12,13 +12,13 @@ endpoint restrictions, placeholders, and flexible configuration.
 </p>
 
 <div align="center">
-  <a href="https://github.com/codeshelldev/secured-signal-api/releases">
+  <a href="./releases">
     <img src="https://img.shields.io/github/v/release/codeshelldev/secured-signal-api?sort=semver&logo=github" alt="GitHub release">
   </a>
-  <a href="https://github.com/codeshelldev/secured-signal-api/stargazers">
+  <a href="./stargazers">
     <img src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=flat&logo=github" alt="GitHub stars">
   </a>
-  <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
+  <a href="./pkgs/container/secured-signal-api">
     <img src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=image+size&trim=" alt="Docker image size">
   </a>
   <a href="./LICENSE">
@@ -491,18 +491,25 @@ To change the Log Level set `logLevel` to: (default: `info`)
 | `fatal` |
 | `dev`   |
 
-</details>
+</details
 
 ## Contributing
 
 Found a bug? Want to change or add something?
-Feel free to open up an issue or create a Pull Request!
+Feel free to open up an [Issue](./issues) or create a [Pull Request](./pulls)!
 
 ## Support
 
 Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project.
 
 :)
+
+## Help
+
+**Are you having Problems setting up Secured Signal API?**
+No worries check out the [Discussions](./discussions) Tab and ask for help.
+
+**We are all Volunteers**, so please be friendly and patient.
 
 ## License
 
