@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -161,6 +162,8 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 	tmplStr := string(jsonBytes)
 
 	logger.Dev("Before AddTemplateFunc: ", tmplStr)
+
+	tmplStr, _ = strconv.Unquote(`"` + tmplStr + `"`)
 
 	tmplStr, err = AddTemplateFunc(tmplStr, "normalize")
 
