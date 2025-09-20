@@ -123,29 +123,13 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_T
 
 If you are not comfortable / don't want to hardcode your Number for example and/or Recipients in you, may use **Placeholders** in your Request.
 
-You can use [**Variable**](#variables) (`{{.NUMBER}}`) Placeholders and **Body** Placeholders (`{{@data.key}}`)
-These Placeholders can be used in the Request Query or the Body of a Request like so:
+You can use [**Variable**](#variables) `{{.NUMBER}}` Placeholders and **Body** Placeholders `{{@data.key}}`.
 
-**Body**
-
-```json
-{
-	"number": "{{ .NUMBER }}",
-	"recipients": "{{ .RECIPIENTS }}"
-}
-```
-
-**Query**
-
-```
-http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}
-```
-
-**Path**
-
-```
-http://sec-signal-api:8880/v1/receive/{{.NUMBER}}
-```
+| Type | Example |
+| :--- | :------ |
+| Body | `{"number": "{{ .NUMBER }}", "recipients": "{{ .RECIPIENTS }}"}` |
+| Query| `http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}` |
+| Path | `http://sec-signal-api:8880/v1/receive/{{.NUMBER}}` |
 
 You can also combine them:
 
@@ -164,7 +148,7 @@ In some cases you may not be able to access / modify the Request Body, in that c
 In order to differentiate Injection Queries and _regular_ Queries
 you have to add `@` in front of any KeyValue Pair assignment.
 
-Supported types include **strings**, **ints** and **arrays**. See [Formatting](#string-to-type).
+Supported types include **strings**, **ints**, **arrays** and **json dictionaries**. See [Formatting](#string-to-type).
 
 ## Best Practices
 
