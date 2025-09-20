@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	"github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 func normalize(value any) string {
@@ -138,6 +140,8 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 	templt := CreateTemplateWithFunc(name, template.FuncMap{
         "normalize": normalizeJSON,
     })
+
+	logger.Dev("Template: ", tmplStr)
 
 	jsonStr, err := ParseTemplate(templt, tmplStr, variables)
 
