@@ -96,7 +96,7 @@ func TransformTemplateKeys(tmplStr string, tmplKey rune, transform func(varRegex
 		return tmplStr, err
 	}
 
-	varRe, err := regexp.Compile(`\` + string(tmplKey) + `(\w+)`)
+	varRe, err := regexp.Compile(`\` + string(tmplKey) + `([a-zA-Z0-9_.])`)
 
 	if err != nil {
 		return tmplStr, err
@@ -160,7 +160,11 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 
 	tmplStr := string(jsonBytes)
 
+	logger.Dev("Before AddTemplateFunc: ", tmplStr)
+
 	tmplStr, err = AddTemplateFunc(tmplStr, "normalize")
+
+	logger.Dev("After AddTemplateFunc: ", tmplStr)
 
 	if err != nil {
 		return nil, err
@@ -169,8 +173,6 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 	templt := CreateTemplateWithFunc(name, template.FuncMap{
         "normalize": normalizeJSON,
     })
-
-	logger.Dev("Template: ", tmplStr)
 
 	jsonStr, err := ParseTemplate(templt, tmplStr, variables)
 
@@ -199,11 +201,7 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 }
 
 func RenderNormalizedTemplate(name string, tmplStr string, variables any) (string, error) {
-	logger.Dev("Before AddTemplateFunc: ", tmplStr)
-
 	tmplStr, err := AddTemplateFunc(tmplStr, "normalize")
-
-	logger.Dev("After AddTemplateFunc: ", tmplStr)
 
 	if err != nil {
 		return tmplStr, err
