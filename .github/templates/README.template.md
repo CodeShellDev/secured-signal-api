@@ -351,7 +351,7 @@ To change the Log Level set `logLevel` to: (default: `info`)
 ## Contributing
 
 Found a bug? Want to change or add something?
-Feel free to open up an [Issue](./issues) or create a [Pull Request](./pulls)!
+Feel free to open up an [Issue](https://github.com/codeshelldev/secured-signal-api/issues) or create a [Pull Request](https://github.com/codeshelldev/secured-signal-api/pulls)!
 
 ## Support
 
@@ -361,8 +361,8 @@ Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project
 
 ## Help
 
-**Are you having Problems setting up Secured Signal API?**
-No worries check out the [Discussions](./discussions) Tab and ask for help.
+**Are you having Problems setting up Secured Signal API?**<br>
+No worries check out the [Discussions](https://github.com/codeshelldev/secured-signal-api/discussions) Tab and ask for help.
 
 **We are all Volunteers**, so please be friendly and patient.
 
