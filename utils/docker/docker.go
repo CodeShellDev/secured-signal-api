@@ -13,6 +13,10 @@ import (
 
 var stop chan os.Signal
 
+func Init() {
+	log.Info("Running ", os.Getenv("IMAGE_TAG"), " Image")
+}
+
 func Run(main func()) chan os.Signal {
 	stop = make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
