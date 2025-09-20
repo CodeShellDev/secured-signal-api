@@ -120,6 +120,8 @@ func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any
 		jsonStr = re.ReplaceAllString(jsonStr, "{{.$1}}")
 
 		normalizedData, err := jsonutils.GetJsonSafe[map[string]any](jsonStr)
+		
+		log.Dev(err.Error())
 
 		if err == nil {
 			data = normalizedData
