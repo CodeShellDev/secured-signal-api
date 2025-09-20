@@ -73,6 +73,8 @@ func (data AliasMiddleware) Use() http.Handler {
 
 			strData := body.ToString()
 
+			log.Debug("Applied Data Aliasing: ", strData)
+
 			req.ContentLength = int64(len(strData))
 			req.Header.Set("Content-Length", strconv.Itoa(len(strData)))
 		}

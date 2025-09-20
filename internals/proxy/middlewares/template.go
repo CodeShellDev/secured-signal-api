@@ -136,8 +136,8 @@ func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any
 		return data, false, err
 	}
 
-	beforeStr := jsonutils.ToJson(templatedData)
-	afterStr := jsonutils.ToJson(data)
+	beforeStr := jsonutils.ToJson(data)
+	afterStr := jsonutils.ToJson(templatedData)
 
 	log.Dev(beforeStr)
 	log.Dev(afterStr)
