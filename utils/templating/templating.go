@@ -160,7 +160,11 @@ func RenderJSONTemplate(name string, data map[string]any, variables map[string]a
 
 	tmplStr := string(jsonBytes)
 
+	logger.Dev("Before AddTemplateFunc: ", tmplStr)
+
 	tmplStr, err = AddTemplateFunc(tmplStr, "normalize")
+
+	logger.Dev("After AddTemplateFunc: ", tmplStr)
 
 	if err != nil {
 		return nil, err
