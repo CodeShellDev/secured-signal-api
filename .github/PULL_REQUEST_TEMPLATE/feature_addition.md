@@ -7,12 +7,12 @@ assignees: ''
 
 ---
 
-## Summary
+### Summary
 Describe the new feature and motivation.
 
-## Changes
+### Changes
 * List major additions
 
-## Checklist
+### Checklist
 - [ ] Feature tested
 - [ ] Docs updated
