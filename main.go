@@ -21,6 +21,8 @@ func main() {
 
 	log.Init(logLevel)
 
+	docker.Init()
+
 	config.Load()
 
 	ENV = config.ENV
