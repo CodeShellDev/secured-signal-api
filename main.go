@@ -57,7 +57,7 @@ func main() {
 		Next: 	serv_m1.Use(),
 	}
 
-	log.Info("Initialized Proxy Handler")
+	log.Info("Initialized Middlewares")
 
 	addr := "0.0.0.0:" + ENV.PORT
 
