@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
@@ -84,7 +85,11 @@ func (data MessageMiddleware) Use() http.Handler {
 func TemplateMessage(template string, data map[string]any, VARIABLES map[string]any) (map[string]any, error) {
 	data["message_template"] = template
 
+	log.Dev(jsonutils.ToJson(data))
+
 	data, ok, err := TemplateBody(data, VARIABLES)
+
+	log.Dev(jsonutils.ToJson(data))
 
 	if err != nil || !ok || data == nil {
 		return data, err
