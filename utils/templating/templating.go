@@ -83,6 +83,12 @@ func cleanQuotedPairsJSON(s string) string {
 
 func AddTemplateFunc(tmplStr string, funcName string) (string, error) {
 	return TransformTemplateKeys(tmplStr, '.', func(re *regexp.Regexp, match string) string {
+		reSimple, _ := regexp.Compile(`{{\s+\.[a-zA-Z0-9_.]+\s+}}`)
+
+		if !reSimple.MatchString(match) {
+			return match
+		}
+
 		return re.ReplaceAllStringFunc(match, func(varMatch string) string {
 			varName := re.ReplaceAllString(varMatch, ".$1")
 
@@ -92,7 +98,7 @@ func AddTemplateFunc(tmplStr string, funcName string) (string, error) {
 }
 
 func TransformTemplateKeys(tmplStr string, tmplKey rune, transform func(varRegex *regexp.Regexp, m string) string) (string, error) {
-	re, err := regexp.Compile(`{{\s+\` + string(tmplKey) + `[a-zA-Z0-9_.]+\s+}}`)
+	re, err := regexp.Compile(`{{[^}]+}}`)
 
 	if err != nil {
 		return tmplStr, err
