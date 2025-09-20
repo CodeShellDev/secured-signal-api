@@ -92,7 +92,7 @@ func AddTemplateFunc(tmplStr string, funcName string) (string, error) {
 }
 
 func TransformTemplateKeys(tmplStr string, tmplKey rune, transform func(varRegex *regexp.Regexp, m string) string) (string, error) {
-	re, err := regexp.Compile(`{{[^}]+}}`)
+	re, err := regexp.Compile(`{{\s+\` + string(tmplKey) + `[a-zA-Z0-9_.]+\s+}}`)
 
 	if err != nil {
 		return tmplStr, err
@@ -178,23 +178,17 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 			return data
 		
 		case string:
-			logger.Dev("Raw:\n", typedValue)
-
 			templt := CreateTemplateWithFunc("json:" + strKey, template.FuncMap{
 				"normalize": normalize,
 			})
 
-			//tmplStr, _ := AddTemplateFunc(typedValue, "normalize")
-
-			tmplStr := typedValue
+			tmplStr, _ := AddTemplateFunc(typedValue, "normalize")
 
 			templatedValue, err := ParseTemplate(templt, tmplStr, variables)
 
 			if err != nil {
 				logger.Dev(err.Error())
 			}
-
-			logger.Dev("Templated:\n", templatedValue)
 
 			re, _ := regexp.Compile(`{{[^}]+}}`)
 
