@@ -3,7 +3,8 @@ RUN apk --no-cache add ca-certificates
 
 ENV SERVER__PORT=8880
 
-ENV DEFAULTS_PATH=/app/config/defaults.yml
+ENV DEFAULTS_PATH=/app/data/defaults.yml
+ENV FAVICON_PATH=/app/data/favicon.ico
 
 ENV CONFIG_PATH=/config/config.yml
 ENV TOKENS_DIR=/config/tokens
