@@ -152,6 +152,8 @@ func TemplateBody(bodyData map[string]any, headerData map[string]any, VARIABLES 
 	// Normalize #Var and @Var to .#Var and .@Var
 	bodyData, err := normalizeData('@', bodyData)
 
+	log.Dev("Normalized:\n", jsonutils.ToJson(bodyData))
+
 	if err != nil {
 		return bodyData, false, err
 	}
