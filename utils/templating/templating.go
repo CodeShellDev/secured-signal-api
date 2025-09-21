@@ -7,6 +7,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/stringutils"
 )
 
@@ -50,7 +51,7 @@ func TransformTemplateKeys(tmplStr string, prefix string, transform func(varRege
 		return tmplStr, err
 	}
 
-	varRe, err := regexp.Compile(string(prefix) + `([a-zA-Z0-9_.]+)`)
+	varRe, err := regexp.Compile(string(prefix) + `("*[a-zA-Z0-9_.]+"*)`)
 
 	if err != nil {
 		return tmplStr, err
@@ -163,6 +164,8 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 
 				if err == nil {
 					filtered := nonWhitespaceRe.ReplaceAllString(tmplStr, "")
+
+					logger.Dev(filtered)
 
 					if !templateRe.MatchString(filtered) {
 						return stringutils.ToType(templatedValue), err
