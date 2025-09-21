@@ -108,7 +108,7 @@ func (data TemplateMiddleware) Use() http.Handler {
 	})
 }
 
-func normalizeData(prefix rune, data map[string]any) (map[string]any, error) {
+func normalizeData(prefix string, data map[string]any) (map[string]any, error) {
 	jsonStr := jsonutils.ToJson(data)
 
 	if jsonStr != "" {
@@ -116,7 +116,7 @@ func normalizeData(prefix rune, data map[string]any) (map[string]any, error) {
 			return re.ReplaceAllStringFunc(match, func(varMatch string) string {
 				varName := re.ReplaceAllString(varMatch, "$1")
 
-				return "." + string(prefix) + varName
+				return "." + prefix + varName
 			})
 		})
 
@@ -136,11 +136,11 @@ func normalizeData(prefix rune, data map[string]any) (map[string]any, error) {
 	return data, nil
 }
 
-func prefixData(prefix rune, data map[string]any) (map[string]any) {
+func prefixData(prefix string, data map[string]any) (map[string]any) {
 	res := map[string]any{}
 
 	for key, value := range data {
-		res[string(prefix) + key] = value
+		res[prefix + key] = value
 	}
 
 	return res
@@ -149,8 +149,8 @@ func prefixData(prefix rune, data map[string]any) (map[string]any) {
 func TemplateBody(bodyData map[string]any, headerData map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
 	var modified bool
 
-	// Normalize #Var and @Var to .#Var and .@Var
-	bodyData, err := normalizeData('@', bodyData)
+	// Normalize #Var and @Var to .HEADER_KEY_Var and .BODY_KEY_Var
+	bodyData, err := normalizeData("BODY_KEY_", bodyData)
 
 	log.Dev("Normalized:\n", jsonutils.ToJson(bodyData))
 
@@ -158,17 +158,17 @@ func TemplateBody(bodyData map[string]any, headerData map[string]any, VARIABLES 
 		return bodyData, false, err
 	}
 
-	headerData, err = normalizeData('#', headerData)
+	headerData, err = normalizeData("HEADER_KEY_", headerData)
 
 	if err != nil {
 		return bodyData, false, err
 	}
 
 	// Prefix Body Data with @
-	bodyData = prefixData('@', bodyData)
+	bodyData = prefixData("BODY_KEY_", bodyData)
 
 	// Prefix Header Data with #
-	headerData = prefixData('#', headerData)
+	headerData = prefixData("HEADER_KEY_", headerData)
 
 	variables := VARIABLES
 	
