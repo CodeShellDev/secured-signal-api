@@ -563,7 +563,7 @@ To change the Log Level set `logLevel` to: (default: `info`)
 | `fatal` |
 | `dev`   |
 
-</details
+</details>
 
 ## Contributing
 
