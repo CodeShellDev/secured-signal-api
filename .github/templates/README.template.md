@@ -123,7 +123,11 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_T
 
 If you are not comfortable / don't want to hardcode your Number for example and/or Recipients in you, may use **Placeholders** in your Request.
 
-You can use [**Variable**](#variables) `{{.NUMBER}}` Placeholders and **Body** Placeholders `{{@data.key}}`.
+| Type                   | Example             | Note             |
+| :--------------------- | :------------------ | :--------------- |
+| Body                   | `{{@data.key}}`     |                  |
+| Header                 | `{{#Content_Type}}` | `-` becomes `_`  |
+| [Variable](#variables) | `{{.VAR}}`          | always uppercase |
 
 | Type  | Example                                                          |
 | :---- | :--------------------------------------------------------------- |
@@ -235,33 +239,30 @@ This makes advanced [Message Templates](#message-templates) like this one possib
 ```yaml
 settings:
     messageTemplate: |
-    {{- /* Variable declaration */ -}}
     {{- $greeting := "Hello" -}}
-    {{- /* Simple variable output */ -}}
     {{ $greeting }}, {{ @name }}!
-    {{- /* If-else conditional */}}
     {{ if @age -}}
     You are {{ @age }} years old.
     {{- else -}}
     Age unknown.
     {{- end }}
-    {{- /* Range over slice */}}
     Your friends:
     {{- range @friends }}
     - {{ . }}
     {{- else }}
     You have no friends.
     {{- end }}
-    {{- /* Range over map */}}
     Profile details:
     {{- range $key, $value := @profile }}
     - {{ $key }}: {{ $value }}
     {{- end }}
-    {{- /* Nested templates */ -}}
     {{ define "footer" -}}
     This is the footer for {{ @name }}.
     {{- end }}
     {{ template "footer" . -}}
+    ------------------------------------
+    Content-Type: {{ #Content_Type }}
+    Redacted Auth Header: {{ #Authorization }}
 ```
 
 ### API Token(s)
@@ -346,7 +347,7 @@ settings:
 ```
 
 Message Templates support [Standard Golang Templating](#templating).
-Use `@data.key` to reference Body Keys and `.KEY` for Variables.
+Use `@data.key` to reference Body Keys, `#Content_Type` for Headers and `.KEY` for Variables.
 
 ### Data Aliases
 
