@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
@@ -89,6 +90,8 @@ func TemplateMessage(template string, bodyData map[string]any, headerData map[st
 	bodyData["message_template"] = template
 
 	data, _, err := TemplateBody(bodyData, headerData, variables)
+
+	log.Dev("msg:\n", jsonutils.ToJson(data))
 
 	if err != nil || data == nil {
 		return bodyData, err
