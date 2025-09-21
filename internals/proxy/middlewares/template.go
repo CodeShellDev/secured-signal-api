@@ -155,15 +155,17 @@ func cleanHeaders(headers map[string]any) map[string]any {
 	}
 
 	headers["Authorization"] = strings.SplitAfterN(authHeader, ` `, 1)[0] + " REDACTED"
+
+	return headers
 }
 
 func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
 	var modified bool
 
+	headers = cleanHeaders(headers)
+
 	// Normalize #Var and @Var to .header_key_Var and .body_key_Var
 	normalizedBody, err := normalizeData("@", "body_key_", body)
-
-	log.Dev("Normalized:\n", jsonutils.ToJson(normalizedBody))
 
 	if err != nil {
 		return body, false, err
@@ -185,9 +187,6 @@ func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[str
 	
 	maps.Copy(variables, prefixedBody)
 	maps.Copy(variables, prefixedHeaders)
-
-	log.Dev("Body:\n", jsonutils.ToJson(prefixedBody))
-	log.Dev("Headers:\n", jsonutils.ToJson(prefixedHeaders))
 
 	templatedData, err := templating.RenderJSON("body", normalizedBody, variables)
 
