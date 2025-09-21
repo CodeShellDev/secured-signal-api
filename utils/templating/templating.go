@@ -2,7 +2,6 @@ package templating
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"maps"
 	"regexp"
@@ -27,57 +26,6 @@ func normalize(value any) string {
 		default:
 			return fmt.Sprintf("%v", value)
 	}
-}
-
-func normalizeJSON(value any) string {
-	if value == nil {
-		return ""
-	}
-
-	switch value.(type) {
-		case []any, []string, map[string]any, int, float64, bool:
-			object, _ := json.Marshal(value)
-
-			if string(object) == "{}" {
-				return value.(string)
-			}
-
-			return "<<" + string(object) + ">>"
-
-		default:
-			return value.(string)
-    }
-}
-
-func cleanQuotedPairsJSON(s string) string {
-	quoteRe, err := regexp.Compile(`"([^"]*?)"`)
-
-	if err != nil {
-		return s
-	}
-
-	pairRe, err := regexp.Compile(`<<([^<>]+)>>`)
-
-	if err != nil {
-		return s
-	}
-
-	return quoteRe.ReplaceAllStringFunc(s, func(container string) string {
-		inner := container[1 : len(container)-1] // remove quotes
-
-		matches := pairRe.FindAllStringSubmatchIndex(inner, -1)
-
-		// ONE pair which fills whole ""
-		if len(matches) == 1 && matches[0][0] == 0 && matches[0][1] == len(inner) {
-			return container // keep <<...>> untouched
-		}
-
-		// MULTIPLE pairs || that do not fill whole ""
-		inner = pairRe.ReplaceAllString(inner, "$1")
-		inner = strings.ReplaceAll(inner, `"`, `'`)
-
-		return `"` + inner + `"`
-	})
 }
 
 func AddTemplateFunc(tmplStr string, funcName string) (string, error) {
