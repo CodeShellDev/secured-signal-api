@@ -3,6 +3,7 @@ package middlewares
 import (
 	"bytes"
 	"io"
+	"maps"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -174,14 +175,12 @@ func TemplateBody(bodyData map[string]any, headers map[string]any, VARIABLES map
 	headerData = prefixData('#', headerData)
 
 	variables := VARIABLES
+	
+	maps.Copy(bodyData, variables)
+	maps.Copy(headerData, variables)
 
-	for key, value := range bodyData {
-		variables[key] = value
-	}
-
-	for key, value := range headerData {
-		variables[key] = value
-	}
+	log.Dev("Body:\n", jsonutils.ToJson(bodyData))
+	log.Dev("Headers:\n", jsonutils.ToJson(headerData))
 
 	templatedData, err := templating.RenderJSON("body", data, variables)
 
