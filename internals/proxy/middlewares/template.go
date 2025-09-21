@@ -146,26 +146,20 @@ func prefixData(prefix rune, data map[string]any) (map[string]any) {
 	return res
 }
 
-func TemplateBody(bodyData map[string]any, headers map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
+func TemplateBody(bodyData map[string]any, headerData map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
 	var modified bool
 
 	// Normalize #Var and @Var to .#Var and .@Var
-	data := bodyData
-
-	bodyData, err := normalizeData('@', data)
+	bodyData, err := normalizeData('@', bodyData)
 
 	if err != nil {
-		return data, false, err
-	} else {
-		data = bodyData
+		return bodyData, false, err
 	}
 
-	headerData, err := normalizeData('#', data)
+	headerData, err = normalizeData('#', headerData)
 
 	if err != nil {
-		return data, false, err
-	} else {
-		data = headerData
+		return bodyData, false, err
 	}
 
 	// Prefix Body Data with @
@@ -182,7 +176,7 @@ func TemplateBody(bodyData map[string]any, headers map[string]any, VARIABLES map
 	log.Dev("Body:\n", jsonutils.ToJson(bodyData))
 	log.Dev("Headers:\n", jsonutils.ToJson(headerData))
 
-	templatedData, err := templating.RenderJSON("body", data, variables)
+	templatedData, err := templating.RenderJSON("body", bodyData, variables)
 
 	if err != nil {
 		return bodyData, false, err
