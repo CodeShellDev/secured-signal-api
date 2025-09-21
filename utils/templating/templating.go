@@ -7,7 +7,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/stringutils"
 )
 
@@ -163,11 +162,9 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 				nonWhitespaceRe, err := regexp.Compile(`(\S+)`)
 
 				if err == nil {
-					filtered := nonWhitespaceRe.ReplaceAllString(tmplStr, "")
+					filtered := templateRe.ReplaceAllString(tmplStr, "")
 
-					logger.Dev(filtered)
-
-					if !templateRe.MatchString(filtered) {
+					if !nonWhitespaceRe.MatchString(filtered) {
 						return stringutils.ToType(templatedValue), err
 					}
 				}
