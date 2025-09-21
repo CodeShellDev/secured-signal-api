@@ -170,8 +170,8 @@ func TemplateBody(bodyData map[string]any, headerData map[string]any, VARIABLES 
 
 	variables := VARIABLES
 	
-	maps.Copy(bodyData, variables)
-	maps.Copy(headerData, variables)
+	maps.Copy(variables, bodyData)
+	maps.Copy(variables, headerData)
 
 	log.Dev("Body:\n", jsonutils.ToJson(bodyData))
 	log.Dev("Headers:\n", jsonutils.ToJson(headerData))
