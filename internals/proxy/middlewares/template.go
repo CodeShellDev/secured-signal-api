@@ -156,13 +156,13 @@ func cleanHeaders(headers map[string]any) map[string]any {
 		cleanedHeaders[cleanedKey] = value
 	}
 
-	authHeader, ok := cleanedHeaders["Authorization"].(string)
+	authHeader, ok := cleanedHeaders["Authorization"].([]string)
 
 	if !ok {
-		authHeader = "REDACTED"
+		authHeader = []string{"UNKNOWN REDACTED"}
 	}
 
-	cleanedHeaders["Authorization"] = strings.SplitAfterN(authHeader, ` `, 1)[0] + " REDACTED"
+	cleanedHeaders["Authorization"] = strings.SplitAfterN(authHeader[0], ` `, 1)[0] + " REDACTED"
 
 	return cleanedHeaders
 }
