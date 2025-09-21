@@ -42,7 +42,9 @@ func (data TemplateMiddleware) Use() http.Handler {
 		if !body.Empty {
 			var modified bool
 
-			bodyData, modified, err = TemplateBody(body.Data, variables)
+			headerData := request.GetReqHeaders(req)
+
+			bodyData, modified, err = TemplateBody(body.Data, headerData, variables)
 
 			if err != nil {
 				log.Error("Error Templating JSON: ", err.Error())
@@ -105,23 +107,23 @@ func (data TemplateMiddleware) Use() http.Handler {
 	})
 }
 
-func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
-	var modified bool
-
+func normalizeData(prefix rune, data map[string]any) (map[string]any, error) {
 	jsonStr := jsonutils.ToJson(data)
 
 	if jsonStr != "" {
-		jsonStr, err := templating.TransformTemplateKeys(jsonStr, '@', func(re *regexp.Regexp, match string) string {
+		toVar, err := templating.TransformTemplateKeys(jsonStr, prefix, func(re *regexp.Regexp, match string) string {
 			return re.ReplaceAllStringFunc(match, func(varMatch string) string {
 				varName := re.ReplaceAllString(varMatch, "$1")
 
-				return "." + varName
+				return "." + string(prefix) + varName
 			})
 		})
 
 		if err != nil {
-			return data, false, err
+			return data, err
 		}
+
+		jsonStr = toVar
 
 		normalizedData, err := jsonutils.GetJsonSafe[map[string]any](jsonStr)
 
@@ -130,17 +132,65 @@ func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any
 		}
 	}
 
-	templatedData, err := templating.RenderJSON("body", data, VARIABLES)
+	return data, nil
+}
+
+func prefixData(prefix rune, data map[string]any) (map[string]any) {
+	res := map[string]any{}
+
+	for key, value := range data {
+		res[string(prefix) + key] = value
+	}
+
+	return res
+}
+
+func TemplateBody(bodyData map[string]any, headers map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
+	var modified bool
+
+	// Normalize #Var and @Var to .#Var and .@Var
+	data := bodyData
+
+	bodyData, err := normalizeData('@', data)
 
 	if err != nil {
 		return data, false, err
+	} else {
+		data = bodyData
 	}
 
-	beforeStr := jsonutils.ToJson(data)
-	afterStr := jsonutils.ToJson(templatedData)
+	headerData, err := normalizeData('#', data)
 
-	log.Dev(beforeStr)
-	log.Dev(afterStr)
+	if err != nil {
+		return data, false, err
+	} else {
+		data = headerData
+	}
+
+	// Prefix Body Data with @
+	bodyData = prefixData('@', bodyData)
+
+	// Prefix Header Data with #
+	headerData = prefixData('#', headerData)
+
+	variables := VARIABLES
+
+	for key, value := range bodyData {
+		variables[key] = value
+	}
+
+	for key, value := range headerData {
+		variables[key] = value
+	}
+
+	templatedData, err := templating.RenderJSON("body", data, variables)
+
+	if err != nil {
+		return bodyData, false, err
+	}
+
+	beforeStr := jsonutils.ToJson(bodyData)
+	afterStr := jsonutils.ToJson(templatedData)
 
 	modified = beforeStr != afterStr
 

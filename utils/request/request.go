@@ -95,6 +95,16 @@ func GetBody(req *http.Request) ([]byte, error) {
 	return bodyBytes, nil
 }
 
+func GetReqHeaders(req *http.Request) (map[string]any) {
+	data := map[string]any{}
+
+	for key, value := range req.Header {
+		data[key] = value
+	}
+
+	return data
+}
+
 func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 	bytes, err := GetBody(req)
 

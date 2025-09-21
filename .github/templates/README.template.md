@@ -220,6 +220,50 @@ If you are using Environment Variables as an example you won't be able to specif
 > If you have a string that should not be turned into any other type, then you will need to escape all Type Denotations, `[]` or `{}` (also `-`) with a `\` **Backslash** (or Double Backslash).
 > An **Odd** number of **Backslashes** **escape** the character in front of them and an **Even** number leave the character **as-is**.
 
+### Templating
+
+Secured Signal API uses Golang's [Standard Templating Library](https://pkg.go.dev/text/template).
+This means that any valid Go template string will also work in Secured Signal API.
+
+Go's templating library is used in the following features:
+
+- [Message Templates](#message-templates)
+- [Placeholders](#placeholders)
+
+This makes advanced [Message Templates](#message-templates) like this one possible:
+
+```yaml
+settings:
+    messageTemplate: |
+    {{- /* Variable declaration */ -}}
+    {{- $greeting := "Hello" -}}
+    {{- /* Simple variable output */ -}}
+    {{ $greeting }}, {{ @name }}!
+    {{- /* If-else conditional */}}
+    {{ if @age -}}
+    You are {{ @age }} years old.
+    {{- else -}}
+    Age unknown.
+    {{- end }}
+    {{- /* Range over slice */}}
+    Your friends:
+    {{- range @friends }}
+    - {{ . }}
+    {{- else }}
+    You have no friends.
+    {{- end }}
+    {{- /* Range over map */}}
+    Profile details:
+    {{- range $key, $value := @profile }}
+    - {{ $key }}: {{ $value }}
+    {{- end }}
+    {{- /* Nested templates */ -}}
+    {{ define "footer" -}}
+    This is the footer for {{ @name }}.
+    {{- end }}
+    {{ template "footer" . -}}
+```
+
 ### API Token(s)
 
 During Authentication Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
@@ -301,7 +345,8 @@ settings:
     Sent with Secured Signal API.
 ```
 
-Use `{{@data.key}}` to reference Body Keys and `{{.KEY}}` for Variables.
+Message Templates support [Standard Golang Templating](#templating).
+Use `@data.key` to reference Body Keys and `.KEY` for Variables.
 
 ### Data Aliases
 

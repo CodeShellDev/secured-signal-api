@@ -9,7 +9,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/stringutils"
 )
 
@@ -83,7 +82,7 @@ func cleanQuotedPairsJSON(s string) string {
 
 func AddTemplateFunc(tmplStr string, funcName string) (string, error) {
 	return TransformTemplateKeys(tmplStr, '.', func(re *regexp.Regexp, match string) string {
-		reSimple, _ := regexp.Compile(`{{\s+\.[a-zA-Z0-9_.]+\s+}}`)
+		reSimple, _ := regexp.Compile(`{{\s*\.[a-zA-Z0-9_.]+\s*}}`)
 
 		if !reSimple.MatchString(match) {
 			return match
@@ -157,7 +156,9 @@ func RenderJSON(name string, data map[string]any, variables map[string]any) (map
 	return data, nil
 }
 
-func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any) (any) {
+func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any) (any, error) {
+	var err error
+
 	strKey, isStr := key.(string)
 
 	if !isStr {
@@ -169,19 +170,35 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 			data := map[string]any{}
 
 			for mapKey, mapValue := range typedValue {
-				data[mapKey] = RenderDataKeyTemplateRecursive(mapKey, mapValue, variables)
+				var templatedValue any
+
+				templatedValue, err = RenderDataKeyTemplateRecursive(mapKey, mapValue, variables)
+
+				if err != nil {
+					return mapValue, err
+				}
+
+				data[mapKey] = templatedValue
 			}
 
-			return data
+			return data, err
 
 		case []any:
 			data := []any{}
 
 			for arrayIndex, arrayValue := range typedValue {
-				data = append(data, RenderDataKeyTemplateRecursive(arrayIndex, arrayValue, variables))
+				var templatedValue any
+
+				templatedValue, err = RenderDataKeyTemplateRecursive(arrayIndex, arrayValue, variables)
+
+				if err != nil {
+					return arrayValue, err
+				}
+
+				data = append(data, templatedValue)
 			}
 
-			return data
+			return data, err
 		
 		case string:
 			templt := CreateTemplateWithFunc("json:" + strKey, template.FuncMap{
@@ -193,29 +210,40 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 			templatedValue, err := ParseTemplate(templt, tmplStr, variables)
 
 			if err != nil {
-				logger.Dev(err.Error())
+				return typedValue, err
 			}
 
-			re, _ := regexp.Compile(`{{[^}]+}}`)
+			templateRe, err := regexp.Compile(`{{[^}]+}}`)
 
-			filtered := re.ReplaceAllString(tmplStr, "")
+			if err == nil {
+				nonWhitespaceRe, err := regexp.Compile(`(\S+)`)
 
-			re, _ = regexp.Compile(`(\S+)`)
+				if err == nil {
+					filtered := nonWhitespaceRe.ReplaceAllString(tmplStr, "")
 
-			if !re.MatchString(filtered) {
-				logger.Dev(templatedValue)
-				return stringutils.ToType(templatedValue)
+					if !templateRe.MatchString(filtered) {
+						return stringutils.ToType(templatedValue), err
+					}
+				}
 			}
 		
-			return templatedValue
+			return templatedValue, err
 		
 		default:
-			return typedValue
+			return typedValue, err
 	}
 }
 
 func RenderJSONTemplate(name string, data map[string]any, variables map[string]any) (map[string]any, error) {
-	return RenderDataKeyTemplateRecursive("", data, variables).(map[string]any), nil
+	res, err := RenderDataKeyTemplateRecursive("", data, variables)
+
+	mapRes, ok := res.(map[string]any)
+
+	if !ok {
+		return data, err
+	}
+
+	return mapRes, err
 }
 
 func RenderNormalizedTemplate(name string, tmplStr string, variables any) (string, error) {
