@@ -170,11 +170,7 @@ func cleanHeaders(headers map[string]any) map[string]any {
 func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
 	var modified bool
 
-	log.Dev("B-Headers:\n", jsonutils.ToJson(headers))
-
 	headers = cleanHeaders(headers)
-
-	log.Dev("A-Headers:\n", jsonutils.ToJson(headers))
 
 	// Normalize #Var and @Var to .header_key_Var and .body_key_Var
 	normalizedBody, err := normalizeData("@", "body_key_", body)
