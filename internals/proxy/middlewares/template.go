@@ -162,7 +162,7 @@ func cleanHeaders(headers map[string]any) map[string]any {
 		authHeader = []string{"UNKNOWN REDACTED"}
 	}
 
-	cleanedHeaders["Authorization"] = strings.SplitAfterN(authHeader[0], ` `, 1)[0] + " REDACTED"
+	cleanedHeaders["Authorization"] = strings.Split(authHeader[0], ` `)[0] + "REDACTED"
 
 	return cleanedHeaders
 }
