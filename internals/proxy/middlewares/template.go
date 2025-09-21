@@ -117,6 +117,9 @@ func normalizeData(fromPrefix, toPrefix string, data map[string]any) (map[string
 			return re.ReplaceAllStringFunc(match, func(varMatch string) string {
 				varName := re.ReplaceAllString(varMatch, "$1")
 
+				// Convert dashes into underscores, because of template syntax
+				varName = strings.ReplaceAll(varName, "-", "_")
+
 				return "." + toPrefix + varName
 			})
 		})
