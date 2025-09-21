@@ -3,7 +3,6 @@ package templating
 import (
 	"bytes"
 	"fmt"
-	"maps"
 	"regexp"
 	"strings"
 	"text/template"
@@ -91,11 +90,7 @@ func CreateTemplateWithFunc(name string, funcMap template.FuncMap) (*template.Te
 }
 
 func RenderJSON(name string, data map[string]any, variables map[string]any) (map[string]any, error) {
-	combinedData := data
-
-	maps.Copy(combinedData, variables)
-
-	data, err := RenderJSONTemplate(name, data, combinedData)
+	data, err := RenderJSONTemplate(name, data, variables)
 
 	if err != nil {
 		return data, err
