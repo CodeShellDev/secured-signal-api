@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 
 	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
@@ -144,6 +145,16 @@ func prefixData(prefix string, data map[string]any) (map[string]any) {
 	}
 
 	return res
+}
+
+func cleanHeaders(headers map[string]any) map[string]any {
+	authHeader, ok := headers["Authorization"].(string)
+
+	if !ok {
+		authHeader = "REDACTED"
+	}
+
+	headers["Authorization"] = strings.SplitAfterN(authHeader, ` `, 1)[0] + " REDACTED"
 }
 
 func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
