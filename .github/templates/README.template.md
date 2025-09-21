@@ -123,7 +123,15 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_T
 
 If you are not comfortable / don't want to hardcode your Number for example and/or Recipients in you, may use **Placeholders** in your Request.
 
-You can use [**Variable**](#variables) `{{.NUMBER}}` Placeholders and **Body** Placeholders `{{@data.key}}`.
+**How to use:**
+
+| Type                   | Example             | Note             |
+| :--------------------- | :------------------ | :--------------- |
+| Body                   | `{{@data.key}}`     |                  |
+| Header                 | `{{#Content_Type}}` | `-` becomes `_`  |
+| [Variable](#variables) | `{{.VAR}}`          | always uppercase |
+
+**Where to use:**
 
 | Type  | Example                                                          |
 | :---- | :--------------------------------------------------------------- |
@@ -220,6 +228,47 @@ If you are using Environment Variables as an example you won't be able to specif
 > If you have a string that should not be turned into any other type, then you will need to escape all Type Denotations, `[]` or `{}` (also `-`) with a `\` **Backslash** (or Double Backslash).
 > An **Odd** number of **Backslashes** **escape** the character in front of them and an **Even** number leave the character **as-is**.
 
+### Templating
+
+Secured Signal API uses Golang's [Standard Templating Library](https://pkg.go.dev/text/template).
+This means that any valid Go template string will also work in Secured Signal API.
+
+Go's templating library is used in the following features:
+
+- [Message Templates](#message-templates)
+- [Placeholders](#placeholders)
+
+This makes advanced [Message Templates](#message-templates) like this one possible:
+
+```yaml
+settings:
+    messageTemplate: |
+    {{- $greeting := "Hello" -}}
+    {{ $greeting }}, {{ @name }}!
+    {{ if @age -}}
+    You are {{ @age }} years old.
+    {{- else -}}
+    Age unknown.
+    {{- end }}
+    Your friends:
+    {{- range @friends }}
+    - {{ . }}
+    {{- else }}
+    You have no friends.
+    {{- end }}
+    Profile details:
+    {{- range $key, $value := @profile }}
+    - {{ $key }}: {{ $value }}
+    {{- end }}
+    {{ define "footer" -}}
+    This is the footer for {{ @name }}.
+    {{- end }}
+    {{ template "footer" . -}}
+    ------------------------------------
+    Content-Type: {{ #Content_Type }}
+    Redacted Auth Header: {{ #Authorization }}
+```
+
 ### API Token(s)
 
 During Authentication Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
@@ -301,7 +350,8 @@ settings:
     Sent with Secured Signal API.
 ```
 
-Use `{{@data.key}}` to reference Body Keys and `{{.KEY}}` for Variables.
+Message Templates support [Standard Golang Templating](#templating).
+Use `@data.key` to reference Body Keys, `#Content_Type` for Headers and `.KEY` for Variables.
 
 ### Data Aliases
 

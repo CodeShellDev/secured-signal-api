@@ -2,11 +2,12 @@ package templating
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
 	"text/template"
+
+	"github.com/codeshelldev/secured-signal-api/utils/stringutils"
 )
 
 func normalize(value any) string {
@@ -26,55 +27,40 @@ func normalize(value any) string {
 	}
 }
 
-func normalizeJSON(value any) string {
-	if value == nil {
-		return ""
-	}
+func AddTemplateFunc(tmplStr string, funcName string) (string, error) {
+	return TransformTemplateKeys(tmplStr, `\.`, func(re *regexp.Regexp, match string) string {
+		reSimple, _ := regexp.Compile(`{{\s*\.[a-zA-Z0-9_.]+\s*}}`)
 
-	switch value.(type) {
-		case []any, []string, map[string]any, int, float64, bool:
-			object, _ := json.Marshal(value)
-
-			if string(object) == "{}" {
-				return value.(string)
-			}
-
-			return "<<" + string(object) + ">>"
-
-		default:
-			return value.(string)
-    }
-}
-
-func cleanQuotedPairsJSON(s string) string {
-	quoteRe, err := regexp.Compile(`"([^"]*?)"`)
-
-	if err != nil {
-		return s
-	}
-
-	pairRe, err := regexp.Compile(`<<([^<>]+)>>`)
-
-	if err != nil {
-		return s
-	}
-
-	return quoteRe.ReplaceAllStringFunc(s, func(container string) string {
-		inner := container[1 : len(container)-1] // remove quotes
-
-		matches := pairRe.FindAllStringSubmatchIndex(inner, -1)
-
-		// ONE pair which fills whole ""
-		if len(matches) == 1 && matches[0][0] == 0 && matches[0][1] == len(inner) {
-			return container // keep <<...>> untouched
+		if !reSimple.MatchString(match) {
+			return match
 		}
 
-		// MULTIPLE pairs || that do not fill whole ""
-		inner = pairRe.ReplaceAllString(inner, "$1")
-		inner = strings.ReplaceAll(inner, `"`, `'`)
+		return re.ReplaceAllStringFunc(match, func(varMatch string) string {
+			varName := re.ReplaceAllString(varMatch, ".$1")
 
-		return `"` + inner + `"`
+			return strings.ReplaceAll(varMatch, varName, "(" + funcName + " " + varName + ")")
+		})
 	})
+}
+
+func TransformTemplateKeys(tmplStr string, prefix string, transform func(varRegex *regexp.Regexp, m string) string) (string, error) {
+	re, err := regexp.Compile(`{{[^}]+}}`)
+
+	if err != nil {
+		return tmplStr, err
+	}
+
+	varRe, err := regexp.Compile(string(prefix) + `("*[a-zA-Z0-9_.]+"*)`)
+
+	if err != nil {
+		return tmplStr, err
+	}
+
+	tmplStr = re.ReplaceAllStringFunc(tmplStr, func(match string) string {
+		return transform(varRe, match)
+	})
+
+	return tmplStr, nil
 }
 
 func ParseTemplate(templt *template.Template, tmplStr string, variables any) (string, error) {
@@ -104,13 +90,7 @@ func CreateTemplateWithFunc(name string, funcMap template.FuncMap) (*template.Te
 }
 
 func RenderJSON(name string, data map[string]any, variables map[string]any) (map[string]any, error) {
-	combinedData := data
-
-	for key, value := range variables {
-		combinedData[key] = value
-	}
-
-	data, err := RenderJSONTemplate(name, data, combinedData)
+	data, err := RenderJSONTemplate(name, data, variables)
 
 	if err != nil {
 		return data, err
@@ -119,58 +99,101 @@ func RenderJSON(name string, data map[string]any, variables map[string]any) (map
 	return data, nil
 }
 
+func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any) (any, error) {
+	var err error
+
+	strKey, isStr := key.(string)
+
+	if !isStr {
+		strKey = "!string"
+	}
+
+	switch typedValue := value.(type) {
+		case map[string]any:
+			data := map[string]any{}
+
+			for mapKey, mapValue := range typedValue {
+				var templatedValue any
+
+				templatedValue, err = RenderDataKeyTemplateRecursive(mapKey, mapValue, variables)
+
+				if err != nil {
+					return mapValue, err
+				}
+
+				data[mapKey] = templatedValue
+			}
+
+			return data, err
+
+		case []any:
+			data := []any{}
+
+			for arrayIndex, arrayValue := range typedValue {
+				var templatedValue any
+
+				templatedValue, err = RenderDataKeyTemplateRecursive(arrayIndex, arrayValue, variables)
+
+				if err != nil {
+					return arrayValue, err
+				}
+
+				data = append(data, templatedValue)
+			}
+
+			return data, err
+		
+		case string:
+			templt := CreateTemplateWithFunc("json:" + strKey, template.FuncMap{
+				"normalize": normalize,
+			})
+
+			tmplStr, _ := AddTemplateFunc(typedValue, "normalize")
+
+			templatedValue, err := ParseTemplate(templt, tmplStr, variables)
+
+			if err != nil {
+				return typedValue, err
+			}
+
+			templateRe, err := regexp.Compile(`{{[^}]+}}`)
+
+			if err == nil {
+				nonWhitespaceRe, err := regexp.Compile(`(\S+)`)
+
+				if err == nil {
+					filtered := templateRe.ReplaceAllString(tmplStr, "")
+
+					if !nonWhitespaceRe.MatchString(filtered) {
+						return stringutils.ToType(templatedValue), err
+					}
+				}
+			}
+		
+			return templatedValue, err
+		
+		default:
+			return typedValue, err
+	}
+}
+
 func RenderJSONTemplate(name string, data map[string]any, variables map[string]any) (map[string]any, error) {
-	jsonBytes, err := json.Marshal(data)
+	res, err := RenderDataKeyTemplateRecursive("", data, variables)
 
-	if err != nil {
-		return nil, err
+	mapRes, ok := res.(map[string]any)
+
+	if !ok {
+		return data, err
 	}
 
-	tmplStr := string(jsonBytes)
-
-	re, err := regexp.Compile(`{{\s*\.([a-zA-Z0-9_.]+)\s*}}`)
-
-	// Add normalize() to be able to remove Quotes from Arrays
-	if err == nil {
-    	tmplStr = re.ReplaceAllString(tmplStr, "{{normalize .$1}}")
-	}
-
-	templt := CreateTemplateWithFunc(name, template.FuncMap{
-        "normalize": normalizeJSON,
-    })
-
-	jsonStr, err := ParseTemplate(templt, tmplStr, variables)
-
-	if err != nil {
-		return nil, err
-	}
-
-	jsonStr = cleanQuotedPairsJSON(jsonStr)
-
-	// Remove the Quotes around "<<[item1,item2]>>"
-	re, err = regexp.Compile(`"<<(.*?)>>"`)
-
-	if err != nil {
-		return nil, err
-	}
-
-	jsonStr = re.ReplaceAllString(jsonStr, "$1")
-
-	err = json.Unmarshal([]byte(jsonStr), &data)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
+	return mapRes, err
 }
 
 func RenderNormalizedTemplate(name string, tmplStr string, variables any) (string, error) {
-	re, err := regexp.Compile(`{{\s*\.(\w+)\s*}}`)
+	tmplStr, err := AddTemplateFunc(tmplStr, "normalize")
 
-	// Add normalize() to normalize arrays to [item1,item2]
-	if err == nil {
-    	tmplStr = re.ReplaceAllString(tmplStr, "{{normalize .$1}}")
+	if err != nil {
+		return tmplStr, err
 	}
 
 	templt := CreateTemplateWithFunc(name, template.FuncMap{

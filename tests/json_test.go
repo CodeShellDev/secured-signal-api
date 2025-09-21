@@ -44,10 +44,10 @@ func TestJsonTemplating(t *testing.T) {
 		"key2": 4,
 	}
 
-	got, err := templating.RenderJSONTemplate("json", data, variables)
+	got, err := templating.RenderDataKeyTemplateRecursive("", data, variables)
 
 	if err != nil {
-		t.Error("Error Templating JSON: ", err.Error())
+		t.Error("Error Templating JSON:\n", err.Error())
 	}
 
 	expectedStr := jsonutils.ToJson(expected)

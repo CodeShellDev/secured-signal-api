@@ -3,10 +3,12 @@ package middlewares
 import (
 	"bytes"
 	"io"
+	"maps"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 
 	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
@@ -42,7 +44,9 @@ func (data TemplateMiddleware) Use() http.Handler {
 		if !body.Empty {
 			var modified bool
 
-			bodyData, modified, err = TemplateBody(body.Data, variables)
+			headerData := request.GetReqHeaders(req)
+
+			bodyData, modified, err = TemplateBody(body.Data, headerData, variables)
 
 			if err != nil {
 				log.Error("Error Templating JSON: ", err.Error())
@@ -105,19 +109,23 @@ func (data TemplateMiddleware) Use() http.Handler {
 	})
 }
 
-func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
-	var modified bool
-
+func normalizeData(fromPrefix, toPrefix string, data map[string]any) (map[string]any, error) {
 	jsonStr := jsonutils.ToJson(data)
 
 	if jsonStr != "" {
-		re, err := regexp.Compile(`{{\s*\@([a-zA-Z0-9_.]+)\s*}}`)
+		toVar, err := templating.TransformTemplateKeys(jsonStr, fromPrefix, func(re *regexp.Regexp, match string) string {
+			return re.ReplaceAllStringFunc(match, func(varMatch string) string {
+				varName := re.ReplaceAllString(varMatch, "$1")
+
+				return "." + toPrefix + varName
+			})
+		})
 
 		if err != nil {
-			return data, false, err
+			return data, err
 		}
 
-		jsonStr = re.ReplaceAllString(jsonStr, "{{.$1}}")
+		jsonStr = toVar
 
 		normalizedData, err := jsonutils.GetJsonSafe[map[string]any](jsonStr)
 
@@ -126,16 +134,78 @@ func TemplateBody(data map[string]any, VARIABLES map[string]any) (map[string]any
 		}
 	}
 
-	templatedData, err := templating.RenderJSON("body", data, VARIABLES)
+	return data, nil
+}
 
-	if err != nil {
-		return data, false, err
+func prefixData(prefix string, data map[string]any) (map[string]any) {
+	res := map[string]any{}
+
+	for key, value := range data {
+		res[prefix + key] = value
 	}
 
-	beforeStr := jsonutils.ToJson(templatedData)
-	afterStr := jsonutils.ToJson(data)
+	return res
+}
 
-	modified = beforeStr == afterStr
+func cleanHeaders(headers map[string]any) map[string]any {
+	cleanedHeaders := map[string]any{}
+
+	for key, value := range headers {
+		cleanedKey := strings.ReplaceAll(key, "-", "_")
+
+		cleanedHeaders[cleanedKey] = value
+	}
+
+	authHeader, ok := cleanedHeaders["Authorization"].([]string)
+
+	if !ok {
+		authHeader = []string{"UNKNOWN REDACTED"}
+	}
+
+	cleanedHeaders["Authorization"] = strings.Split(authHeader[0], ` `)[0] + " REDACTED"
+
+	return cleanedHeaders
+}
+
+func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
+	var modified bool
+
+	headers = cleanHeaders(headers)
+
+	// Normalize #Var and @Var to .header_key_Var and .body_key_Var
+	normalizedBody, err := normalizeData("@", "body_key_", body)
+
+	if err != nil {
+		return body, false, err
+	}
+
+	normalizedBody, err = normalizeData("#", "header_key_", normalizedBody)
+
+	if err != nil {
+		return body, false, err
+	}
+
+	// Prefix Body Data with body_key_
+	prefixedBody := prefixData("body_key_", normalizedBody)
+
+	// Prefix Header Data with header_key_
+	prefixedHeaders := prefixData("header_key_", headers)
+
+	variables := VARIABLES
+	
+	maps.Copy(variables, prefixedBody)
+	maps.Copy(variables, prefixedHeaders)
+
+	templatedData, err := templating.RenderJSON("body", normalizedBody, variables)
+
+	if err != nil {
+		return body, false, err
+	}
+
+	beforeStr := jsonutils.ToJson(body)
+	afterStr := jsonutils.ToJson(templatedData)
+
+	modified = beforeStr != afterStr
 
 	return templatedData, modified, nil
 }
