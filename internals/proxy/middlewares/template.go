@@ -146,22 +146,22 @@ func prefixData(prefix string, data map[string]any) (map[string]any) {
 	return res
 }
 
-func TemplateBody(bodyData map[string]any, headerData map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
+func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
 	var modified bool
 
 	// Normalize #Var and @Var to .header_key_Var and .body_key_Var
-	bodyData, err := normalizeData("@", "body_key_", bodyData)
+	bodyData, err := normalizeData("@", "body_key_", body)
 
 	log.Dev("Normalized:\n", jsonutils.ToJson(bodyData))
 
 	if err != nil {
-		return bodyData, false, err
+		return body, false, err
 	}
 
-	headerData, err = normalizeData("#", "header_key_", headerData)
+	headerData, err := normalizeData("#", "header_key_", headers)
 
 	if err != nil {
-		return bodyData, false, err
+		return body, false, err
 	}
 
 	// Prefix Body Data with body_key_
@@ -178,13 +178,13 @@ func TemplateBody(bodyData map[string]any, headerData map[string]any, VARIABLES 
 	log.Dev("Body:\n", jsonutils.ToJson(bodyData))
 	log.Dev("Headers:\n", jsonutils.ToJson(headerData))
 
-	templatedData, err := templating.RenderJSON("body", bodyData, variables)
+	templatedData, err := templating.RenderJSON("body", body, variables)
 
 	if err != nil {
 		return bodyData, false, err
 	}
 
-	beforeStr := jsonutils.ToJson(bodyData)
+	beforeStr := jsonutils.ToJson(body)
 	afterStr := jsonutils.ToJson(templatedData)
 
 	modified = beforeStr != afterStr
