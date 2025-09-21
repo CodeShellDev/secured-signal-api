@@ -150,38 +150,38 @@ func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[str
 	var modified bool
 
 	// Normalize #Var and @Var to .header_key_Var and .body_key_Var
-	bodyData, err := normalizeData("@", "body_key_", body)
+	normalizedBody, err := normalizeData("@", "body_key_", body)
 
-	log.Dev("Normalized:\n", jsonutils.ToJson(bodyData))
+	log.Dev("Normalized:\n", jsonutils.ToJson(normalizedBody))
 
 	if err != nil {
 		return body, false, err
 	}
 
-	headerData, err := normalizeData("#", "header_key_", headers)
+	normalizedHeaders, err := normalizeData("#", "header_key_", headers)
 
 	if err != nil {
 		return body, false, err
 	}
 
 	// Prefix Body Data with body_key_
-	bodyData = prefixData("body_key_", bodyData)
+	prefixedBody := prefixData("body_key_", normalizedBody)
 
 	// Prefix Header Data with header_key_
-	headerData = prefixData("header_key_", headerData)
+	prefixedHeaders := prefixData("header_key_", normalizedHeaders)
 
 	variables := VARIABLES
 	
-	maps.Copy(variables, bodyData)
-	maps.Copy(variables, headerData)
+	maps.Copy(variables, prefixedBody)
+	maps.Copy(variables, prefixedHeaders)
 
-	log.Dev("Body:\n", jsonutils.ToJson(bodyData))
-	log.Dev("Headers:\n", jsonutils.ToJson(headerData))
+	log.Dev("Body:\n", jsonutils.ToJson(prefixedBody))
+	log.Dev("Headers:\n", jsonutils.ToJson(prefixedHeaders))
 
-	templatedData, err := templating.RenderJSON("body", body, variables)
+	templatedData, err := templating.RenderJSON("body", normalizedBody, variables)
 
 	if err != nil {
-		return bodyData, false, err
+		return body, false, err
 	}
 
 	beforeStr := jsonutils.ToJson(body)
