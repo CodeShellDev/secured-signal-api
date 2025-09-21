@@ -148,15 +148,23 @@ func prefixData(prefix string, data map[string]any) (map[string]any) {
 }
 
 func cleanHeaders(headers map[string]any) map[string]any {
-	authHeader, ok := headers["Authorization"].(string)
+	cleanedHeaders := map[string]any{}
+
+	for key, value := range headers {
+		cleanedKey := strings.ReplaceAll(key, "-", "_")
+
+		cleanedHeaders[cleanedKey] = value
+	}
+
+	authHeader, ok := cleanedHeaders["Authorization"].(string)
 
 	if !ok {
 		authHeader = "REDACTED"
 	}
 
-	headers["Authorization"] = strings.SplitAfterN(authHeader, ` `, 1)[0] + " REDACTED"
+	cleanedHeaders["Authorization"] = strings.SplitAfterN(authHeader, ` `, 1)[0] + " REDACTED"
 
-	return headers
+	return cleanedHeaders
 }
 
 func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
@@ -171,7 +179,7 @@ func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[str
 		return body, false, err
 	}
 
-	normalizedHeaders, err := normalizeData("#", "header_key_", headers)
+	normalizedBody, err = normalizeData("#", "header_key_", normalizedBody)
 
 	if err != nil {
 		return body, false, err
@@ -181,7 +189,7 @@ func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[str
 	prefixedBody := prefixData("body_key_", normalizedBody)
 
 	// Prefix Header Data with header_key_
-	prefixedHeaders := prefixData("header_key_", normalizedHeaders)
+	prefixedHeaders := prefixData("header_key_", headers)
 
 	variables := VARIABLES
 	
