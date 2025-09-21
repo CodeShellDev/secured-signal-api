@@ -123,11 +123,15 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer API_T
 
 If you are not comfortable / don't want to hardcode your Number for example and/or Recipients in you, may use **Placeholders** in your Request.
 
+**How to use:**
+
 | Type                   | Example             | Note             |
 | :--------------------- | :------------------ | :--------------- |
 | Body                   | `{{@data.key}}`     |                  |
 | Header                 | `{{#Content_Type}}` | `-` becomes `_`  |
 | [Variable](#variables) | `{{.VAR}}`          | always uppercase |
+
+**Where to use:**
 
 | Type  | Example                                                          |
 | :---- | :--------------------------------------------------------------- |
