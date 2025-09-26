@@ -39,6 +39,7 @@ endpoint restrictions, placeholders, flexible configuration
   - [Message Templates](#message-templates)
 - [Contributing](#contributing)
 - [Support](#support)
+- [Help](#help)
 - [License](#license)
 
 ## Getting Started
