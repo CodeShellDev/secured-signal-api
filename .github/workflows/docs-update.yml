@@ -7,8 +7,8 @@ on:
       - dev
     paths:
       - docker-compose.yaml
-      - docs/**
-      - .github/templates/docs/**
+      - docs/*
+      - .github/templates/docs/*
 
 jobs:
   update:
