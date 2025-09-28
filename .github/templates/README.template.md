@@ -76,31 +76,7 @@ And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 > In this documentation, we use `sec-signal-api:8880` as the host for simplicity.
 > Replace it with your actual container/host IP, port, or hostname.
 
-### Reverse Proxy
-
-#### Traefik
-
-Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
-
-```yaml
-{ { file.examples/reverse-proxy/traefik/traefik.docker-compose.yaml } }
-```
-
-#### NGINX Proxy
-
-This is the [NGINX](https://github.com/nginx/nginx) `docker-compose.yaml` file:
-
-```yaml
-{ { file.examples/reverse-proxy/nginx/nginx.docker-compose.yaml } }
-```
-
-Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `etc/nginx/conf.d/default.conf`:
-
-```conf
-{ { file.examples/reverse-proxy/nginx/nginx.conf } }
-```
-
-Lastly add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/nginx/ssl`.
+{{ file.docs/reverse-proxy/reverse-proxy.template.md }}
 
 ## Setup
 
