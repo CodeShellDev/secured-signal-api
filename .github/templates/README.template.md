@@ -76,7 +76,7 @@ And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 > In this documentation, we use `sec-signal-api:8880` as the host for simplicity.
 > Replace it with your actual container/host IP, port, or hostname.
 
-{{ file.docs/reverse-proxy/reverse-proxy.template.md }}
+{{ file..github/templates/docs/reverse-proxy/reverse-proxy.template.md }}
 
 ## Setup
 
