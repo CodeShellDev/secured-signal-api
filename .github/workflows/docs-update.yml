@@ -1,0 +1,17 @@
+name: Update README
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - docker-compose.yaml
+      - docs/**
+      - .github/templates/docs/**
+
+jobs:
+  update:
+    uses: codeshelldev/gh-actions/.github/workflows/readme-update.yml@main
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
