@@ -1,3 +1,4 @@
+>>docs/reverse-proxy/reverse-proxy.md
 ### Reverse Proxy
 
 {{ file..github/templates/docs/reverse-proxy/traefik.template.md }}
