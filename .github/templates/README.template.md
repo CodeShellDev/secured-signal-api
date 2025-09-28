@@ -173,7 +173,7 @@ To change the internal config file location set `CONFIG_PATH` in your **Environm
 This example config shows all of the individual settings that can be applied:
 
 ```yaml
-{ { file.examples/config.yml } }
+{ { file.docs/examples/config.yml } }
 ```
 
 #### Token Configs
@@ -185,7 +185,7 @@ This way you can permission tokens by further restricting or adding [Endpoints](
 Here is an example:
 
 ```yaml
-{ { file.examples/token.yml } }
+{ { file.docs/examples/token.yml } }
 ```
 
 ### Environment
