@@ -82,8 +82,6 @@ Before you can send messages via Secured Signal API you must first set up [Signa
 
 Secured Signal API provides 3 Ways to Authenticate
 
-### Auth
-
 | Method      | Example                                                    |
 | :---------- | :--------------------------------------------------------- |
 | Bearer Auth | Add `Authorization: Bearer API_TOKEN` to headers           |
