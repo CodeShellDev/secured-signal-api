@@ -80,6 +80,8 @@ Before you can send messages via Secured Signal API you must first set up [Signa
 
 ## Usage
 
+### Auth
+
 Secured Signal API provides 3 Ways to Authenticate
 
 | Method      | Example                                                    |
