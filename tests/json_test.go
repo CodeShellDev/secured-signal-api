@@ -38,9 +38,9 @@ func TestJsonTemplating(t *testing.T) {
 		},
 		"dictArray": []any{
 			map[string]any{"key": "val"},
-			map[string]any{"key": []any{ "item0", "item1" }},
+			map[string]any{"key": []any{"item0", "item1"}},
 		},
-		"key1": []any{ "item0", "item1" },
+		"key1": []any{"item0", "item1"},
 		"key2": 4,
 	}
 
@@ -75,32 +75,32 @@ func TestJsonPath(t *testing.T) {
 
 	data := jsonutils.GetJson[map[string]any](json)
 
-	cases := []struct{
-		key 	 string
+	cases := []struct {
+		key      string
 		expected string
 	}{
 		{
-			key: "key",
+			key:      "key",
 			expected: "val",
 		},
 		{
-			key: "dict.key",
+			key:      "dict.key",
 			expected: "value",
 		},
 		{
-			key: "dictArray[0].key",
+			key:      "dictArray[0].key",
 			expected: "value0",
 		},
 		{
-			key: "dictArray[1].key",
+			key:      "dictArray[1].key",
 			expected: "value1",
 		},
 		{
-			key: "array[0]",
+			key:      "array[0]",
 			expected: "item0",
 		},
 		{
-			key: "array[1]",
+			key:      "array[1]",
 			expected: "item1",
 		},
 	}
