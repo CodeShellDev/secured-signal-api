@@ -1,4 +1,4 @@
-// Pretty useless, but go requires seperate package
+// Pretty useless, but go requires separate package
 // since import cycles are not allowed
 
 package middlewareTypes
