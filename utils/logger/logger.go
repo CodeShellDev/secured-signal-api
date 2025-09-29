@@ -49,20 +49,20 @@ func Init(level string) {
 
 func getLogLevel(level string) zapcore.Level {
 	switch level {
-		case "info":
-			return zapcore.InfoLevel
-		case "debug":
-			return zapcore.DebugLevel
-		case "dev":
-			return zapcore.DebugLevel
-		case "warn":
-			return zapcore.WarnLevel
-		case "error":
-			return zapcore.ErrorLevel
-		case "fatal":
-			return zapcore.FatalLevel
-		default:
-			return zapcore.InfoLevel
+	case "info":
+		return zapcore.InfoLevel
+	case "debug":
+		return zapcore.DebugLevel
+	case "dev":
+		return zapcore.DebugLevel
+	case "warn":
+		return zapcore.WarnLevel
+	case "error":
+		return zapcore.ErrorLevel
+	case "fatal":
+		return zapcore.FatalLevel
+	default:
+		return zapcore.InfoLevel
 	}
 }
 

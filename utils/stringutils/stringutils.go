@@ -11,7 +11,7 @@ import (
 func ToType(str string) any {
 	cleaned := strings.TrimSpace(str)
 
-    //* Try JSON
+	//* Try JSON
 	if IsEnclosedBy(cleaned, `[`, `]`) || IsEnclosedBy(cleaned, `{`, `}`) {
 		data, err := jsonutils.GetJsonSafe[any](str)
 
@@ -49,11 +49,11 @@ func ToType(str string) any {
 		}
 	}
 
-    return str
+	return str
 }
 
 func Contains(str string, match string) bool {
-    return !IsEscaped(str, match)
+	return !IsEscaped(str, match)
 }
 
 // Checks if a string is Enclosed by `char` and are not Escaped
@@ -68,7 +68,7 @@ func IsEnclosedBy(str string, charA, charB string) bool {
 
 	regexStr := `(^|[^\\])(\\\\)*(` + charA + `)(.*?)(^|[^\\])(\\\\)*(` + charB + ")"
 
- 	re := regexp.MustCompile(regexStr)
+	re := regexp.MustCompile(regexStr)
 
 	matches := re.FindAllStringSubmatchIndex(str, -1)
 
@@ -121,19 +121,19 @@ func NeedsEscapeForRegex(char rune) bool {
 }
 
 func ToArray(sliceStr string) []string {
-    if sliceStr == "" {
-        return nil
-    }
+	if sliceStr == "" {
+		return nil
+	}
 
-    rawItems := strings.Split(sliceStr, ",")
-    items := make([]string, 0, len(rawItems))
+	rawItems := strings.Split(sliceStr, ",")
+	items := make([]string, 0, len(rawItems))
 
-    for _, item := range rawItems {
-        trimmed := strings.TrimSpace(item)
-        if trimmed != "" {
-            items = append(items, trimmed)
-        }
-    }
+	for _, item := range rawItems {
+		trimmed := strings.TrimSpace(item)
+		if trimmed != "" {
+			items = append(items, trimmed)
+		}
+	}
 
-    return items
+	return items
 }

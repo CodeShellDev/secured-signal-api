@@ -4,6 +4,6 @@
 package middlewareTypes
 
 type DataAlias struct {
-	Alias    string `koanf:"alias"`
-	Score 	 int	`koanf:"score"`
+	Alias string `koanf:"alias"`
+	Score int    `koanf:"score"`
 }

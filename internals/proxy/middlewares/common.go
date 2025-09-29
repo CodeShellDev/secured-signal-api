@@ -7,7 +7,7 @@ import (
 )
 
 type Context struct {
-	Next  	http.Handler
+	Next http.Handler
 }
 
 type authType string
@@ -24,21 +24,21 @@ type contextKey string
 const tokenKey contextKey = "token"
 
 func getSettingsByReq(req *http.Request) *config.SETTING_ {
-    token, ok := req.Context().Value(tokenKey).(string)
+	token, ok := req.Context().Value(tokenKey).(string)
 
-    if !ok {
-        token = "*"
-    }
+	if !ok {
+		token = "*"
+	}
 
-    return getSettings(token)
+	return getSettings(token)
 }
 
 func getSettings(token string) *config.SETTING_ {
-    settings, exists := config.ENV.SETTINGS[token]
+	settings, exists := config.ENV.SETTINGS[token]
 
-    if !exists || settings == nil {
-        settings = config.ENV.SETTINGS["*"]
-    }
+	if !exists || settings == nil {
+		settings = config.ENV.SETTINGS["*"]
+	}
 
-    return settings
+	return settings
 }

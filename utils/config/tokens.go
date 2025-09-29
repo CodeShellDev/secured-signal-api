@@ -8,8 +8,8 @@ import (
 )
 
 type TOKEN_CONFIG_ struct {
-	TOKENS		[]string 	`koanf:"tokens"`
-	OVERRIDES 	SETTING_	`koanf:"overrides"`
+	TOKENS    []string `koanf:"tokens"`
+	OVERRIDES SETTING_ `koanf:"overrides"`
 }
 
 func LoadTokens() {
@@ -52,13 +52,13 @@ func InitTokens() {
 	}
 
 	if len(apiTokens) > 0 {
-		log.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")	
+		log.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")
 
 		ENV.API_TOKENS = apiTokens
 	}
 }
 
-func parseTokenConfigs(configs []TOKEN_CONFIG_) (map[string]SETTING_) {
+func parseTokenConfigs(configs []TOKEN_CONFIG_) map[string]SETTING_ {
 	settings := map[string]SETTING_{}
 
 	for _, config := range configs {

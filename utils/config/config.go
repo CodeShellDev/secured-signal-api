@@ -56,11 +56,11 @@ func WatchFile(path string, f *file.File) {
 }
 
 func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) error {
-    files, err := filepath.Glob(filepath.Join(dir, "*.yml"))
+	files, err := filepath.Glob(filepath.Join(dir, "*.yml"))
 
-    if err != nil {
-        return nil
-    }
+	if err != nil {
+		return nil
+	}
 
 	var array []any
 
@@ -80,7 +80,7 @@ func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) 
 		path: array,
 	}
 
-    return config.Load(confmap.Provider(wrapper, "."), nil)
+	return config.Load(confmap.Provider(wrapper, "."), nil)
 }
 
 func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
@@ -112,7 +112,7 @@ func templateConfig(config *koanf.Koanf) {
 		}
 	}
 
-    config.Load(confmap.Provider(data, "."), nil)
+	config.Load(confmap.Provider(data, "."), nil)
 }
 
 func mergeLayers() *koanf.Koanf {
@@ -125,28 +125,28 @@ func mergeLayers() *koanf.Koanf {
 }
 
 func normalizeKeys(config *koanf.Koanf) {
-    data := map[string]any{}
+	data := map[string]any{}
 
-    for _, key := range config.Keys() {
-        lower := strings.ToLower(key)
+	for _, key := range config.Keys() {
+		lower := strings.ToLower(key)
 
-        data[lower] = config.Get(key)
-    }
+		data[lower] = config.Get(key)
+	}
 
 	config.Delete("")
-    config.Load(confmap.Provider(data, "."), nil)
+	config.Load(confmap.Provider(data, "."), nil)
 }
 
 // Transforms Children of path
 func transformChildren(config *koanf.Koanf, path string, transform func(key string, value any) (string, any)) error {
 	var sub map[string]any
-	
+
 	if !config.Exists(path) {
 		return errors.New("invalid path")
 	}
 
 	err := config.Unmarshal(path, &sub)
-	
+
 	if err != nil {
 		return err
 	}
@@ -158,7 +158,7 @@ func transformChildren(config *koanf.Koanf, path string, transform func(key stri
 
 		transformed[newKey] = newVal
 	}
-	
+
 	config.Delete(path)
 
 	config.Load(confmap.Provider(map[string]any{
@@ -171,7 +171,7 @@ func transformChildren(config *koanf.Koanf, path string, transform func(key stri
 // Does the same thing as transformChildren() but does it for each Array Item inside of root and transforms subPath
 func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath string, transform func(key string, value any) (string, any)) error {
 	var array []map[string]any
-	
+
 	err := config.Unmarshal(root, &array)
 	if err != nil {
 		return err
@@ -186,7 +186,7 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 			"item": data,
 		}, "."), nil)
 
-		err := transformChildren(tmp, "item." + subPath, transform)
+		err := transformChildren(tmp, "item."+subPath, transform)
 
 		if err != nil {
 			return err
@@ -211,7 +211,6 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 
 	return nil
 }
-
 
 func normalizeEnv(key string, value string) (string, any) {
 	key = strings.ToLower(key)

@@ -13,7 +13,7 @@ import (
 )
 
 type AliasMiddleware struct {
-	Next 	http.Handler
+	Next http.Handler
 }
 
 func (data AliasMiddleware) Use() http.Handler {
@@ -52,11 +52,11 @@ func (data AliasMiddleware) Use() http.Handler {
 				keyWithoutPrefix := key[1:]
 
 				switch prefix {
-					case "@":
-						bodyData[keyWithoutPrefix] = value
-						modifiedBody = true
-					case ".":
-						settings.VARIABLES[keyWithoutPrefix] = value
+				case "@":
+					bodyData[keyWithoutPrefix] = value
+					modifiedBody = true
+				case ".":
+					settings.VARIABLES[keyWithoutPrefix] = value
 				}
 			}
 		}
@@ -85,7 +85,7 @@ func (data AliasMiddleware) Use() http.Handler {
 	})
 }
 
-func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map[string]any) (map[string]any) {
+func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map[string]any) map[string]any {
 	aliasData := map[string]any{}
 
 	for key, alias := range aliases {

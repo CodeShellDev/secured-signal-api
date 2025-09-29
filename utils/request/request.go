@@ -11,17 +11,17 @@ import (
 )
 
 const (
-	Json BodyType = "Json"
-	Form  BodyType = "Form"
+	Json    BodyType = "Json"
+	Form    BodyType = "Form"
 	Unknown BodyType = "Unknown"
 )
 
 type BodyType string
 
 type Body struct {
-	Data	map[string]any
-	Raw     []byte
-	Empty	bool
+	Data  map[string]any
+	Raw   []byte
+	Empty bool
 }
 
 func (body Body) ToString() string {
@@ -45,8 +45,8 @@ func CreateBody(data map[string]any) (Body, error) {
 	isEmpty := len(data) <= 0
 
 	return Body{
-		Data: data,
-		Raw: bytes,
+		Data:  data,
+		Raw:   bytes,
 		Empty: isEmpty,
 	}, nil
 }
@@ -75,7 +75,7 @@ func GetFormData(body []byte) (map[string]any, error) {
 		return nil, err
 	}
 
-	for key, value := range queryData {	
+	for key, value := range queryData {
 		data[key] = query.ParseTypedQueryValues(value)
 	}
 
@@ -84,7 +84,7 @@ func GetFormData(body []byte) (map[string]any, error) {
 
 func GetBody(req *http.Request) ([]byte, error) {
 	bodyBytes, err := io.ReadAll(req.Body)
-	
+
 	if err != nil {
 		req.Body.Close()
 
@@ -95,7 +95,7 @@ func GetBody(req *http.Request) ([]byte, error) {
 	return bodyBytes, nil
 }
 
-func GetReqHeaders(req *http.Request) (map[string]any) {
+func GetReqHeaders(req *http.Request) map[string]any {
 	data := map[string]any{}
 
 	for key, value := range req.Header {
@@ -109,7 +109,7 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 	bytes, err := GetBody(req)
 
 	var isEmpty bool
-	
+
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 
@@ -123,29 +123,29 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 	var data map[string]any
 
 	switch GetBodyType(req) {
-		case Json:
-			data, err = GetJsonData(bytes)
+	case Json:
+		data, err = GetJsonData(bytes)
 
-			if err != nil {
-				http.Error(w, "Bad Request: invalid JSON", http.StatusBadRequest)
+		if err != nil {
+			http.Error(w, "Bad Request: invalid JSON", http.StatusBadRequest)
 
-				return Body{Empty: true}, err
-			}
-		case Form:
-			data, err = GetFormData(bytes)
+			return Body{Empty: true}, err
+		}
+	case Form:
+		data, err = GetFormData(bytes)
 
-			if err != nil {
-				http.Error(w, "Bad Request: invalid Form", http.StatusBadRequest)
+		if err != nil {
+			http.Error(w, "Bad Request: invalid Form", http.StatusBadRequest)
 
-				return Body{Empty: true}, err
-			}
+			return Body{Empty: true}, err
+		}
 	}
 
 	isEmpty = len(data) <= 0
 
 	return Body{
-		Raw: bytes,
-		Data: data,
+		Raw:   bytes,
+		Data:  data,
 		Empty: isEmpty,
 	}, nil
 }

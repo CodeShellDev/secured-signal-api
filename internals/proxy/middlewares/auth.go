@@ -12,7 +12,7 @@ import (
 )
 
 type AuthMiddleware struct {
-	Next 	http.Handler
+	Next http.Handler
 }
 
 func getAuthType(str string) authType {
@@ -26,7 +26,7 @@ func getAuthType(str string) authType {
 	}
 }
 
-func isValidToken(tokens []string, match string) (bool) {
+func isValidToken(tokens []string, match string) bool {
 	return slices.Contains(tokens, match)
 }
 
@@ -57,26 +57,26 @@ func (data AuthMiddleware) Use() http.Handler {
 			authToken = authBody[1]
 
 			switch authType {
-				case Bearer:
-					if isValidToken(tokens, authToken) {
-						success = true
-					}
+			case Bearer:
+				if isValidToken(tokens, authToken) {
+					success = true
+				}
 
-				case Basic:
-					basicAuthBody, err := base64.StdEncoding.DecodeString(authToken)
+			case Basic:
+				basicAuthBody, err := base64.StdEncoding.DecodeString(authToken)
 
-					if err != nil {
-						log.Error("Could not decode Basic Auth Payload: ", err.Error())
-					}
+				if err != nil {
+					log.Error("Could not decode Basic Auth Payload: ", err.Error())
+				}
 
-					basicAuth := string(basicAuthBody)
-					basicAuthParams := strings.Split(basicAuth, ":")
+				basicAuth := string(basicAuthBody)
+				basicAuthParams := strings.Split(basicAuth, ":")
 
-					user := "api"
+				user := "api"
 
-					if basicAuthParams[0] == user && isValidToken(tokens, basicAuthParams[1]) {
-						success = true
-					}
+				if basicAuthParams[0] == user && isValidToken(tokens, basicAuthParams[1]) {
+					success = true
+				}
 			}
 
 		} else if authQuery != "" {

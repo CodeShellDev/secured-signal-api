@@ -9,7 +9,7 @@ import (
 )
 
 type EndpointsMiddleware struct {
-	Next             http.Handler
+	Next http.Handler
 }
 
 func (data EndpointsMiddleware) Use() http.Handler {
@@ -60,7 +60,7 @@ func isBlocked(endpoint string, allowed []string, blocked []string) bool {
 	}
 
 	// Allow all except explicitly Blocked
-	if len(allowed) == 0 && len(blocked) != 0{
+	if len(allowed) == 0 && len(blocked) != 0 {
 		return isExplicitlyBlocked
 	}
 

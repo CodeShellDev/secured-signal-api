@@ -18,7 +18,7 @@ import (
 )
 
 type TemplateMiddleware struct {
-	Next      http.Handler
+	Next http.Handler
 }
 
 func (data TemplateMiddleware) Use() http.Handler {
@@ -137,11 +137,11 @@ func normalizeData(fromPrefix, toPrefix string, data map[string]any) (map[string
 	return data, nil
 }
 
-func prefixData(prefix string, data map[string]any) (map[string]any) {
+func prefixData(prefix string, data map[string]any) map[string]any {
 	res := map[string]any{}
 
 	for key, value := range data {
-		res[prefix + key] = value
+		res[prefix+key] = value
 	}
 
 	return res
@@ -192,7 +192,7 @@ func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[str
 	prefixedHeaders := prefixData("header_key_", headers)
 
 	variables := VARIABLES
-	
+
 	maps.Copy(variables, prefixedBody)
 	maps.Copy(variables, prefixedHeaders)
 

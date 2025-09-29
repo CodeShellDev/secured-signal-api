@@ -11,7 +11,7 @@ import (
 )
 
 type MessageMiddleware struct {
-	Next      http.Handler
+	Next http.Handler
 }
 
 func (data MessageMiddleware) Use() http.Handler {
@@ -30,7 +30,6 @@ func (data MessageMiddleware) Use() http.Handler {
 		if messageTemplate == "" {
 			messageTemplate = getSettings("*").MESSAGE_TEMPLATE
 		}
-
 
 		body, err := request.GetReqBody(w, req)
 

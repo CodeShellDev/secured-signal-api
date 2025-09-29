@@ -36,7 +36,7 @@ func ParseTypedQueryValues(values []string) any {
 	return stringutils.ToType(raw)
 }
 
-func ParseTypedQuery(query string, matchPrefix string) (map[string]any) {
+func ParseTypedQuery(query string, matchPrefix string) map[string]any {
 	addedData := map[string]any{}
 
 	queryData := ParseRawQuery(query)

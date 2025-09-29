@@ -36,23 +36,23 @@ func main() {
 	proxy_last = proxy.Create(ENV.API_URL)
 
 	mesg_m6 := middlewares.MessageMiddleware{
-		Next: 	proxy_last,
+		Next: proxy_last,
 	}
 
 	alias_m5 := middlewares.AliasMiddleware{
-		Next: 	mesg_m6.Use(),
+		Next: mesg_m6.Use(),
 	}
 
 	temp_m4 := middlewares.TemplateMiddleware{
-		Next: 	alias_m5.Use(),
+		Next: alias_m5.Use(),
 	}
 
 	endp_m3 := middlewares.EndpointsMiddleware{
-		Next: 	temp_m4.Use(),
+		Next: temp_m4.Use(),
 	}
 
 	auth_m2 := middlewares.AuthMiddleware{
-		Next:   endp_m3.Use(),
+		Next: endp_m3.Use(),
 	}
 
 	serv_m1 := middlewares.ServeMiddleware{
@@ -60,7 +60,7 @@ func main() {
 	}
 
 	log_m0 := middlewares.LogMiddleware{
-		Next: 	serv_m1.Use(),
+		Next: serv_m1.Use(),
 	}
 
 	log.Info("Initialized Middlewares")
@@ -74,9 +74,9 @@ func main() {
 		Handler: log_m0.Use(),
 	}
 
-	stop := docker.Run(func(){
+	stop := docker.Run(func() {
 		err := server.ListenAndServe()
-		
+
 		if err != nil && err != http.ErrServerClosed {
 			log.Fatal("Server error: ", err.Error())
 		}

@@ -12,18 +12,18 @@ import (
 
 func normalize(value any) string {
 	switch str := value.(type) {
-		case []string:
-			return "[" + strings.Join(str, ",") + "]"
-		case []any:
-			items := make([]string, len(str))
+	case []string:
+		return "[" + strings.Join(str, ",") + "]"
+	case []any:
+		items := make([]string, len(str))
 
-			for i, item := range str {
-				items[i] = fmt.Sprintf("%v", item)
-			}
+		for i, item := range str {
+			items[i] = fmt.Sprintf("%v", item)
+		}
 
-			return "[" + strings.Join(items, ",") + "]"
-		default:
-			return fmt.Sprintf("%v", value)
+		return "[" + strings.Join(items, ",") + "]"
+	default:
+		return fmt.Sprintf("%v", value)
 	}
 }
 
@@ -38,7 +38,7 @@ func AddTemplateFunc(tmplStr string, funcName string) (string, error) {
 		return re.ReplaceAllStringFunc(match, func(varMatch string) string {
 			varName := re.ReplaceAllString(varMatch, ".$1")
 
-			return strings.ReplaceAll(varMatch, varName, "(" + funcName + " " + varName + ")")
+			return strings.ReplaceAll(varMatch, varName, "("+funcName+" "+varName+")")
 		})
 	})
 }
@@ -85,7 +85,7 @@ func RenderTemplate(name string, tmplStr string, variables any) (string, error) 
 	return ParseTemplate(templt, tmplStr, variables)
 }
 
-func CreateTemplateWithFunc(name string, funcMap template.FuncMap) (*template.Template) {
+func CreateTemplateWithFunc(name string, funcMap template.FuncMap) *template.Template {
 	return template.New(name).Funcs(funcMap)
 }
 
@@ -109,71 +109,71 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 	}
 
 	switch typedValue := value.(type) {
-		case map[string]any:
-			data := map[string]any{}
+	case map[string]any:
+		data := map[string]any{}
 
-			for mapKey, mapValue := range typedValue {
-				var templatedValue any
+		for mapKey, mapValue := range typedValue {
+			var templatedValue any
 
-				templatedValue, err = RenderDataKeyTemplateRecursive(mapKey, mapValue, variables)
-
-				if err != nil {
-					return mapValue, err
-				}
-
-				data[mapKey] = templatedValue
-			}
-
-			return data, err
-
-		case []any:
-			data := []any{}
-
-			for arrayIndex, arrayValue := range typedValue {
-				var templatedValue any
-
-				templatedValue, err = RenderDataKeyTemplateRecursive(arrayIndex, arrayValue, variables)
-
-				if err != nil {
-					return arrayValue, err
-				}
-
-				data = append(data, templatedValue)
-			}
-
-			return data, err
-		
-		case string:
-			templt := CreateTemplateWithFunc("json:" + strKey, template.FuncMap{
-				"normalize": normalize,
-			})
-
-			tmplStr, _ := AddTemplateFunc(typedValue, "normalize")
-
-			templatedValue, err := ParseTemplate(templt, tmplStr, variables)
+			templatedValue, err = RenderDataKeyTemplateRecursive(mapKey, mapValue, variables)
 
 			if err != nil {
-				return typedValue, err
+				return mapValue, err
 			}
 
-			templateRe, err := regexp.Compile(`{{[^}]+}}`)
+			data[mapKey] = templatedValue
+		}
+
+		return data, err
+
+	case []any:
+		data := []any{}
+
+		for arrayIndex, arrayValue := range typedValue {
+			var templatedValue any
+
+			templatedValue, err = RenderDataKeyTemplateRecursive(arrayIndex, arrayValue, variables)
+
+			if err != nil {
+				return arrayValue, err
+			}
+
+			data = append(data, templatedValue)
+		}
+
+		return data, err
+
+	case string:
+		templt := CreateTemplateWithFunc("json:"+strKey, template.FuncMap{
+			"normalize": normalize,
+		})
+
+		tmplStr, _ := AddTemplateFunc(typedValue, "normalize")
+
+		templatedValue, err := ParseTemplate(templt, tmplStr, variables)
+
+		if err != nil {
+			return typedValue, err
+		}
+
+		templateRe, err := regexp.Compile(`{{[^}]+}}`)
+
+		if err == nil {
+			nonWhitespaceRe, err := regexp.Compile(`(\S+)`)
 
 			if err == nil {
-				nonWhitespaceRe, err := regexp.Compile(`(\S+)`)
+				filtered := templateRe.ReplaceAllString(tmplStr, "")
 
-				if err == nil {
-					filtered := templateRe.ReplaceAllString(tmplStr, "")
-
-					if !nonWhitespaceRe.MatchString(filtered) {
-						return stringutils.ToType(templatedValue), err
-					}
+				if !nonWhitespaceRe.MatchString(filtered) {
+					return stringutils.ToType(templatedValue), err
 				}
 			}
-		
-			return templatedValue, err
-		
-		default:
-			return typedValue, err
+		}
+
+		return templatedValue, err
+
+	default:
+		return typedValue, err
 	}
 }
 
@@ -197,8 +197,8 @@ func RenderNormalizedTemplate(name string, tmplStr string, variables any) (strin
 	}
 
 	templt := CreateTemplateWithFunc(name, template.FuncMap{
-        "normalize": normalize,
-    })
+		"normalize": normalize,
+	})
 
 	return ParseTemplate(templt, tmplStr, variables)
 }

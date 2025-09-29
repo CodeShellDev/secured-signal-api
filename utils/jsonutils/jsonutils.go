@@ -7,46 +7,46 @@ import (
 )
 
 func GetByPath(path string, data any) (any, bool) {
-    // Split into parts by `.` and `[]`
-    re := regexp.MustCompile(`\.|\[|\]`)
+	// Split into parts by `.` and `[]`
+	re := regexp.MustCompile(`\.|\[|\]`)
 
-    parts := re.Split(path, -1)
+	parts := re.Split(path, -1)
 
-    cleaned := []string{}
+	cleaned := []string{}
 
-    for _, part := range parts {
-        if part != "" {
-            cleaned = append(cleaned, part)
-        }
-    }
+	for _, part := range parts {
+		if part != "" {
+			cleaned = append(cleaned, part)
+		}
+	}
 
-    current := data
+	current := data
 
-    for _, key := range cleaned {
-        switch currentDataType := current.(type) {
-            // Case: Dictionary
-            case map[string]any:
-                value, ok := currentDataType[key]
-                if !ok {
-                    return nil, false
-                }
-                current = value
+	for _, key := range cleaned {
+		switch currentDataType := current.(type) {
+		// Case: Dictionary
+		case map[string]any:
+			value, ok := currentDataType[key]
+			if !ok {
+				return nil, false
+			}
+			current = value
 
-            // Case: Array
-            case []any:
-                index, err := strconv.Atoi(key)
+		// Case: Array
+		case []any:
+			index, err := strconv.Atoi(key)
 
-                if err != nil || index < 0 || index >= len(currentDataType) {
-                    return nil, false
-                }
-                current = currentDataType[index]
+			if err != nil || index < 0 || index >= len(currentDataType) {
+				return nil, false
+			}
+			current = currentDataType[index]
 
-            default:
-                return nil, false
-        }
-    }
+		default:
+			return nil, false
+		}
+	}
 
-    return current, true
+	return current, true
 }
 
 func GetJsonSafe[T any](jsonStr string) (T, error) {
@@ -57,7 +57,7 @@ func GetJsonSafe[T any](jsonStr string) (T, error) {
 	return result, err
 }
 
-func GetJson[T any](jsonStr string) (T) {
+func GetJson[T any](jsonStr string) T {
 	var result T
 
 	json.Unmarshal([]byte(jsonStr), &result)
