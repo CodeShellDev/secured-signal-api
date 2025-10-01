@@ -32,7 +32,7 @@ endpoint restrictions, placeholders, flexible configuration
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
     <img 
-		src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=image+downloads&trim=" 
+		src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/pulls?color=%2344cc11&tag=latest&label=image+downloads&trim=" 
 		alt="Docker image pulls"
 		>
   </a>
