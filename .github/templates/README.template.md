@@ -30,12 +30,6 @@ endpoint restrictions, placeholders, flexible configuration
 		alt="Docker image size"
 	>
   </a>
-  <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
-    <img 
-		src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/pulls?color=%2344cc11&tag=latest&label=image+downloads&trim=" 
-		alt="Docker image pulls"
-		>
-  </a>
   <a href="./LICENSE">
     <img 
 		src="https://img.shields.io/badge/License-MIT-yellow.svg"
