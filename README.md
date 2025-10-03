@@ -234,7 +234,7 @@ Before you can send messages via Secured Signal API you must first set up [Signa
 
 > [!TIP]
 > Run setup directly with Signal rAPI.
-> Setup requests via Secured Signal API are blocked. See [Blocked Endpoints](#blocked-endpoints).
+> Setup requests via Secured Signal API are blocked. See [Blocked Endpoints](#endpoints).
 
 ## Usage
 
@@ -351,7 +351,7 @@ settings:
 
 You can also override the `config.yml` file for each individual token by adding configs under `TOKENS_PATH` (default: `config/tokens/`)
 
-This way you can permission tokens by further restricting or adding [Endpoints](#blocked-endpoints), [Placeholders](#variables), etc.
+This way you can permission tokens by further restricting or adding [Endpoints](#endpoints), [Placeholders](#variables), etc.
 
 Here is an example:
 
