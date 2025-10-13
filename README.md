@@ -362,7 +362,7 @@ overrides:
   variables: # Disable Placeholder
   blockedEndpoints: # Disable Sending
     - /v2/send
-  messageAliases: # Disable Aliases
+  dataAliases: # Disable Aliases
 ```
 
 ### Environment
