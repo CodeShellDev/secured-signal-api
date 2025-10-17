@@ -67,7 +67,7 @@ endpoint restrictions, placeholders, flexible configuration
 Get the latest version of the `docker-compose.yaml` file:
 
 ```yaml
-{ { file.docker-compose.yaml } }
+{ { #://docker-compose.yaml } }
 ```
 
 And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
@@ -83,7 +83,7 @@ And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 
 ```yaml
-{ { file.examples/reverse-proxy/traefik/traefik.docker-compose.yaml } }
+{ { #://examples/reverse-proxy/traefik/traefik.docker-compose.yaml } }
 ```
 
 #### NGINX Proxy
@@ -91,13 +91,13 @@ Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
 This is the [NGINX](https://github.com/nginx/nginx) `docker-compose.yaml` file:
 
 ```yaml
-{ { file.examples/reverse-proxy/nginx/nginx.docker-compose.yaml } }
+{ { #://examples/reverse-proxy/nginx/nginx.docker-compose.yaml } }
 ```
 
 Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `etc/nginx/conf.d/default.conf`:
 
 ```conf
-{ { file.examples/reverse-proxy/nginx/nginx.conf } }
+{ { #://examples/reverse-proxy/nginx/nginx.conf } }
 ```
 
 Lastly add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/nginx/ssl`.
@@ -197,7 +197,7 @@ To change the internal config file location set `CONFIG_PATH` in your **Environm
 This example config shows all of the individual settings that can be applied:
 
 ```yaml
-{ { file.examples/config.yml } }
+{ { #://examples/config.yml } }
 ```
 
 #### Token Configs
@@ -209,7 +209,7 @@ This way you can permission tokens by further restricting or adding [Endpoints](
 Here is an example:
 
 ```yaml
-{ { file.examples/token.yml } }
+{ { #://examples/token.yml } }
 ```
 
 ### Environment
