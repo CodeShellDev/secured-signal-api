@@ -190,34 +190,39 @@ networks:
 Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `etc/nginx/conf.d/default.conf`:
 
 ```conf
-server {
-    # Allow SSL on Port 443
-    listen 443 ssl;
+services:
+  secured-signal:
+    image: ghcr.io/codeshelldev/secured-signal-api:latest
+    container_name: secured-signal-api
+    environment:
+      API__URL: http://signal-api:8080
+      SETTINGS__VARIABLES__RECIPIENTS: "[+123400002,+123400003,+123400004]"
+      SETTINGS__VARIABLES__NUMBER: "+123400001"
+      API__TOKENS: "[LOOOOOONG_STRING]"
+    restart: unless-stopped
+    networks:
+      backend:
+        aliases:
+          - secured-signal-api
 
-    # Add allowed hostnames which nginx should respond to
-    # `_` for any
-    server_name localhost;
+  nginx:
+    image: nginx:latest
+    container_name: secured-signal-proxy
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      # Load SSL certificates: cert.key, cert.crt
+      - ./certs:/etc/nginx/ssl
+    ports:
+      - "443:443"
+      - "80:80"
+    restart: unless-stopped
+    networks:
+      frontend:
+      backend:
 
-    ssl_certificate /etc/nginx/ssl/cert.crt;
-    ssl_certificate_key /etc/nginx/ssl/cert.key;
-
-    location / {
-        # Use whatever network alias you set in the docker-compose file
-        proxy_pass http://secured-signal-api:8880;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Host $host;
-        proxy_set_header X-Fowarded-Proto $scheme;
-    }
-}
-
-# Redirect HTTP to HTTPs
-server {
-    listen 80;
-    server_name localhost;
-    return 301 https://$host$request_uri;
-}
+networks:
+  backend:
+  frontend:
 ```
 
 Lastly add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/nginx/ssl`.
@@ -266,23 +271,23 @@ If you are not comfortable / don't want to hardcode your Number for example and/
 
 | Type                   | Example             | Note             |
 | :--------------------- | :------------------ | :--------------- |
-| Body                   | `{{@data.key}}`     |                  |
-| Header                 | `{{#Content_Type}}` | `-` becomes `_`  |
-| [Variable](#variables) | `{{.VAR}}`          | always uppercase |
+| Body                   | `{{@(get data.key)}}`     |                  |
+| Header                 | `{{#(get Content_Type)}}` | `-` becomes `_`  |
+| [Variable](#variables) | `{{(get .VAR)}}`          | always uppercase |
 
 **Where to use:**
 
 | Type  | Example                                                          |
 | :---- | :--------------------------------------------------------------- |
-| Body  | `{"number": "{{ .NUMBER }}", "recipients": "{{ .RECIPIENTS }}"}` |
-| Query | `http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}`     |
-| Path  | `http://sec-signal-api:8880/v1/receive/{{.NUMBER}}`              |
+| Body  | `{"number": "{{ (get .NUMBER) }}", "recipients": "{{ (get .RECIPIENTS) }}"}` |
+| Query | `http://sec-signal-api:8880/v1/receive/?@number={{(get .NUMBER)}}`     |
+| Path  | `http://sec-signal-api:8880/v1/receive/{{(get .NUMBER)}}`              |
 
 You can also combine them:
 
 ```json
 {
-	"content": "{{.NUMBER}} -> {{.RECIPIENTS}}"
+	"content": "{{(get .NUMBER)}} -> {{(get .RECIPIENTS)}}"
 }
 ```
 
@@ -330,16 +335,16 @@ logLevel: info
 settings:
   messageTemplate: |
     You've got a Notification:
-    {{}} 
-    At {{.timestamp}} on {{.date}}.
-    Send using {{.NUMBER}}.
+    {{@(get message)}} 
+    At {{@(get data.timestamp)}} on {{@(get data.date)}}.
+    Send using {{(get .NUMBER)}}.
 
   variables:
     number: "+123400001"
     recipients: ["+123400002", "group.id", "user.id"]
 
   dataAliases: 
-    "": [{ alias: "msg", score: 100 }]
+    "@message": [{ alias: "msg", score: 100 }]
 
   blockedEndpoints:
     - /v1/about
@@ -415,30 +420,30 @@ This makes advanced [Message Templates](#message-templates) like this one possib
 ```yaml
 settings:
     messageTemplate: |
-    {{- $greeting := "Hello" -}}
-    {{ $greeting }}, {{ @name }}!
-    {{ if @age -}}
-    You are {{ @age }} years old.
-    {{- else -}}
+    {{- $(get greeting) := (get "Hello") -}}
+    {{ $(get greeting) }}, {{ @(get name) }}!
+    {{ (get if) @(get age) -}}
+    You are {{ @(get age) }} years old.
+    {{- (get else) -}}
     Age unknown.
-    {{- end }}
+    {{- (get end) }}
     Your friends:
-    {{- range @friends }}
-    - {{ . }}
-    {{- else }}
+    {{- (get range) @(get friends) }}
+    - {{ (get .) }}
+    {{- (get else) }}
     You have no friends.
-    {{- end }}
+    {{- (get end) }}
     Profile details:
-    {{- range $key, $value := @profile }}
-    - {{ $key }}: {{ $value }}
-    {{- end }}
-    {{ define "footer" -}}
-    This is the footer for {{ @name }}.
-    {{- end }}
-    {{ template "footer" . -}}
+    {{- (get range) $(get key), $(get value) := @(get profile) }}
+    - {{ $(get key) }}: {{ $(get value) }}
+    {{- (get end) }}
+    {{ (get define) (get "footer") -}}
+    This is the footer for {{ @(get name) }}.
+    {{- (get end) }}
+    {{ (get template) (get "footer") (get .) -}}
     ------------------------------------
-    Content-Type: {{ #Content_Type }}
-    Redacted Auth Header: {{ #Authorization }}
+    Content-Type: {{ #(get Content_Type) }}
+    Redacted Auth Header: {{ #(get Authorization) }}
 ```
 
 ### API Token(s)
@@ -500,7 +505,7 @@ See [Placeholders](#placeholders).
 
 > [!NOTE]
 > Every Placeholder Key will be converted into an Uppercase String.
-> Example: `number` becomes `NUMBER` in `{{.NUMBER}}`
+> Example: `number` becomes `NUMBER` in `{{(get .NUMBER)}}`
 
 ```yaml
 settings:
@@ -518,7 +523,7 @@ Use `messageTemplate` to configure:
 settings:
   messageTemplate: |
     Your Message:
-    {{@message}}.
+    {{@(get message)}}.
     Sent with Secured Signal API.
 ```
 
