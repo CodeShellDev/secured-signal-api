@@ -438,7 +438,9 @@ Feel free to open up an [Issue](https://github.com/codeshelldev/secured-signal-a
 
 ## Support
 
-Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project. :)
+Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project.
+
+:)
 
 ## Help
 
