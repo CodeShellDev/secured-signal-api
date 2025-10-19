@@ -156,7 +156,7 @@ func RenderDataKeyTemplateRecursive(key any, value any, variables map[string]any
 			return typedValue, err
 		}
 
-		templateRe, err := regexp.Compile(`{{[^}]+}}`)
+		templateRe, err := regexp.Compile(`{{[^{}]+}}`)
 
 		if err == nil {
 			nonWhitespaceRe, err := regexp.Compile(`(\S+)`)
