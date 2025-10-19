@@ -44,7 +44,7 @@ func AddTemplateFunc(tmplStr string, funcName string) (string, error) {
 }
 
 func TransformTemplateKeys(tmplStr string, prefix string, transform func(varRegex *regexp.Regexp, m string) string) (string, error) {
-	re, err := regexp.Compile(`{{[^{}]+}}`)
+	re, err := regexp.Compile(`{{([^{}]+)}}`)
 
 	if err != nil {
 		return tmplStr, err
