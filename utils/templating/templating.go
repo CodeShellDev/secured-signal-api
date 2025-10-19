@@ -50,7 +50,7 @@ func TransformTemplateKeys(tmplStr string, prefix string, transform func(varRege
 		return tmplStr, err
 	}
 
-	varRe, err := regexp.Compile(string(prefix) + `("*[a-zA-Z0-9_.]+"*)`)
+	varRe, err := regexp.Compile(string(prefix) + `("?[a-zA-Z0-9_.]+"?)`)
 
 	if err != nil {
 		return tmplStr, err
