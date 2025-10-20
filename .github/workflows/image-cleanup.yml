@@ -8,6 +8,7 @@ on:
 jobs:
   update:
     uses: codeshelldev/gh-actions/.github/workflows/image-cleanup.yml@main
+    name: Development Image
     with:
       registry: ghcr.io
     secrets:
