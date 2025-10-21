@@ -40,7 +40,7 @@ Secured Signal API acts purely as a **gateway** — it never bypasses or replace
 
 ```mermaid
 flowchart LR
-  Client[Your App / Script] -->|HTTP| TLSReverseProxy[TLS-enabled Reverse Proxy]
+  Client[Your App / Script] -->|HTTP| TLSReverseProxy[tls Reverse Proxy]
   TLSReverseProxy -->|HTTPS| SecuredProxy[Secured Signal API]
   SecuredProxy -->|Forwarded Request| SignalAPI[Signal CLI REST API]
   SignalAPI -->|Encrypted Signal Network| SignalNetwork[Signal Servers]
