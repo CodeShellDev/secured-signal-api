@@ -1,0 +1,26 @@
+settings:
+    messageTemplate: |
+    {{- $greeting := "Hello" -}}
+    {{ $greeting }}, {{ @name }}!
+    {{ if @age -}}
+    You are {{ @age }} years old.
+    {{- else -}}
+    Age unknown.
+    {{- end }}
+    Your friends:
+    {{- range @friends }}
+    - {{ . }}
+    {{- else }}
+    You have no friends.
+    {{- end }}
+    Profile details:
+    {{- range $key, $value := @profile }}
+    - {{ $key }}: {{ $value }}
+    {{- end }}
+    {{ define "footer" -}}
+    This is the footer for {{ @name }}.
+    {{- end }}
+    {{ template "footer" . -}}
+    ------------------------------------
+    Content-Type: {{ #Content_Type }}
+    Redacted Auth Header: {{ #Authorization }}
