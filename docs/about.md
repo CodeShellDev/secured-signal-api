@@ -36,7 +36,7 @@ It’s designed for developers who want to:
 
 ## Architecture Overview
 
-Secured Signal API acts purely as a **gateway** — it never bypasses or replaces your existing **Signal CLI REST API**:
+Secured Signal API acts purely as a **gateway** — it never bypasses or replaces your existing Signal CLI REST API:
 
 ```mermaid
 flowchart LR
