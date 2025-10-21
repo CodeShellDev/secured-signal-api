@@ -75,4 +75,4 @@ If you encounter any issues in the steps above look at the examples provided by 
 {{{ @://https://raw.githubusercontent.com/bbernhard/signal-cli-rest-api/refs/heads/master/doc/EXAMPLES.md }}}
 ```
 
-Source: https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md
+Source: [Signal CLI REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md)
