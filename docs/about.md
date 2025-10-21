@@ -15,7 +15,7 @@ It does **not** replace or modify the original API — it sits in front of it, a
 The [Signal CLI REST API](https://github.com/bbernhard/signal-cli-rest-api) provides a robust HTTP interface to the Signal Messenger service.  
 **Secured Signal API** works as a **reverse proxy**, forwarding approved requests to your existing Signal CLI REST API instance, while managing access and configuration.
 
-It’s designed for developers who want to:
+It's designed for developers who want to:
 
 - **Restrict** or **log** certain API calls,
 - Enforce **authentication**,
@@ -31,6 +31,7 @@ It’s designed for developers who want to:
 - ⚙️ **Configurable Proxy Behavior** — Define templates and limits via YAML or environment variables.
 - 🧠 **Message Templates** — Use [**variables**](./configuration/variables) and [**placeholders**](./features) to standardize common message formats.
 - 🐳 **Docker-Ready** — Comes packaged for containerized environments, deployable in seconds.
+- [and many more...](./features)
 
 ---
 
