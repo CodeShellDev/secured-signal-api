@@ -28,7 +28,7 @@ This would internally be converted into `settings.variables.number` matching the
 Config files are the **recommended** way to configure and use **Secured Signal API**,
 they are **flexible**, **extensible** and really **easy to use**.
 
-Config files allow **YML** formatting and also `${ENV}` to get environment variables.
+Config files allow **YAML** formatting and also `${ENV}` to get environment variables.
 
 > [!NOTE]
 > To change the internal config file location set `CONFIG_PATH` in your **Environment** to an absolute path. (default: `/config/config.yml`)
