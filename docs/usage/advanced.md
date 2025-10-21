@@ -14,11 +14,11 @@ These can be especially **helpful** if have to manage multiple **Variables** and
 
 ### How to use
 
-| Type                   | Example             | Note             |
-| :--------------------- | :------------------ | :--------------- |
-| Body                   | `{{@data.key}}`     |                  |
-| Header                 | `{{#Content_Type}}` | `-` becomes `_`  |
-| [Variable](#variables) | `{{.VAR}}`          | always uppercase |
+| Type                                   | Example             | Note             |
+| :------------------------------------- | :------------------ | :--------------- |
+| Body                                   | `{{@data.key}}`     |                  |
+| Header                                 | `{{#Content_Type}}` | `-` becomes `_`  |
+| [Variable](../configuration/variables) | `{{.VAR}}`          | always uppercase |
 
 ### Where to use
 
