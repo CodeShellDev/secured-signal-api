@@ -1,0 +1,7 @@
+tokens: [LOOOONG_STRING]
+
+overrides:
+  variables: # Disable Placeholder
+  blockedEndpoints: # Disable Sending
+    - /v2/send
+  dataAliases: # Disable Aliases
