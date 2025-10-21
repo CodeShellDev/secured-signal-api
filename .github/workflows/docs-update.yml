@@ -15,5 +15,6 @@ jobs:
     with:
       template-path: docs/
       output-path: docs/
+      output-branch: docs-build
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
