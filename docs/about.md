@@ -10,7 +10,7 @@ It does **not** replace or modify the original API — it sits in front of it, a
 
 ---
 
-## 💡 What It Is
+## What It Is
 
 The [Signal CLI REST API](https://github.com/bbernhard/signal-cli-rest-api) provides a robust HTTP interface to the Signal Messenger service.  
 **Secured Signal API** works as a **reverse proxy**, forwarding approved requests to your existing Signal CLI REST API instance, while managing access and configuration.
@@ -24,7 +24,7 @@ It’s designed for developers who want to:
 
 ---
 
-## 🔧 Key Features
+## Key Features
 
 - 🔒 **Access Control** — Protect your Signal API with [**token-based authentication**](./configuration/api-tokens) and [**endpoint restrictions**](./features).
 - 🧩 **Full Compatibility** — 100% protocol-compatible; all requests are still handled by your existing Signal CLI REST API.
@@ -34,7 +34,7 @@ It’s designed for developers who want to:
 
 ---
 
-## 🏗 Architecture Overview
+## Architecture Overview
 
 Secured Signal API acts purely as a **gateway** — it never bypasses or replaces your existing **Signal CLI REST API**:
 
