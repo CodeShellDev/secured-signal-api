@@ -31,7 +31,7 @@ It's designed for developers who want to:
 - ⚙️ **Configurable Proxy Behavior** — Define templates and limits via YAML or environment variables.
 - 🧠 **Message Templates** — Use [**variables**](./configuration/variables) and [**placeholders**](./features) to standardize common message formats.
 - 🐳 **Docker-Ready** — Comes packaged for containerized environments, deployable in seconds.
-- [and many more...](./features)
+- [and much more...](./features)
 
 ---
 
