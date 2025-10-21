@@ -157,7 +157,7 @@ There are multiple ways to configure Secured Signal API, you can optionally use 
 
 ### Config Files
 
-Config files allow **YML** formatting and also `${ENV}` to get Environment Variables.
+Config files allow **YAML** formatting and also `${ENV}` to get Environment Variables.
 
 To change the internal config file location set `CONFIG_PATH` in your **Environment** to an absolute path including the filename.extension. (default: `/config/config.yml`)
 
