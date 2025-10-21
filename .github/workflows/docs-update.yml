@@ -1,0 +1,19 @@
+name: Update Documentation
+
+on:
+  push:
+    branches:
+      - docs
+    paths:
+      - docs/**
+  workflow_dispatch:
+
+jobs:
+  docs:
+    uses: codeshelldev/gh-actions/.github/workflows/docs-update.yml@main
+    name: Template Docs
+    with:
+      template-path: docs/
+      output-path: docs/
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
