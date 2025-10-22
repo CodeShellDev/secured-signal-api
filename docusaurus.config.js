@@ -130,7 +130,7 @@ const config = {
 						],
 					},
 				],
-				copyright: `Copyright © ${new Date().getFullYear()} Secured Signal API. Built with Docusaurus.`,
+				copyright: `Copyright © ${new Date().getFullYear()} CodeShellDev. Built with Docusaurus.`,
 			},
 			prism: {
 				theme: prismThemes.github,
