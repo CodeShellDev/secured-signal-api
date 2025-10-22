@@ -24,7 +24,7 @@ Add caddy to your `docker-compose.yaml` file.
 
 Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your caddy container.
 
-```conf
+```apacheconf
 {{{ #://./examples/Caddyfile }}}
 ```
 
