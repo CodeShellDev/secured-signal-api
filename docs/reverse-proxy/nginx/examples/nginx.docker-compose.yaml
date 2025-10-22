@@ -23,11 +23,11 @@ services:
     ports:
       - "443:443"
       - "80:80"
+    depends_on:
+      - secured-signal
     restart: unless-stopped
     networks:
-      frontend:
       backend:
 
 networks:
   backend:
-  frontend:
