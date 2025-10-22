@@ -24,7 +24,7 @@ const config = {
 	// Set the /<baseUrl>/ pathname under which your site is served
 	// For GitHub pages deployment, it is often '/<projectName>/'
 	baseUrl: "/secured-signal-api/",
-	deploymentBranch: "docs",
+	deploymentBranch: "docs-build",
 	trailingSlash: false,
 
 	// GitHub pages deployment config.
@@ -57,7 +57,7 @@ const config = {
 					sidebarPath: "./sidebars.js",
 					// Please change this to your repo.
 					// Remove this to remove the "edit this page" links.
-					editUrl: "https://github.com/codeshelldev/secured-signal-api/tree",
+					editUrl: "https://github.com/codeshelldev/secured-signal-api/tree/docs",
 					beforeDefaultRemarkPlugins: [
 						require("remark-github-admonitions-to-directives"),
 					],
@@ -129,7 +129,7 @@ const config = {
 						],
 					},
 				],
-				copyright: `Copyright © ${new Date().getFullYear()} Secured Signal API - Built with Docusaurus`,
+				copyright: `Copyright © ${new Date().getFullYear() Secured Signal API. Built with Docusaurus.`,
 			},
 			prism: {
 				theme: prismThemes.github,
