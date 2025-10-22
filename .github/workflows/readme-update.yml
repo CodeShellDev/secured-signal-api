@@ -1,17 +1,17 @@
 name: Update README
 
 on:
-  push:
-    branches:
-      - docs
-    paths:
-      - .github/templates/**
+  workflow_dispatch:
 
 jobs:
   update:
-    uses: codeshelldev/gh-actions/.github/workflows/readme-update.yml@main
     name: Update
-    with:
-      output-branch: main
-    secrets:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fail
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          echo "❌ This workflow cannot be run from the main branch."
+          echo "Please pin to a release, use another branch or commit SHA instead of @main."
+          exit 1

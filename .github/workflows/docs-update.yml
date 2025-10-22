@@ -5,10 +5,11 @@ on:
 
 jobs:
   docs:
+    name: Template Docs
     runs-on: ubuntu-latest
 
     steps:
-      - name: Update Documentation
+      - name: Fail
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo "❌ This workflow cannot be run from the main branch."
