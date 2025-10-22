@@ -135,6 +135,8 @@ const config = {
 			prism: {
 				theme: prismThemes.github,
 				darkTheme: prismThemes.oneDark,
+				additionalLanguages: ["bash", "apacheconf"],
+				plugins: ["line-numbers", "command-line"],
 			},
 		}),
 }

@@ -55,7 +55,7 @@ volumes:
 
 Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your caddy container.
 
-```conf
+```apacheconf
 # Replace with your actual domain
 domain.com {
     # Use whatever network alias you set in the docker-compose file

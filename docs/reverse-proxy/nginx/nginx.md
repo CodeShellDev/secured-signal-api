@@ -58,7 +58,7 @@ To include the needed mounts for your certificates and your config.
 
 Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `/etc/nginx/conf.d/default.conf` in your nginx container.
 
-```conf
+```apacheconf
 server {
     # Allow SSL on Port 443
     listen 443 ssl;
