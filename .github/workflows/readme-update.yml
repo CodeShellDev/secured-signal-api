@@ -6,6 +6,7 @@ on:
       - docs
     paths:
       - .github/templates/**
+  workflow_dispatch:
 
 jobs:
   update:
