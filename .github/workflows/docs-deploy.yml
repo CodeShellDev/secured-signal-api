@@ -1,19 +1,16 @@
 name: Deploy Documentation
 
 on:
-  push:
-    branches:
-      - docs-build
-    paths:
-      - docs/**
-      - src/**
   workflow_dispatch:
 
 jobs:
   docs:
-    uses: codeshelldev/gh-actions/.github/workflows/docs-deploy.yml@main
-    name: Deploy
-    with:
-      branch: docs-build
-    secrets:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Documentation
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          echo "❌ This workflow cannot be run from the main branch."
+          echo "Please pin to a release, use another branch or commit SHA instead of @main."
+          exit 1
