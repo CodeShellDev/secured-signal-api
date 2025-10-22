@@ -45,7 +45,7 @@ settings:
     Redacted Auth Header: {{ #Authorization }}
 ```
 
-It can extract needed data from the body and even the headers (with an exception of the `Authorization` Header) and then process them using Go's Templating Library
+It can extract needed data from the body and even the headers ([exceptions](./usage/advanced)) and then process them using Go's Templating Library
 and finally output a message packed with so much information.
 
 Head to [Configuration](./configuration/message-templates) to see how-to use.

@@ -44,14 +44,14 @@ services:
     ports:
       - "443:443"
       - "80:80"
+    depends_on:
+      - secured-signal
     restart: unless-stopped
     networks:
-      frontend:
       backend:
 
 networks:
   backend:
-  frontend:
 ```
 
 To include the needed mounts for your certificates and your config.
@@ -65,7 +65,7 @@ server {
 
     # Add allowed hostnames which nginx should respond to
     # `_` for any
-    server_name localhost;
+    server_name domain.com;
 
     ssl_certificate /etc/nginx/ssl/cert.crt;
     ssl_certificate_key /etc/nginx/ssl/cert.key;
@@ -84,7 +84,7 @@ server {
 # Redirect HTTP to HTTPs
 server {
     listen 80;
-    server_name localhost;
+    server_name domain.com;
     return 301 https://$host$request_uri;
 }
 ```

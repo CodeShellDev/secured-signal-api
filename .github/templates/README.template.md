@@ -67,7 +67,7 @@ endpoint restrictions, placeholders, flexible configuration
 Get the latest version of the `docker-compose.yaml` file:
 
 ```yaml
-{{{ #://docs-src/getting-started/examples/docker-compose.yaml }}}
+{{{ #://docs/getting-started/examples/docker-compose.yaml }}}
 ```
 
 And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
@@ -164,7 +164,7 @@ To change the internal config file location set `CONFIG_PATH` in your **Environm
 This example config shows all of the individual settings that can be applied:
 
 ```yaml
-{{{ #://docs-src/configuration/examples/config.yml }}}
+{{{ #://docs/configuration/examples/config.yml }}}
 ```
 
 #### Token Configs
@@ -176,7 +176,7 @@ This way you can permission tokens by further restricting or adding [Endpoints](
 Here is an example:
 
 ```yaml
-{{{ #://docs-src/configuration/examples/token.yml }}}
+{{{ #://docs/configuration/examples/token.yml }}}
 ```
 
 ### Templating
@@ -192,7 +192,7 @@ Go's templating library is used in the following features:
 This makes advanced [Message Templates](#message-templates) like this one possible:
 
 ```yaml
-{{{ #://docs-src/configuration/examples/message-template.yml }}}
+{{{ #://docs/configuration/examples/message-template.yml }}}
 ```
 
 ### API Tokens

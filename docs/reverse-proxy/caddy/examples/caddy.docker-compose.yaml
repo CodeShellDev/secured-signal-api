@@ -13,21 +13,20 @@ services:
         aliases:
           - secured-signal-api
 
-  nginx:
-    image: nginx:latest
-    container_name: secured-signal-proxy
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      # Load SSL certificates: cert.key, cert.crt
-      - ./certs:/etc/nginx/ssl
+  caddy:
+    image: caddy:latest
+    container_name: caddy
     ports:
-      - "443:443"
       - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - data:/data
     depends_on:
       - secured-signal
-    restart: unless-stopped
-    networks:
-      backend:
 
 networks:
   backend:
+
+volumes:
+  data:

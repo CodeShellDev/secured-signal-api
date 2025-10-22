@@ -17,7 +17,7 @@ These can be especially **helpful** if have to manage multiple **Variables** and
 | Type                                   | Example             | Note             |
 | :------------------------------------- | :------------------ | :--------------- |
 | Body                                   | `{{@data.key}}`     |                  |
-| Header                                 | `{{#Content_Type}}` | `-` becomes `_`  |
+| Header (except `Authorization`)        | `{{#Content_Type}}` | `-` becomes `_`  |
 | [Variable](../configuration/variables) | `{{.VAR}}`          | always uppercase |
 
 ### Where to use
