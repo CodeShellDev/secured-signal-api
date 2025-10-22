@@ -47,10 +47,10 @@ services:
       - secured-signal
 
 networks:
-  backend:
+  backend: {}
 
 volumes:
-  data:
+  data: {}
 ```
 
 Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your caddy container.

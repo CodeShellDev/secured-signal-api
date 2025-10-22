@@ -51,7 +51,7 @@ services:
       backend:
 
 networks:
-  backend:
+  backend: {}
 ```
 
 To include the needed mounts for your certificates and your config.
