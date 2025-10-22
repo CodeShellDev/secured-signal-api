@@ -32,4 +32,4 @@ You successfully integrated a service and want to share it?
 
 > Well that's nice of you 🤩👍️
 
-Then create a [Discussion](https://github.com/CodeShellDev/secured-signal-api/discussions/categories/integrations) and share your configs or if you want you can also submit a [Pull Request](https://github.com/codeshelldev/secured-signal-api/pulls) to add your integration to the [**Integrations Section**](.) in the official Documentation.
+Then create a [Discussion](https://github.com/CodeShellDev/secured-signal-api/discussions/categories/integrations) and share your configs or if you want you can also submit a [Pull Request](https://github.com/codeshelldev/secured-signal-api/pulls) to add your integration to the **Integrations Section** in the official Documentation.
