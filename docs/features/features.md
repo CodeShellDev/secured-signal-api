@@ -17,7 +17,32 @@ Here are some of the highlights of using **Secured Signal API**
 Look at this complex template for example:
 
 ```yaml
-file not found: /home/runner/work/secured-signal-api/secured-signal-api/docs/features/examples/message-template.yml
+settings:
+    messageTemplate: |
+    {{- $greeting := "Hello" -}}
+    {{ $greeting }}, {{ @name }}!
+    {{ if @age -}}
+    You are {{ @age }} years old.
+    {{- else -}}
+    Age unknown.
+    {{- end }}
+    Your friends:
+    {{- range @friends }}
+    - {{ . }}
+    {{- else }}
+    You have no friends.
+    {{- end }}
+    Profile details:
+    {{- range $key, $value := @profile }}
+    - {{ $key }}: {{ $value }}
+    {{- end }}
+    {{ define "footer" -}}
+    This is the footer for {{ @name }}.
+    {{- end }}
+    {{ template "footer" . -}}
+    ------------------------------------
+    Content-Type: {{ #Content_Type }}
+    Redacted Auth Header: {{ #Authorization }}
 ```
 
 It can extract needed data from the body and even the headers (with an exception of the `Authorization` Header) and then process them using Go's Templating Library
