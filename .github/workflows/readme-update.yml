@@ -1,0 +1,17 @@
+name: Update README
+
+on:
+  push:
+    branches:
+      - docs
+    paths:
+      - .github/templates/**
+
+jobs:
+  update:
+    uses: codeshelldev/gh-actions/.github/workflows/readme-update.yml@main
+    name: Update
+    with:
+      output-branch: main
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
