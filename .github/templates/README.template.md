@@ -56,6 +56,7 @@ Check out the official [Documentation](https://codeshelldev.github.io/secured-si
   - [Variables](#variables)
   - [Data Aliases](#data-aliases)
   - [Message Templates](#message-templates)
+- [Integrations](https://codeshelldev.github.io/secured-signal-api/docs/integrations/compatibility)
 - [Contributing](#contributing)
 - [Support](#support)
 - [Help](#help)
