@@ -46,10 +46,10 @@ endpoint restrictions, placeholders, flexible configuration
 
 ## Contents
 
+- [Documentation](https://codeshelldev.github.io/secured-signal-api/docs)
 - [Getting Started](#getting-started)
 - [Setup](#setup)
 - [Usage](#usage)
-- [Best Practices](#best-practices)
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
@@ -67,39 +67,7 @@ endpoint restrictions, placeholders, flexible configuration
 Get the latest version of the `docker-compose.yaml` file:
 
 ```yaml
-services:
-  signal-api:
-    image: bbernhard/signal-cli-rest-api:latest
-    container_name: signal-api
-    environment:
-      - MODE=normal
-    volumes:
-      - ./data:/home/.local/share/signal-cli
-    restart: unless-stopped
-    networks:
-      backend:
-        aliases:
-          - signal-api
-
-  secured-signal:
-    image: ghcr.io/codeshelldev/secured-signal-api:latest
-    container_name: secured-signal
-    environment:
-      API__URL: http://signal-api:8080
-      SETTINGS__VARIABLES__RECIPIENTS:
-        '[+123400002, +123400003, +123400004]'
-      SETTINGS__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: '[LOOOOOONG_STRING]'
-    ports:
-      - "8880:8880"
-    restart: unless-stopped
-    networks:
-      backend:
-        aliases:
-          - secured-signal-api
-
-networks:
-  backend:
+file not found: /home/runner/work/secured-signal-api/secured-signal-api/docs-src/getting-started/examples/docker-compose.yaml
 ```
 
 And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
@@ -107,120 +75,6 @@ And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
 > [!IMPORTANT]
 > In this documentation, we use `sec-signal-api:8880` as the host for simplicity.
 > Replace it with your actual container/host IP, port, or hostname.
-
-### Reverse Proxy
-
-#### Traefik
-
-Take a look at the [traefik](https://github.com/traefik/traefik) implementation:
-
-```yaml
-services:
-  secured-signal:
-    image: ghcr.io/codeshelldev/secured-signal-api:latest
-    container_name: secured-signal
-    environment:
-      API__URL: http://signal-api:8080
-      SETTINGS__VARIABLES__RECIPIENTS:
-        '[+123400002,+123400003,+123400004]'
-      SETTINGS__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: '[LOOOOOONG_STRING]'
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.signal-api.rule=Host(`signal-api.mydomain.com`)
-      - traefik.http.routers.signal-api.entrypoints=websecure
-      - traefik.http.routers.signal-api.tls=true
-      - traefik.http.routers.signal-api.tls.certresolver=cloudflare
-      - traefik.http.routers.signal-api.service=signal-api-svc
-      - traefik.http.services.signal-api-svc.loadbalancer.server.port=8880
-      - traefik.docker.network=proxy
-    restart: unless-stopped
-    networks:
-      proxy:
-      backend:
-        aliases:
-          - secured-signal-api
-
-networks:
-  backend:
-  proxy:
-    external: true
-```
-
-#### NGINX Proxy
-
-This is the [NGINX](https://github.com/nginx/nginx) `docker-compose.yaml` file:
-
-```yaml
-services:
-  secured-signal:
-    image: ghcr.io/codeshelldev/secured-signal-api:latest
-    container_name: secured-signal-api
-    environment:
-      API__URL: http://signal-api:8080
-      SETTINGS__VARIABLES__RECIPIENTS: "[+123400002,+123400003,+123400004]"
-      SETTINGS__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: "[LOOOOOONG_STRING]"
-    restart: unless-stopped
-    networks:
-      backend:
-        aliases:
-          - secured-signal-api
-
-  nginx:
-    image: nginx:latest
-    container_name: secured-signal-proxy
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      # Load SSL certificates: cert.key, cert.crt
-      - ./certs:/etc/nginx/ssl
-    ports:
-      - "443:443"
-      - "80:80"
-    restart: unless-stopped
-    networks:
-      frontend:
-      backend:
-
-networks:
-  backend:
-  frontend:
-```
-
-Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `etc/nginx/conf.d/default.conf`:
-
-```conf
-server {
-    # Allow SSL on Port 443
-    listen 443 ssl;
-
-    # Add allowed hostnames which nginx should respond to
-    # `_` for any
-    server_name localhost;
-
-    ssl_certificate /etc/nginx/ssl/cert.crt;
-    ssl_certificate_key /etc/nginx/ssl/cert.key;
-
-    location / {
-        # Use whatever network alias you set in the docker-compose file
-        proxy_pass http://secured-signal-api:8880;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Host $host;
-        proxy_set_header X-Fowarded-Proto $scheme;
-    }
-}
-
-# Redirect HTTP to HTTPs
-server {
-    listen 80;
-    server_name localhost;
-    return 301 https://$host$request_uri;
-}
-```
-
-Lastly add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/nginx/ssl`.
 
 ## Setup
 
@@ -295,14 +149,7 @@ In some cases you may not be able to access / modify the Request Body, in that c
 In order to differentiate Injection Queries and _regular_ Queries
 you have to add `@` in front of any KeyValue Pair assignment.
 
-Supported types include **strings**, **ints**, **arrays** and **json dictionaries**. See [Formatting](#string-to-type).
-
-## Best Practices
-
-- Always use API tokens in production
-- Run behind a TLS-enabled [Reverse Proxy](#reverse-proxy) (Traefik, Nginx, Caddy)
-- Be cautious when overriding Blocked Endpoints
-- Use per-token overrides to enforce least privilege
+Supported types include **strings**, **ints**, **arrays** and **json dictionaries**. See [Formatting](https://codeshelldev.github.io/secured-signal-api/docs/usage/formatting).
 
 ## Configuration
 
@@ -310,41 +157,14 @@ There are multiple ways to configure Secured Signal API, you can optionally use 
 
 ### Config Files
 
-Config files allow **YML** formatting and also `${ENV}` to get Environment Variables.
+Config files allow **YAML** formatting and also `${ENV}` to get Environment Variables.
 
 To change the internal config file location set `CONFIG_PATH` in your **Environment** to an absolute path including the filename.extension. (default: `/config/config.yml`)
 
 This example config shows all of the individual settings that can be applied:
 
 ```yaml
-# Example Config (all configurations shown)
-service:
-  port: 8880
-
-api:
-  url: http://signal-api:8080
-  tokens: [token1, token2]
-
-logLevel: info
-
-settings:
-  messageTemplate: |
-    You've got a Notification:
-    {{@message}} 
-    At {{@data.timestamp}} on {{@data.date}}.
-    Send using {{.NUMBER}}.
-
-  variables:
-    number: "+123400001"
-    recipients: ["+123400002", "group.id", "user.id"]
-
-  dataAliases: 
-    "@message": [{ alias: "msg", score: 100 }]
-
-  blockedEndpoints:
-    - /v1/about
-  allowedEndpoints:
-    - /v2/send
+file not found: /home/runner/work/secured-signal-api/secured-signal-api/docs-src/configuration/examples/config.yml
 ```
 
 #### Token Configs
@@ -356,49 +176,8 @@ This way you can permission tokens by further restricting or adding [Endpoints](
 Here is an example:
 
 ```yaml
-tokens: [LOOOONG_STRING]
-
-overrides:
-  variables: # Disable Placeholder
-  blockedEndpoints: # Disable Sending
-    - /v2/send
-  dataAliases: # Disable Aliases
+file not found: /home/runner/work/secured-signal-api/secured-signal-api/docs-src/configuration/examples/token.yml
 ```
-
-### Environment
-
-Suppose you want to set a new [Placeholder](#placeholders) `NUMBER` in your Environment...
-
-```yaml
-environment:
-  SETTINGS__VARIABLES__NUMBER: "+123400001"
-```
-
-This would internally be converted into `settings.variables.number` matching the config formatting.
-
-> [!IMPORTANT]
-> Underscores `_` are removed during Conversion, Double Underscores `__` on the other hand convert the Variable into a nested Object (`__` replaced by `.`)
-
-### String To Type
-
-> [!TIP]
-> This formatting applies to almost every situation where the only (allowed) Input Type is a string and other Output Types are needed.
-
-If you are using Environment Variables as an example you won't be able to specify an Array or a Dictionary of items, in that case you can provide a specifically formatted string which will be translated into the correct type...
-
-| type       | example           |
-| :--------- | :---------------- |
-| string     | abc               |
-| string     | +123              |
-| int        | 123               |
-| int        | -123              |
-| json       | {"a":"b","c":"d"} |
-| array(int) | [1,2,3]           |
-| array(str) | [a,b,c]           |
-
-> [!NOTE]
-> If you have a string that should not be turned into any other type, then you will need to escape all Type Denotations, `[]` or `{}` (also `-`) with a `\` **Backslash** (or Double Backslash).
-> An **Odd** number of **Backslashes** **escape** the character in front of them and an **Even** number leave the character **as-is**.
 
 ### Templating
 
@@ -413,35 +192,10 @@ Go's templating library is used in the following features:
 This makes advanced [Message Templates](#message-templates) like this one possible:
 
 ```yaml
-settings:
-    messageTemplate: |
-    {{- $greeting := "Hello" -}}
-    {{ $greeting }}, {{ @name }}!
-    {{ if @age -}}
-    You are {{ @age }} years old.
-    {{- else -}}
-    Age unknown.
-    {{- end }}
-    Your friends:
-    {{- range @friends }}
-    - {{ . }}
-    {{- else }}
-    You have no friends.
-    {{- end }}
-    Profile details:
-    {{- range $key, $value := @profile }}
-    - {{ $key }}: {{ $value }}
-    {{- end }}
-    {{ define "footer" -}}
-    This is the footer for {{ @name }}.
-    {{- end }}
-    {{ template "footer" . -}}
-    ------------------------------------
-    Content-Type: {{ #Content_Type }}
-    Redacted Auth Header: {{ #Authorization }}
+file not found: /home/runner/work/secured-signal-api/secured-signal-api/docs-src/configuration/examples/message-template.yml
 ```
 
-### API Token(s)
+### API Tokens
 
 During Authentication Secured Signal API will try to match the given Token against the list of Tokens inside of these Variables.
 
@@ -561,28 +315,6 @@ settings:
 ```
 
 Use `@` for aliasing Body Keys and `.` for aliasing Variables.
-
-### Port
-
-To change the Port which Secured Signal API uses, you need to set `service.port` in your config. (default: `8880`)
-
-### Log Level
-
-To change the Log Level set `logLevel` to: (default: `info`)
-
-<details>
-<summary>Log Levels</summary>
-
-| Level   |
-| ------- |
-| `info`  |
-| `debug` |
-| `warn`  |
-| `error` |
-| `fatal` |
-| `dev`   |
-
-</details>
 
 ## Contributing
 
