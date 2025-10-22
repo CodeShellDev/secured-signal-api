@@ -16,7 +16,13 @@ Before moving on you must have
 
 ## Installation
 
-Create or update your `Caddyfile` file and mount it to `/etc/caddy/Caddyfile` in your caddy container.
+Add caddy to your `docker-compose.yaml` file.
+
+```yaml
+{{{ #://./examples/caddy.docker-compose.yaml }}}
+```
+
+Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your caddy container.
 
 ```conf
 {{{ #://./examples/Caddyfile }}}
@@ -27,3 +33,5 @@ Then spin up your stack:
 ```bash
 docker compose up -d
 ```
+
+And you are ready to go!
