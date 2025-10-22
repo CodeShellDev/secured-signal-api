@@ -69,10 +69,4 @@ This will show you a QR-Code which you will be able to use for linking.
 
 ## Troubleshooting
 
-If you encounter any issues in the steps above look at the examples provided by [@bbernhard](https://github.com/bbernhard/signal-cli-rest-api) below
-
-```markdown
-{{{ @://https://raw.githubusercontent.com/bbernhard/signal-cli-rest-api/refs/heads/master/doc/EXAMPLES.md }}}
-```
-
-Source: [Signal CLI REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md)
+If you encounter any issues in the steps above look at the [examples](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md) provided by [@bbernhard](https://github.com/bbernhard/signal-cli-rest-api)
