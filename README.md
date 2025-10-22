@@ -67,7 +67,39 @@ endpoint restrictions, placeholders, flexible configuration
 Get the latest version of the `docker-compose.yaml` file:
 
 ```yaml
-file not found: /home/runner/work/secured-signal-api/secured-signal-api/docs-src/getting-started/examples/docker-compose.yaml
+services:
+  signal-api:
+    image: bbernhard/signal-cli-rest-api:latest
+    container_name: signal-api
+    environment:
+      - MODE=normal
+    volumes:
+      - ./data:/home/.local/share/signal-cli
+    restart: unless-stopped
+    networks:
+      backend:
+        aliases:
+          - signal-api
+
+  secured-signal:
+    image: ghcr.io/codeshelldev/secured-signal-api:latest
+    container_name: secured-signal
+    environment:
+      API__URL: http://signal-api:8080
+      SETTINGS__VARIABLES__RECIPIENTS:
+        '[+123400002, +123400003, +123400004]'
+      SETTINGS__VARIABLES__NUMBER: "+123400001"
+      API__TOKENS: '[LOOOOOONG_STRING]'
+    ports:
+      - "8880:8880"
+    restart: unless-stopped
+    networks:
+      backend:
+        aliases:
+          - secured-signal-api
+
+networks:
+  backend:
 ```
 
 And add secure Token(s) to `api.tokens`. See [API TOKENs](#api-tokens).
@@ -164,7 +196,34 @@ To change the internal config file location set `CONFIG_PATH` in your **Environm
 This example config shows all of the individual settings that can be applied:
 
 ```yaml
-file not found: /home/runner/work/secured-signal-api/secured-signal-api/docs-src/configuration/examples/config.yml
+# Example Config (all configurations shown)
+service:
+  port: 8880
+
+api:
+  url: http://signal-api:8080
+  tokens: [token1, token2]
+
+logLevel: info
+
+settings:
+  messageTemplate: |
+    You've got a Notification:
+    {{@message}} 
+    At {{@data.timestamp}} on {{@data.date}}.
+    Send using {{.NUMBER}}.
+
+  variables:
+    number: "+123400001"
+    recipients: ["+123400002", "group.id", "user.id"]
+
+  dataAliases: 
+    "@message": [{ alias: "msg", score: 100 }]
+
+  blockedEndpoints:
+    - /v1/about
+  allowedEndpoints:
+    - /v2/send
 ```
 
 #### Token Configs
@@ -176,7 +235,13 @@ This way you can permission tokens by further restricting or adding [Endpoints](
 Here is an example:
 
 ```yaml
-file not found: /home/runner/work/secured-signal-api/secured-signal-api/docs-src/configuration/examples/token.yml
+tokens: [LOOOONG_STRING]
+
+overrides:
+  variables: # Disable Placeholder
+  blockedEndpoints: # Disable Sending
+    - /v2/send
+  dataAliases: # Disable Aliases
 ```
 
 ### Templating
@@ -192,7 +257,32 @@ Go's templating library is used in the following features:
 This makes advanced [Message Templates](#message-templates) like this one possible:
 
 ```yaml
-file not found: /home/runner/work/secured-signal-api/secured-signal-api/docs-src/configuration/examples/message-template.yml
+settings:
+    messageTemplate: |
+    {{- $greeting := "Hello" -}}
+    {{ $greeting }}, {{ @name }}!
+    {{ if @age -}}
+    You are {{ @age }} years old.
+    {{- else -}}
+    Age unknown.
+    {{- end }}
+    Your friends:
+    {{- range @friends }}
+    - {{ . }}
+    {{- else }}
+    You have no friends.
+    {{- end }}
+    Profile details:
+    {{- range $key, $value := @profile }}
+    - {{ $key }}: {{ $value }}
+    {{- end }}
+    {{ define "footer" -}}
+    This is the footer for {{ @name }}.
+    {{- end }}
+    {{ template "footer" . -}}
+    ------------------------------------
+    Content-Type: {{ #Content_Type }}
+    Redacted Auth Header: {{ #Authorization }}
 ```
 
 ### API Tokens
