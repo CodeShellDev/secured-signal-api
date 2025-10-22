@@ -36,7 +36,34 @@ Config files allow **YAML** formatting and also `${ENV}` to get environment vari
 This example config shows all of the individual settings that can be applied:
 
 ```yaml
-file not found: /home/runner/work/secured-signal-api/secured-signal-api/examples/config.yml
+# Example Config (all configurations shown)
+service:
+  port: 8880
+
+api:
+  url: http://signal-api:8080
+  tokens: [token1, token2]
+
+logLevel: info
+
+settings:
+  messageTemplate: |
+    You've got a Notification:
+    {{@message}} 
+    At {{@data.timestamp}} on {{@data.date}}.
+    Send using {{.NUMBER}}.
+
+  variables:
+    number: "+123400001"
+    recipients: ["+123400002", "group.id", "user.id"]
+
+  dataAliases: 
+    "@message": [{ alias: "msg", score: 100 }]
+
+  blockedEndpoints:
+    - /v1/about
+  allowedEndpoints:
+    - /v2/send
 ```
 
 ### Token Configs
@@ -53,5 +80,11 @@ This way you can permission tokens by further restricting or adding [Endpoints](
 Here is an example:
 
 ```yaml
-file not found: /home/runner/work/secured-signal-api/secured-signal-api/examples/token.yml
+tokens: [LOOOONG_STRING]
+
+overrides:
+  variables: # Disable Placeholder
+  blockedEndpoints: # Disable Sending
+    - /v2/send
+  dataAliases: # Disable Aliases
 ```

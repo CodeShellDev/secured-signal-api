@@ -13,7 +13,32 @@ These support Go Templates (See [Usage](../usage/advanced)) and work by templati
 Here is an example:
 
 ```yaml
-file not found: /home/runner/work/secured-signal-api/secured-signal-api/examples/message-template.yml
+settings:
+    messageTemplate: |
+    {{- $greeting := "Hello" -}}
+    {{ $greeting }}, {{ @name }}!
+    {{ if @age -}}
+    You are {{ @age }} years old.
+    {{- else -}}
+    Age unknown.
+    {{- end }}
+    Your friends:
+    {{- range @friends }}
+    - {{ . }}
+    {{- else }}
+    You have no friends.
+    {{- end }}
+    Profile details:
+    {{- range $key, $value := @profile }}
+    - {{ $key }}: {{ $value }}
+    {{- end }}
+    {{ define "footer" -}}
+    This is the footer for {{ @name }}.
+    {{- end }}
+    {{ template "footer" . -}}
+    ------------------------------------
+    Content-Type: {{ #Content_Type }}
+    Redacted Auth Header: {{ #Authorization }}
 ```
 
 > [!IMPORTANT]
