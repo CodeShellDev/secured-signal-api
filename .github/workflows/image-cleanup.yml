@@ -8,6 +8,7 @@ on:
 jobs:
   update:
     uses: codeshelldev/gh-actions/.github/workflows/image-cleanup.yml@main
+    name: Untagged Images
     with:
       registry: ghcr.io
     secrets:

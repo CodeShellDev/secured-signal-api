@@ -1,6 +1,6 @@
 .gitignore
-.git
+.git*
 .github
 *.yaml
 *.md
-!config/*.yml
+!data/*.yml

@@ -10,6 +10,7 @@ on:
 jobs:
   update:
     uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
+    name: Development Image
     with:
       registry: ghcr.io
       flavor: |

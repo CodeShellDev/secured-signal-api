@@ -1,11 +1,11 @@
-name: Update README
+name: Update Documentation
 
 on:
   workflow_dispatch:
 
 jobs:
-  update:
-    name: Update
+  docs:
+    name: Template Docs
     runs-on: ubuntu-latest
 
     steps:
