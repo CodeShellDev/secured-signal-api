@@ -12,13 +12,12 @@ import (
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
-type AliasMiddleware struct {
-	Next http.Handler
+var Aliases Middleware = Middleware{
+	Name: "Aliases",
+	Use: aliasesHandler,
 }
 
-func (data AliasMiddleware) Use() http.Handler {
-	next := data.Next
-
+func aliasesHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		settings := getSettingsByReq(req)
 

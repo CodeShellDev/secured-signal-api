@@ -8,13 +8,12 @@ import (
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
-type EndpointsMiddleware struct {
-	Next http.Handler
+var Endpoints Middleware = Middleware{
+	Name: "Endpoints",
+	Use: endpointsHandler,
 }
 
-func (data EndpointsMiddleware) Use() http.Handler {
-	next := data.Next
-
+func endpointsHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		settings := getSettingsByReq(req)
 

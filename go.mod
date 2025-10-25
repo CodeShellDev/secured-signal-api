@@ -1,6 +1,6 @@
 module github.com/codeshelldev/secured-signal-api
 
-go 1.25.1
+go 1.25.3
 
 require go.uber.org/zap v1.27.0
 
@@ -17,5 +17,5 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
 )

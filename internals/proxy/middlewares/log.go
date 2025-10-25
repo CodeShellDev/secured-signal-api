@@ -6,13 +6,12 @@ import (
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
-type LogMiddleware struct {
-	Next http.Handler
+var Logging Middleware = Middleware{
+	Name: "Logging",
+	Use: loggingHandler,
 }
 
-func (data LogMiddleware) Use() http.Handler {
-	next := data.Next
-
+func loggingHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		log.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
 
