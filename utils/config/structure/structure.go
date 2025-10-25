@@ -13,6 +13,11 @@ type ENV struct {
 	INSECURE      		bool
 }
 
+type SETTINGS struct {
+	ACCESS 				ACCESS_SETTINGS 			`koanf:"access"`
+	MESSAGE				MESSAGE_SETTINGS			`koanf:"message"`
+}
+
 type MESSAGE_SETTINGS struct {
 	VARIABLES         	map[string]any              `koanf:"variables"`
 	FIELD_MAPPINGS      map[string][]FieldMapping	`koanf:"fieldMappings"`
@@ -26,9 +31,4 @@ type FieldMapping struct {
 
 type ACCESS_SETTINGS struct {
 	ENDPOINTS			[]string					`koanf:"endpoints"`
-}
-
-type SETTINGS struct {
-	ACCESS 				ACCESS_SETTINGS 			`koanf:"access"`
-	MESSAGE				MESSAGE_SETTINGS			`koanf:"message"`
 }
