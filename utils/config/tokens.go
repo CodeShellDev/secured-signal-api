@@ -10,7 +10,7 @@ import (
 
 type TOKEN_CONFIG_ struct {
 	TOKENS    []string 				`koanf:"tokens"`
-	OVERRIDES structure.SETTING_ 	`koanf:"overrides"`
+	OVERRIDES structure.SETTINGS 	`koanf:"overrides"`
 }
 
 func LoadTokens() {
@@ -59,8 +59,8 @@ func InitTokens() {
 	}
 }
 
-func parseTokenConfigs(configs []TOKEN_CONFIG_) map[string]structure.SETTING_ {
-	settings := map[string]structure.SETTING_{}
+func parseTokenConfigs(configs []TOKEN_CONFIG_) map[string]structure.SETTINGS {
+	settings := map[string]structure.SETTINGS{}
 
 	for _, config := range configs {
 		for _, token := range config.TOKENS {

@@ -25,10 +25,10 @@ func (data TemplateMiddleware) Use() http.Handler {
 	next := data.Next
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		variables := getSettingsByReq(req).VARIABLES
+		variables := getSettingsByReq(req).MESSAGE.VARIABLES
 
 		if variables == nil {
-			variables = getSettings("*").VARIABLES
+			variables = getSettings("*").MESSAGE.VARIABLES
 		}
 
 		body, err := request.GetReqBody(w, req)

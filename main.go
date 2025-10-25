@@ -15,7 +15,7 @@ import (
 
 var proxy_last *httputil.ReverseProxy
 
-var ENV *structure.ENV_
+var ENV *structure.ENV
 
 func main() {
 	logLevel := os.Getenv("LOG_LEVEL")

@@ -24,7 +24,7 @@ type contextKey string
 
 const tokenKey contextKey = "token"
 
-func getSettingsByReq(req *http.Request) *structure.SETTING_ {
+func getSettingsByReq(req *http.Request) *structure.SETTINGS {
 	token, ok := req.Context().Value(tokenKey).(string)
 
 	if !ok {
@@ -34,7 +34,7 @@ func getSettingsByReq(req *http.Request) *structure.SETTING_ {
 	return getSettings(token)
 }
 
-func getSettings(token string) *structure.SETTING_ {
+func getSettings(token string) *structure.SETTINGS {
 	settings, exists := config.ENV.SETTINGS[token]
 
 	if !exists || settings == nil {

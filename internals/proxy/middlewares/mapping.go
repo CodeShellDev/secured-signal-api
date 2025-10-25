@@ -22,14 +22,14 @@ func (data MappingMiddleware) Use() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		settings := getSettingsByReq(req)
 
-		fieldMappings := settings.FIELD_MAPPINGS
+		fieldMappings := settings.MESSAGE.FIELD_MAPPINGS
 
 		if fieldMappings == nil {
-			fieldMappings = getSettings("*").FIELD_MAPPINGS
+			fieldMappings = getSettings("*").MESSAGE.FIELD_MAPPINGS
 		}
 
-		if settings.VARIABLES == nil {
-			settings.VARIABLES = getSettings("*").VARIABLES
+		if settings.MESSAGE.VARIABLES == nil {
+			settings.MESSAGE.VARIABLES = getSettings("*").MESSAGE.VARIABLES
 		}
 
 		body, err := request.GetReqBody(w, req)
@@ -56,7 +56,7 @@ func (data MappingMiddleware) Use() http.Handler {
 					bodyData[keyWithoutPrefix] = value
 					modifiedBody = true
 				case ".":
-					settings.VARIABLES[keyWithoutPrefix] = value
+					settings.MESSAGE.VARIABLES[keyWithoutPrefix] = value
 				}
 			}
 		}

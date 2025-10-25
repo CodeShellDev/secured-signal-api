@@ -14,13 +14,13 @@ import (
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
-var ENV *structure.ENV_ = &structure.ENV_{
+var ENV *structure.ENV = &structure.ENV{
 	CONFIG_PATH:   os.Getenv("CONFIG_PATH"),
 	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
 	TOKENS_DIR:    os.Getenv("TOKENS_DIR"),
 	FAVICON_PATH:  os.Getenv("FAVICON_PATH"),
 	API_TOKENS:    []string{},
-	SETTINGS:      map[string]*structure.SETTING_{},
+	SETTINGS:      map[string]*structure.SETTINGS{},
 	INSECURE:      false,
 }
 
@@ -55,7 +55,7 @@ func InitEnv() {
 
 	ENV.API_URL = config.String("api.url")
 
-	var settings structure.SETTING_
+	var settings structure.SETTINGS
 
 	transformChildren(config, "settings.message.variables", transformVariables)
 

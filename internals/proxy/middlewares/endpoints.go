@@ -18,10 +18,10 @@ func (data EndpointsMiddleware) Use() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		settings := getSettingsByReq(req)
 
-		endpoints := settings.ENDPOINTS
+		endpoints := settings.ACCESS.ENDPOINTS
 
 		if endpoints == nil {
-			endpoints = getSettings("*").ENDPOINTS
+			endpoints = getSettings("*").ACCESS.ENDPOINTS
 		}
 
 		reqPath := req.URL.Path
