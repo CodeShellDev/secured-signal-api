@@ -53,8 +53,7 @@ func InitTokens() {
 
 		// Set Blocked Endpoints on Config to User Layer Value
 		// => effectively ignoring Default Layer
-		// TODO: check this, `endpoints` might be wrong and instead `access.endpoints`
-		config.Set("endpoints", userLayer.Strings("endpoints"))
+		config.Set("settings.access.endpoints", userLayer.Strings("settings.access.endpoints"))
 	}
 
 	if len(apiTokens) > 0 {
