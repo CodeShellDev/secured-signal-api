@@ -18,16 +18,15 @@ func (data EndpointsMiddleware) Use() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		settings := getSettingsByReq(req)
 
-		blockedEndpoints := settings.BLOCKED_ENDPOINTS
-		allowedEndpoints := settings.ALLOWED_ENDPOINTS
+		endpoints := settings.ENDPOINTS
 
-		if blockedEndpoints == nil && allowedEndpoints == nil {
-			blockedEndpoints = getSettings("*").BLOCKED_ENDPOINTS
+		if endpoints == nil {
+			endpoints = getSettings("*").ENDPOINTS
 		}
 
 		reqPath := req.URL.Path
 
-		if isBlocked(reqPath, allowedEndpoints, blockedEndpoints) {
+		if isBlocked(reqPath, endpoints) {
 			log.Warn("User tried to access blocked endpoint: ", reqPath)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -37,14 +36,25 @@ func (data EndpointsMiddleware) Use() http.Handler {
 	})
 }
 
-func isBlocked(endpoint string, allowed []string, blocked []string) bool {
-	if blocked == nil {
-		blocked = []string{}
+func getEndpoints(endpoints []string) ([]string, []string) {
+	blockedEndpoints := []string{}
+	allowedEndpoints := []string{}
+
+	for i, endpoint := range endpoints {
+		endpoint, block := strings.CutPrefix(endpoint, "!")
+
+		if block {
+			blockedEndpoints[i] = endpoint
+		} else {
+			allowedEndpoints[i] = endpoint
+		}
 	}
 
-	if allowed == nil {
-		allowed = []string{}
-	}
+	return allowedEndpoints, blockedEndpoints
+}
+
+func isBlocked(endpoint string, endpoints []string) bool {
+	allowed, blocked := getEndpoints(endpoints)
 
 	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try string) bool {
 		return strings.HasPrefix(endpoint, try)
