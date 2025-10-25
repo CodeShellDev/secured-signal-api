@@ -2,18 +2,16 @@ package main
 
 import (
 	"net/http"
-	"net/http/httputil"
 	"os"
 
-	proxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
-	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
+	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
 	config "github.com/codeshelldev/secured-signal-api/utils/config"
 	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
-var proxy_last *httputil.ReverseProxy
+var proxy reverseProxy.Proxy
 
 var ENV *structure.ENV
 
@@ -34,35 +32,9 @@ func main() {
 
 	log.Info("Initialized Logger with Level of ", log.Level())
 
-	proxy_last = proxy.Create(ENV.API_URL)
+	proxy = reverseProxy.Create(ENV.API_URL)
 
-	mesg_m6 := middlewares.MessageMiddleware{
-		Next: proxy_last,
-	}
-
-	alias_m5 := middlewares.MappingMiddleware{
-		Next: mesg_m6.Use(),
-	}
-
-	temp_m4 := middlewares.TemplateMiddleware{
-		Next: alias_m5.Use(),
-	}
-
-	endp_m3 := middlewares.EndpointsMiddleware{
-		Next: temp_m4.Use(),
-	}
-
-	auth_m2 := middlewares.AuthMiddleware{
-		Next: endp_m3.Use(),
-	}
-
-	serv_m1 := middlewares.ServeMiddleware{
-		Next: auth_m2.Use(),
-	}
-
-	log_m0 := middlewares.LogMiddleware{
-		Next: serv_m1.Use(),
-	}
+	handler := proxy.Init()
 
 	log.Info("Initialized Middlewares")
 
@@ -72,7 +44,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    addr,
-		Handler: log_m0.Use(),
+		Handler: handler,
 	}
 
 	stop := docker.Run(func() {

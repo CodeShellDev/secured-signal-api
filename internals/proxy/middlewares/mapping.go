@@ -12,13 +12,12 @@ import (
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
-type MappingMiddleware struct {
-	Next http.Handler
+var Mapping Middleware = Middleware{
+	Name: "Mapping",
+	Use: mappingHandler,
 }
 
-func (data MappingMiddleware) Use() http.Handler {
-	next := data.Next
-
+func mappingHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		settings := getSettingsByReq(req)
 

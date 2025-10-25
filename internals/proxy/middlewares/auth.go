@@ -11,27 +11,12 @@ import (
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
-type AuthMiddleware struct {
-	Next http.Handler
+var Auth Middleware = Middleware{
+	Name: "Auth",
+	Use: authHandler,
 }
 
-func getAuthType(str string) authType {
-	switch str {
-	case "Bearer":
-		return Bearer
-	case "Basic":
-		return Basic
-	default:
-		return None
-	}
-}
-
-func isValidToken(tokens []string, match string) bool {
-	return slices.Contains(tokens, match)
-}
-
-func (data AuthMiddleware) Use() http.Handler {
-	next := data.Next
+func authHandler(next http.Handler) http.Handler {
 	tokens := config.ENV.API_TOKENS
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -108,4 +93,19 @@ func (data AuthMiddleware) Use() http.Handler {
 
 		next.ServeHTTP(w, req)
 	})
+}
+
+func getAuthType(str string) authType {
+	switch str {
+	case "Bearer":
+		return Bearer
+	case "Basic":
+		return Basic
+	default:
+		return None
+	}
+}
+
+func isValidToken(tokens []string, match string) bool {
+	return slices.Contains(tokens, match)
 }

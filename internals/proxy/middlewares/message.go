@@ -10,13 +10,12 @@ import (
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
-type MessageMiddleware struct {
-	Next http.Handler
+var Message Middleware = Middleware{
+	Name: "Message",
+	Use: messageHandler,
 }
 
-func (data MessageMiddleware) Use() http.Handler {
-	next := data.Next
-
+func messageHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		settings := getSettingsByReq(req)
 

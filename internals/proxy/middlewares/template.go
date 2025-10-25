@@ -17,13 +17,12 @@ import (
 	templating "github.com/codeshelldev/secured-signal-api/utils/templating"
 )
 
-type TemplateMiddleware struct {
-	Next http.Handler
+var Template Middleware = Middleware{
+	Name: "Template",
+	Use: templateHandler,
 }
 
-func (data TemplateMiddleware) Use() http.Handler {
-	next := data.Next
-
+func templateHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		variables := getSettingsByReq(req).MESSAGE.VARIABLES
 
