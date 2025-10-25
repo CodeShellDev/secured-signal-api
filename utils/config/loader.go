@@ -65,23 +65,27 @@ func InitEnv() {
 }
 
 func LoadDefaults() {
-	_, defErr := LoadFile(ENV.DEFAULTS_PATH, defaultsLayer, yaml.Parser())
+	_, err := LoadFile(ENV.DEFAULTS_PATH, defaultsLayer, yaml.Parser())
 
-	if defErr != nil {
+	if err != nil {
 		log.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
 	}
 }
 
 func LoadConfig() {
-	_, conErr := LoadFile(ENV.CONFIG_PATH, userLayer, yaml.Parser())
+	_, err := LoadFile(ENV.CONFIG_PATH, userLayer, yaml.Parser())
 
-	if conErr != nil {
-		_, err := os.Stat(ENV.CONFIG_PATH)
+	if err != nil {
+		_, fsErr := os.Stat(ENV.CONFIG_PATH)
 
-		if !errors.Is(err, fs.ErrNotExist) {
-			log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", conErr.Error())
+		// Config File doesn't exist
+		// => User is using Environment
+		if errors.Is(fsErr, fs.ErrNotExist) {
+			return
 		}
 	}
+
+	log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
 }
 
 func transformVariables(key string, value any) (string, any) {

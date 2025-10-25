@@ -14,9 +14,13 @@ type TOKEN_CONFIG_ struct {
 }
 
 func LoadTokens() {
-	log.Debug("Loading Configs ", ENV.TOKENS_DIR)
+	log.Debug("Loading Configs in ", ENV.TOKENS_DIR)
 
-	LoadDir("tokenconfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
+	err := LoadDir("tokenconfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
+
+	if err != nil {
+		log.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
+	}
 
 	normalizeKeys(tokensLayer)
 
@@ -49,6 +53,7 @@ func InitTokens() {
 
 		// Set Blocked Endpoints on Config to User Layer Value
 		// => effectively ignoring Default Layer
+		// TODO: check this, `endpoints` might be wrong and instead `access.endpoints`
 		config.Set("endpoints", userLayer.Strings("endpoints"))
 	}
 
