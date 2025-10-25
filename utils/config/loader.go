@@ -28,7 +28,7 @@ type ENV_ struct {
 }
 
 type SETTING_ struct {
-	ENDPOINTS []string                               		 `koanf:"blockedendpoints"`
+	ENDPOINTS []string                               		 `koanf:"access.endpoints"`
 	VARIABLES         map[string]any                         `koanf:"message.variables"`
 	DATA_ALIASES      map[string][]middlewareTypes.DataAlias `koanf:"message.fieldMappings"`
 	MESSAGE_TEMPLATE  string                                 `koanf:"message.template"`
