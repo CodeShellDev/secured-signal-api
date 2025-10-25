@@ -80,12 +80,14 @@ func doBlock(body map[string]any, headers map[string]any, policies map[string]st
 		isHeader := strings.HasPrefix(try, "#")
 		isBody := strings.HasPrefix(try, "@")
 
-		if body[try] != nil && isBody {
+		tryWithoutPrefix := try[:1]
+
+		if body[tryWithoutPrefix] != nil && isBody {
 			blockField = try
 			return true
 		}
 
-		if headers[try] != nil && isHeader {
+		if headers[tryWithoutPrefix] != nil && isHeader {
 			blockField = try
 			return true
 		}
@@ -97,11 +99,16 @@ func doBlock(body map[string]any, headers map[string]any, policies map[string]st
 		isHeader := strings.HasPrefix(try, "#")
 		isBody := strings.HasPrefix(try, "@")
 
-		if body[try] != nil && isBody {
+		tryWithoutPrefix := try[:1]
+
+		// TODO: check for value before returning:
+		// body[tryWithoutPrefix] != try.Value
+
+		if body[tryWithoutPrefix] != nil && isBody {
 			return true
 		}
 
-		if headers[try] != nil && isHeader {
+		if headers[tryWithoutPrefix] != nil && isHeader {
 			return true
 		}
 
