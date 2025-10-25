@@ -54,7 +54,7 @@ Check out the official [Documentation](https://codeshelldev.github.io/secured-si
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
-  - [Data Aliases](#data-aliases)
+  - [Field Mappings](#field-mappings)
   - [Message Templates](#message-templates)
 - [Integrations](https://codeshelldev.github.io/secured-signal-api/docs/integrations/compatibility)
 - [Contributing](#contributing)
@@ -229,25 +229,26 @@ These Endpoints are blocked by default due to Security Risks.
 > [!NOTE]
 > Matching works by checking if the requested Endpoints starts with a Blocked or an Allowed Endpoint
 
-You can modify Blocked Endpoints by configuring `blockedEndpoints` in your config:
+You can modify endpoints by configuring `access.endpoints` in your config:
 
 ```yaml
 settings:
-  blockedEndpoints: [/v1/register, /v1/unregister, /v1/qrcodelink, /v1/contacts]
+  access:
+    endpoints:
+      - !/v1/register
+      - !/v1/unregister
+      - !/v1/qrcodelink
+      - !/v1/contacts
+      - /v2/send
 ```
 
-You can also override Blocked Endpoints by adding Allowed Endpoints to `allowedEndpoints`.
+By default adding an endpoint explictly allows access to it, use `!` to block it instead.
 
-```yaml
-settings:
-  allowedEndpoints: [/v2/send]
-```
-
-| Config (Allow)                   | (Block)                             |   Result   |     |                   |     |
-| :------------------------------- | :---------------------------------- | :--------: | --- | :---------------: | --- |
-| `allowedEndpoints: ["/v2/send"]` | `unset`                             |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
-| `unset`                          | `blockedEndpoints: ["/v1/receive"]` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
-| `blockedEndpoints: ["/v2"]`      | `allowedEndpoints: ["/v2/send"]`    | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
+| Config (Allow) | (Block)        |   Result   |     |                   |     |
+| :------------- | :------------- | :--------: | --- | :---------------: | --- |
+| `/v2/send`     | `unset`        |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
+| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
+| `/v2`          | `!/v2/send`    | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
 
 ### Variables
 
@@ -260,35 +261,37 @@ See [Placeholders](#placeholders).
 
 ```yaml
 settings:
-  variables:
-    number: "+123400001",
-    recipients: ["+123400002", "group.id", "user.id"]
+  message:
+    variables:
+      number: "+123400001",
+      recipients: ["+123400002", "group.id", "user.id"]
 ```
 
 ### Message Templates
 
 To customize the `message` attribute you can use **Message Templates** to build your message by using other Body Keys and Variables.
-Use `messageTemplate` to configure:
+Use `message.template` to configure:
 
 ```yaml
 settings:
-  messageTemplate: |
-    Your Message:
-    {{@message}}.
-    Sent with Secured Signal API.
+  message:
+    template: |
+      Your Message:
+      {{@message}}.
+      Sent with Secured Signal API.
 ```
 
 Message Templates support [Standard Golang Templating](#templating).
 Use `@data.key` to reference Body Keys, `#Content_Type` for Headers and `.KEY` for Variables.
 
-### Data Aliases
+### Field Mappings
 
-To improve compatibility with other services Secured Signal API provides **Data Aliases** and a built-in `message` Alias.
+To improve compatibility with other services Secured Signal API provides **Field Mappings** and a built-in `message` Mapping.
 
 <details>
-<summary><strong>Default `message` Aliases</strong></summary>
+<summary><strong>Default `message` Mapping</strong></summary>
 
-| Alias        | Score | Alias            | Score |
+| Field        | Score | Field            | Score |
 | ------------ | ----- | ---------------- | ----- |
 | msg          | 100   | data.content     | 9     |
 | content      | 99    | data.description | 8     |
@@ -300,23 +303,24 @@ To improve compatibility with other services Secured Signal API provides **Data 
 
 </details>
 
-Secured Signal API will pick the best scoring Data Alias (if available) to extract set the Key to the correct Value from the Request Body.
+Secured Signal API will pick the best scoring Field (if available) to set the Key to the correct Value from the Request Body.
 
-Data Aliases can be added by setting `dataAliases` in your config:
+Field Mappings can be added by setting `message.fieldMappings` in your config:
 
 ```yaml
 settings:
-  dataAliases:
-    "@message":
-      [
-        { alias: "msg", score: 80 },
-        { alias: "data.message", score: 79 },
-        { alias: "array[0].message", score: 78 },
-      ]
-    ".NUMBER": [{ alias: "phone_number", score: 100 }]
+  message:
+    fieldMappings:
+      "@message":
+        [
+          { field: "msg", score: 80 },
+          { field: "data.message", score: 79 },
+          { field: "array[0].message", score: 78 },
+        ]
+      ".NUMBER": [{ field: "phone_number", score: 100 }]
 ```
 
-Use `@` for aliasing Body Keys and `.` for aliasing Variables.
+Use `@` for mapping to Body Keys and `.` for mapping to Variables.
 
 ## Contributing
 
