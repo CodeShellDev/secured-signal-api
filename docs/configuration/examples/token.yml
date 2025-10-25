@@ -1,7 +1,10 @@
 tokens: [LOOOONG_STRING]
 
 overrides:
-  variables: # Disable Placeholder
-  blockedEndpoints: # Disable Sending
-    - /v2/send
-  dataAliases: # Disable Aliases
+  message:
+    fieldMappings: # Disable Mappings
+    variables: # Disable Placeholder
+
+  access:
+    endpoints: # Disable Sending
+      - !/v2/send

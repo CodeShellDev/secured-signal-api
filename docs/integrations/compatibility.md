@@ -17,7 +17,7 @@ But with one flaw:
 
 > _manual configuration_
 
-In order for Secured Signal API to be compatible and integratable with a service you still need to manually define [**Data Aliases**](../configuration/data-aliases)
+In order for Secured Signal API to be compatible and integratable with a service you still need to manually define [**Field Mappings**](../configuration/field-mappings)
 and [**Message Templates**](../configuration/message-templates), which is quite easy,
 provided you know what the services is using as payload (try sending a request to some debugging endpoint).
 

@@ -14,7 +14,7 @@ Which means that any valid Go template string will also work in Secured Signal A
 
 > [!NOTE]
 > Go's templating library is used in the following features:
-> <br/>- [Message Templates](./advanced) <br/>- [Placeholders](./advanced)
+> <br/>- [Message Templates](../configuration/message-template) <br/>- [Placeholders](./advanced)
 
 But you will mostly be using `{{.VAR}}`.
 

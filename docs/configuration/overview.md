@@ -15,10 +15,10 @@ Suppose you want to set a new [Placeholder](../usage/advanced) `NUMBER` in your 
 
 ```yaml
 environment:
-  SETTINGS__VARIABLES__NUMBER: "+123400001"
+  SETTINGS__MESSAGE__VARIABLES__NUMBER: "+123400001"
 ```
 
-This would internally be converted into `settings.variables.number` matching the config formatting.
+This would internally be converted into `settings.message.variables.number` matching the config formatting.
 
 > [!IMPORTANT]
 > Underscores `_` are removed during Conversion, double Underscores `__` on the other hand convert the Variable into a nested Object (`__` replaced by `.`)
@@ -47,23 +47,24 @@ api:
 logLevel: info
 
 settings:
-  messageTemplate: |
-    You've got a Notification:
-    {{@message}} 
-    At {{@data.timestamp}} on {{@data.date}}.
-    Send using {{.NUMBER}}.
+  message:
+    template: |
+      You've got a Notification:
+      {{@message}} 
+      At {{@data.timestamp}} on {{@data.date}}.
+      Send using {{.NUMBER}}.
 
-  variables:
-    number: "+123400001"
-    recipients: ["+123400002", "group.id", "user.id"]
+    variables:
+      number: "+123400001"
+      recipients: ["+123400002", "group.id", "user.id"]
 
-  dataAliases: 
-    "@message": [{ alias: "msg", score: 100 }]
+    fieldMappings:
+      "@message": [{ field: "msg", score: 100 }]
 
-  blockedEndpoints:
-    - /v1/about
-  allowedEndpoints:
-    - /v2/send
+  access:
+    endpoints:
+      - !/v1/about
+      - /v2/send
 ```
 
 ### Token Configs
@@ -83,8 +84,11 @@ Here is an example:
 tokens: [LOOOONG_STRING]
 
 overrides:
-  variables: # Disable Placeholder
-  blockedEndpoints: # Disable Sending
-    - /v2/send
-  dataAliases: # Disable Aliases
+  message:
+    fieldMappings: # Disable Mappings
+    variables: # Disable Placeholder
+
+  access:
+    endpoints: # Disable Sending
+      - !/v2/send
 ```
