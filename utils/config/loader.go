@@ -28,11 +28,10 @@ type ENV_ struct {
 }
 
 type SETTING_ struct {
-	BLOCKED_ENDPOINTS []string                               `koanf:"blockedendpoints"`
-	ALLOWED_ENDPOINTS []string                               `koanf:"allowedendpoints"`
-	VARIABLES         map[string]any                         `koanf:"variables"`
-	DATA_ALIASES      map[string][]middlewareTypes.DataAlias `koanf:"dataaliases"`
-	MESSAGE_TEMPLATE  string                                 `koanf:"messagetemplate"`
+	ENDPOINTS []string                               		 `koanf:"blockedendpoints"`
+	VARIABLES         map[string]any                         `koanf:"message.variables"`
+	DATA_ALIASES      map[string][]middlewareTypes.DataAlias `koanf:"message.fieldMappings"`
+	MESSAGE_TEMPLATE  string                                 `koanf:"message.template"`
 }
 
 var ENV *ENV_ = &ENV_{
@@ -78,7 +77,7 @@ func InitEnv() {
 
 	var settings SETTING_
 
-	transformChildren(config, "settings.variables", transformVariables)
+	transformChildren(config, "settings.message.variables", transformVariables)
 
 	config.Unmarshal("settings", &settings)
 

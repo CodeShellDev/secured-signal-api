@@ -27,7 +27,7 @@ func InitTokens() {
 
 	var tokenConfigs []TOKEN_CONFIG_
 
-	transformChildrenUnderArray(tokensLayer, "tokenconfigs", "overrides.variables", transformVariables)
+	transformChildrenUnderArray(tokensLayer, "tokenconfigs", "overrides.message.variables", transformVariables)
 
 	tokensLayer.Unmarshal("tokenconfigs", &tokenConfigs)
 
@@ -48,7 +48,7 @@ func InitTokens() {
 
 		// Set Blocked Endpoints on Config to User Layer Value
 		// => effectively ignoring Default Layer
-		config.Set("blockedendpoints", userLayer.Strings("blockeendpoints"))
+		config.Set("endpoints", userLayer.Strings("endpoints"))
 	}
 
 	if len(apiTokens) > 0 {
