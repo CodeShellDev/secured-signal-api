@@ -45,7 +45,7 @@ func InitTokens() {
 	}
 
 	if len(apiTokens) <= 0 {
-		log.Warn("No API TOKEN provided this is NOT recommended")
+		log.Warn("No API Tokens provided this is NOT recommended")
 
 		log.Info("Disabling Security Features due to incomplete Congfiguration")
 
