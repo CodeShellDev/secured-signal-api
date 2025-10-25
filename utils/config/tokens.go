@@ -3,19 +3,24 @@ package config
 import (
 	"strconv"
 
+	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
 type TOKEN_CONFIG_ struct {
-	TOKENS    []string `koanf:"tokens"`
-	OVERRIDES SETTING_ `koanf:"overrides"`
+	TOKENS    []string 				`koanf:"tokens"`
+	OVERRIDES structure.SETTINGS 	`koanf:"overrides"`
 }
 
 func LoadTokens() {
-	log.Debug("Loading Configs ", ENV.TOKENS_DIR)
+	log.Debug("Loading Configs in ", ENV.TOKENS_DIR)
 
-	LoadDir("tokenconfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
+	err := LoadDir("tokenconfigs", ENV.TOKENS_DIR, tokensLayer, yaml.Parser())
+
+	if err != nil {
+		log.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
+	}
 
 	normalizeKeys(tokensLayer)
 
@@ -27,7 +32,7 @@ func InitTokens() {
 
 	var tokenConfigs []TOKEN_CONFIG_
 
-	transformChildrenUnderArray(tokensLayer, "tokenconfigs", "overrides.variables", transformVariables)
+	transformChildrenUnderArray(tokensLayer, "tokenconfigs", "overrides.message.variables", transformVariables)
 
 	tokensLayer.Unmarshal("tokenconfigs", &tokenConfigs)
 
@@ -40,7 +45,7 @@ func InitTokens() {
 	}
 
 	if len(apiTokens) <= 0 {
-		log.Warn("No API TOKEN provided this is NOT recommended")
+		log.Warn("No API Tokens provided this is NOT recommended")
 
 		log.Info("Disabling Security Features due to incomplete Congfiguration")
 
@@ -48,7 +53,7 @@ func InitTokens() {
 
 		// Set Blocked Endpoints on Config to User Layer Value
 		// => effectively ignoring Default Layer
-		config.Set("blockedendpoints", userLayer.Strings("blockeendpoints"))
+		config.Set("settings.access.endpoints", userLayer.Strings("settings.access.endpoints"))
 	}
 
 	if len(apiTokens) > 0 {
@@ -58,8 +63,8 @@ func InitTokens() {
 	}
 }
 
-func parseTokenConfigs(configs []TOKEN_CONFIG_) map[string]SETTING_ {
-	settings := map[string]SETTING_{}
+func parseTokenConfigs(configs []TOKEN_CONFIG_) map[string]structure.SETTINGS {
+	settings := map[string]structure.SETTINGS{}
 
 	for _, config := range configs {
 		for _, token := range config.TOKENS {

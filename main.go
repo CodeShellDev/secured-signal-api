@@ -6,13 +6,14 @@ import (
 
 	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
 	config "github.com/codeshelldev/secured-signal-api/utils/config"
+	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 var proxy reverseProxy.Proxy
 
-var ENV *config.ENV_
+var ENV *structure.ENV
 
 func main() {
 	logLevel := os.Getenv("LOG_LEVEL")

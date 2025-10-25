@@ -19,15 +19,15 @@ func messageHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		settings := getSettingsByReq(req)
 
-		variables := settings.VARIABLES
-		messageTemplate := settings.MESSAGE_TEMPLATE
+		variables := settings.MESSAGE.VARIABLES
+		messageTemplate := settings.MESSAGE.TEMPLATE
 
 		if variables == nil {
-			variables = getSettings("*").VARIABLES
+			variables = getSettings("*").MESSAGE.VARIABLES
 		}
 
 		if messageTemplate == "" {
-			messageTemplate = getSettings("*").MESSAGE_TEMPLATE
+			messageTemplate = getSettings("*").MESSAGE.TEMPLATE
 		}
 
 		body, err := request.GetReqBody(w, req)
