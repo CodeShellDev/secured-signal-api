@@ -20,7 +20,7 @@ type SETTINGS struct {
 
 type MESSAGE_SETTINGS struct {
 	VARIABLES         	map[string]any              `koanf:"variables"`
-	FIELD_MAPPINGS      map[string][]FieldMapping	`koanf:"fieldMappings"`
+	FIELD_MAPPINGS      map[string][]FieldMapping	`koanf:"fieldmappings"`
 	TEMPLATE  			string                      `koanf:"template"`
 }
 
@@ -31,4 +31,5 @@ type FieldMapping struct {
 
 type ACCESS_SETTINGS struct {
 	ENDPOINTS			[]string					`koanf:"endpoints"`
+	FIELD_POLOCIES		[]string					`koanf:"fieldpolicies"`
 }
