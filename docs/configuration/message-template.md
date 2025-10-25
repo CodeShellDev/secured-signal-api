@@ -8,7 +8,7 @@ Message Templates are the best way to **structure** and **customize** your messa
 
 Configure them by using the `message.template` attribute in you config.
 
-These support Go Templates (See [Usage](../usage/formatting)) and work by templating the `message` attribute in the request's body.
+These support Go Templates (See [Templates](../usage/formatting)) and work by templating the `message` attribute in the request's body.
 
 Here is an example:
 
