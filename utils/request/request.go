@@ -1,6 +1,7 @@
 package req
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
@@ -87,6 +88,8 @@ func GetBody(req *http.Request) ([]byte, error) {
 
 	if err != nil {
 		req.Body.Close()
+
+		req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 
 		return nil, err
 	}

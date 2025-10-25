@@ -54,9 +54,10 @@ func getPolicies(policies map[string]structure.FieldPolicy) ([]string, []string)
 	allowedFields := []string{}
 
 	for field, policy := range policies {
-		if policy.Action == "block" {
+		switch policy.Action {
+		case "block":
 			blockedFields = append(blockedFields, field)
-		} else if policy.Action == "allow" {
+		case "allow":
 			allowedFields = append(allowedFields, field)
 		}
 	}
