@@ -7,40 +7,20 @@ import (
 	"strconv"
 	"strings"
 
-	middlewareTypes "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/types"
+	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
 	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
-type ENV_ struct {
-	CONFIG_PATH   string
-	DEFAULTS_PATH string
-	FAVICON_PATH  string
-	TOKENS_DIR    string
-	LOG_LEVEL     string
-	PORT          string
-	API_URL       string
-	API_TOKENS    []string
-	SETTINGS      map[string]*SETTING_
-	INSECURE      bool
-}
-
-type SETTING_ struct {
-	ENDPOINTS []string                               		 `koanf:"access.endpoints"`
-	VARIABLES         map[string]any                         `koanf:"message.variables"`
-	DATA_ALIASES      map[string][]middlewareTypes.DataAlias `koanf:"message.fieldMappings"`
-	MESSAGE_TEMPLATE  string                                 `koanf:"message.template"`
-}
-
-var ENV *ENV_ = &ENV_{
+var ENV *structure.ENV_ = &structure.ENV_{
 	CONFIG_PATH:   os.Getenv("CONFIG_PATH"),
 	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
 	TOKENS_DIR:    os.Getenv("TOKENS_DIR"),
 	FAVICON_PATH:  os.Getenv("FAVICON_PATH"),
 	API_TOKENS:    []string{},
-	SETTINGS:      map[string]*SETTING_{},
+	SETTINGS:      map[string]*structure.SETTING_{},
 	INSECURE:      false,
 }
 
@@ -75,7 +55,7 @@ func InitEnv() {
 
 	ENV.API_URL = config.String("api.url")
 
-	var settings SETTING_
+	var settings structure.SETTING_
 
 	transformChildren(config, "settings.message.variables", transformVariables)
 

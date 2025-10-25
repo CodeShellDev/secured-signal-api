@@ -3,13 +3,14 @@ package config
 import (
 	"strconv"
 
+	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
 type TOKEN_CONFIG_ struct {
-	TOKENS    []string `koanf:"tokens"`
-	OVERRIDES SETTING_ `koanf:"overrides"`
+	TOKENS    []string 				`koanf:"tokens"`
+	OVERRIDES structure.SETTING_ 	`koanf:"overrides"`
 }
 
 func LoadTokens() {
@@ -58,8 +59,8 @@ func InitTokens() {
 	}
 }
 
-func parseTokenConfigs(configs []TOKEN_CONFIG_) map[string]SETTING_ {
-	settings := map[string]SETTING_{}
+func parseTokenConfigs(configs []TOKEN_CONFIG_) map[string]structure.SETTING_ {
+	settings := map[string]structure.SETTING_{}
 
 	for _, config := range configs {
 		for _, token := range config.TOKENS {

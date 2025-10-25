@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/codeshelldev/secured-signal-api/utils/config"
+	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
 )
 
 type Context struct {
@@ -23,7 +24,7 @@ type contextKey string
 
 const tokenKey contextKey = "token"
 
-func getSettingsByReq(req *http.Request) *config.SETTING_ {
+func getSettingsByReq(req *http.Request) *structure.SETTING_ {
 	token, ok := req.Context().Value(tokenKey).(string)
 
 	if !ok {
@@ -33,7 +34,7 @@ func getSettingsByReq(req *http.Request) *config.SETTING_ {
 	return getSettings(token)
 }
 
-func getSettings(token string) *config.SETTING_ {
+func getSettings(token string) *structure.SETTING_ {
 	settings, exists := config.ENV.SETTINGS[token]
 
 	if !exists || settings == nil {

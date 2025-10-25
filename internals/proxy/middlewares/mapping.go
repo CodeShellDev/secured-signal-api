@@ -6,26 +6,26 @@ import (
 	"net/http"
 	"strconv"
 
-	middlewareTypes "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/types"
+	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
 	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
-type AliasMiddleware struct {
+type MappingMiddleware struct {
 	Next http.Handler
 }
 
-func (data AliasMiddleware) Use() http.Handler {
+func (data MappingMiddleware) Use() http.Handler {
 	next := data.Next
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		settings := getSettingsByReq(req)
 
-		dataAliases := settings.DATA_ALIASES
+		fieldMappings := settings.FIELD_MAPPINGS
 
-		if dataAliases == nil {
-			dataAliases = getSettings("*").DATA_ALIASES
+		if fieldMappings == nil {
+			fieldMappings = getSettings("*").FIELD_MAPPINGS
 		}
 
 		if settings.VARIABLES == nil {
@@ -44,7 +44,7 @@ func (data AliasMiddleware) Use() http.Handler {
 		if !body.Empty {
 			bodyData = body.Data
 
-			aliasData := processDataAliases(dataAliases, bodyData)
+			aliasData := processFieldMappings(fieldMappings, bodyData)
 
 			for key, value := range aliasData {
 				prefix := key[:1]
@@ -85,7 +85,7 @@ func (data AliasMiddleware) Use() http.Handler {
 	})
 }
 
-func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map[string]any) map[string]any {
+func processFieldMappings(aliases map[string][]structure.FieldMapping, data map[string]any) map[string]any {
 	aliasData := map[string]any{}
 
 	for key, alias := range aliases {
@@ -99,27 +99,27 @@ func processDataAliases(aliases map[string][]middlewareTypes.DataAlias, data map
 	return aliasData
 }
 
-func getData(key string, aliases []middlewareTypes.DataAlias, data map[string]any) (string, any) {
+func getData(key string, aliases []structure.FieldMapping, data map[string]any) (string, any) {
 	var best int
 	var value any
 
 	for _, alias := range aliases {
-		aliasValue, score, ok := processAlias(alias, data)
+		aliasValue, score, ok := processFieldMapping(alias, data)
 
 		if ok {
 			if score > best {
 				value = aliasValue
 			}
 
-			delete(data, alias.Alias)
+			delete(data, alias.Field)
 		}
 	}
 
 	return key, value
 }
 
-func processAlias(alias middlewareTypes.DataAlias, data map[string]any) (any, int, bool) {
-	aliasKey := alias.Alias
+func processFieldMapping(alias structure.FieldMapping, data map[string]any) (any, int, bool) {
+	aliasKey := alias.Field
 
 	value, ok := jsonutils.GetByPath(aliasKey, data)
 

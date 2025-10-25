@@ -8,13 +8,14 @@ import (
 	proxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
 	middlewares "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
 	config "github.com/codeshelldev/secured-signal-api/utils/config"
+	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 var proxy_last *httputil.ReverseProxy
 
-var ENV *config.ENV_
+var ENV *structure.ENV_
 
 func main() {
 	logLevel := os.Getenv("LOG_LEVEL")
@@ -39,7 +40,7 @@ func main() {
 		Next: proxy_last,
 	}
 
-	alias_m5 := middlewares.AliasMiddleware{
+	alias_m5 := middlewares.MappingMiddleware{
 		Next: mesg_m6.Use(),
 	}
 
