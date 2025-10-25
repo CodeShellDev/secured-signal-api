@@ -9,7 +9,7 @@ Here are some of the highlights of using **Secured Signal API**
 
 ---
 
-## Message Templates
+## Message Template
 
 > _Incredible fun and useful_
 
@@ -20,10 +20,10 @@ Look at this complex template for example:
 {{{ #://configuration/examples/message-template.yml }}}
 ```
 
-It can extract needed data from the body and even the headers ([exceptions](./usage/advanced)) and then process them using Go's Templating Library
+It can extract needed data from the body and even the headers ([exceptions](./configuration/message-template)) and then process them using Go's Templating Library
 and finally output a message packed with so much information.
 
-Head to [Configuration](./configuration/message-templates) to see how-to use.
+Head to [Configuration](./configuration/message-template) to see how-to use.
 
 ---
 
@@ -38,14 +38,14 @@ Take a look at the [Usage](./usage/advanced).
 
 ---
 
-## Data Aliases
+## Field Mappings
 
 > _Boring, but sooo definetly needed_
 
-**Data Aliases** are also very useful for when your favorite service does not officially support **Secured Signal API** (or Signal CLI REST API).
+**Field Mappings** are also very useful for when your favorite service does not officially support **Secured Signal API** (or Signal CLI REST API).
 With this feature you have the power to do it yourself, just extract what's needed and then integrate with any of the other features.
 
-Interested? [Take a look](./configuration/data-aliases).
+Interested? [Take a look](./configuration/field-mappings).
 
 ---
 
@@ -59,6 +59,6 @@ Interested? [Take a look](./configuration/data-aliases).
 - [**Blocked Endpoints**](./configuration/endpoints)
 
 Go hand in hand for restricting unauthorized access and for ensuring least privilege.
-[Time to go blocking...](./configuration/endpoints)
+[Let's start blocking then!](./configuration/endpoints)
 
 ---
