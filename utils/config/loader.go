@@ -83,9 +83,9 @@ func LoadConfig() {
 		if errors.Is(fsErr, fs.ErrNotExist) {
 			return
 		}
-	}
 
-	log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
+		log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
+	}
 }
 
 func transformVariables(key string, value any) (string, any) {
