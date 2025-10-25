@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
@@ -48,16 +49,14 @@ func policyHandler(next http.Handler) http.Handler {
 	})
 }
 
-func getPolicies(policies []string) ([]string, []string) {
+func getPolicies(policies map[string]structure.FieldPolicy) ([]string, []string) {
 	blockedFields := []string{}
 	allowedFields := []string{}
 
-	for _, field := range policies {
-		field, block := strings.CutPrefix(field, "!")
-
-		if block {
+	for field, policy := range policies {
+		if policy.Action == "block" {
 			blockedFields = append(blockedFields, field)
-		} else {
+		} else if policy.Action == "allow" {
 			allowedFields = append(allowedFields, field)
 		}
 	}
@@ -65,7 +64,7 @@ func getPolicies(policies []string) ([]string, []string) {
 	return allowedFields, blockedFields
 }
 
-func doBlock(body map[string]any, headers map[string]any, policies []string) (bool, string) {
+func doBlock(body map[string]any, headers map[string]any, policies map[string]structure.FieldPolicy) (bool, string) {
 	if policies == nil {
 		return false, ""
 	} else if len(policies) <= 0 {

@@ -31,5 +31,10 @@ type FieldMapping struct {
 
 type ACCESS_SETTINGS struct {
 	ENDPOINTS			[]string					`koanf:"endpoints"`
-	FIELD_POLOCIES		[]string					`koanf:"fieldpolicies"`
+	FIELD_POLOCIES		map[string]FieldPolicy		`koanf:"fieldpolicies"`
+}
+
+type FieldPolicy struct {
+	Field				string						`koanf:"field"`
+	Action				string						`koanf:"action"`
 }
