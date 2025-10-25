@@ -11,7 +11,7 @@ To improve compatibility with other services Secured Signal API provides **Field
 <details>
 <summary><strong>Default `message` Mapping</strong></summary>
 
-| Alias        | Score | Alias            | Score |
+| Field        | Score | Field            | Score |
 | ------------ | ----- | ---------------- | ----- |
 | msg          | 100   | data.content     | 9     |
 | content      | 99    | data.description | 8     |
@@ -33,11 +33,11 @@ settings:
     fieldMappings:
       "@message":
         [
-          { alias: "msg", score: 80 },
-          { alias: "data.message", score: 79 },
-          { alias: "array[0].message", score: 78 },
+          { field: "msg", score: 80 },
+          { field: "data.message", score: 79 },
+          { field: "array[0].message", score: 78 },
         ]
-      ".NUMBER": [{ alias: "phone_number", score: 100 }]
+      ".NUMBER": [{ field: "phone_number", score: 100 }]
 ```
 
 > [!IMPORTANT]

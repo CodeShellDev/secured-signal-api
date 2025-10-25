@@ -21,7 +21,7 @@ settings:
       recipients: ["+123400002", "group.id", "user.id"]
 
     fieldMappings:
-      "@message": [{ alias: "msg", score: 100 }]
+      "@message": [{ field: "msg", score: 100 }]
 
   access:
     endpoints:

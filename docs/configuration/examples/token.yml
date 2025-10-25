@@ -2,7 +2,7 @@ tokens: [LOOOONG_STRING]
 
 overrides:
   message:
-    fieldMappings: # Disable Aliases
+    fieldMappings: # Disable Mappings
     variables: # Disable Placeholder
 
   access:
