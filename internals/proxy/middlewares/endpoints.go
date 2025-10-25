@@ -40,13 +40,13 @@ func getEndpoints(endpoints []string) ([]string, []string) {
 	blockedEndpoints := []string{}
 	allowedEndpoints := []string{}
 
-	for i, endpoint := range endpoints {
+	for _, endpoint := range endpoints {
 		endpoint, block := strings.CutPrefix(endpoint, "!")
 
 		if block {
-			blockedEndpoints[i] = endpoint
+			blockedEndpoints = append(blockedEndpoints, endpoint)
 		} else {
-			allowedEndpoints[i] = endpoint
+			allowedEndpoints = append(allowedEndpoints, endpoint)
 		}
 	}
 
