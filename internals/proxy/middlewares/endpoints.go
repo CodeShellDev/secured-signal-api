@@ -53,6 +53,12 @@ func getEndpoints(endpoints []string) ([]string, []string) {
 }
 
 func isBlocked(endpoint string, endpoints []string) bool {
+	if endpoints == nil {
+		return false
+	} else if len(endpoints) <= 0 {
+		return false
+	}
+
 	allowed, blocked := getEndpoints(endpoints)
 
 	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try string) bool {
