@@ -54,7 +54,7 @@ Check out the official [Documentation](https://codeshelldev.github.io/secured-si
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
-  - [Field Mappings](#field-mappings)
+  - [Data Aliases](#data-aliases)
   - [Message Templates](#message-templates)
 - [Integrations](https://codeshelldev.github.io/secured-signal-api/docs/integrations/compatibility)
 - [Contributing](#contributing)
@@ -88,9 +88,10 @@ services:
     container_name: secured-signal
     environment:
       API__URL: http://signal-api:8080
-      SETTINGS__MESSAGE__VARIABLES__RECIPIENTS: "[+123400002, +123400003, +123400004]"
-      SETTINGS__MESSAGE__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: "[LOOOOOONG_STRING]"
+      SETTINGS__VARIABLES__RECIPIENTS:
+        '[+123400002, +123400003, +123400004]'
+      SETTINGS__VARIABLES__NUMBER: "+123400001"
+      API__TOKENS: '[LOOOOOONG_STRING]'
     ports:
       - "8880:8880"
     restart: unless-stopped
@@ -208,24 +209,23 @@ api:
 logLevel: info
 
 settings:
-  message:
-    template: |
-      You've got a Notification:
-      {{@message}} 
-      At {{@data.timestamp}} on {{@data.date}}.
-      Send using {{.NUMBER}}.
+  messageTemplate: |
+    You've got a Notification:
+    {{@message}} 
+    At {{@data.timestamp}} on {{@data.date}}.
+    Send using {{.NUMBER}}.
 
-    variables:
-      number: "+123400001"
-      recipients: ["+123400002", "group.id", "user.id"]
+  variables:
+    number: "+123400001"
+    recipients: ["+123400002", "group.id", "user.id"]
 
-    fieldMappings:
-      "@message": [{ field: "msg", score: 100 }]
+  dataAliases: 
+    "@message": [{ alias: "msg", score: 100 }]
 
-  access:
-    endpoints:
-      - !/v1/about
-      - /v2/send
+  blockedEndpoints:
+    - /v1/about
+  allowedEndpoints:
+    - /v2/send
 ```
 
 #### Token Configs
@@ -240,13 +240,10 @@ Here is an example:
 tokens: [LOOOONG_STRING]
 
 overrides:
-  message:
-    fieldMappings: # Disable Mappings
-    variables: # Disable Placeholder
-
-  access:
-    endpoints: # Disable Sending
-      - !/v2/send
+  variables: # Disable Placeholder
+  blockedEndpoints: # Disable Sending
+    - /v2/send
+  dataAliases: # Disable Aliases
 ```
 
 ### Templating
@@ -263,32 +260,31 @@ This makes advanced [Message Templates](#message-templates) like this one possib
 
 ```yaml
 settings:
-  message:
-    template: |
-      {{- $greeting := "Hello" -}}
-      {{ $greeting }}, {{ @name }}!
-      {{ if @age -}}
-      You are {{ @age }} years old.
-      {{- else -}}
-      Age unknown.
-      {{- end }}
-      Your friends:
-      {{- range @friends }}
-      - {{ . }}
-      {{- else }}
-      You have no friends.
-      {{- end }}
-      Profile details:
-      {{- range $key, $value := @profile }}
-      - {{ $key }}: {{ $value }}
-      {{- end }}
-      {{ define "footer" -}}
-      This is the footer for {{ @name }}.
-      {{- end }}
-      {{ template "footer" . -}}
-      ------------------------------------
-      Content-Type: {{ #Content_Type }}
-      Redacted Auth Header: {{ #Authorization }}
+    messageTemplate: |
+    {{- $greeting := "Hello" -}}
+    {{ $greeting }}, {{ @name }}!
+    {{ if @age -}}
+    You are {{ @age }} years old.
+    {{- else -}}
+    Age unknown.
+    {{- end }}
+    Your friends:
+    {{- range @friends }}
+    - {{ . }}
+    {{- else }}
+    You have no friends.
+    {{- end }}
+    Profile details:
+    {{- range $key, $value := @profile }}
+    - {{ $key }}: {{ $value }}
+    {{- end }}
+    {{ define "footer" -}}
+    This is the footer for {{ @name }}.
+    {{- end }}
+    {{ template "footer" . -}}
+    ------------------------------------
+    Content-Type: {{ #Content_Type }}
+    Redacted Auth Header: {{ #Authorization }}
 ```
 
 ### API Tokens
@@ -323,26 +319,25 @@ These Endpoints are blocked by default due to Security Risks.
 > [!NOTE]
 > Matching works by checking if the requested Endpoints starts with a Blocked or an Allowed Endpoint
 
-You can modify endpoints by configuring `access.endpoints` in your config:
+You can modify Blocked Endpoints by configuring `blockedEndpoints` in your config:
 
 ```yaml
 settings:
-  access:
-    endpoints:
-      - !/v1/register
-      - !/v1/unregister
-      - !/v1/qrcodelink
-      - !/v1/contacts
-      - /v2/send
+  blockedEndpoints: [/v1/register, /v1/unregister, /v1/qrcodelink, /v1/contacts]
 ```
 
-By default adding an endpoint explictly allows access to it, use `!` to block it instead.
+You can also override Blocked Endpoints by adding Allowed Endpoints to `allowedEndpoints`.
 
-| Config (Allow) | (Block)        |   Result   |     |                   |     |
-| :------------- | :------------- | :--------: | --- | :---------------: | --- |
-| `/v2/send`     | `unset`        |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
-| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
-| `/v2`          | `!/v2/send`    | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
+```yaml
+settings:
+  allowedEndpoints: [/v2/send]
+```
+
+| Config (Allow)                   | (Block)                             |   Result   |     |                   |     |
+| :------------------------------- | :---------------------------------- | :--------: | --- | :---------------: | --- |
+| `allowedEndpoints: ["/v2/send"]` | `unset`                             |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
+| `unset`                          | `blockedEndpoints: ["/v1/receive"]` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
+| `blockedEndpoints: ["/v2"]`      | `allowedEndpoints: ["/v2/send"]`    | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
 
 ### Variables
 
@@ -355,37 +350,35 @@ See [Placeholders](#placeholders).
 
 ```yaml
 settings:
-  message:
-    variables:
-      number: "+123400001",
-      recipients: ["+123400002", "group.id", "user.id"]
+  variables:
+    number: "+123400001",
+    recipients: ["+123400002", "group.id", "user.id"]
 ```
 
 ### Message Templates
 
 To customize the `message` attribute you can use **Message Templates** to build your message by using other Body Keys and Variables.
-Use `message.template` to configure:
+Use `messageTemplate` to configure:
 
 ```yaml
 settings:
-  message:
-    template: |
-      Your Message:
-      {{@message}}.
-      Sent with Secured Signal API.
+  messageTemplate: |
+    Your Message:
+    {{@message}}.
+    Sent with Secured Signal API.
 ```
 
 Message Templates support [Standard Golang Templating](#templating).
 Use `@data.key` to reference Body Keys, `#Content_Type` for Headers and `.KEY` for Variables.
 
-### Field Mappings
+### Data Aliases
 
-To improve compatibility with other services Secured Signal API provides **Field Mappings** and a built-in `message` Mapping.
+To improve compatibility with other services Secured Signal API provides **Data Aliases** and a built-in `message` Alias.
 
 <details>
-<summary><strong>Default `message` Mapping</strong></summary>
+<summary><strong>Default `message` Aliases</strong></summary>
 
-| Field        | Score | Field            | Score |
+| Alias        | Score | Alias            | Score |
 | ------------ | ----- | ---------------- | ----- |
 | msg          | 100   | data.content     | 9     |
 | content      | 99    | data.description | 8     |
@@ -397,24 +390,23 @@ To improve compatibility with other services Secured Signal API provides **Field
 
 </details>
 
-Secured Signal API will pick the best scoring Field (if available) to set the Key to the correct Value from the Request Body.
+Secured Signal API will pick the best scoring Data Alias (if available) to extract set the Key to the correct Value from the Request Body.
 
-Field Mappings can be added by setting `message.fieldMappings` in your config:
+Data Aliases can be added by setting `dataAliases` in your config:
 
 ```yaml
 settings:
-  message:
-    fieldMappings:
-      "@message":
-        [
-          { field: "msg", score: 80 },
-          { field: "data.message", score: 79 },
-          { field: "array[0].message", score: 78 },
-        ]
-      ".NUMBER": [{ field: "phone_number", score: 100 }]
+  dataAliases:
+    "@message":
+      [
+        { alias: "msg", score: 80 },
+        { alias: "data.message", score: 79 },
+        { alias: "array[0].message", score: 78 },
+      ]
+    ".NUMBER": [{ alias: "phone_number", score: 100 }]
 ```
 
-Use `@` for mapping to Body Keys and `.` for mapping to Variables.
+Use `@` for aliasing Body Keys and `.` for aliasing Variables.
 
 ## Contributing
 
