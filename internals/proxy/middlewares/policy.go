@@ -1,10 +1,12 @@
 package middlewares
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
 	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
@@ -64,13 +66,25 @@ func getPolicies(policies map[string]structure.FieldPolicy) (map[string]structur
 	return allowedFields, blockedFields
 }
 
-func hasField(field string, body map[string]any, headers map[string]any) bool {
+func getField(field string, body map[string]any, headers map[string]any) (any, error) {
 	isHeader := strings.HasPrefix(field, "#")
 	isBody := strings.HasPrefix(field, "@")
 
 	fieldWithoutPrefix := field[:1]
 
-	return (body[fieldWithoutPrefix] != nil && isBody) || (headers[fieldWithoutPrefix] != nil && isHeader)
+	var value any
+
+	if body[fieldWithoutPrefix] != nil && isBody {
+		value = body[fieldWithoutPrefix]
+	} else if headers[fieldWithoutPrefix] != nil && isHeader {
+		value = headers[fieldWithoutPrefix]
+	}
+
+	if value != nil {
+		return value, nil
+	}
+
+	return value, errors.New("field not found")
 }
 
 func doBlock(body map[string]any, headers map[string]any, policies map[string]structure.FieldPolicy) (bool, string) {
@@ -86,16 +100,26 @@ func doBlock(body map[string]any, headers map[string]any, policies map[string]st
 
 	var isExplictlyAllowed, isExplicitlyBlocked bool
 
-	for field := range allowed {
-		if hasField(field, body, headers) {
+	for field, policy := range allowed {
+		value, err := getField(field, body, headers)
+
+		log.Dev("Checking ", field, "...")
+		log.Dev("Got Value of ", jsonutils.ToJson(value))
+
+		if value == policy.Value && err == nil {
 			isExplictlyAllowed = true
 			cause = field
 			break
 		}
 	}
 
-	for field := range blocked {
-		if hasField(field, body, headers) {
+	for field, policy := range blocked {
+		value, err := getField(field, body, headers)
+
+		log.Dev("Checking ", field, "...")
+		log.Dev("Got Value of ", jsonutils.ToJson(value))
+
+		if value == policy.Value && err == nil {
 			isExplicitlyBlocked = true
 			cause = field
 			break
