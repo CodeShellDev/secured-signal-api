@@ -35,9 +35,9 @@ func (proxy Proxy) Init() http.Handler {
 		Use(m.Server).
 		Use(m.Auth).
 		Use(m.Endpoints).
-		Use(m.Policy).
 		Use(m.Template).
 		Use(m.Mapping).
+		Use(m.Policy).
 		Use(m.Message).
 		Then(proxy.Use())
 
