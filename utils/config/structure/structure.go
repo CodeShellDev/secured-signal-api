@@ -35,6 +35,6 @@ type ACCESS_SETTINGS struct {
 }
 
 type FieldPolicy struct {
-	Value				string						`koanf:"value"`
+	Value				any						    `koanf:"value"`
 	Action				string						`koanf:"action"`
 }
