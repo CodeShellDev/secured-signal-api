@@ -62,3 +62,12 @@ Go hand in hand for restricting unauthorized access and for ensuring least privi
 [Let's start blocking then!](./configuration/endpoints)
 
 ---
+
+## Field Policies
+
+**Field Policies** are a great way to disallow specific fields or even disallowing fields with unwanted values.
+This is really helpful when trying to block certain numbers from using certain tokens, and therefor mitigating risks of unwanted use of an token.
+
+Find more about this feature [here](./configuration/field-policies).
+
+---
