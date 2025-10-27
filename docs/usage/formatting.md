@@ -18,6 +18,17 @@ Which means that any valid Go template string will also work in Secured Signal A
 
 But you will mostly be using `{{.VAR}}`.
 
+### Keys
+
+`{{.VAR}}` might be the most common, but there is also `{{@data.key}}` (Body Keys) and `{{#Content_Type}}` (Headers), that can be used,
+when using any of these keys make sure that you understand how each key will be parsed and transformed:
+
+| Type                                   | Example             | Note             |
+| :------------------------------------- | :------------------ | :--------------- |
+| Body                                   | `{{@data.key}}`     |                  |
+| Header                                 | `{{#Content_Type}}` | `-` becomes `_`  |
+| [Variable](../configuration/variables) | `{{.VAR}}`          | always uppercase |
+
 ## String to Type
 
 > [!TIP]
