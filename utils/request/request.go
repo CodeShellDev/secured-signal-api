@@ -1,6 +1,7 @@
 package req
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
@@ -85,12 +86,13 @@ func GetFormData(body []byte) (map[string]any, error) {
 func GetBody(req *http.Request) ([]byte, error) {
 	bodyBytes, err := io.ReadAll(req.Body)
 
-	if err != nil {
-		req.Body.Close()
+	req.Body.Close()
 
+	req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+
+	if err != nil {
 		return nil, err
 	}
-	defer req.Body.Close()
 
 	return bodyBytes, nil
 }
