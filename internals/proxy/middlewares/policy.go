@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"net/http"
-	"slices"
 	"strings"
 
 	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
@@ -49,20 +48,29 @@ func policyHandler(next http.Handler) http.Handler {
 	})
 }
 
-func getPolicies(policies map[string]structure.FieldPolicy) ([]string, []string) {
-	blockedFields := []string{}
-	allowedFields := []string{}
+func getPolicies(policies map[string]structure.FieldPolicy) (map[string]structure.FieldPolicy, map[string]structure.FieldPolicy) {
+	blockedFields := map[string]structure.FieldPolicy{}
+	allowedFields := map[string]structure.FieldPolicy{}
 
 	for field, policy := range policies {
 		switch policy.Action {
 		case "block":
-			blockedFields = append(blockedFields, field)
+			blockedFields[field] = policy
 		case "allow":
-			allowedFields = append(allowedFields, field)
+			allowedFields[field] = policy
 		}
 	}
 
 	return allowedFields, blockedFields
+}
+
+func hasField(field string, body map[string]any, headers map[string]any) bool {
+	isHeader := strings.HasPrefix(field, "#")
+	isBody := strings.HasPrefix(field, "@")
+
+	fieldWithoutPrefix := field[:1]
+
+	return (body[fieldWithoutPrefix] != nil && isBody) || (headers[fieldWithoutPrefix] != nil && isHeader)
 }
 
 func doBlock(body map[string]any, headers map[string]any, policies map[string]structure.FieldPolicy) (bool, string) {
@@ -74,60 +82,39 @@ func doBlock(body map[string]any, headers map[string]any, policies map[string]st
 
 	allowed, blocked := getPolicies(policies)
 
-	var blockField string
+	var cause string
 
-	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try string) bool {
-		isHeader := strings.HasPrefix(try, "#")
-		isBody := strings.HasPrefix(try, "@")
+	var isExplictlyAllowed, isExplicitlyBlocked bool
 
-		tryWithoutPrefix := try[:1]
-
-		if body[tryWithoutPrefix] != nil && isBody {
-			blockField = try
-			return true
+	for field := range allowed {
+		if hasField(field, body, headers) {
+			isExplictlyAllowed = true
+			cause = field
+			break
 		}
+	}
 
-		if headers[tryWithoutPrefix] != nil && isHeader {
-			blockField = try
-			return true
+	for field := range blocked {
+		if hasField(field, body, headers) {
+			isExplicitlyBlocked = true
+			cause = field
+			break
 		}
-
-		return false
-	})
-
-	isExplictlyAllowed := slices.ContainsFunc(allowed, func(try string) bool {
-		isHeader := strings.HasPrefix(try, "#")
-		isBody := strings.HasPrefix(try, "@")
-
-		tryWithoutPrefix := try[:1]
-
-		// TODO: check for value before returning:
-		// body[tryWithoutPrefix] != try.Value
-
-		if body[tryWithoutPrefix] != nil && isBody {
-			return true
-		}
-
-		if headers[tryWithoutPrefix] != nil && isHeader {
-			return true
-		}
-
-		return false
-	})
+	}
 
 	// Block all except explicitly Allowed
 	if len(blocked) == 0 && len(allowed) != 0 {
-		return !isExplictlyAllowed, blockField
+		return !isExplictlyAllowed, cause
 	}
 
 	// Allow all except explicitly Blocked
 	if len(allowed) == 0 && len(blocked) != 0 {
-		return isExplicitlyBlocked, blockField
+		return isExplicitlyBlocked, cause
 	}
 
 	// Excplicitly Blocked except excplictly Allowed
 	if len(blocked) != 0 && len(allowed) != 0 {
-		return isExplicitlyBlocked && !isExplictlyAllowed, blockField
+		return isExplicitlyBlocked && !isExplictlyAllowed, cause
 	}
 
 	// Block all
