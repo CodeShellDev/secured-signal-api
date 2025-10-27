@@ -70,7 +70,7 @@ func getField(field string, body map[string]any, headers map[string]any) (any, e
 	isHeader := strings.HasPrefix(field, "#")
 	isBody := strings.HasPrefix(field, "@")
 
-	fieldWithoutPrefix := field[:1]
+	fieldWithoutPrefix := field[1:]
 
 	var value any
 
