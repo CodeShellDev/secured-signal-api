@@ -130,6 +130,8 @@ func normalizeKeys(config *koanf.Koanf) {
 	for _, key := range config.Keys() {
 		lower := strings.ToLower(key)
 
+		log.Dev("Lowering key: ", key)
+
 		data[lower] = config.Get(key)
 	}
 
