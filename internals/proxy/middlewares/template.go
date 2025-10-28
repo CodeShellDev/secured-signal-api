@@ -14,6 +14,7 @@ import (
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	query "github.com/codeshelldev/secured-signal-api/utils/query"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
+	"github.com/codeshelldev/secured-signal-api/utils/request/requestkeys"
 	templating "github.com/codeshelldev/secured-signal-api/utils/templating"
 )
 
@@ -30,10 +31,11 @@ func templateHandler(next http.Handler) http.Handler {
 			variables = getSettings("*").MESSAGE.VARIABLES
 		}
 
-		body, err := request.GetReqBody(w, req)
+		body, err := request.GetReqBody(req)
 
 		if err != nil {
 			log.Error("Could not get Request Body: ", err.Error())
+			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
 		}
 
 		bodyData := map[string]any{}
@@ -146,8 +148,8 @@ func prefixData(prefix string, data map[string]any) map[string]any {
 	return res
 }
 
-func cleanHeaders(headers map[string]any) map[string]any {
-	cleanedHeaders := map[string]any{}
+func cleanHeaders(headers map[string][]string) map[string][]string {
+	cleanedHeaders := map[string][]string{}
 
 	for key, value := range headers {
 		cleanedKey := strings.ReplaceAll(key, "-", "_")
@@ -155,30 +157,30 @@ func cleanHeaders(headers map[string]any) map[string]any {
 		cleanedHeaders[cleanedKey] = value
 	}
 
-	authHeader, ok := cleanedHeaders["Authorization"].([]string)
+	authHeader, ok := cleanedHeaders["Authorization"]
 
 	if !ok {
 		authHeader = []string{"UNKNOWN REDACTED"}
 	}
 
-	cleanedHeaders["Authorization"] = strings.Split(authHeader[0], ` `)[0] + " REDACTED"
+	cleanedHeaders["Authorization"] = []string{strings.Split(authHeader[0], ` `)[0] + " REDACTED"}
 
 	return cleanedHeaders
 }
 
-func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[string]any) (map[string]any, bool, error) {
+func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES map[string]any) (map[string]any, bool, error) {
 	var modified bool
 
 	headers = cleanHeaders(headers)
 
-	// Normalize #Var and @Var to .header_key_Var and .body_key_Var
-	normalizedBody, err := normalizeData("@", "body_key_", body)
+	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to "".header_key_Var" and ".body_key_Var"
+	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "body_key_", body)
 
 	if err != nil {
 		return body, false, err
 	}
 
-	normalizedBody, err = normalizeData("#", "header_key_", normalizedBody)
+	normalizedBody, err = normalizeData(requestkeys.HeaderPrefix, "header_key_", normalizedBody)
 
 	if err != nil {
 		return body, false, err
@@ -188,7 +190,7 @@ func TemplateBody(body map[string]any, headers map[string]any, VARIABLES map[str
 	prefixedBody := prefixData("body_key_", normalizedBody)
 
 	// Prefix Header Data with header_key_
-	prefixedHeaders := prefixData("header_key_", headers)
+	prefixedHeaders := prefixData("header_key_", request.ParseHeaders(headers))
 
 	variables := VARIABLES
 

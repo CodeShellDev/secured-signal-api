@@ -31,10 +31,11 @@ func mappingHandler(next http.Handler) http.Handler {
 			settings.MESSAGE.VARIABLES = getSettings("*").MESSAGE.VARIABLES
 		}
 
-		body, err := request.GetReqBody(w, req)
+		body, err := request.GetReqBody(req)
 
 		if err != nil {
 			log.Error("Could not get Request Body: ", err.Error())
+			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
 		}
 
 		var modifiedBody bool

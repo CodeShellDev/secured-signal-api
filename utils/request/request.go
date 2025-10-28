@@ -1,4 +1,4 @@
-package req
+package request
 
 import (
 	"bytes"
@@ -97,8 +97,8 @@ func GetBody(req *http.Request) ([]byte, error) {
 	return bodyBytes, nil
 }
 
-func GetReqHeaders(req *http.Request) map[string]any {
-	data := map[string]any{}
+func GetReqHeaders(req *http.Request) map[string][]string {
+	data := map[string][]string{}
 
 	for key, value := range req.Header {
 		data[key] = value
@@ -107,14 +107,26 @@ func GetReqHeaders(req *http.Request) map[string]any {
 	return data
 }
 
-func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
+func ParseHeaders(headers map[string][]string) map[string]any {
+	generic := make(map[string]any, len(headers))
+
+	for i, header := range headers {
+		if len(header) == 1 {
+			generic[i] = header[0]
+		} else {
+			generic[i] = header
+		}
+	}
+
+	return generic
+}
+
+func GetReqBody(req *http.Request) (Body, error) {
 	bytes, err := GetBody(req)
 
 	var isEmpty bool
 
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-
 		return Body{Empty: true}, err
 	}
 
@@ -129,16 +141,12 @@ func GetReqBody(w http.ResponseWriter, req *http.Request) (Body, error) {
 		data, err = GetJsonData(bytes)
 
 		if err != nil {
-			http.Error(w, "Bad Request: invalid JSON", http.StatusBadRequest)
-
 			return Body{Empty: true}, err
 		}
 	case Form:
 		data, err = GetFormData(bytes)
 
 		if err != nil {
-			http.Error(w, "Bad Request: invalid Form", http.StatusBadRequest)
-
 			return Body{Empty: true}, err
 		}
 	}

@@ -8,25 +8,25 @@ import (
 )
 
 func TestStringEscaping(t *testing.T) {
-	str1 := `\#`
+	str1 := `\-`
 
-	res1 := stringutils.IsEscaped(str1, "#")
+	res1 := stringutils.IsEscaped(str1, "-")
 
 	if !res1 {
 		t.Error("Expected: ", str1, " == true", "; Got: ", str1, " == ", res1)
 	}
 
-	str2 := "#"
+	str2 := "-"
 
-	res2 := stringutils.IsEscaped(str2, "#")
+	res2 := stringutils.IsEscaped(str2, "-")
 
 	if res2 {
 		t.Error("Expected: ", str2, " == false", "; Got: ", str2, " == ", res2)
 	}
 
-	str3 := `#\#`
+	str3 := `-\-`
 
-	res3 := stringutils.Contains(str3, "#")
+	res3 := stringutils.Contains(str3, "-")
 
 	if !res3 {
 		t.Error("Expected: ", str3, " == true", "; Got: ", str3, " == ", res3)
