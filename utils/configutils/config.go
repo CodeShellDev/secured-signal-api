@@ -1,4 +1,4 @@
-package config
+package configutils
 
 import (
 	"errors"
@@ -16,31 +16,40 @@ import (
 	"github.com/knadh/koanf/v2"
 )
 
-var defaultsLayer = koanf.New(".")
-var userLayer = koanf.New(".")
-var tokensLayer = koanf.New(".")
-
-var config *koanf.Koanf
-
 var configLock sync.Mutex
 
-func LoadFile(path string, config *koanf.Koanf, parser koanf.Parser) (koanf.Provider, error) {
+type Config struct {
+	Layer *koanf.Koanf
+	LoadFunc func()
+}
+
+func New() Config {
+	return Config{
+		Layer: koanf.New("."),
+	}
+}
+
+func (config Config) OnLoad(onLoad func()) {
+	config.LoadFunc = onLoad
+}
+
+func (config Config) LoadFile(path string, parser koanf.Parser) (koanf.Provider, error) {
 	log.Debug("Loading Config File: ", path)
 
 	f := file.Provider(path)
 
-	err := config.Load(f, parser)
+	err := config.Layer.Load(f, parser)
 
 	if err != nil {
 		return nil, err
 	}
 
-	WatchFile(path, f)
+	WatchFile(path, f, config.LoadFunc)
 
 	return f, err
 }
 
-func WatchFile(path string, f *file.File) {
+func WatchFile(path string, f *file.File, loadFunc func()) {
 	f.Watch(func(event any, err error) {
 		if err != nil {
 			return
@@ -51,11 +60,11 @@ func WatchFile(path string, f *file.File) {
 		configLock.Lock()
 		defer configLock.Unlock()
 
-		Load()
+		loadFunc()
 	})
 }
 
-func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) error {
+func (config Config) LoadDir(path string, dir string, parser koanf.Parser) error {
 	files, err := filepath.Glob(filepath.Join(dir, "*.yml"))
 
 	if err != nil {
@@ -65,30 +74,30 @@ func LoadDir(path string, dir string, config *koanf.Koanf, parser koanf.Parser) 
 	var array []any
 
 	for _, f := range files {
-		tmp := koanf.New(".")
+		tmp := New()
 
-		_, err := LoadFile(f, tmp, parser)
+		_, err := tmp.LoadFile(f, parser)
 
 		if err != nil {
 			return err
 		}
 
-		array = append(array, tmp.Raw())
+		array = append(array, tmp.Layer.Raw())
 	}
 
 	wrapper := map[string]any{
 		path: array,
 	}
 
-	return config.Load(confmap.Provider(wrapper, "."), nil)
+	return config.Layer.Load(confmap.Provider(wrapper, "."), nil)
 }
 
-func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
+func (config Config) LoadEnv() (koanf.Provider, error) {
 	e := env.Provider(".", env.Opt{
-		TransformFunc: normalizeEnv,
+		TransformFunc: config.NormalizeEnv,
 	})
 
-	err := config.Load(e, nil)
+	err := config.Layer.Load(e, nil)
 
 	if err != nil {
 		log.Fatal("Error loading env: ", err.Error())
@@ -97,8 +106,8 @@ func LoadEnv(config *koanf.Koanf) (koanf.Provider, error) {
 	return e, err
 }
 
-func templateConfig(config *koanf.Koanf) {
-	data := config.All()
+func (config Config) TemplateConfig() {
+	data := config.Layer.All()
 
 	for key, value := range data {
 		str, isStr := value.(string)
@@ -112,42 +121,41 @@ func templateConfig(config *koanf.Koanf) {
 		}
 	}
 
-	config.Load(confmap.Provider(data, "."), nil)
+	config.Layer.Load(confmap.Provider(data, "."), nil)
 }
 
-func mergeLayers() *koanf.Koanf {
-	final := koanf.New(".")
+func (config Config) MergeLayers(layers ...*koanf.Koanf) *koanf.Koanf {
+	for _, layer := range layers {
+		config.Layer.Merge(layer)
+	}
 
-	final.Merge(defaultsLayer)
-	final.Merge(userLayer)
-
-	return final
+	return config.Layer
 }
 
-func normalizeKeys(config *koanf.Koanf) {
+func (config Config) NormalizeKeys() {
 	data := map[string]any{}
 
-	for _, key := range config.Keys() {
+	for _, key := range config.Layer.Keys() {
 		lower := strings.ToLower(key)
 
 		log.Dev("Lowering key: ", key)
 
-		data[lower] = config.Get(key)
+		data[lower] = config.Layer.Get(key)
 	}
 
-	config.Delete("")
-	config.Load(confmap.Provider(data, "."), nil)
+	config.Layer.Delete("")
+	config.Layer.Load(confmap.Provider(data, "."), nil)
 }
 
 // Transforms Children of path
-func transformChildren(config *koanf.Koanf, path string, transform func(key string, value any) (string, any)) error {
+func (config Config) TransformChildren(path string, transform func(key string, value any) (string, any)) error {
 	var sub map[string]any
 
-	if !config.Exists(path) {
+	if !config.Layer.Exists(path) {
 		return errors.New("invalid path")
 	}
 
-	err := config.Unmarshal(path, &sub)
+	err := config.Layer.Unmarshal(path, &sub)
 
 	if err != nil {
 		return err
@@ -161,9 +169,9 @@ func transformChildren(config *koanf.Koanf, path string, transform func(key stri
 		transformed[newKey] = newVal
 	}
 
-	config.Delete(path)
+	config.Layer.Delete(path)
 
-	config.Load(confmap.Provider(map[string]any{
+	config.Layer.Load(confmap.Provider(map[string]any{
 		path: transformed,
 	}, "."), nil)
 
@@ -171,10 +179,10 @@ func transformChildren(config *koanf.Koanf, path string, transform func(key stri
 }
 
 // Does the same thing as transformChildren() but does it for each Array Item inside of root and transforms subPath
-func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath string, transform func(key string, value any) (string, any)) error {
+func (config Config) TransformChildrenUnderArray(root string, subPath string, transform func(key string, value any) (string, any)) error {
 	var array []map[string]any
 
-	err := config.Unmarshal(root, &array)
+	err := config.Layer.Unmarshal(root, &array)
 	if err != nil {
 		return err
 	}
@@ -182,19 +190,19 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 	transformed := []map[string]any{}
 
 	for _, data := range array {
-		tmp := koanf.New(".")
+		tmp := New()
 
-		tmp.Load(confmap.Provider(map[string]any{
+		tmp.Layer.Load(confmap.Provider(map[string]any{
 			"item": data,
 		}, "."), nil)
 
-		err := transformChildren(tmp, "item."+subPath, transform)
+		err := tmp.TransformChildren("item."+subPath, transform)
 
 		if err != nil {
 			return err
 		}
 
-		item := tmp.Get("item")
+		item := tmp.Layer.Get("item")
 
 		if item != nil {
 			itemMap, ok := item.(map[string]any)
@@ -205,16 +213,16 @@ func transformChildrenUnderArray(config *koanf.Koanf, root string, subPath strin
 		}
 	}
 
-	config.Delete(root)
+	config.Layer.Delete(root)
 
-	config.Load(confmap.Provider(map[string]any{
+	config.Layer.Load(confmap.Provider(map[string]any{
 		root: transformed,
 	}, "."), nil)
 
 	return nil
 }
 
-func normalizeEnv(key string, value string) (string, any) {
+func (config Config) NormalizeEnv(key string, value string) (string, any) {
 	key = strings.ToLower(key)
 	key = strings.ReplaceAll(key, "__", ".")
 	key = strings.ReplaceAll(key, "_", "")
