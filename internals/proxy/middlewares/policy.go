@@ -4,8 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
-	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
 	"github.com/codeshelldev/secured-signal-api/utils/request/requestkeys"
@@ -95,9 +94,6 @@ func doBlock(body map[string]any, headers map[string][]string, policies map[stri
 	for field, policy := range allowed {
 		value, err := getField(field, body, headers)
 
-		log.Dev("Checking ", field, "...")
-		log.Dev("Got Value of ", jsonutils.ToJson(value))
-
 		if value == policy.Value && err == nil {
 			isExplictlyAllowed = true
 			cause = field
@@ -107,9 +103,6 @@ func doBlock(body map[string]any, headers map[string][]string, policies map[stri
 
 	for field, policy := range blocked {
 		value, err := getField(field, body, headers)
-
-		log.Dev("Checking ", field, "...")
-		log.Dev("Got Value of ", jsonutils.ToJson(value))
 
 		if value == policy.Value && err == nil {
 			isExplicitlyBlocked = true

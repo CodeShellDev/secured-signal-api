@@ -7,7 +7,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/codeshelldev/secured-signal-api/utils/config"
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 

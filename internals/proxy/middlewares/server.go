@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/codeshelldev/secured-signal-api/utils/config"
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 )
 
 var Server Middleware = Middleware{
