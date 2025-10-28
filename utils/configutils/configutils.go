@@ -64,8 +64,8 @@ func WatchFile(path string, f *file.File, loadFunc func()) {
 	})
 }
 
-func (config *Config) LoadDir(path string, dir string, parser koanf.Parser) error {
-	files, err := filepath.Glob(filepath.Join(dir, "*.yml"))
+func (config *Config) LoadDir(path string, dir string, ext string, parser koanf.Parser) error {
+	files, err := filepath.Glob(filepath.Join(dir, "*" + ext))
 
 	if err != nil {
 		return nil

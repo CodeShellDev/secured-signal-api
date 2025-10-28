@@ -32,6 +32,8 @@ var tokensLayer = configutils.New()
 var configLayer = configutils.New()
 
 func Load() {
+	InitReload()
+
 	LoadDefaults()
 
 	LoadConfig()
@@ -55,6 +57,12 @@ func Load() {
 	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokensLayer.Layer.All()))
 }
 
+func InitReload() {
+	defaultsLayer.OnLoad(Load)
+	userLayer.OnLoad(Load)
+	tokensLayer.OnLoad(Load)
+}
+
 func InitEnv() {
 	ENV.PORT = strconv.Itoa(configLayer.Layer.Int("service.port"))
 
@@ -72,8 +80,6 @@ func InitEnv() {
 }
 
 func LoadDefaults() {
-	defaultsLayer.OnLoad(Load)
-
 	_, err := defaultsLayer.LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
 
 	if err != nil {
@@ -82,8 +88,6 @@ func LoadDefaults() {
 }
 
 func LoadConfig() {
-	userLayer.OnLoad(Load)
-
 	_, err := userLayer.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
 
 	if err != nil {
