@@ -16,6 +16,8 @@ type TOKEN_CONFIG_ struct {
 func LoadTokens() {
 	log.Debug("Loading Configs in ", ENV.TOKENS_DIR)
 
+	tokensLayer.OnLoad(Load)
+
 	err := tokensLayer.LoadDir("tokenconfigs", ENV.TOKENS_DIR, yaml.Parser())
 
 	if err != nil {

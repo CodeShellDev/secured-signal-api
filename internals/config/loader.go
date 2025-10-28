@@ -72,6 +72,8 @@ func InitEnv() {
 }
 
 func LoadDefaults() {
+	defaultsLayer.OnLoad(Load)
+
 	_, err := defaultsLayer.LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
 
 	if err != nil {
@@ -80,6 +82,8 @@ func LoadDefaults() {
 }
 
 func LoadConfig() {
+	userLayer.OnLoad(Load)
+
 	_, err := userLayer.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
 
 	if err != nil {
