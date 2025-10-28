@@ -25,11 +25,11 @@ var ENV *structure.ENV = &structure.ENV{
 	INSECURE:      false,
 }
 
-var defaultsLayer = configutils.New()
-var userLayer = configutils.New()
-var tokensLayer = configutils.New()
+var defaultsConf = configutils.New()
+var userConf = configutils.New()
+var tokenConf = configutils.New()
 
-var configLayer = configutils.New()
+var config = configutils.New()
 
 func Load() {
 	InitReload()
@@ -40,12 +40,12 @@ func Load() {
 
 	LoadTokens()
 
-	userLayer.LoadEnv()
+	userConf.LoadEnv()
 
-	configLayer.MergeLayers()
+	config.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
-	configLayer.NormalizeKeys()
-	configLayer.TemplateConfig()
+	config.NormalizeKeys()
+	config.TemplateConfig()
 
 	InitTokens()
 
@@ -53,36 +53,34 @@ func Load() {
 
 	log.Info("Finished Loading Configuration")
 
-	log.Dev("Loaded Config:\n" + jsonutils.ToJson(configLayer.Layer.All()))
-	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokensLayer.Layer.All()))
+	log.Dev("Loaded Config:\n" + jsonutils.ToJson(config.Layer.All()))
+	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokenConf.Layer.All()))
 }
 
 func InitReload() {
-	defaultsLayer.OnLoad(Load)
-	userLayer.OnLoad(Load)
-	tokensLayer.OnLoad(Load)
+	defaultsConf.OnLoad(Load)
+	userConf.OnLoad(Load)
+	tokenConf.OnLoad(Load)
 }
 
 func InitEnv() {
-	ENV.PORT = strconv.Itoa(configLayer.Layer.Int("service.port"))
+	ENV.PORT = strconv.Itoa(config.Layer.Int("service.port"))
 
-	ENV.LOG_LEVEL = strings.ToLower(configLayer.Layer.String("loglevel"))
+	ENV.LOG_LEVEL = strings.ToLower(config.Layer.String("loglevel"))
 
-	ENV.API_URL = configLayer.Layer.String("api.url")
+	ENV.API_URL = config.Layer.String("api.url")
 
 	var settings structure.SETTINGS
 
-	configLayer.TransformChildren("settings.message.variables", transformVariables)
+	config.TransformChildren("settings.message.variables", transformVariables)
 
-	configLayer.Layer.Unmarshal("settings", &settings)
+	config.Layer.Unmarshal("settings", &settings)
 
 	ENV.SETTINGS["*"] = &settings
 }
 
 func LoadDefaults() {
-	_, err := defaultsLayer.LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
-
-	log.Info("Back in loader.go:\n", defaultsLayer.Layer.Sprint())
+	_, err := defaultsConf.LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
 
 	if err != nil {
 		log.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
@@ -90,7 +88,7 @@ func LoadDefaults() {
 }
 
 func LoadConfig() {
-	_, err := userLayer.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
+	_, err := userConf.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
 
 	if err != nil {
 		_, fsErr := os.Stat(ENV.CONFIG_PATH)

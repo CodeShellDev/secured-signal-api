@@ -42,9 +42,7 @@ func (config *Config) LoadFile(path string, parser koanf.Parser) (koanf.Provider
 	f := file.Provider(path)
 
 	err := config.Layer.Load(f, parser)
-
-	log.Info("Config after load:\n", config.Layer.Sprint())
-
+	
 	if err != nil {
 		return nil, err
 	}

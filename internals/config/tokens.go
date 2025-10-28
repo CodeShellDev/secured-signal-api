@@ -15,26 +15,26 @@ type TOKEN_CONFIG_ struct {
 
 func LoadTokens() {
 	log.Debug("Loading Configs in ", ENV.TOKENS_DIR)
-	
-	err := tokensLayer.LoadDir("tokenconfigs", ENV.TOKENS_DIR, ".yml", yaml.Parser())
+
+	err := tokenConf.LoadDir("tokenconfigs", ENV.TOKENS_DIR, ".yml", yaml.Parser())
 
 	if err != nil {
 		log.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
 	}
 
-	tokensLayer.NormalizeKeys()
+	tokenConf.NormalizeKeys()
 
-	tokensLayer.TemplateConfig()
+	tokenConf.TemplateConfig()
 }
 
 func InitTokens() {
-	apiTokens := configLayer.Layer.Strings("api.tokens")
+	apiTokens := config.Layer.Strings("api.tokens")
 
 	var tokenConfigs []TOKEN_CONFIG_
 
-	tokensLayer.TransformChildrenUnderArray("tokenconfigs", "overrides.message.variables", transformVariables)
+	tokenConf.TransformChildrenUnderArray("tokenconfigs", "overrides.message.variables", transformVariables)
 
-	tokensLayer.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
+	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
 
 	overrides := parseTokenConfigs(tokenConfigs)
 
@@ -53,7 +53,7 @@ func InitTokens() {
 
 		// Set Blocked Endpoints on Config to User Layer Value
 		// => effectively ignoring Default Layer
-		configLayer.Layer.Set("settings.access.endpoints", userLayer.Layer.Strings("settings.access.endpoints"))
+		config.Layer.Set("settings.access.endpoints", userConf.Layer.Strings("settings.access.endpoints"))
 	}
 
 	if len(apiTokens) > 0 {
