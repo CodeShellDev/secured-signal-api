@@ -82,6 +82,8 @@ func InitEnv() {
 func LoadDefaults() {
 	_, err := defaultsLayer.LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
 
+	log.Info("Back in loader.go:\n", defaultsLayer.Layer.Sprint())
+
 	if err != nil {
 		log.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
 	}
