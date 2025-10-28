@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	stringutils "github.com/codeshelldev/secured-signal-api/utils/stringutils"
 
@@ -37,6 +38,8 @@ func (config *Config) LoadFile(path string, parser koanf.Parser) (koanf.Provider
 	log.Debug("Loading Config File: ", path)
 
 	f := file.Provider(path)
+
+	log.Info("*Config: ", jsonutils.ToJson(config))
 
 	err := config.Layer.Load(f, parser)
 
