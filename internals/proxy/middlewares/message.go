@@ -30,10 +30,11 @@ func messageHandler(next http.Handler) http.Handler {
 			messageTemplate = getSettings("*").MESSAGE.TEMPLATE
 		}
 
-		body, err := request.GetReqBody(w, req)
+		body, err := request.GetReqBody(req)
 
 		if err != nil {
 			log.Error("Could not get Request Body: ", err.Error())
+			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
 		}
 
 		bodyData := map[string]any{}
@@ -83,7 +84,7 @@ func messageHandler(next http.Handler) http.Handler {
 	})
 }
 
-func TemplateMessage(template string, bodyData map[string]any, headerData map[string]any, variables map[string]any) (map[string]any, error) {
+func TemplateMessage(template string, bodyData map[string]any, headerData map[string][]string, variables map[string]any) (map[string]any, error) {
 	bodyData["message_template"] = template
 
 	data, _, err := TemplateBody(bodyData, headerData, variables)

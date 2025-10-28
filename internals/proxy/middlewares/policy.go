@@ -3,11 +3,11 @@ package middlewares
 import (
 	"errors"
 	"net/http"
-	"strings"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
+	"github.com/codeshelldev/secured-signal-api/utils/request/requestkeys"
 )
 
 var Policy Middleware = Middleware{
@@ -25,10 +25,11 @@ func policyHandler(next http.Handler) http.Handler {
 			policies = getSettings("*").ACCESS.FIELD_POLOCIES
 		}
 
-		body, err := request.GetReqBody(w, req)
+		body, err := request.GetReqBody(req)
 
 		if err != nil {
 			log.Error("Could not get Request Body: ", err.Error())
+			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
 		}
 
 		if body.Empty {
@@ -65,19 +66,10 @@ func getPolicies(policies map[string]structure.FieldPolicy) (map[string]structur
 	return allowedFields, blockedFields
 }
 
-func getField(field string, body map[string]any, headers map[string]any) (any, error) {
-	isHeader := strings.HasPrefix(field, "#")
-	isBody := strings.HasPrefix(field, "@")
+func getField(key string, body map[string]any, headers map[string][]string) (any, error) {
+	field := requestkeys.Parse(key)
 
-	fieldWithoutPrefix := field[1:]
-
-	var value any
-
-	if body[fieldWithoutPrefix] != nil && isBody {
-		value = body[fieldWithoutPrefix]
-	} else if headers[fieldWithoutPrefix] != nil && isHeader {
-		value = headers[fieldWithoutPrefix]
-	}
+	value := requestkeys.GetFromBodyAndHeaders(field, body, headers)
 
 	if value != nil {
 		return value, nil
@@ -86,7 +78,7 @@ func getField(field string, body map[string]any, headers map[string]any) (any, e
 	return value, errors.New("field not found")
 }
 
-func doBlock(body map[string]any, headers map[string]any, policies map[string]structure.FieldPolicy) (bool, string) {
+func doBlock(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicy) (bool, string) {
 	if policies == nil {
 		return false, ""
 	} else if len(policies) <= 0 {
