@@ -83,8 +83,6 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 		field := t.Field(i)
 		fieldValue := v.Field(i)
 
-		log.Info("Field: ", field.Name)
-
 		key := field.Tag.Get("koanf")
 		if key == "" {
 			continue
@@ -97,8 +95,6 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 			Transform: transformTag,
 			Value:     getValueSafe(fieldValue),
 		}
-
-		log.Info(key, ": ", jsonutils.ToJson(getValueSafe(fieldValue)))
 
 		// Recursively walk nested structs
 		if fieldValue.Kind() == reflect.Struct || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) {
@@ -153,7 +149,11 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 			fn = funcs["default"]
 		}
 
+		log.Info("Key: ", key, "; Value: ", jsonutils.ToJson(value))
+
 		newKey, newValue := fn(key, value)
+
+		log.Info("[NEW] Key: ", newKey, "; Value: ", jsonutils.ToJson(newValue))
 
 		res[newKey] = newValue
 	}
