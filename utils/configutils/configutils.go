@@ -129,10 +129,17 @@ func getValueSafe(value reflect.Value) any {
 func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs map[string]func(string, any) (string, any)) {
 	transformTargets := GetKeyToTransformMap(structSchema)
 
-	all := config.Layer.Get(path)
+	var all map[string]any
+
+	if path == "." {
+		all = config.Layer.All()
+	} else {
+		all = config.Layer.Get(path).(map[string]any)
+	}
+
 	res := map[string]any{}
 
-	for key, value := range all.(map[string]any) {
+	for key, value := range all {
 		transformTarget, ok := transformTargets[key]
 		if !ok {
 			transformTarget.Transform = "default"
