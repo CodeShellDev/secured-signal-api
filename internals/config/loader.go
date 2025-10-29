@@ -78,6 +78,8 @@ func Normalize() {
 	tmpConf := configutils.New()
 	tmpConf.Layer.Load(confmap.Provider(config.Layer.Get("settings").(map[string]any), "."), nil)
 
+	log.Info("CONF:\n", tmpConf.Layer.Sprint())
+
 	// Apply transforms to the new configs
 	tmpConf.ApplyTransformFuncs(&ENV.SETTINGS, ".", transformFuncs)
 
@@ -103,7 +105,7 @@ func Normalize() {
 	LowercaseKeys(tokenConf)
 
 	// Load temporary configs back into paths
-	config.Layer.Load(confmap.Provider(tmpConf.Layer.All(), "."), nil)
+	config.Layer.Load(confmap.Provider(tmpConf.Layer.All(), "settings"), nil)
 	tokenConf.Layer.Load(confmap.Provider(tkConfigs.All(), "."), nil)
 }
 
