@@ -81,7 +81,7 @@ func Normalize() {
 	log.Info("CONF:\n", tmpConf.Layer.Sprint())
 
 	// Apply transforms to the new configs
-	tmpConf.ApplyTransformFuncs(&ENV.SETTINGS, ".", transformFuncs)
+	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, ".", transformFuncs)
 
 	tkConfigs := koanf.New(".")
 	tkConfigArray := []map[string]any{}
@@ -92,7 +92,7 @@ func Normalize() {
 
 		log.Info("TMP:\n", tmpTkConf.Layer.Sprint())
 
-		tmpTkConf.ApplyTransformFuncs(&ENV.SETTINGS, "overrides", transformFuncs)
+		tmpTkConf.ApplyTransformFuncs(&structure.SETTINGS{}, "overrides", transformFuncs)
 
 		tkConfigArray = append(tkConfigArray, tkConfig.All())
 	}
