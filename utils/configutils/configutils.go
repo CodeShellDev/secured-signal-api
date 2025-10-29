@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	stringutils "github.com/codeshelldev/secured-signal-api/utils/stringutils"
 
@@ -61,6 +62,8 @@ func (config *Config) LoadFile(path string, parser koanf.Parser) (koanf.Provider
 
 func GetKeyToTransformMap(value any) map[string]TransformTarget {
 	data := map[string]TransformTarget{}
+
+	log.Info("Value: ", jsonutils.ToJson(value))
 
 	if value == nil {
 		return data
