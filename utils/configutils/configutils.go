@@ -149,13 +149,21 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 			fn = funcs["default"]
 		}
 
-		log.Info("Key: ", key, "; Value: ", jsonutils.ToJson(value))
+		log.Info("Transform: ", transformTarget.Transform)
 
-		newKey, newValue := fn(key, value)
+		keyParts := strings.Split(key, ".")
+
+		lastKey := keyParts[len(keyParts)-1]
+
+		newKey, newValue := fn(lastKey, value)
 
 		log.Info("[NEW] Key: ", newKey, "; Value: ", jsonutils.ToJson(newValue))
 
-		res[newKey] = newValue
+		keyParts[len(keyParts)-1] = newKey
+
+		newFullKey := strings.Join(keyParts, ".")
+
+		res[newFullKey] = newValue
 	}
 
 	config.Layer.Delete("")
