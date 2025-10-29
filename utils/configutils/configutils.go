@@ -95,6 +95,8 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 			Value:     getValueSafe(fieldValue),
 		}
 
+		log.Info(key, ": ", v.String())
+
 		// Recursively walk nested structs
 		if fieldValue.Kind() == reflect.Struct || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) {
 

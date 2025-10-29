@@ -9,7 +9,7 @@ type ENV struct {
 	PORT          		string
 	API_URL       		string
 	API_TOKENS    		[]string
-	SETTINGS      		map[string]*SETTINGS
+	SETTINGS      		map[string]*SETTINGS		`koanf:"settings"`
 	INSECURE      		bool
 }
 
