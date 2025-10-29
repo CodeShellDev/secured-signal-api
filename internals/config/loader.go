@@ -88,6 +88,8 @@ func Normalize() {
 		tmpTkConf := configutils.New()
 		tmpTkConf.Layer.Load(confmap.Provider(tkConfig.All(), "."), nil)
 
+		log.Info("TMP:\n", tmpTkConf.Layer.Sprint())
+
 		tmpTkConf.ApplyTransformFuncs(&ENV.SETTINGS, "overrides", transformFuncs)
 
 		tkConfigArray = append(tkConfigArray, tkConfig.All())
