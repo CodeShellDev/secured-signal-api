@@ -14,27 +14,27 @@ type ENV struct {
 }
 
 type SETTINGS struct {
-	ACCESS 				ACCESS_SETTINGS 			`koanf:"access"`
-	MESSAGE				MESSAGE_SETTINGS			`koanf:"message"`
+	ACCESS 				ACCESS_SETTINGS 			`koanf:"access" transform:"lower"`
+	MESSAGE				MESSAGE_SETTINGS			`koanf:"message" transform:"lower"`
 }
 
 type MESSAGE_SETTINGS struct {
-	VARIABLES         	map[string]any              `koanf:"variables"`
+	VARIABLES         	map[string]any              `koanf:"variables" transform:"upper"`
 	FIELD_MAPPINGS      map[string][]FieldMapping	`koanf:"fieldmappings"`
-	TEMPLATE  			string                      `koanf:"template"`
+	TEMPLATE  			string                      `koanf:"template" transform:"lower"`
 }
 
 type FieldMapping struct {
-	Field 				string 						`koanf:"field"`
-	Score 				int    						`koanf:"score"`
+	Field 				string 						`koanf:"field" transform:"lower"`
+	Score 				int    						`koanf:"score" transform:"lower"`
 }
 
 type ACCESS_SETTINGS struct {
-	ENDPOINTS			[]string					`koanf:"endpoints"`
+	ENDPOINTS			[]string					`koanf:"endpoints" transform:"lower"`
 	FIELD_POLOCIES		map[string]FieldPolicy		`koanf:"fieldpolicies"`
 }
 
 type FieldPolicy struct {
-	Value				any						    `koanf:"value"`
-	Action				string						`koanf:"action"`
+	Value				any						    `koanf:"value" transform:"lower"`
+	Action				string						`koanf:"action" transform:"lower"`
 }

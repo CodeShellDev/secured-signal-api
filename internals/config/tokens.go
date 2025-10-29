@@ -22,8 +22,6 @@ func LoadTokens() {
 		log.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
 	}
 
-	tokenConf.NormalizeKeys()
-
 	tokenConf.TemplateConfig()
 }
 
@@ -32,7 +30,7 @@ func InitTokens() {
 
 	var tokenConfigs []TOKEN_CONFIG_
 
-	tokenConf.TransformChildrenUnderArray("tokenconfigs", "overrides.message.variables", transformVariables)
+	//tokenConf.TransformChildrenUnderArray("tokenconfigs", "overrides.message.variables", transformVariables)
 
 	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
 

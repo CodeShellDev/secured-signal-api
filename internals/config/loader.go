@@ -44,7 +44,8 @@ func Load() {
 
 	config.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
-	config.NormalizeKeys()
+	config.ApplyTransformFuncs(&ENV, transformFuncs)
+
 	config.TemplateConfig()
 
 	InitTokens()
@@ -72,7 +73,7 @@ func InitEnv() {
 
 	var settings structure.SETTINGS
 
-	config.TransformChildren("settings.message.variables", transformVariables)
+	//config.TransformChildren("settings.message.variables", transformVariables)
 
 	config.Layer.Unmarshal("settings", &settings)
 

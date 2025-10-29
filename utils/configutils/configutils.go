@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"sync"
 
@@ -21,6 +22,12 @@ var configLock sync.Mutex
 type Config struct {
 	Layer *koanf.Koanf
 	LoadFunc func()
+}
+
+type TransformTarget struct {
+	Key string
+	Transform string
+	Value any
 }
 
 func New() *Config {
@@ -50,6 +57,97 @@ func (config *Config) LoadFile(path string, parser koanf.Parser) (koanf.Provider
 	WatchFile(path, f, config.LoadFunc)
 
 	return f, err
+}
+
+func GetKeyToTransformMap(value any) map[string]TransformTarget {
+	data := map[string]TransformTarget{}
+
+	if value == nil {
+		return data
+	}
+
+	v := reflect.ValueOf(value)
+	t := reflect.TypeOf(value)
+
+	if t.Kind() == reflect.Ptr {
+		v = v.Elem()
+		t = t.Elem()
+	}
+
+	if t.Kind() != reflect.Struct {
+		return data
+	}
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		fieldValue := v.Field(i)
+
+		key := field.Tag.Get("koanf")
+		if key == "" {
+			continue
+		}
+
+		transformTag := field.Tag.Get("transform")
+
+		data[key] = TransformTarget{
+			Key:       key,
+			Transform: transformTag,
+			Value:     getValueSafe(fieldValue),
+		}
+
+		// Recursively walk nested structs
+		if fieldValue.Kind() == reflect.Struct || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) {
+
+			sub := GetKeyToTransformMap(fieldValue.Interface())
+
+			for subKey, subValue := range sub {
+				fullKey := key + "." + subKey
+
+				data[fullKey] = subValue
+			}
+		}
+	}
+
+	return data
+}
+
+func getValueSafe(value reflect.Value) any {
+	if !value.IsValid() {
+		return nil
+	}
+	if value.Kind() == reflect.Ptr {
+		if value.IsNil() {
+			return nil
+		}
+		return getValueSafe(value.Elem())
+	}
+	return value.Interface()
+}
+
+func (config Config) ApplyTransformFuncs(structSchema any, funcs map[string]func(string, any) (string, any)) {
+	transformTargets := GetKeyToTransformMap(structSchema)
+
+	all := config.Layer.All()
+	res := map[string]any{}
+
+	for key, value := range all {
+		transformTarget, ok := transformTargets[key]
+		if !ok {
+			transformTarget.Transform = "default"
+		}
+
+		fn, ok := funcs[transformTarget.Transform]
+		if !ok {
+			fn = funcs["default"]
+		}
+
+		newKey, newValue := fn(key, value)
+
+		res[newKey] = newValue
+	}
+
+	config.Layer.Delete("")
+	config.Layer.Load(confmap.Provider(res, "."), nil)
 }
 
 func WatchFile(path string, f *file.File, loadFunc func()) {
@@ -131,21 +229,6 @@ func (config *Config) MergeLayers(layers ...*koanf.Koanf) {
 	for _, layer := range layers {
 		config.Layer.Merge(layer)
 	}
-}
-
-func (config *Config) NormalizeKeys() {
-	data := map[string]any{}
-
-	for _, key := range config.Layer.Keys() {
-		lower := strings.ToLower(key)
-
-		log.Dev("Lowering key: ", key)
-
-		data[lower] = config.Layer.Get(key)
-	}
-
-	config.Layer.Delete("")
-	config.Layer.Load(confmap.Provider(data, "."), nil)
 }
 
 // Transforms Children of path
