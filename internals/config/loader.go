@@ -13,6 +13,8 @@ import (
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 
 	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/confmap"
+	"github.com/knadh/koanf/v2"
 )
 
 var ENV *structure.ENV = &structure.ENV{
@@ -44,7 +46,7 @@ func Load() {
 
 	config.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
-	config.ApplyTransformFuncs(&ENV, transformFuncs)
+	Normalize()
 
 	config.TemplateConfig()
 
@@ -56,6 +58,51 @@ func Load() {
 
 	log.Dev("Loaded Config:\n" + jsonutils.ToJson(config.Layer.All()))
 	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokenConf.Layer.All()))
+}
+
+func LowercaseKeys(config *configutils.Config) {
+	data := map[string]any{}
+
+	for _, key := range config.Layer.Keys() {
+		lower := strings.ToLower(key)
+
+		data[lower] = config.Layer.Get(key)
+	}
+
+	config.Layer.Delete("")
+	config.Layer.Load(confmap.Provider(data, "."), nil)
+}
+
+func Normalize() {
+	// Create temporary configs
+	tmpConf := configutils.New()
+	tmpConf.Layer.Load(confmap.Provider(config.Layer.Get("settings").(map[string]any), "."), nil)
+
+	// Apply transforms to the new configs
+	tmpConf.ApplyTransformFuncs(&ENV.SETTINGS, ".", transformFuncs)
+
+	tkConfigs := koanf.New(".")
+	tkConfigArray := []map[string]any{}
+
+	for _, tkConfig := range tokenConf.Layer.Slices("tokensconfig") {
+		tmpTkConf := configutils.New()
+		tmpTkConf.Layer.Load(confmap.Provider(tkConfig.All(), "."), nil)
+
+		tmpTkConf.ApplyTransformFuncs(&ENV.SETTINGS, "overrides", transformFuncs)
+
+		tkConfigArray = append(tkConfigArray, tkConfig.All())
+	}
+
+	// Merge token configs together into new temporary config
+	tkConfigs.Set("tokenconfigs", tkConfigArray)
+
+	// Lowercase actual configs
+	LowercaseKeys(config)
+	LowercaseKeys(tokenConf)
+
+	// Load temporary configs back into paths
+	config.Layer.Load(confmap.Provider(tmpConf.Layer.All(), "."), nil)
+	tokenConf.Layer.Load(confmap.Provider(tkConfigs.All(), "."), nil)
 }
 
 func InitReload() {
