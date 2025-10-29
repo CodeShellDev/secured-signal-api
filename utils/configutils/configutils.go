@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	stringutils "github.com/codeshelldev/secured-signal-api/utils/stringutils"
 
@@ -97,7 +98,7 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 			Value:     getValueSafe(fieldValue),
 		}
 
-		log.Info(key, ": ", v.String())
+		log.Info(key, ": ", jsonutils.ToJson(getValueSafe(fieldValue)))
 
 		// Recursively walk nested structs
 		if fieldValue.Kind() == reflect.Struct || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) {
@@ -151,8 +152,6 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 		if !ok {
 			fn = funcs["default"]
 		}
-
-		log.Info()
 
 		newKey, newValue := fn(key, value)
 
