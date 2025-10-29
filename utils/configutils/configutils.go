@@ -82,6 +82,8 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 		field := t.Field(i)
 		fieldValue := v.Field(i)
 
+		log.Info("Field: ", field.Name)
+
 		key := field.Tag.Get("koanf")
 		if key == "" {
 			continue
@@ -149,6 +151,8 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 		if !ok {
 			fn = funcs["default"]
 		}
+
+		log.Info()
 
 		newKey, newValue := fn(key, value)
 

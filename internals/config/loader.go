@@ -86,7 +86,7 @@ func Normalize() {
 	tkConfigs := koanf.New(".")
 	tkConfigArray := []map[string]any{}
 
-	for _, tkConfig := range tokenConf.Layer.Slices("tokensconfig") {
+	for _, tkConfig := range tokenConf.Layer.Slices("tokenconfigs") {
 		tmpTkConf := configutils.New()
 		tmpTkConf.Layer.Load(confmap.Provider(tkConfig.All(), "."), nil)
 
