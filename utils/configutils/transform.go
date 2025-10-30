@@ -125,7 +125,7 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 		res := map[string]any{}
 
 		for k, v := range asserted {
-			fullKey := newKey + "." + k
+			fullKey := newKey + k + "."
 
 			childTarget := TransformTarget{
 				Key: fullKey,
@@ -145,7 +145,7 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 		res := []any{}
 		
 		for i, child := range asserted {
-			fullKey := newKey + "." + strconv.Itoa(i)
+			fullKey := newKey + strconv.Itoa(i) + "."
 
 			childTarget := TransformTarget{
 				Key: strconv.Itoa(i),
