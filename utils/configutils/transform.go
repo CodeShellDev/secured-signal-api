@@ -120,12 +120,18 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 
 	newKey, _ := applyTransformToAny(key, value, transformTargets, funcs)
 
+	newKeyWithDot := newKey
+
+	if newKey != "" {
+		newKeyWithDot = newKey + "."
+	}
+
 	switch asserted := value.(type) {
 	case map[string]any:
 		res := map[string]any{}
 
 		for k, v := range asserted {
-			fullKey := newKey + k + "."
+			fullKey := newKeyWithDot + k
 
 			childTarget := TransformTarget{
 				Key: fullKey,
@@ -145,7 +151,7 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 		res := []any{}
 		
 		for i, child := range asserted {
-			fullKey := newKey + strconv.Itoa(i) + "."
+			fullKey := newKeyWithDot + strconv.Itoa(i)
 
 			childTarget := TransformTarget{
 				Key: strconv.Itoa(i),
