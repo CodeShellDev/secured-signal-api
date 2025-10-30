@@ -77,9 +77,7 @@ func Normalize() {
 	// Create temporary configs
 	tmpConf := configutils.New()
 	tmpConf.Layer.Load(confmap.Provider(config.Layer.Get("settings").(map[string]any), "."), nil)
-
-	log.Info("CONF:\n", tmpConf.Layer.Sprint())
-
+	
 	// Apply transforms to the new configs
 	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, ".", transformFuncs)
 
@@ -89,8 +87,6 @@ func Normalize() {
 	for _, tkConfig := range tokenConf.Layer.Slices("tokenconfigs") {
 		tmpTkConf := configutils.New()
 		tmpTkConf.Layer.Load(confmap.Provider(tkConfig.All(), "."), nil)
-
-		log.Info("TMP:\n", tmpTkConf.Layer.Sprint())
 
 		tmpTkConf.ApplyTransformFuncs(&structure.SETTINGS{}, "overrides", transformFuncs)
 

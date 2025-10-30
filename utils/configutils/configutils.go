@@ -90,11 +90,15 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 			continue
 		}
 
+		lower := strings.ToLower(key)
+
 		transformTag := field.Tag.Get("transform")
 		childTransformTag := field.Tag.Get("childrentransform")
 
-		data[key] = TransformTarget{
-			Key:               key,
+		log.Dev("Registering ", lower, " with ", transformTag, " and ", childTransformTag)
+
+		data[lower] = TransformTarget{
+			Key:               lower,
 			Transform:         transformTag,
 			ChildrenTransform: childTransformTag,
 			Value:             getValueSafe(fieldValue),
@@ -106,7 +110,7 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 			sub := GetKeyToTransformMap(fieldValue.Interface())
 
 			for subKey, subValue := range sub {
-				fullKey := key + "." + subKey
+				fullKey := lower + "." + strings.ToLower(subKey)
 
 				data[fullKey] = subValue
 			}
@@ -204,7 +208,9 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 }
 
 func applyTransformToAny(key string, value any, transformTargets map[string]TransformTarget, funcs map[string]func(string, any) (string, any)) (string, any) {
-	transformTarget, ok := transformTargets[key]
+	lower := strings.ToLower(key)
+
+	transformTarget, ok := transformTargets[lower]
 	if !ok {
 		transformTarget.Transform = "default"
 	}
@@ -222,6 +228,8 @@ func applyTransformToAny(key string, value any, transformTargets map[string]Tran
 	keyParts[len(keyParts)-1] = newKey
 
 	newFullKey := strings.Join(keyParts, ".")
+
+	log.Dev("Applying ", lower, " with ", transformTarget.Transform, " to ", newFullKey)
 
 	return newFullKey, newValue
 }
