@@ -94,9 +94,12 @@ func getValueSafe(value reflect.Value) any {
 func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs map[string]func(string, any) (string, any)) {
 	transformTargets := GetKeyToTransformMap(structSchema)
 
-	log.Dev("TransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
+	data := config.Unflatten(path)
 
-	_, res := applyTransform("", config.Unflatten(path), transformTargets, funcs)
+	log.Dev("TransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
+	log.Dev("BeginningMapData:\n-------------------------------------------\n", jsonutils.ToJson(data), "\n-------------------------------------------")
+
+	_, res := applyTransform("", data, transformTargets, funcs)
 
 	mapRes, ok := res.(map[string]any)
 
