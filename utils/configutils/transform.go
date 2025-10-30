@@ -138,6 +138,8 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 	case map[string]any:
 		res := map[string]any{}
 
+		log.Dev("MapData:\n-------------------------------------------\n", jsonutils.ToJson(asserted), "\n-------------------------------------------")
+
 		for k, v := range asserted {
 			fullKey := newKeyWithDot + k
 
