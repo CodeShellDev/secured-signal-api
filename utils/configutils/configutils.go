@@ -29,7 +29,7 @@ type Config struct {
 type TransformTarget struct {
 	Key string
 	Transform string
-	ChildrenTransform string
+	ChildTransform string
 	Value any
 }
 
@@ -93,14 +93,14 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 		lower := strings.ToLower(key)
 
 		transformTag := field.Tag.Get("transform")
-		childTransformTag := field.Tag.Get("childrentransform")
+		childTransformTag := field.Tag.Get("childtransform")
 
 		log.Dev("Registering ", lower, " with ", transformTag, " and ", childTransformTag)
 
 		data[lower] = TransformTarget{
 			Key:               lower,
 			Transform:         transformTag,
-			ChildrenTransform: childTransformTag,
+			ChildTransform: childTransformTag,
 			Value:             getValueSafe(fieldValue),
 		}
 
@@ -172,8 +172,8 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 		for k, v := range asserted {
 			childTarget := TransformTarget{
 				Key: k,
-				Transform: target.ChildrenTransform,
-				ChildrenTransform: target.ChildrenTransform,
+				Transform: target.ChildTransform,
+				ChildTransform: target.ChildTransform,
 			}
 
 			targets[k] = childTarget
@@ -190,8 +190,8 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 		for i, child := range asserted {
 			childTarget := TransformTarget{
 				Key: strconv.Itoa(i),
-				Transform: target.ChildrenTransform,
-				ChildrenTransform: target.ChildrenTransform,
+				Transform: target.ChildTransform,
+				ChildTransform: target.ChildTransform,
 			}
 
 			targets[strconv.Itoa(i)] = childTarget
