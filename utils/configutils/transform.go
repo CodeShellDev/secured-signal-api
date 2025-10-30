@@ -121,7 +121,7 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 
 	targets := map[string]TransformTarget{}
 		
-	maps.Copy(transformTargets, targets)
+	maps.Copy(targets, transformTargets)
 
 	newKey, _ := applyTransformToAny(lower, value, transformTargets, funcs)
 
