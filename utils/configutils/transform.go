@@ -98,8 +98,7 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 
 	log.Dev("TransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
 	log.Dev("InitMapData:\n-------------------------------------------\n", jsonutils.ToJson(data), "\n-------------------------------------------")
-	log.Dev("RawMapData:\n-------------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n-------------------------------------------")
-
+	
 	_, res := applyTransform("", data, transformTargets, funcs)
 
 	mapRes, ok := res.(map[string]any)
@@ -139,13 +138,17 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 		for k, v := range asserted {
 			fullKey := newKeyWithDot + k
 
-			childTarget := TransformTarget{
-				Key: fullKey,
-				Transform: target.ChildTransform,
-				ChildTransform: target.ChildTransform,
-			}
+			_, ok := targets[fullKey]
 
-			targets[fullKey] = childTarget
+			if !ok {
+				childTarget := TransformTarget{
+					Key: fullKey,
+					Transform: target.ChildTransform,
+					ChildTransform: target.ChildTransform,
+				}
+
+				targets[fullKey] = childTarget
+			}
 
 			childKey, childValue := applyTransform(fullKey, v, targets, funcs)
 
@@ -159,13 +162,17 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 		for i, child := range asserted {
 			fullKey := newKeyWithDot + strconv.Itoa(i)
 
-			childTarget := TransformTarget{
-				Key: strconv.Itoa(i),
-				Transform: target.ChildTransform,
-				ChildTransform: target.ChildTransform,
-			}
+			_, ok := targets[fullKey]
 
-			targets[fullKey] = childTarget
+			if !ok {
+				childTarget := TransformTarget{
+					Key: fullKey,
+					Transform: target.ChildTransform,
+					ChildTransform: target.ChildTransform,
+				}
+
+				targets[fullKey] = childTarget
+			}
 			
 			_, childValue := applyTransform(fullKey, child, targets, funcs)
 
