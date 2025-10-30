@@ -67,6 +67,36 @@ func WatchFile(path string, f *file.File, loadFunc func()) {
 	})
 }
 
+func (config *Config) Unflatten(path string) map[string]any {
+	var all map[string]any
+
+	if path == "." {
+		all = config.Layer.All()
+	} else {
+		all = config.Layer.Get(path).(map[string]any)
+	}
+
+    res := map[string]any{}
+
+    for key, value := range all {
+        parts := strings.Split(key, ".")
+
+        for i, p := range parts {
+            if i == len(parts)-1 {
+                res[p] = value
+            } else {
+                if _, ok := res[p]; !ok {
+                    res[p] = map[string]any{}
+                }
+                res = res[p].(map[string]any)
+            }
+        }
+    }
+	
+    return res
+}
+
+
 func (config *Config) LoadDir(path string, dir string, ext string, parser koanf.Parser) error {
 	files, err := filepath.Glob(filepath.Join(dir, "*" + ext))
 

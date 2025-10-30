@@ -96,15 +96,7 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 
 	log.Dev("TransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
 
-	var all map[string]any
-
-	if path == "." {
-		all = config.Layer.All()
-	} else {
-		all = config.Layer.Get(path).(map[string]any)
-	}
-
-	_, res := applyTransform("", all, transformTargets, funcs)
+	_, res := applyTransform("", config.Unflatten(path), transformTargets, funcs)
 
 	mapRes, ok := res.(map[string]any)
 
