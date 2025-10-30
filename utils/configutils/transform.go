@@ -117,13 +117,16 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 }
 
 func applyTransform(key string, value any, transformTargets map[string]TransformTarget, funcs map[string]func(string, any) (string, any)) (string, any) {
-	target := transformTargets[key]
+	lower := strings.ToLower(key)
+	target := transformTargets[lower]
+
+	log.Dev("Got ", target.Transform, " for ", lower)
 
 	targets := map[string]TransformTarget{}
 		
 	maps.Copy(transformTargets, targets)
 
-	newKey, _ := applyTransformToAny(key, value, transformTargets, funcs)
+	newKey, _ := applyTransformToAny(lower, value, transformTargets, funcs)
 
 	newKeyWithDot := newKey
 
