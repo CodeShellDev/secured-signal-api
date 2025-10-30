@@ -97,7 +97,8 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 	data := config.Unflatten(path)
 
 	log.Dev("TransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
-	log.Dev("BeginningMapData:\n-------------------------------------------\n", jsonutils.ToJson(data), "\n-------------------------------------------")
+	log.Dev("InitMapData:\n-------------------------------------------\n", jsonutils.ToJson(data), "\n-------------------------------------------")
+	log.Dev("RawMapData:\n-------------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n-------------------------------------------")
 
 	_, res := applyTransform("", data, transformTargets, funcs)
 
