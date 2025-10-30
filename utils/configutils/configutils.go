@@ -2,11 +2,8 @@ package configutils
 
 import (
 	"errors"
-	"maps"
 	"os"
 	"path/filepath"
-	"reflect"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -24,13 +21,6 @@ var configLock sync.Mutex
 type Config struct {
 	Layer *koanf.Koanf
 	LoadFunc func()
-}
-
-type TransformTarget struct {
-	Key string
-	Transform string
-	ChildTransform string
-	Value any
 }
 
 func New() *Config {
@@ -60,178 +50,6 @@ func (config *Config) LoadFile(path string, parser koanf.Parser) (koanf.Provider
 	WatchFile(path, f, config.LoadFunc)
 
 	return f, err
-}
-
-func GetKeyToTransformMap(value any) map[string]TransformTarget {
-	data := map[string]TransformTarget{}
-
-	if value == nil {
-		return data
-	}
-
-	v := reflect.ValueOf(value)
-	t := reflect.TypeOf(value)
-
-	if t.Kind() == reflect.Ptr {
-		v = v.Elem()
-		t = t.Elem()
-	}
-
-	if t.Kind() != reflect.Struct {
-		return data
-	}
-
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		fieldValue := v.Field(i)
-
-		key := field.Tag.Get("koanf")
-		if key == "" {
-			continue
-		}
-
-		lower := strings.ToLower(key)
-
-		transformTag := field.Tag.Get("transform")
-		childTransformTag := field.Tag.Get("childtransform")
-
-		log.Dev("Registering ", lower, " with ", transformTag, " and ", childTransformTag)
-
-		data[lower] = TransformTarget{
-			Key:               lower,
-			Transform:         transformTag,
-			ChildTransform: childTransformTag,
-			Value:             getValueSafe(fieldValue),
-		}
-
-		// Recursively walk nested structs
-		if fieldValue.Kind() == reflect.Struct || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) {
-
-			sub := GetKeyToTransformMap(fieldValue.Interface())
-
-			for subKey, subValue := range sub {
-				fullKey := lower + "." + strings.ToLower(subKey)
-
-				data[fullKey] = subValue
-			}
-		}
-	}
-
-	return data
-}
-
-func getValueSafe(value reflect.Value) any {
-	if !value.IsValid() {
-		return nil
-	}
-	if value.Kind() == reflect.Ptr {
-		if value.IsNil() {
-			return nil
-		}
-		return getValueSafe(value.Elem())
-	}
-	return value.Interface()
-}
-
-func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs map[string]func(string, any) (string, any)) {
-	transformTargets := GetKeyToTransformMap(structSchema)
-
-	var all map[string]any
-
-	if path == "." {
-		all = config.Layer.All()
-	} else {
-		all = config.Layer.Get(path).(map[string]any)
-	}
-
-	_, res := applyTransform("", all, transformTargets, funcs)
-
-	mapRes, ok := res.(map[string]any)
-
-	if !ok {
-		return
-	}
-
-	config.Layer.Delete("")
-	config.Layer.Load(confmap.Provider(mapRes, "."), nil)
-}
-
-func applyTransform(key string, value any, transformTargets map[string]TransformTarget, funcs map[string]func(string, any) (string, any)) (string, any) {
-	target := transformTargets[key]
-
-	targets := map[string]TransformTarget{}
-		
-	maps.Copy(transformTargets, targets)
-
-	newKey, _ := applyTransformToAny(key, value, transformTargets, funcs)
-
-	switch asserted := value.(type) {
-	case map[string]any:
-		res := map[string]any{}
-
-		for k, v := range asserted {
-			childTarget := TransformTarget{
-				Key: k,
-				Transform: target.ChildTransform,
-				ChildTransform: target.ChildTransform,
-			}
-
-			targets[k] = childTarget
-
-			childKey, childValue := applyTransform(k, v, targets, funcs)
-
-			res[childKey] = childValue
-		}
-
-		return newKey, res
-	case []any:
-		res := []any{}
-		
-		for i, child := range asserted {
-			childTarget := TransformTarget{
-				Key: strconv.Itoa(i),
-				Transform: target.ChildTransform,
-				ChildTransform: target.ChildTransform,
-			}
-
-			targets[strconv.Itoa(i)] = childTarget
-			
-			_, childValue := applyTransform(strconv.Itoa(i), child, targets, funcs)
-
-			res = append(res, childValue)
-		}
-
-		return newKey, res
-	default:
-		return applyTransformToAny(key, asserted, transformTargets, funcs)
-	}
-}
-
-func applyTransformToAny(key string, value any, transformTargets map[string]TransformTarget, funcs map[string]func(string, any) (string, any)) (string, any) {
-	lower := strings.ToLower(key)
-
-	transformTarget, ok := transformTargets[lower]
-	if !ok {
-		transformTarget.Transform = "default"
-	}
-
-	fn, ok := funcs[transformTarget.Transform]
-	if !ok {
-		fn = funcs["default"]
-	}
-
-	keyParts := strings.Split(key, ".")
-
-	lastKey := keyParts[len(keyParts)-1]
-
-	newKey, newValue := fn(lastKey, value)
-	keyParts[len(keyParts)-1] = newKey
-
-	newFullKey := strings.Join(keyParts, ".")
-
-	log.Dev("Applying ", lower, " with ", transformTarget.Transform, " to ", newFullKey)
-
-	return newFullKey, newValue
 }
 
 func WatchFile(path string, f *file.File, loadFunc func()) {
