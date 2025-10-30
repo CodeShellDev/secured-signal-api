@@ -81,14 +81,16 @@ func (config *Config) Unflatten(path string) map[string]any {
     for key, value := range all {
         parts := strings.Split(key, ".")
 
+		sub := res
+
         for i, p := range parts {
             if i == len(parts)-1 {
-                res[p] = value
+                sub[p] = value
             } else {
-                if _, ok := res[p]; !ok {
-                    res[p] = map[string]any{}
+                if _, ok := sub[p]; !ok {
+                    sub[p] = map[string]any{}
                 }
-                res = res[p].(map[string]any)
+                sub = sub[p].(map[string]any)
             }
         }
     }
