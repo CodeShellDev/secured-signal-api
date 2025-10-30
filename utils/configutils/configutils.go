@@ -2,13 +2,14 @@ package configutils
 
 import (
 	"errors"
+	"maps"
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 
-	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	stringutils "github.com/codeshelldev/secured-signal-api/utils/stringutils"
 
@@ -28,6 +29,7 @@ type Config struct {
 type TransformTarget struct {
 	Key string
 	Transform string
+	ChildrenTransform string
 	Value any
 }
 
@@ -89,11 +91,13 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 		}
 
 		transformTag := field.Tag.Get("transform")
+		childTransformTag := field.Tag.Get("childrentransform")
 
 		data[key] = TransformTarget{
-			Key:       key,
-			Transform: transformTag,
-			Value:     getValueSafe(fieldValue),
+			Key:               key,
+			Transform:         transformTag,
+			ChildrenTransform: childTransformTag,
+			Value:             getValueSafe(fieldValue),
 		}
 
 		// Recursively walk nested structs
@@ -136,38 +140,90 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 		all = config.Layer.Get(path).(map[string]any)
 	}
 
-	res := map[string]any{}
+	_, res := applyTransform("", all, transformTargets, funcs)
 
-	for key, value := range all {
-		transformTarget, ok := transformTargets[key]
-		if !ok {
-			transformTarget.Transform = "default"
-		}
+	mapRes, ok := res.(map[string]any)
 
-		fn, ok := funcs[transformTarget.Transform]
-		if !ok {
-			fn = funcs["default"]
-		}
-
-		log.Info("Transform: ", transformTarget.Transform)
-
-		keyParts := strings.Split(key, ".")
-
-		lastKey := keyParts[len(keyParts)-1]
-
-		newKey, newValue := fn(lastKey, value)
-
-		log.Info("[NEW] Key: ", newKey, "; Value: ", jsonutils.ToJson(newValue))
-
-		keyParts[len(keyParts)-1] = newKey
-
-		newFullKey := strings.Join(keyParts, ".")
-
-		res[newFullKey] = newValue
+	if !ok {
+		return
 	}
 
 	config.Layer.Delete("")
-	config.Layer.Load(confmap.Provider(res, "."), nil)
+	config.Layer.Load(confmap.Provider(mapRes, "."), nil)
+}
+
+func applyTransform(key string, value any, transformTargets map[string]TransformTarget, funcs map[string]func(string, any) (string, any)) (string, any) {
+	target := transformTargets[key]
+
+	targets := map[string]TransformTarget{}
+		
+	maps.Copy(transformTargets, targets)
+
+	newKey, _ := applyTransformToAny(key, value, transformTargets, funcs)
+
+	switch asserted := value.(type) {
+	case map[string]any:
+		res := map[string]any{}
+
+		for k, v := range asserted {
+			childTarget := TransformTarget{
+				Key: k,
+				Transform: target.ChildrenTransform,
+				ChildrenTransform: target.ChildrenTransform,
+			}
+
+			targets[k] = childTarget
+
+			childKey, childValue := applyTransform(k, v, targets, funcs)
+
+			res[childKey] = childValue
+		}
+
+		return newKey, res
+	case []any:
+		res := []any{}
+		
+		for i, child := range asserted {
+			childTarget := TransformTarget{
+				Key: strconv.Itoa(i),
+				Transform: target.ChildrenTransform,
+				ChildrenTransform: target.ChildrenTransform,
+			}
+
+			targets[strconv.Itoa(i)] = childTarget
+			
+			_, childValue := applyTransform(strconv.Itoa(i), child, targets, funcs)
+
+			res = append(res, childValue)
+		}
+
+		return newKey, res
+	default:
+		return applyTransformToAny(key, asserted, transformTargets, funcs)
+	}
+}
+
+func applyTransformToAny(key string, value any, transformTargets map[string]TransformTarget, funcs map[string]func(string, any) (string, any)) (string, any) {
+	transformTarget, ok := transformTargets[key]
+	if !ok {
+		transformTarget.Transform = "default"
+	}
+
+	fn, ok := funcs[transformTarget.Transform]
+	if !ok {
+		fn = funcs["default"]
+	}
+
+	keyParts := strings.Split(key, ".")
+
+	lastKey := keyParts[len(keyParts)-1]
+
+	newKey, newValue := fn(lastKey, value)
+	keyParts[len(keyParts)-1] = newKey
+
+	newFullKey := strings.Join(keyParts, ".")
+
+	return newFullKey, newValue
 }
 
 func WatchFile(path string, f *file.File, loadFunc func()) {
