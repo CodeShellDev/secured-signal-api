@@ -96,7 +96,7 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 
 	data := config.Unflatten(path)
 
-	log.Dev("TransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
+	log.Dev("InitTransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
 	log.Dev("InitMapData:\n-------------------------------------------\n", jsonutils.ToJson(data), "\n-------------------------------------------")
 	
 	_, res := applyTransform("", data, transformTargets, funcs)
@@ -114,6 +114,8 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 func applyTransform(key string, value any, transformTargets map[string]TransformTarget, funcs map[string]func(string, any) (string, any)) (string, any) {
 	lower := strings.ToLower(key)
 	target := transformTargets[lower]
+
+	log.Dev("TransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
 
 	log.Dev("Got ", target.Transform, " for ", lower)
 
