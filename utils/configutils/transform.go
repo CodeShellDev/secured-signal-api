@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/providers/confmap"
 )
@@ -62,6 +63,8 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 		// Recursively walk nested structs
 		if fieldValue.Kind() == reflect.Struct || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) {
 
+			log.Dev("Recursively walking ", lower)
+
 			sub := GetKeyToTransformMap(fieldValue.Interface())
 
 			for subKey, subValue := range sub {
@@ -90,6 +93,8 @@ func getValueSafe(value reflect.Value) any {
 
 func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs map[string]func(string, any) (string, any)) {
 	transformTargets := GetKeyToTransformMap(structSchema)
+
+	log.Dev("TransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
 
 	var all map[string]any
 
