@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"os"
 
+	config "github.com/codeshelldev/secured-signal-api/internals/config"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
-	config "github.com/codeshelldev/secured-signal-api/utils/config"
-	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )

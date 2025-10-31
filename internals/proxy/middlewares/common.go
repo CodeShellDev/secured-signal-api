@@ -3,8 +3,8 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/codeshelldev/secured-signal-api/utils/config"
-	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
+	"github.com/codeshelldev/secured-signal-api/internals/config"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 )
 
 type Context struct {

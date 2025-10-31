@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
@@ -31,10 +31,11 @@ func mappingHandler(next http.Handler) http.Handler {
 			settings.MESSAGE.VARIABLES = getSettings("*").MESSAGE.VARIABLES
 		}
 
-		body, err := request.GetReqBody(w, req)
+		body, err := request.GetReqBody(req)
 
 		if err != nil {
 			log.Error("Could not get Request Body: ", err.Error())
+			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
 		}
 
 		var modifiedBody bool

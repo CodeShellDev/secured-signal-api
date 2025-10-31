@@ -7,7 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/codeshelldev/secured-signal-api/utils/config/structure"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	"github.com/codeshelldev/secured-signal-api/utils/configutils"
 	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 
@@ -24,19 +25,27 @@ var ENV *structure.ENV = &structure.ENV{
 	INSECURE:      false,
 }
 
+var defaultsConf = configutils.New()
+var userConf = configutils.New()
+var tokenConf = configutils.New()
+
+var config = configutils.New()
+
 func Load() {
+	InitReload()
+
 	LoadDefaults()
 
 	LoadConfig()
 
 	LoadTokens()
 
-	LoadEnv(userLayer)
+	userConf.LoadEnv()
 
-	config = mergeLayers()
+	config.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
-	normalizeKeys(config)
-	templateConfig(config)
+	config.NormalizeKeys()
+	config.TemplateConfig()
 
 	InitTokens()
 
@@ -44,28 +53,34 @@ func Load() {
 
 	log.Info("Finished Loading Configuration")
 
-	log.Dev("Loaded Config:\n" + jsonutils.ToJson(config.All()))
-	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokensLayer.All()))
+	log.Dev("Loaded Config:\n" + jsonutils.ToJson(config.Layer.All()))
+	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokenConf.Layer.All()))
+}
+
+func InitReload() {
+	defaultsConf.OnLoad(Load)
+	userConf.OnLoad(Load)
+	tokenConf.OnLoad(Load)
 }
 
 func InitEnv() {
-	ENV.PORT = strconv.Itoa(config.Int("service.port"))
+	ENV.PORT = strconv.Itoa(config.Layer.Int("service.port"))
 
-	ENV.LOG_LEVEL = strings.ToLower(config.String("loglevel"))
+	ENV.LOG_LEVEL = strings.ToLower(config.Layer.String("loglevel"))
 
-	ENV.API_URL = config.String("api.url")
+	ENV.API_URL = config.Layer.String("api.url")
 
 	var settings structure.SETTINGS
 
-	transformChildren(config, "settings.message.variables", transformVariables)
+	config.TransformChildren("settings.message.variables", transformVariables)
 
-	config.Unmarshal("settings", &settings)
+	config.Layer.Unmarshal("settings", &settings)
 
 	ENV.SETTINGS["*"] = &settings
 }
 
 func LoadDefaults() {
-	_, err := LoadFile(ENV.DEFAULTS_PATH, defaultsLayer, yaml.Parser())
+	_, err := defaultsConf.LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
 
 	if err != nil {
 		log.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
@@ -73,7 +88,7 @@ func LoadDefaults() {
 }
 
 func LoadConfig() {
-	_, err := LoadFile(ENV.CONFIG_PATH, userLayer, yaml.Parser())
+	_, err := userConf.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
 
 	if err != nil {
 		_, fsErr := os.Stat(ENV.CONFIG_PATH)
