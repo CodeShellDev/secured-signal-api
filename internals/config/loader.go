@@ -103,7 +103,10 @@ func Normalize() {
 	LowercaseKeys(tokenConf)
 
 	// Load temporary configs back into paths
+	config.Layer.Delete("settings")
 	config.Layer.Load(confmap.Provider(tmpConf.Layer.All(), "settings"), nil)
+
+	tokenConf.Layer.Delete("")
 	tokenConf.Layer.Load(confmap.Provider(tkConfigs.All(), "."), nil)
 }
 
