@@ -7,7 +7,6 @@ import (
 	"github.com/codeshelldev/secured-signal-api/utils/configutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/v2"
 )
 
@@ -25,33 +24,32 @@ func LoadTokens() {
 		log.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
 	}
 
-	tokenConf.OnLoad(Load)
 	tokenConf.TemplateConfig()
 }
 
 func NormalizeTokens() {
 	// Create temporary configs
 	configs := koanf.New(".")
-	tkConfigArray := []map[string]any{}
+	configArray := []map[string]any{}
 
-	for _, tkConfig := range tokenConf.Layer.Slices("tokenconfigs") {
+	for _, config := range tokenConf.Layer.Slices("tokenconfigs") {
 		tmpConf := configutils.New()
-		tmpConf.Layer.Load(confmap.Provider(tkConfig.All(), "."), nil)
+		tmpConf.Load(config.All(), "")
 
 		tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "overrides", transformFuncs)
 
-		tkConfigArray = append(tkConfigArray, tkConfig.All())
+		configArray = append(configArray, config.All())
 	}
 
 	// Merge token configs together into new temporary config
-	configs.Set("tokenconfigs", tkConfigArray)
+	configs.Set("tokenconfigs", configArray)
 
 	// Lowercase actual configs
 	LowercaseKeys(tokenConf)
 
 	// Load temporary configs back into paths
 	tokenConf.Layer.Delete("")
-	tokenConf.Layer.Load(confmap.Provider(configs.All(), "."), nil)
+	tokenConf.Load(configs.All(), "")
 }
 
 func InitTokens() {

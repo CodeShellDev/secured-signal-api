@@ -13,7 +13,6 @@ import (
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 
 	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/confmap"
 )
 
 var ENV *structure.ENV = &structure.ENV{
@@ -79,7 +78,7 @@ func LowercaseKeys(config *configutils.Config) {
 	}
 
 	config.Layer.Delete("")
-	config.Layer.Load(confmap.Provider(data, "."), nil)
+	config.Load(data, "")
 }
 
 func NormalizeConfig() {
@@ -93,7 +92,7 @@ func NormalizeConfig() {
 
 	// Create temporary configs
 	tmpConf := configutils.New()
-	tmpConf.Layer.Load(confmap.Provider(old, "."), nil)
+	tmpConf.Load(old, "")
 	
 	// Apply transforms to the new configs
 	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "", transformFuncs)
@@ -106,7 +105,7 @@ func NormalizeConfig() {
 
 	log.Dev("Loading:\n--------------------------------------\n", jsonutils.ToJson(mainConf.Layer.All()), "\n--------------------------------------")
 
-	mainConf.Layer.Load(confmap.Provider(tmpConf.Layer.All(), "settings"), nil)
+	mainConf.Load(tmpConf.Layer.All(), "settings")
 }
 
 func InitReload() {

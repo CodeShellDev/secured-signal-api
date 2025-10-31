@@ -8,7 +8,6 @@ import (
 
 	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
-	"github.com/knadh/koanf/providers/confmap"
 )
 
 type TransformTarget struct {
@@ -104,14 +103,8 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 		return
 	}
 
-	if path != "" {
-		mapRes = map[string]any {
-			path: mapRes,
-		}
-	}
-
 	config.Layer.Delete("")
-	config.Layer.Load(confmap.Provider(mapRes, "."), nil)
+	config.Load(mapRes, path)
 }
 
 func applyTransform(key string, value any, transformTargets map[string]TransformTarget, funcs map[string]func(string, any) (string, any)) (string, any) {

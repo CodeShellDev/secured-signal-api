@@ -76,12 +76,32 @@ func getPath(str string) string {
 	return str
 }
 
+func (config *Config) Load(data map[string]any, path string) error {
+	parts := strings.Split(path, ".")
+
+	res := map[string]any{}
+
+	for i, key := range parts {
+		if i == 0 {
+			res[key] = data
+		} else {
+			sub := map[string]any{}
+
+			sub[key] = res
+
+			res = sub
+		}
+	}
+
+	return config.Layer.Load(confmap.Provider(res, "."), nil)
+}
+
 func (config *Config) Delete(path string) (error) {
 	if !config.Layer.Exists(path) {
 		return errors.New("path not found")
 	}
 
-	all := config.Layer.Get("")
+	all := config.Layer.All()
 
 	log.Dev("Init:\n--------------------------------------\n", jsonutils.ToJson(all), "\n--------------------------------------")
 	
@@ -125,7 +145,7 @@ func (config *Config) LoadDir(path string, dir string, ext string, parser koanf.
 		path: array,
 	}
 
-	return config.Layer.Load(confmap.Provider(wrapper, "."), nil)
+	return config.Load(wrapper, "")
 }
 
 func (config *Config) LoadEnv() (koanf.Provider, error) {
@@ -157,7 +177,7 @@ func (config *Config) TemplateConfig() {
 		}
 	}
 
-	config.Layer.Load(confmap.Provider(data, "."), nil)
+	config.Load(data, "")
 }
 
 func (config *Config) MergeLayers(layers ...*koanf.Koanf) {
