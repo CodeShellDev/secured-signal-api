@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
-	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/providers/confmap"
 )
 
@@ -101,8 +99,6 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 	if !ok {
 		return
 	}
-
-	logger.Dev("Result:\n----------------------------------\n", jsonutils.ToJson(mapRes), "\n----------------------------------")
 
 	config.Layer.Delete(path)
 	config.Layer.Load(confmap.Provider(mapRes, "."), nil)

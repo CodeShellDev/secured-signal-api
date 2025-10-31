@@ -89,14 +89,17 @@ func NormalizeConfig() {
 	// Apply transforms to the new configs
 	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "", transformFuncs)
 
-	log.Dev("Transform:\n--------------------------------------\n", jsonutils.ToJson(tmpConf.Layer.All()), "\n--------------------------------------")
-
 	// Lowercase actual configs
 	LowercaseKeys(config)
 
 	// Load temporary configs back into paths
 	config.Layer.Delete("settings")
+
+	log.Dev("Deletion:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
+
 	config.Layer.Load(confmap.Provider(tmpConf.Layer.All(), "settings"), nil)
+
+	log.Dev("Loading:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
 }
 
 func InitReload() {
