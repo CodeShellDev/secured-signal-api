@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/providers/confmap"
 )
@@ -195,13 +194,9 @@ func applyTransformToAny(key string, value any, transformTargets map[string]Tran
 
 	newKey, newValue := fn(keyParts[len(keyParts)-1], value)
 
-	log.Dev("NewKey: ", newKey)
-
 	keyParts[len(keyParts)-1] = newKey
 
 	newFullKey := strings.Join(keyParts, ".")
-
-	log.Dev("Applying ", lower, " with ", transformTarget.Transform, " to ", newFullKey, "\n--------------------------------------------\n", jsonutils.ToJson(keyParts))
 
 	return newFullKey, newValue
 }
