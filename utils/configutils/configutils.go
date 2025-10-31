@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	stringutils "github.com/codeshelldev/secured-signal-api/utils/stringutils"
 
@@ -110,13 +111,17 @@ func (config *Config) Delete(path string) (error) {
 		return errors.New("path not found")
 	}
 
-	data := config.Layer.All()
+	data := config.Unflatten(path)
 	
 	if data == nil {
 		return errors.New("empty config")
 	}
 
+	log.Dev("Unflattened:\n--------------------------------------\n", jsonutils.ToJson(data), "\n--------------------------------------")
+
 	delete(data, path)
+
+	log.Dev("Deletion:\n--------------------------------------\n", jsonutils.ToJson(data), "\n--------------------------------------")
 
 	config.Layer.Delete("")
 	config.Layer.Load(confmap.Provider(data, "."), nil)

@@ -95,11 +95,9 @@ func NormalizeConfig() {
 	// Load temporary configs back into paths
 	config.Delete("settings")
 
-	log.Dev("Deletion:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
+	log.Dev("Loading:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
 
 	config.Layer.Load(confmap.Provider(tmpConf.Layer.All(), "settings"), nil)
-
-	log.Dev("Loading:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
 }
 
 func InitReload() {
