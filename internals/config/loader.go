@@ -74,6 +74,8 @@ func LowercaseKeys(config *configutils.Config) {
 }
 
 func NormalizeConfig() {
+	log.Dev("Normilization:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
+
 	settings := config.Layer.Get("settings")
 	old, ok := settings.(map[string]any)
 

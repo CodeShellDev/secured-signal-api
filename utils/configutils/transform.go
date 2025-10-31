@@ -92,10 +92,9 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 
 	transformTargets := GetKeyToTransformMap(structSchema)
 
-	data := config.Unflatten(path)
+	data := config.Layer.Get(path)
 
-	log.Dev("Unflatten+Get:\n--------------------------------------\n", jsonutils.ToJson(data), "\n--------------------------------------")
-	log.Dev("Get:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.Get("")), "\n--------------------------------------")
+	log.Dev("Init:\n--------------------------------------\n", jsonutils.ToJson(data), "\n--------------------------------------")
 	
 	_, res := applyTransform("", config.Layer.Get(path), transformTargets, funcs)
 

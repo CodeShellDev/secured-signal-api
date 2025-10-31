@@ -74,62 +74,26 @@ func getPath(str string) string {
 	return str
 }
 
-func (config *Config) Unflatten(path string) map[string]any {
-	data := config.Layer.Get(path)
-	all, ok := data.(map[string]any)
-
-	if !ok {
-		return nil
-	}
-
-    res := map[string]any{}
-
-    for key, value := range all {
-        parts := strings.Split(key, ".")
-
-		sub := res
-
-        for i, part := range parts {
-            if i == len(parts) - 1 {
-                sub[part] = value
-            } else {
-				_, ok := sub[part]
-
-                if !ok {
-                    sub[part] = map[string]any{}
-                }
-                sub = sub[part].(map[string]any)
-            }
-        }
-    }
-	
-    return res
-}
-
 func (config *Config) Delete(path string) (error) {
 	if !config.Layer.Exists(path) {
 		return errors.New("path not found")
 	}
 
-	all := config.Layer.All()
+	all := config.Layer.Get("")
 
 	log.Dev("Init:\n--------------------------------------\n", jsonutils.ToJson(all), "\n--------------------------------------")
-	log.Dev("Init:Sprint():\n--------------------------------------\n", config.Layer.Sprint(), "\n--------------------------------------")
 	
 	if all == nil {
 		return errors.New("empty config")
 	}
 
-	for key := range all {
+	for _, key := range config.Layer.Keys() {
 		if strings.HasPrefix(key, path + ".") || key == path {
-			delete(all, key)
+			config.Layer.Delete(key)
 		}
 	}
 
 	log.Dev("Deletion:\n--------------------------------------\n", jsonutils.ToJson(all), "\n--------------------------------------")
-
-	config.Layer.Delete("")
-	config.Layer.Load(confmap.Provider(all, "."), nil)
 
 	return nil
 }
