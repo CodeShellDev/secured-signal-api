@@ -25,9 +25,7 @@ type Config struct {
 func New() *Config {
 	return &Config{
 		Layer: koanf.New("."),
-		LoadFunc: func() {
-			log.Dev("Config.LoadFunc not initialized!")
-		},
+		LoadFunc: func() {},
 	}
 }
 
