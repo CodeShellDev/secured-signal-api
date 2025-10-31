@@ -93,7 +93,7 @@ func NormalizeConfig() {
 	LowercaseKeys(config)
 
 	// Load temporary configs back into paths
-	config.Layer.Delete("settings")
+	config.Delete("settings")
 
 	log.Dev("Deletion:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
 

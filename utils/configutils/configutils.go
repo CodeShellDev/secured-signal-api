@@ -1,6 +1,7 @@
 package configutils
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -104,6 +105,24 @@ func (config *Config) Unflatten(path string) map[string]any {
     return res
 }
 
+func (config *Config) Delete(path string) (error) {
+	if !config.Layer.Exists(path) {
+		return errors.New("path not found")
+	}
+
+	data := config.Layer.All()
+	
+	if data == nil {
+		return errors.New("empty config")
+	}
+
+	delete(data, path)
+
+	config.Layer.Delete("")
+	config.Layer.Load(confmap.Provider(data, "."), nil)
+
+	return nil
+}
 
 func (config *Config) LoadDir(path string, dir string, ext string, parser koanf.Parser) error {
 	files, err := filepath.Glob(filepath.Join(dir, "*" + ext))
