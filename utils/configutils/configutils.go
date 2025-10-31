@@ -62,6 +62,8 @@ func WatchFile(path string, f *file.File, loadFunc func()) {
 		configLock.Lock()
 		defer configLock.Unlock()
 
+		f.Unwatch()
+
 		loadFunc()
 	})
 }
