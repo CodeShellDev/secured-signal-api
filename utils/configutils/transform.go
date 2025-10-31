@@ -199,13 +199,7 @@ func applyTransformToAny(key string, value any, transformTargets map[string]Tran
 
 	newKey, newValue := fn(keyParts[len(keyParts)-1], value)
 
-	keyParts[len(keyParts)-1] = newKey
-
-	newFullKey := strings.Join(keyParts, ".")
-
-	log.Dev("Applying ", lower, " with ", transformTarget.Transform, " to ", newFullKey)
-
-	return newFullKey, newValue
+	return newKey, newValue
 }
 
 func getKeyParts(fullKey string) []string {
