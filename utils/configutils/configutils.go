@@ -160,6 +160,8 @@ func (config *Config) TemplateConfig() {
 }
 
 func (config *Config) MergeLayers(layers ...*koanf.Koanf) {
+	log.Dev("Before:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
+
 	for i, layer := range layers {
 		log.Dev("Merge[", strconv.Itoa(i), "]:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
 		config.Layer.Merge(layer)

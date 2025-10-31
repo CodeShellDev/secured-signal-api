@@ -33,6 +33,8 @@ var tokenConf = configutils.New()
 var mainConf = configutils.New()
 
 func Load() {
+	Clear()
+
 	InitReload()
 
 	LoadDefaults()
@@ -58,6 +60,13 @@ func Load() {
 
 	log.Dev("Loaded Config:\n" + jsonutils.ToJson(mainConf.Layer.All()))
 	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokenConf.Layer.All()))
+}
+
+func Clear() {
+	defaultsConf = configutils.New()
+	userConf = configutils.New()
+	tokenConf = configutils.New()
+	mainConf = configutils.New()
 }
 
 func LowercaseKeys(config *configutils.Config) {
