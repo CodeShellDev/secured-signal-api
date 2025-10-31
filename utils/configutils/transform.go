@@ -5,9 +5,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-
-	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 type TransformTarget struct {
@@ -93,9 +90,7 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 
 	data := config.Layer.Get(path)
 
-	log.Dev("Init:\n--------------------------------------\n", jsonutils.ToJson(data), "\n--------------------------------------")
-	
-	_, res := applyTransform("", config.Layer.Get(path), transformTargets, funcs)
+	_, res := applyTransform("", data, transformTargets, funcs)
 
 	mapRes, ok := res.(map[string]any)
 

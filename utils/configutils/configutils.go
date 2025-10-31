@@ -7,7 +7,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	stringutils "github.com/codeshelldev/secured-signal-api/utils/stringutils"
 
@@ -96,8 +95,6 @@ func (config *Config) Load(data map[string]any, path string) error {
 			}
 		}
 	}
-	
-	log.Info("Load:\n--------------------------------------\n", jsonutils.ToJson(res), "\n--------------------------------------")
 
 	return config.Layer.Load(confmap.Provider(res, "."), nil)
 }
@@ -108,8 +105,6 @@ func (config *Config) Delete(path string) (error) {
 	}
 
 	all := config.Layer.All()
-
-	log.Dev("Init:\n--------------------------------------\n", jsonutils.ToJson(all), "\n--------------------------------------")
 	
 	if all == nil {
 		return errors.New("empty config")
@@ -120,8 +115,6 @@ func (config *Config) Delete(path string) (error) {
 			config.Layer.Delete(key)
 		}
 	}
-
-	log.Dev("Deletion:\n--------------------------------------\n", jsonutils.ToJson(all), "\n--------------------------------------")
 
 	return nil
 }
