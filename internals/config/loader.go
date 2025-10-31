@@ -81,6 +81,8 @@ func Normalize() {
 	// Apply transforms to the new configs
 	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, ".", transformFuncs)
 
+	log.Dev("After Transforms:\n-----------------------------------\n", tmpConf.Layer.Sprint(), "\n-----------------------------------")
+
 	tkConfigs := koanf.New(".")
 	tkConfigArray := []map[string]any{}
 
