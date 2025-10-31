@@ -30,7 +30,7 @@ var defaultsConf = configutils.New()
 var userConf = configutils.New()
 var tokenConf = configutils.New()
 
-var config = configutils.New()
+var mainConf = configutils.New()
 
 func Load() {
 	InitReload()
@@ -43,12 +43,12 @@ func Load() {
 
 	userConf.LoadEnv()
 
-	config.MergeLayers(defaultsConf.Layer, userConf.Layer)
+	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
 	NormalizeConfig()
 	NormalizeTokens()
 
-	config.TemplateConfig()
+	mainConf.TemplateConfig()
 
 	InitTokens()
 
@@ -56,7 +56,7 @@ func Load() {
 
 	log.Info("Finished Loading Configuration")
 
-	log.Dev("Loaded Config:\n" + jsonutils.ToJson(config.Layer.All()))
+	log.Dev("Loaded Config:\n" + jsonutils.ToJson(mainConf.Layer.All()))
 	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokenConf.Layer.All()))
 }
 
@@ -74,9 +74,9 @@ func LowercaseKeys(config *configutils.Config) {
 }
 
 func NormalizeConfig() {
-	log.Dev("Normilization:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
+	log.Dev("Normilization:\n--------------------------------------\n", jsonutils.ToJson(mainConf.Layer.All()), "\n--------------------------------------")
 
-	settings := config.Layer.Get("settings")
+	settings := mainConf.Layer.Get("settings")
 	old, ok := settings.(map[string]any)
 
 	if !ok {
@@ -92,14 +92,14 @@ func NormalizeConfig() {
 	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "", transformFuncs)
 
 	// Lowercase actual configs
-	LowercaseKeys(config)
+	LowercaseKeys(mainConf)
 
 	// Load temporary configs back into paths
-	config.Delete("settings")
+	mainConf.Delete("settings")
 
-	log.Dev("Loading:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
+	log.Dev("Loading:\n--------------------------------------\n", jsonutils.ToJson(mainConf.Layer.All()), "\n--------------------------------------")
 
-	config.Layer.Load(confmap.Provider(tmpConf.Layer.All(), "settings"), nil)
+	mainConf.Layer.Load(confmap.Provider(tmpConf.Layer.All(), "settings"), nil)
 }
 
 func InitReload() {
@@ -109,15 +109,15 @@ func InitReload() {
 }
 
 func InitEnv() {
-	ENV.PORT = strconv.Itoa(config.Layer.Int("service.port"))
+	ENV.PORT = strconv.Itoa(mainConf.Layer.Int("service.port"))
 
-	ENV.LOG_LEVEL = strings.ToLower(config.Layer.String("loglevel"))
+	ENV.LOG_LEVEL = strings.ToLower(mainConf.Layer.String("loglevel"))
 
-	ENV.API_URL = config.Layer.String("api.url")
+	ENV.API_URL = mainConf.Layer.String("api.url")
 
 	var settings structure.SETTINGS
 
-	config.Layer.Unmarshal("settings", &settings)
+	mainConf.Layer.Unmarshal("settings", &settings)
 
 	ENV.SETTINGS["*"] = &settings
 }

@@ -55,7 +55,7 @@ func NormalizeTokens() {
 }
 
 func InitTokens() {
-	apiTokens := config.Layer.Strings("api.tokens")
+	apiTokens := mainConf.Layer.Strings("api.tokens")
 
 	var tokenConfigs []TOKEN_CONFIG_
 
@@ -78,7 +78,7 @@ func InitTokens() {
 
 		// Set Blocked Endpoints on Config to User Layer Value
 		// => effectively ignoring Default Layer
-		config.Layer.Set("settings.access.endpoints", userConf.Layer.Strings("settings.access.endpoints"))
+		mainConf.Layer.Set("settings.access.endpoints", userConf.Layer.Strings("settings.access.endpoints"))
 	}
 
 	if len(apiTokens) > 0 {
