@@ -95,9 +95,6 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 	transformTargets := GetKeyToTransformMap(structSchema)
 
 	data := config.Unflatten(path)
-
-	log.Dev("InitTransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
-	log.Dev("InitMapData:\n-------------------------------------------\n", jsonutils.ToJson(data), "\n-------------------------------------------")
 	
 	_, res := applyTransform("", data, transformTargets, funcs)
 
@@ -115,10 +112,6 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 	lower := strings.ToLower(key)
 	target := transformTargets[lower]
 
-	log.Dev("TransformMap:\n-------------------------------------------\n", jsonutils.ToJson(transformTargets), "\n-------------------------------------------")
-
-	log.Dev("Got ", target.Transform, " for ", lower)
-
 	targets := map[string]TransformTarget{}
 		
 	maps.Copy(targets, transformTargets)
@@ -134,8 +127,6 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 	switch asserted := value.(type) {
 	case map[string]any:
 		res := map[string]any{}
-
-		log.Dev("MapData:\n-------------------------------------------\n", jsonutils.ToJson(asserted), "\n-------------------------------------------")
 
 		for k, v := range asserted {
 			fullKey := newKeyWithDot + k
@@ -203,11 +194,12 @@ func applyTransformToAny(key string, value any, transformTargets map[string]Tran
 	keyParts := getKeyParts(key)
 
 	newKey, newValue := fn(keyParts[len(keyParts)-1], value)
+
 	keyParts[len(keyParts)-1] = newKey
 
 	newFullKey := strings.Join(keyParts, ".")
 
-	log.Dev("Applying ", lower, " with ", transformTarget.Transform, " to ", newFullKey)
+	log.Dev("Applying ", lower, " with ", transformTarget.Transform, " to ", newFullKey, "\n--------------------------------------------\n", jsonutils.ToJson(keyParts))
 
 	return newFullKey, newValue
 }
