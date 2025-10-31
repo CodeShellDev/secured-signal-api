@@ -81,18 +81,22 @@ func (config *Config) Load(data map[string]any, path string) error {
 
 	res := map[string]any{}
 
-	for i, key := range parts {
-		if i == 0 {
-			res[key] = data
-		} else {
-			sub := map[string]any{}
+	if path == "" {
+		res = data
+	} else {
+		for i, key := range parts {
+			if i == 0 {
+				res[key] = data
+			} else {
+				sub := map[string]any{}
 
-			sub[key] = res
+				sub[key] = res
 
-			res = sub
+				res = sub
+			}
 		}
 	}
-
+	
 	log.Info("Load:\n--------------------------------------\n", jsonutils.ToJson(res), "\n--------------------------------------")
 
 	return config.Layer.Load(confmap.Provider(res, "."), nil)
