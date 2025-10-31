@@ -93,6 +93,8 @@ func (config *Config) Load(data map[string]any, path string) error {
 		}
 	}
 
+	log.Info("Load:\n--------------------------------------\n", jsonutils.ToJson(res), "\n--------------------------------------")
+
 	return config.Layer.Load(confmap.Provider(res, "."), nil)
 }
 
