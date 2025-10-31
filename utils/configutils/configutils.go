@@ -90,7 +90,7 @@ func (config *Config) Unflatten(path string) map[string]any {
 		sub := res
 
         for i, part := range parts {
-            if i == len(parts)-1 {
+            if i == len(parts) - 1 {
                 sub[part] = value
             } else {
 				_, ok := sub[part]
@@ -111,27 +111,17 @@ func (config *Config) Delete(path string) (error) {
 		return errors.New("path not found")
 	}
 
-	all := config.Unflatten("")
+	all := config.Layer.All()
 	
 	if all == nil {
 		return errors.New("empty config")
 	}
 
-	keyParts := getKeyParts(path)
-
-	for i := 0; i < len(keyParts) - 1; i++ {
-		next, ok := all[keyParts[i]].(map[string]any)
-
-		if !ok {
-			return nil
+	for key := range all {
+		if strings.HasPrefix(key, path + ".") || key == path {
+			delete(all, key)
 		}
-
-		all = next
 	}
-
-	log.Dev("Unflattened:\n--------------------------------------\n", jsonutils.ToJson(all), "\n--------------------------------------")
-
-	delete(all, keyParts[len(keyParts)-1])
 
 	log.Dev("Deletion:\n--------------------------------------\n", jsonutils.ToJson(all), "\n--------------------------------------")
 
