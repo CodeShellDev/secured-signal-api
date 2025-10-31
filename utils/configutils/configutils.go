@@ -162,6 +162,8 @@ func (config *Config) MergeLayers(layers ...*koanf.Koanf) {
 	for _, layer := range layers {
 		config.Layer.Merge(layer)
 	}
+
+	log.Dev("Merge:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
 }
 
 func (config *Config) NormalizeEnv(key string, value string) (string, any) {
