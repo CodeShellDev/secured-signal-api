@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/providers/confmap"
 )
@@ -91,11 +92,15 @@ func getValueSafe(value reflect.Value) any {
 }
 
 func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs map[string]func(string, any) (string, any)) {
+	path = getPath(path)
+
 	transformTargets := GetKeyToTransformMap(structSchema)
 
 	data := config.Unflatten(path)
 	
 	_, res := applyTransform("", data, transformTargets, funcs)
+
+	log.Dev("Result:\n-----------------------------\n", jsonutils.ToJson(res))
 
 	mapRes, ok := res.(map[string]any)
 
@@ -103,8 +108,8 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 		return
 	}
 
-	config.Layer.Delete("")
-	config.Layer.Load(confmap.Provider(mapRes, "."), nil)
+	config.Layer.Delete(path)
+	config.Layer.Load(confmap.Provider(mapRes, path), nil)
 }
 
 func applyTransform(key string, value any, transformTargets map[string]TransformTarget, funcs map[string]func(string, any) (string, any)) (string, any) {
@@ -197,6 +202,8 @@ func applyTransformToAny(key string, value any, transformTargets map[string]Tran
 	keyParts[len(keyParts)-1] = newKey
 
 	newFullKey := strings.Join(keyParts, ".")
+
+	log.Dev("Applying ", lower, " with ", transformTarget.Transform, " to ", newFullKey)
 
 	return newFullKey, newValue
 }

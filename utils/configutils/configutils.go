@@ -67,13 +67,20 @@ func WatchFile(path string, f *file.File, loadFunc func()) {
 	})
 }
 
-func (config *Config) Unflatten(path string) map[string]any {
-	var all map[string]any
+func getPath(str string) string {
+	if str == "." {
+		str = ""
+	}
 
-	if path == "." {
-		all = config.Layer.All()
-	} else {
-		all = config.Layer.Get(path).(map[string]any)
+	return str
+}
+
+func (config *Config) Unflatten(path string) map[string]any {
+	data := config.Layer.Get(path)
+	all, ok := data.(map[string]any)
+
+	if !ok {
+		return nil
 	}
 
     res := map[string]any{}
