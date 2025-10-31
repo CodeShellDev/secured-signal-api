@@ -125,6 +125,8 @@ func InitEnv() {
 func LoadDefaults() {
 	_, err := defaultsConf.LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
 
+	log.Dev("Defaults:\n--------------------------------------\n", jsonutils.ToJson(defaultsConf.Layer.All()), "\n--------------------------------------")
+
 	if err != nil {
 		log.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
 	}
@@ -132,6 +134,8 @@ func LoadDefaults() {
 
 func LoadConfig() {
 	_, err := userConf.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
+
+	log.Dev("User:\n--------------------------------------\n", jsonutils.ToJson(userConf.Layer.All()), "\n--------------------------------------")
 
 	if err != nil {
 		_, fsErr := os.Stat(ENV.CONFIG_PATH)
