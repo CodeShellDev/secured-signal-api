@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -159,7 +160,8 @@ func (config *Config) TemplateConfig() {
 }
 
 func (config *Config) MergeLayers(layers ...*koanf.Koanf) {
-	for _, layer := range layers {
+	for i, layer := range layers {
+		log.Dev("Merge[", strconv.Itoa(i), "]:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
 		config.Layer.Merge(layer)
 	}
 
