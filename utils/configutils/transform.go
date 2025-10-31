@@ -109,7 +109,7 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 	}
 
 	config.Layer.Delete(path)
-	config.Layer.Load(confmap.Provider(mapRes, path), nil)
+	config.Layer.Load(confmap.Provider(mapRes, "."), nil)
 }
 
 func applyTransform(key string, value any, transformTargets map[string]TransformTarget, funcs map[string]func(string, any) (string, any)) (string, any) {

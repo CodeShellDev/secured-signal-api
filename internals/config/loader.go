@@ -79,9 +79,7 @@ func Normalize() {
 	tmpConf.Layer.Load(confmap.Provider(config.Layer.Get("settings").(map[string]any), "."), nil)
 	
 	// Apply transforms to the new configs
-	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, ".", transformFuncs)
-
-	log.Dev("After Transforms:\n-----------------------------------\n", tmpConf.Layer.Sprint(), "\n-----------------------------------")
+	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "", transformFuncs)
 
 	tkConfigs := koanf.New(".")
 	tkConfigArray := []map[string]any{}
