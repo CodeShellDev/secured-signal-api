@@ -111,20 +111,32 @@ func (config *Config) Delete(path string) (error) {
 		return errors.New("path not found")
 	}
 
-	data := config.Unflatten(path)
+	all := config.Unflatten("")
 	
-	if data == nil {
+	if all == nil {
 		return errors.New("empty config")
 	}
 
-	log.Dev("Unflattened:\n--------------------------------------\n", jsonutils.ToJson(data), "\n--------------------------------------")
+	keyParts := getKeyParts(path)
 
-	delete(data, path)
+	for i := 0; i < len(keyParts) - 1; i++ {
+		next, ok := all[keyParts[i]].(map[string]any)
 
-	log.Dev("Deletion:\n--------------------------------------\n", jsonutils.ToJson(data), "\n--------------------------------------")
+		if !ok {
+			return nil
+		}
+
+		all = next
+	}
+
+	log.Dev("Unflattened:\n--------------------------------------\n", jsonutils.ToJson(all), "\n--------------------------------------")
+
+	delete(all, keyParts[len(keyParts)-1])
+
+	log.Dev("Deletion:\n--------------------------------------\n", jsonutils.ToJson(all), "\n--------------------------------------")
 
 	config.Layer.Delete("")
-	config.Layer.Load(confmap.Provider(data, "."), nil)
+	config.Layer.Load(confmap.Provider(all, "."), nil)
 
 	return nil
 }
