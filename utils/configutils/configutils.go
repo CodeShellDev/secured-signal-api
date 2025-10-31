@@ -112,6 +112,9 @@ func (config *Config) Delete(path string) (error) {
 	}
 
 	all := config.Layer.All()
+
+	log.Dev("Init:\n--------------------------------------\n", jsonutils.ToJson(all), "\n--------------------------------------")
+	log.Dev("Init:Sprint():\n--------------------------------------\n", config.Layer.Sprint(), "\n--------------------------------------")
 	
 	if all == nil {
 		return errors.New("empty config")
