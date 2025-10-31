@@ -195,6 +195,8 @@ func applyTransformToAny(key string, value any, transformTargets map[string]Tran
 
 	newKey, newValue := fn(keyParts[len(keyParts)-1], value)
 
+	log.Dev("NewKey: ", newKey)
+
 	keyParts[len(keyParts)-1] = newKey
 
 	newFullKey := strings.Join(keyParts, ".")
