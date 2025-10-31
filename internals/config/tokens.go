@@ -4,8 +4,11 @@ import (
 	"strconv"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	"github.com/codeshelldev/secured-signal-api/utils/configutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/confmap"
+	"github.com/knadh/koanf/v2"
 )
 
 type TOKEN_CONFIG_ struct {
@@ -25,12 +28,35 @@ func LoadTokens() {
 	tokenConf.TemplateConfig()
 }
 
+func NormalizeTokens() {
+	// Create temporary configs
+	configs := koanf.New(".")
+	tkConfigArray := []map[string]any{}
+
+	for _, tkConfig := range tokenConf.Layer.Slices("tokenconfigs") {
+		tmpConf := configutils.New()
+		tmpConf.Layer.Load(confmap.Provider(tkConfig.All(), "."), nil)
+
+		tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "overrides", transformFuncs)
+
+		tkConfigArray = append(tkConfigArray, tkConfig.All())
+	}
+
+	// Merge token configs together into new temporary config
+	configs.Set("tokenconfigs", tkConfigArray)
+
+	// Lowercase actual configs
+	LowercaseKeys(tokenConf)
+
+	// Load temporary configs back into paths
+	tokenConf.Layer.Delete("")
+	tokenConf.Layer.Load(confmap.Provider(configs.All(), "."), nil)
+}
+
 func InitTokens() {
 	apiTokens := config.Layer.Strings("api.tokens")
 
 	var tokenConfigs []TOKEN_CONFIG_
-
-	//tokenConf.TransformChildrenUnderArray("tokenconfigs", "overrides.message.variables", transformVariables)
 
 	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
 

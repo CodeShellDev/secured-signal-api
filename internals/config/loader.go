@@ -14,7 +14,6 @@ import (
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/confmap"
-	"github.com/knadh/koanf/v2"
 )
 
 var ENV *structure.ENV = &structure.ENV{
@@ -46,7 +45,8 @@ func Load() {
 
 	config.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
-	Normalize()
+	NormalizeConfig()
+	NormalizeTokens()
 
 	config.TemplateConfig()
 
@@ -73,39 +73,28 @@ func LowercaseKeys(config *configutils.Config) {
 	config.Layer.Load(confmap.Provider(data, "."), nil)
 }
 
-func Normalize() {
+func NormalizeConfig() {
+	settings := config.Layer.Get("settings")
+	old, ok := settings.(map[string]any)
+
+	if !ok {
+		log.Warn("Could not load `settings`")
+		return
+	}
+
 	// Create temporary configs
 	tmpConf := configutils.New()
-	tmpConf.Layer.Load(confmap.Provider(config.Layer.Get("settings").(map[string]any), "."), nil)
+	tmpConf.Layer.Load(confmap.Provider(old, "."), nil)
 	
 	// Apply transforms to the new configs
 	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "", transformFuncs)
 
-	tkConfigs := koanf.New(".")
-	tkConfigArray := []map[string]any{}
-
-	for _, tkConfig := range tokenConf.Layer.Slices("tokenconfigs") {
-		tmpTkConf := configutils.New()
-		tmpTkConf.Layer.Load(confmap.Provider(tkConfig.All(), "."), nil)
-
-		tmpTkConf.ApplyTransformFuncs(&structure.SETTINGS{}, "overrides", transformFuncs)
-
-		tkConfigArray = append(tkConfigArray, tkConfig.All())
-	}
-
-	// Merge token configs together into new temporary config
-	tkConfigs.Set("tokenconfigs", tkConfigArray)
-
 	// Lowercase actual configs
 	LowercaseKeys(config)
-	LowercaseKeys(tokenConf)
 
 	// Load temporary configs back into paths
 	config.Layer.Delete("settings")
 	config.Layer.Load(confmap.Provider(tmpConf.Layer.All(), "settings"), nil)
-
-	tokenConf.Layer.Delete("")
-	tokenConf.Layer.Load(confmap.Provider(tkConfigs.All(), "."), nil)
 }
 
 func InitReload() {
@@ -122,8 +111,6 @@ func InitEnv() {
 	ENV.API_URL = config.Layer.String("api.url")
 
 	var settings structure.SETTINGS
-
-	//config.TransformChildren("settings.message.variables", transformVariables)
 
 	config.Layer.Unmarshal("settings", &settings)
 
@@ -152,8 +139,4 @@ func LoadConfig() {
 
 		log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
 	}
-}
-
-func transformVariables(key string, value any) (string, any) {
-	return strings.ToUpper(key), value
 }

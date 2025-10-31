@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/providers/confmap"
 )
@@ -99,8 +98,6 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 	data := config.Unflatten(path)
 	
 	_, res := applyTransform("", data, transformTargets, funcs)
-
-	log.Dev("Result:\n-----------------------------\n", jsonutils.ToJson(res))
 
 	mapRes, ok := res.(map[string]any)
 

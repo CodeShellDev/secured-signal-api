@@ -1,7 +1,6 @@
 package configutils
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -172,81 +171,6 @@ func (config *Config) MergeLayers(layers ...*koanf.Koanf) {
 	for _, layer := range layers {
 		config.Layer.Merge(layer)
 	}
-}
-
-// Transforms Children of path
-func (config *Config) TransformChildren(path string, transform func(key string, value any) (string, any)) error {
-	var sub map[string]any
-
-	if !config.Layer.Exists(path) {
-		return errors.New("invalid path")
-	}
-
-	err := config.Layer.Unmarshal(path, &sub)
-
-	if err != nil {
-		return err
-	}
-
-	transformed := make(map[string]any)
-
-	for key, val := range sub {
-		newKey, newVal := transform(key, val)
-
-		transformed[newKey] = newVal
-	}
-
-	config.Layer.Delete(path)
-
-	config.Layer.Load(confmap.Provider(map[string]any{
-		path: transformed,
-	}, "."), nil)
-
-	return nil
-}
-
-// Does the same thing as transformChildren() but does it for each Array Item inside of root and transforms subPath
-func (config *Config) TransformChildrenUnderArray(root string, subPath string, transform func(key string, value any) (string, any)) error {
-	var array []map[string]any
-
-	err := config.Layer.Unmarshal(root, &array)
-	if err != nil {
-		return err
-	}
-
-	transformed := []map[string]any{}
-
-	for _, data := range array {
-		tmp := New()
-
-		tmp.Layer.Load(confmap.Provider(map[string]any{
-			"item": data,
-		}, "."), nil)
-
-		err := tmp.TransformChildren("item."+subPath, transform)
-
-		if err != nil {
-			return err
-		}
-
-		item := tmp.Layer.Get("item")
-
-		if item != nil {
-			itemMap, ok := item.(map[string]any)
-
-			if ok {
-				transformed = append(transformed, itemMap)
-			}
-		}
-	}
-
-	config.Layer.Delete(root)
-
-	config.Layer.Load(confmap.Provider(map[string]any{
-		root: transformed,
-	}, "."), nil)
-
-	return nil
 }
 
 func (config *Config) NormalizeEnv(key string, value string) (string, any) {
