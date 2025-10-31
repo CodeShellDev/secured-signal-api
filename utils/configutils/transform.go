@@ -6,7 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
+	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/providers/confmap"
 )
 
@@ -50,8 +51,6 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 		transformTag := field.Tag.Get("transform")
 		childTransformTag := field.Tag.Get("childtransform")
 
-		log.Dev("Registering ", lower, " with ", transformTag, " and ", childTransformTag)
-
 		data[lower] = TransformTarget{
 			Key:               lower,
 			Transform:         transformTag,
@@ -61,8 +60,6 @@ func GetKeyToTransformMap(value any) map[string]TransformTarget {
 
 		// Recursively walk nested structs
 		if fieldValue.Kind() == reflect.Struct || (fieldValue.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) {
-
-			log.Dev("Recursively walking ", lower)
 
 			sub := GetKeyToTransformMap(fieldValue.Interface())
 
@@ -104,6 +101,8 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 	if !ok {
 		return
 	}
+
+	logger.Dev("Result:\n----------------------------------\n", jsonutils.ToJson(mapRes), "\n----------------------------------")
 
 	config.Layer.Delete(path)
 	config.Layer.Load(confmap.Provider(mapRes, "."), nil)
