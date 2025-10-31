@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
-	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/providers/confmap"
 )
@@ -95,8 +94,8 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 
 	data := config.Unflatten(path)
 
-	log.Dev("Init:\n--------------------------------------\n", jsonutils.ToJson(data), "\n--------------------------------------")
-	logger.Dev("Init:Sprint():\n--------------------------------------\n", config.Layer.Sprint(), "\n--------------------------------------")
+	log.Dev("Unflatten+Get:\n--------------------------------------\n", jsonutils.ToJson(data), "\n--------------------------------------")
+	log.Dev("Get:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.Get("")), "\n--------------------------------------")
 	
 	_, res := applyTransform("", config.Layer.Get(path), transformTargets, funcs)
 
@@ -104,6 +103,12 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 
 	if !ok {
 		return
+	}
+
+	if path != "" {
+		mapRes = map[string]any {
+			path: mapRes,
+		}
 	}
 
 	config.Layer.Delete(path)
