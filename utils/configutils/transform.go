@@ -111,7 +111,7 @@ func (config Config) ApplyTransformFuncs(structSchema any, path string, funcs ma
 		}
 	}
 
-	config.Layer.Delete(path)
+	config.Layer.Delete("")
 	config.Layer.Load(confmap.Provider(mapRes, "."), nil)
 }
 
