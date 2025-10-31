@@ -4,7 +4,6 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -160,14 +159,9 @@ func (config *Config) TemplateConfig() {
 }
 
 func (config *Config) MergeLayers(layers ...*koanf.Koanf) {
-	log.Dev("Before:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
-
-	for i, layer := range layers {
-		log.Dev("Merge[", strconv.Itoa(i), "]:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
+	for _, layer := range layers {
 		config.Layer.Merge(layer)
 	}
-
-	log.Dev("Merge:\n--------------------------------------\n", jsonutils.ToJson(config.Layer.All()), "\n--------------------------------------")
 }
 
 func (config *Config) NormalizeEnv(key string, value string) (string, any) {

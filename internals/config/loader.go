@@ -83,8 +83,6 @@ func LowercaseKeys(config *configutils.Config) {
 }
 
 func NormalizeConfig() {
-	log.Dev("Normilization:\n--------------------------------------\n", jsonutils.ToJson(mainConf.Layer.All()), "\n--------------------------------------")
-
 	settings := mainConf.Layer.Get("settings")
 	old, ok := settings.(map[string]any)
 
@@ -104,7 +102,7 @@ func NormalizeConfig() {
 	LowercaseKeys(mainConf)
 
 	// Load temporary configs back into paths
-	mainConf.Delete("settings")
+	mainConf.Layer.Delete("settings")
 
 	log.Dev("Loading:\n--------------------------------------\n", jsonutils.ToJson(mainConf.Layer.All()), "\n--------------------------------------")
 
