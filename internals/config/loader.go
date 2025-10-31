@@ -89,6 +89,8 @@ func NormalizeConfig() {
 	// Apply transforms to the new configs
 	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "", transformFuncs)
 
+	log.Dev("Transform:\n--------------------------------------\n", jsonutils.ToJson(tmpConf.Layer.All()), "\n--------------------------------------")
+
 	// Lowercase actual configs
 	LowercaseKeys(config)
 

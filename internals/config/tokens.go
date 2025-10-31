@@ -25,6 +25,7 @@ func LoadTokens() {
 		log.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
 	}
 
+	tokenConf.OnLoad(Load)
 	tokenConf.TemplateConfig()
 }
 
