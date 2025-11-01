@@ -1,6 +1,9 @@
 package logger
 
 import (
+	"fmt"
+	"image/color"
+	"strconv"
 	"strings"
 
 	"go.uber.org/zap/zapcore"
@@ -27,6 +30,18 @@ func ParseLevel(s string) zapcore.Level {
 	}
 }
 
+func ColorCode(str string, color color.RGBA) string {
+	r, g, b := color.R, color.G, color.B
+
+	red, green, blue := int(r), int(g), int(b)
+
+	colorStr := strconv.Itoa(red) + ";" + strconv.Itoa(green) + ";" + strconv.Itoa(blue)
+
+	fmt.Println(colorStr)
+
+	return "\x1b[38;2;" + colorStr + "m" + str + "\x1b[0m"
+}
+
 func LevelString(l zapcore.Level) string {
 	switch l {
 	case DeveloperLevel:
@@ -39,7 +54,9 @@ func LevelString(l zapcore.Level) string {
 func CapitalLevel(l zapcore.Level) string {
 	switch l {
 	case DeveloperLevel:
-		return "\033[92mDEV\033[0m"
+		return ColorCode("DEV", color.RGBA{
+			R: 95, G: 175, B: 135,
+		})
 	default:
 		return l.CapitalString()
 	}
