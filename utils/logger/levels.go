@@ -30,16 +30,25 @@ func ParseLevel(s string) zapcore.Level {
 func LevelString(l zapcore.Level) string {
 	switch l {
 	case DeveloperLevel:
+		return "dev"
+	default:
+		return l.CapitalString()
+	}
+}
+
+func CapitalLevel(l zapcore.Level) string {
+	switch l {
+	case DeveloperLevel:
 		return "DEV"
 	default:
-		return strings.ToUpper(l.String())
+		return l.CapitalString()
 	}
 }
 
 func CustomEncodeLevel(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
 	switch l {
 	case DeveloperLevel:
-		enc.AppendString(LevelString(l))
+		enc.AppendString(CapitalLevel(l))
 	default:
 		zapcore.CapitalColorLevelEncoder(l, enc)
 	}

@@ -43,12 +43,12 @@ func Init(level string) {
 	_log, err = cfg.Build(zap.AddCaller(), zap.AddCallerSkip(1))
 
 	if err != nil {
-		fmt.Println("Encountered Error during Log.Init(): err.Error()")
+		fmt.Println("Encountered Error during Log.Init(): ", err.Error())
 	}
 }
 
 func Level() string {
-	return _log.Level().String()
+	return LevelString(_log.Level())
 }
 
 func Info(msg ...string) {
