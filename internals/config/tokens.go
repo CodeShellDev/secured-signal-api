@@ -27,19 +27,21 @@ func LoadTokens() {
 }
 
 func NormalizeTokens() {
-	configArray := []map[string]any{}
+	data := []map[string]any{}
 
 	for _, config := range tokenConf.Layer.Slices("tokenconfigs") {
 		tmpConf := configutils.New()
-		tmpConf.Load(config.All(), "")
+		tmpConf.Load(config.Get("").(map[string]any), "")
 
 		Normalize(tmpConf, "overrides", &structure.SETTINGS{})
 		
-		configArray = append(configArray, tmpConf.Layer.All())
+		data = append(data, tmpConf.Layer.Get("").(map[string]any))
 	}
 
 	// Merge token configs together into new temporary config
-	tokenConf.Layer.Set("tokenconfigs", configArray)
+	tokenConf.Load(map[string]any{
+		"tokenconfigs": data,
+	}, "")
 }
 
 func InitTokens() {
