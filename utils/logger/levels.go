@@ -39,7 +39,7 @@ func LevelString(l zapcore.Level) string {
 func CapitalLevel(l zapcore.Level) string {
 	switch l {
 	case DeveloperLevel:
-		return "DEV"
+		return "\033[92mDEV\033[0m"
 	default:
 		return l.CapitalString()
 	}
