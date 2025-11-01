@@ -54,6 +54,7 @@ Check out the official [Documentation](https://codeshelldev.github.io/secured-si
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
+  - [Field Policies](#field-policies)
   - [Field Mappings](#field-mappings)
   - [Message Templates](#message-templates)
 - [Integrations](https://codeshelldev.github.io/secured-signal-api/docs/integrations/compatibility)
@@ -235,14 +236,17 @@ You can modify endpoints by configuring `access.endpoints` in your config:
 settings:
   access:
     endpoints:
-      - !/v1/register
-      - !/v1/unregister
-      - !/v1/qrcodelink
-      - !/v1/contacts
+      - "!/v1/register"
+      - "!/v1/unregister"
+      - "!/v1/qrcodelink"
+      - "!/v1/contacts"
       - /v2/send
 ```
 
 By default adding an endpoint explictly allows access to it, use `!` to block it instead.
+
+> [!IMPORTANT]
+> When using `!` to block you must enclose the endpoint with quotes, like in the example above.
 
 | Config (Allow) | (Block)        |   Result   |     |                   |     |
 | :------------- | :------------- | :--------: | --- | :---------------: | --- |
@@ -283,6 +287,23 @@ settings:
 
 Message Templates support [Standard Golang Templating](#templating).
 Use `@data.key` to reference Body Keys, `#Content_Type` for Headers and `.KEY` for Variables.
+
+### Field Policies
+
+**Field Policies** allow for blocking or specifically allowing certain fields with set values from being used in the requests body or headers.
+
+Configure them by using `access.fieldPolicies` like so:
+
+```yaml
+settings:
+  access:
+    fieldPolicies:
+      "@number": { value: "+123400002", action: block }
+```
+
+Set the wanted action on encounter, available options are `block` and `allow`.
+
+Use `@` for Body Keys and `#` for Headers.
 
 ### Field Mappings
 
