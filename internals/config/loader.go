@@ -9,7 +9,6 @@ import (
 
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/configutils"
-	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 
 	"github.com/knadh/koanf/parsers/yaml"
@@ -58,9 +57,11 @@ func Load() {
 	InitEnv()
 
 	log.Info("Finished Loading Configuration")
+}
 
-	log.Dev("Loaded Config:\n" + jsonutils.ToJson(mainConf.Layer.All()))
-	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokenConf.Layer.All()))
+func Log() {
+	log.Dev("Loaded Config:", mainConf.Layer.All())
+	log.Dev("Loaded Token Configs:", tokenConf.Layer.All())
 }
 
 func Clear() {
