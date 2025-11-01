@@ -4,11 +4,12 @@ import (
 	"strconv"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	"github.com/codeshelldev/secured-signal-api/utils/configutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
-type TOKEN_CONFIG_ struct {
+type TOKEN_CONFIG struct {
 	TOKENS    []string 				`koanf:"tokens"`
 	OVERRIDES structure.SETTINGS 	`koanf:"overrides"`
 }
@@ -22,17 +23,29 @@ func LoadTokens() {
 		log.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
 	}
 
-	tokenConf.NormalizeKeys()
-
 	tokenConf.TemplateConfig()
 }
 
+func NormalizeTokens() {
+	configArray := []map[string]any{}
+
+	for _, config := range tokenConf.Layer.Slices("tokenconfigs") {
+		tmpConf := configutils.New()
+		tmpConf.Load(config.All(), "")
+
+		Normalize(tmpConf, "overrides", &structure.SETTINGS{})
+		
+		configArray = append(configArray, tmpConf.Layer.All())
+	}
+
+	// Merge token configs together into new temporary config
+	tokenConf.Layer.Set("tokenconfigs", configArray)
+}
+
 func InitTokens() {
-	apiTokens := config.Layer.Strings("api.tokens")
+	apiTokens := mainConf.Layer.Strings("api.tokens")
 
-	var tokenConfigs []TOKEN_CONFIG_
-
-	tokenConf.TransformChildrenUnderArray("tokenconfigs", "overrides.message.variables", transformVariables)
+	var tokenConfigs []TOKEN_CONFIG
 
 	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
 
@@ -53,7 +66,7 @@ func InitTokens() {
 
 		// Set Blocked Endpoints on Config to User Layer Value
 		// => effectively ignoring Default Layer
-		config.Layer.Set("settings.access.endpoints", userConf.Layer.Strings("settings.access.endpoints"))
+		mainConf.Layer.Set("settings.access.endpoints", userConf.Layer.Strings("settings.access.endpoints"))
 	}
 
 	if len(apiTokens) > 0 {
@@ -63,7 +76,7 @@ func InitTokens() {
 	}
 }
 
-func parseTokenConfigs(configs []TOKEN_CONFIG_) map[string]structure.SETTINGS {
+func parseTokenConfigs(configs []TOKEN_CONFIG) map[string]structure.SETTINGS {
 	settings := map[string]structure.SETTINGS{}
 
 	for _, config := range configs {

@@ -25,13 +25,15 @@ var ENV *structure.ENV = &structure.ENV{
 	INSECURE:      false,
 }
 
-var defaultsConf = configutils.New()
-var userConf = configutils.New()
-var tokenConf = configutils.New()
+var defaultsConf *configutils.Config
+var userConf *configutils.Config
+var tokenConf *configutils.Config
 
-var config = configutils.New()
+var mainConf *configutils.Config
 
 func Load() {
+	Clear()
+
 	InitReload()
 
 	LoadDefaults()
@@ -42,10 +44,14 @@ func Load() {
 
 	userConf.LoadEnv()
 
-	config.MergeLayers(defaultsConf.Layer, userConf.Layer)
+	NormalizeConfig(defaultsConf)
+	NormalizeConfig(userConf)
+	
+	NormalizeTokens()
 
-	config.NormalizeKeys()
-	config.TemplateConfig()
+	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer)
+
+	mainConf.TemplateConfig()
 
 	InitTokens()
 
@@ -53,8 +59,57 @@ func Load() {
 
 	log.Info("Finished Loading Configuration")
 
-	log.Dev("Loaded Config:\n" + jsonutils.ToJson(config.Layer.All()))
+	log.Dev("Loaded Config:\n" + jsonutils.ToJson(mainConf.Layer.All()))
 	log.Dev("Loaded Token Configs:\n" + jsonutils.ToJson(tokenConf.Layer.All()))
+}
+
+func Clear() {
+	defaultsConf = configutils.New()
+	userConf = configutils.New()
+	tokenConf = configutils.New()
+	mainConf = configutils.New()
+}
+
+func LowercaseKeys(config *configutils.Config) {
+	data := map[string]any{}
+
+	for _, key := range config.Layer.Keys() {
+		lower := strings.ToLower(key)
+
+		data[lower] = config.Layer.Get(key)
+	}
+
+	config.Layer.Delete("")
+	config.Load(data, "")
+}
+
+func NormalizeConfig(config *configutils.Config) {
+	Normalize(config, "settings", &structure.SETTINGS{})
+}
+
+func Normalize(config *configutils.Config, path string, structure any) {
+	data := config.Layer.Get(path)
+	old, ok := data.(map[string]any)
+
+	if !ok {
+		log.Warn("Could not load `"+path+"`")
+		return
+	}
+
+	// Create temporary config
+	tmpConf := configutils.New()
+	tmpConf.Load(old, "")
+	
+	// Apply transforms to the new config
+	tmpConf.ApplyTransformFuncs(structure, "", transformFuncs)
+
+	// Lowercase actual config
+	LowercaseKeys(config)
+
+	// Load temporary config back into paths
+	config.Layer.Delete(path)
+	
+	config.Load(tmpConf.Layer.All(), path)
 }
 
 func InitReload() {
@@ -64,17 +119,15 @@ func InitReload() {
 }
 
 func InitEnv() {
-	ENV.PORT = strconv.Itoa(config.Layer.Int("service.port"))
+	ENV.PORT = strconv.Itoa(mainConf.Layer.Int("service.port"))
 
-	ENV.LOG_LEVEL = strings.ToLower(config.Layer.String("loglevel"))
+	ENV.LOG_LEVEL = strings.ToLower(mainConf.Layer.String("loglevel"))
 
-	ENV.API_URL = config.Layer.String("api.url")
+	ENV.API_URL = mainConf.Layer.String("api.url")
 
 	var settings structure.SETTINGS
 
-	config.TransformChildren("settings.message.variables", transformVariables)
-
-	config.Layer.Unmarshal("settings", &settings)
+	mainConf.Layer.Unmarshal("settings", &settings)
 
 	ENV.SETTINGS["*"] = &settings
 }
@@ -101,8 +154,4 @@ func LoadConfig() {
 
 		log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
 	}
-}
-
-func transformVariables(key string, value any) (string, any) {
-	return strings.ToUpper(key), value
 }

@@ -32,11 +32,11 @@ settings:
 
   access:
     endpoints:
-      - !/v1/about
-      - !/v1/configuration
-      - !/v1/devices
-      - !/v1/register
-      - !/v1/unregister
-      - !/v1/qrcodelink
-      - !/v1/accounts
-      - !/v1/contacts
+      - "!/v1/about"
+      - "!/v1/configuration"
+      - "!/v1/devices"
+      - "!/v1/register"
+      - "!/v1/unregister"
+      - "!/v1/qrcodelink"
+      - "!/v1/accounts"
+      - "!/v1/contacts"
