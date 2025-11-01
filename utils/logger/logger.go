@@ -14,7 +14,7 @@ var _logLevel = ""
 func Init(level string) {
 	_logLevel = strings.ToLower(level)
 
-	logLevel := getLogLevel(_logLevel)
+	logLevel := ParseLevel(_logLevel)
 
 	cfg := zap.Config{
 		Level:       zap.NewAtomicLevelAt(logLevel),
@@ -29,7 +29,7 @@ func Init(level string) {
 			MessageKey:     "msg",
 			StacktraceKey:  "stacktrace",
 			LineEnding:     zapcore.DefaultLineEnding,
-			EncodeLevel:    zapcore.CapitalColorLevelEncoder,
+			EncodeLevel:    CustomEncodeLevel,
 			EncodeTime:     zapcore.TimeEncoderOfLayout("02.01 15:04"),
 			EncodeDuration: zapcore.StringDurationEncoder,
 			EncodeCaller:   zapcore.ShortCallerEncoder,
@@ -43,31 +43,12 @@ func Init(level string) {
 	_log, err = cfg.Build(zap.AddCaller(), zap.AddCallerSkip(1))
 
 	if err != nil {
-		fmt.Println("Encountered Error during Log.Init(): err.Error()")
-	}
-}
-
-func getLogLevel(level string) zapcore.Level {
-	switch level {
-	case "info":
-		return zapcore.InfoLevel
-	case "debug":
-		return zapcore.DebugLevel
-	case "dev":
-		return zapcore.DebugLevel
-	case "warn":
-		return zapcore.WarnLevel
-	case "error":
-		return zapcore.ErrorLevel
-	case "fatal":
-		return zapcore.FatalLevel
-	default:
-		return zapcore.InfoLevel
+		fmt.Println("Encountered Error during Log.Init(): ", err.Error())
 	}
 }
 
 func Level() string {
-	return _log.Level().String()
+	return LevelString(_log.Level())
 }
 
 func Info(msg ...string) {
@@ -79,8 +60,10 @@ func Debug(msg ...string) {
 }
 
 func Dev(msg ...string) {
-	if _logLevel == "dev" {
-		_log.Debug(strings.Join(msg, ""))
+	ok := _log.Check(DeveloperLevel, strings.Join(msg, ""))
+
+	if ok != nil {
+		ok.Write()
 	}
 }
 
