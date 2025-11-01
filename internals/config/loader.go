@@ -44,10 +44,12 @@ func Load() {
 
 	userConf.LoadEnv()
 
-	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer)
-
-	NormalizeConfig()
+	NormalizeConfig(defaultsConf)
+	NormalizeConfig(userConf)
+	
 	NormalizeTokens()
+
+	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
 	mainConf.TemplateConfig()
 
@@ -81,8 +83,8 @@ func LowercaseKeys(config *configutils.Config) {
 	config.Load(data, "")
 }
 
-func NormalizeConfig() {
-	settings := mainConf.Layer.Get("settings")
+func NormalizeConfig(config *configutils.Config) {
+	settings := config.Layer.Get("settings")
 	old, ok := settings.(map[string]any)
 
 	if !ok {
@@ -98,12 +100,12 @@ func NormalizeConfig() {
 	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "", transformFuncs)
 
 	// Lowercase actual configs
-	LowercaseKeys(mainConf)
+	LowercaseKeys(config)
 
 	// Load temporary configs back into paths
-	mainConf.Layer.Delete("settings")
+	config.Layer.Delete("settings")
 	
-	mainConf.Load(tmpConf.Layer.All(), "settings")
+	config.Load(tmpConf.Layer.All(), "settings")
 }
 
 func InitReload() {
