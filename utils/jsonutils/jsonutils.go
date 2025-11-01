@@ -76,3 +76,9 @@ func ToJson[T any](obj T) string {
 
 	return string(bytes)
 }
+
+func Pretty[T any](obj T) string {
+	bytes, _ := json.MarshalIndent(obj, "", "  ")
+
+	return string(bytes)
+}

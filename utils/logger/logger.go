@@ -2,8 +2,11 @@ package logger
 
 import (
 	"fmt"
+	"image/color"
+	"strconv"
 	"strings"
 
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -14,7 +17,7 @@ var _logLevel = ""
 func Init(level string) {
 	_logLevel = strings.ToLower(level)
 
-	logLevel := getLogLevel(_logLevel)
+	logLevel := ParseLevel(_logLevel)
 
 	cfg := zap.Config{
 		Level:       zap.NewAtomicLevelAt(logLevel),
@@ -29,7 +32,7 @@ func Init(level string) {
 			MessageKey:     "msg",
 			StacktraceKey:  "stacktrace",
 			LineEnding:     zapcore.DefaultLineEnding,
-			EncodeLevel:    zapcore.CapitalColorLevelEncoder,
+			EncodeLevel:    CustomEncodeLevel,
 			EncodeTime:     zapcore.TimeEncoderOfLayout("02.01 15:04"),
 			EncodeDuration: zapcore.StringDurationEncoder,
 			EncodeCaller:   zapcore.ShortCallerEncoder,
@@ -43,57 +46,64 @@ func Init(level string) {
 	_log, err = cfg.Build(zap.AddCaller(), zap.AddCallerSkip(1))
 
 	if err != nil {
-		fmt.Println("Encountered Error during Log.Init(): err.Error()")
+		fmt.Println("Encountered Error during Log.Init(): ", err.Error())
 	}
 }
 
-func getLogLevel(level string) zapcore.Level {
-	switch level {
-	case "info":
-		return zapcore.InfoLevel
-	case "debug":
-		return zapcore.DebugLevel
-	case "dev":
-		return zapcore.DebugLevel
-	case "warn":
-		return zapcore.WarnLevel
-	case "error":
-		return zapcore.ErrorLevel
-	case "fatal":
-		return zapcore.FatalLevel
-	default:
-		return zapcore.InfoLevel
+func Format(data ...any) string {
+	res := ""
+
+	for _, item := range data {
+		switch value := item.(type) {
+		case string:
+			res += value
+		case int:
+			res += strconv.Itoa(value)
+		default:
+			lines := strings.Split(jsonutils.Pretty(value), "\n")
+
+			lineStr := ""
+
+			for _, line := range lines {
+				lineStr += "\n" + startColor(color.RGBA{ R: 0, G: 135, B: 95,}) + line + endColor()
+			}
+			res += lineStr
+		}
 	}
+
+	return res
 }
 
 func Level() string {
-	return _log.Level().String()
+	return LevelString(_log.Level())
 }
 
-func Info(msg ...string) {
-	_log.Info(strings.Join(msg, ""))
+func Info(data ...any) {
+	_log.Info(Format(data...))
 }
 
-func Debug(msg ...string) {
-	_log.Debug(strings.Join(msg, ""))
+func Debug(data ...any) {
+	_log.Debug(Format(data...))
 }
 
-func Dev(msg ...string) {
-	if _logLevel == "dev" {
-		_log.Debug(strings.Join(msg, ""))
+func Dev(data ...any) {
+	ok := _log.Check(DeveloperLevel, Format(data...))
+
+	if ok != nil {
+		ok.Write()
 	}
 }
 
-func Error(msg ...string) {
-	_log.Error(strings.Join(msg, ""))
+func Error(data ...any) {
+	_log.Error(Format(data...))
 }
 
-func Fatal(msg ...string) {
-	_log.Fatal(strings.Join(msg, ""))
+func Fatal(data ...any) {
+	_log.Fatal(Format(data...))
 }
 
-func Warn(msg ...string) {
-	_log.Warn(strings.Join(msg, ""))
+func Warn(data ...any) {
+	_log.Warn(Format(data...))
 }
 
 func Sync() {

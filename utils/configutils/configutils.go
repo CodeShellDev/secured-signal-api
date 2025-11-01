@@ -26,9 +26,7 @@ type Config struct {
 func New() *Config {
 	return &Config{
 		Layer: koanf.New("."),
-		LoadFunc: func() {
-			log.Dev("Config.LoadFunc not initialized!")
-		},
+		LoadFunc: func() {},
 	}
 }
 
@@ -63,8 +61,62 @@ func WatchFile(path string, f *file.File, loadFunc func()) {
 		configLock.Lock()
 		defer configLock.Unlock()
 
+		f.Unwatch()
+
 		loadFunc()
 	})
+}
+
+func getPath(str string) string {
+	if str == "." {
+		str = ""
+	}
+
+	return str
+}
+
+func (config *Config) Load(data map[string]any, path string) error {
+	parts := strings.Split(path, ".")
+
+	res := map[string]any{}
+
+	if path == "" {
+		res = data
+	} else {
+		for i, key := range parts {
+			if i == 0 {
+				res[key] = data
+			} else {
+				sub := map[string]any{}
+
+				sub[key] = res
+
+				res = sub
+			}
+		}
+	}
+
+	return config.Layer.Load(confmap.Provider(res, "."), nil)
+}
+
+func (config *Config) Delete(path string) (error) {
+	if !config.Layer.Exists(path) {
+		return errors.New("path not found")
+	}
+
+	all := config.Layer.All()
+	
+	if all == nil {
+		return errors.New("empty config")
+	}
+
+	for _, key := range config.Layer.Keys() {
+		if strings.HasPrefix(key, path + ".") || key == path {
+			config.Layer.Delete(key)
+		}
+	}
+
+	return nil
 }
 
 func (config *Config) LoadDir(path string, dir string, ext string, parser koanf.Parser) error {
@@ -79,6 +131,8 @@ func (config *Config) LoadDir(path string, dir string, ext string, parser koanf.
 	for _, f := range files {
 		tmp := New()
 
+		tmp.OnLoad(config.LoadFunc)
+
 		_, err := tmp.LoadFile(f, parser)
 
 		if err != nil {
@@ -92,7 +146,7 @@ func (config *Config) LoadDir(path string, dir string, ext string, parser koanf.
 		path: array,
 	}
 
-	return config.Layer.Load(confmap.Provider(wrapper, "."), nil)
+	return config.Load(wrapper, "")
 }
 
 func (config *Config) LoadEnv() (koanf.Provider, error) {
@@ -124,103 +178,13 @@ func (config *Config) TemplateConfig() {
 		}
 	}
 
-	config.Layer.Load(confmap.Provider(data, "."), nil)
+	config.Load(data, "")
 }
 
 func (config *Config) MergeLayers(layers ...*koanf.Koanf) {
 	for _, layer := range layers {
 		config.Layer.Merge(layer)
 	}
-}
-
-func (config *Config) NormalizeKeys() {
-	data := map[string]any{}
-
-	for _, key := range config.Layer.Keys() {
-		lower := strings.ToLower(key)
-
-		log.Dev("Lowering key: ", key)
-
-		data[lower] = config.Layer.Get(key)
-	}
-
-	config.Layer.Delete("")
-	config.Layer.Load(confmap.Provider(data, "."), nil)
-}
-
-// Transforms Children of path
-func (config *Config) TransformChildren(path string, transform func(key string, value any) (string, any)) error {
-	var sub map[string]any
-
-	if !config.Layer.Exists(path) {
-		return errors.New("invalid path")
-	}
-
-	err := config.Layer.Unmarshal(path, &sub)
-
-	if err != nil {
-		return err
-	}
-
-	transformed := make(map[string]any)
-
-	for key, val := range sub {
-		newKey, newVal := transform(key, val)
-
-		transformed[newKey] = newVal
-	}
-
-	config.Layer.Delete(path)
-
-	config.Layer.Load(confmap.Provider(map[string]any{
-		path: transformed,
-	}, "."), nil)
-
-	return nil
-}
-
-// Does the same thing as transformChildren() but does it for each Array Item inside of root and transforms subPath
-func (config *Config) TransformChildrenUnderArray(root string, subPath string, transform func(key string, value any) (string, any)) error {
-	var array []map[string]any
-
-	err := config.Layer.Unmarshal(root, &array)
-	if err != nil {
-		return err
-	}
-
-	transformed := []map[string]any{}
-
-	for _, data := range array {
-		tmp := New()
-
-		tmp.Layer.Load(confmap.Provider(map[string]any{
-			"item": data,
-		}, "."), nil)
-
-		err := tmp.TransformChildren("item."+subPath, transform)
-
-		if err != nil {
-			return err
-		}
-
-		item := tmp.Layer.Get("item")
-
-		if item != nil {
-			itemMap, ok := item.(map[string]any)
-
-			if ok {
-				transformed = append(transformed, itemMap)
-			}
-		}
-	}
-
-	config.Layer.Delete(root)
-
-	config.Layer.Load(confmap.Provider(map[string]any{
-		root: transformed,
-	}, "."), nil)
-
-	return nil
 }
 
 func (config *Config) NormalizeEnv(key string, value string) (string, any) {
