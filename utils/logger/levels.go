@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"fmt"
 	"image/color"
 	"strconv"
 	"strings"
@@ -36,8 +35,6 @@ func ColorCode(str string, color color.RGBA) string {
 	red, green, blue := int(r), int(g), int(b)
 
 	colorStr := strconv.Itoa(red) + ";" + strconv.Itoa(green) + ";" + strconv.Itoa(blue)
-
-	fmt.Println(colorStr)
 
 	return "\x1b[38;2;" + colorStr + "m" + str + "\x1b[0m"
 }
