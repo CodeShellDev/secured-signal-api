@@ -114,9 +114,14 @@ func Normalize(config *configutils.Config, path string, structure any) {
 }
 
 func InitReload() {
-	defaultsConf.OnLoad(Load)
-	userConf.OnLoad(Load)
-	tokenConf.OnLoad(Load)
+	reload := func() {
+		Load()
+		Log()
+	}
+	
+	defaultsConf.OnLoad(reload)
+	userConf.OnLoad(reload)
+	tokenConf.OnLoad(reload)
 }
 
 func InitEnv() {
