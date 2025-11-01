@@ -84,28 +84,32 @@ func LowercaseKeys(config *configutils.Config) {
 }
 
 func NormalizeConfig(config *configutils.Config) {
-	settings := config.Layer.Get("settings")
-	old, ok := settings.(map[string]any)
+	Normalize(config, "settings", &structure.SETTINGS{})
+}
+
+func Normalize(config *configutils.Config, path string, structure any) {
+	data := config.Layer.Get(path)
+	old, ok := data.(map[string]any)
 
 	if !ok {
-		log.Warn("Could not load `settings`")
+		log.Warn("Could not load `"+path+"`")
 		return
 	}
 
-	// Create temporary configs
+	// Create temporary config
 	tmpConf := configutils.New()
 	tmpConf.Load(old, "")
 	
-	// Apply transforms to the new configs
-	tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "", transformFuncs)
+	// Apply transforms to the new config
+	tmpConf.ApplyTransformFuncs(structure, "", transformFuncs)
 
-	// Lowercase actual configs
+	// Lowercase actual config
 	LowercaseKeys(config)
 
-	// Load temporary configs back into paths
-	config.Layer.Delete("settings")
+	// Load temporary config back into paths
+	config.Layer.Delete(path)
 	
-	config.Load(tmpConf.Layer.All(), "settings")
+	config.Load(tmpConf.Layer.All(), path)
 }
 
 func InitReload() {

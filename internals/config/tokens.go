@@ -36,20 +36,15 @@ func NormalizeTokens() {
 		tmpConf := configutils.New()
 		tmpConf.Load(config.All(), "")
 
+		Normalize(tmpConf, "overrides", &structure.SETTINGS{})
+
 		tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "overrides", transformFuncs)
 
-		configArray = append(configArray, config.All())
+		configArray = append(configArray, tmpConf.Layer.All())
 	}
 
 	// Merge token configs together into new temporary config
 	configs.Set("tokenconfigs", configArray)
-
-	// Lowercase actual configs
-	LowercaseKeys(tokenConf)
-
-	// Load temporary configs back into paths
-	tokenConf.Layer.Delete("")
-	tokenConf.Load(configs.All(), "")
 }
 
 func InitTokens() {
