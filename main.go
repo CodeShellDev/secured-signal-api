@@ -32,6 +32,11 @@ func main() {
 
 	log.Info("Initialized Logger with Level of ", log.Level())
 
+	if log.Level() == "dev" {
+		log.Dev("Welcome back Developer!")
+		log.Dev("CTRL+S config to Print to Console")
+	}
+
 	proxy = reverseProxy.Create(ENV.API_URL)
 
 	handler := proxy.Init()
