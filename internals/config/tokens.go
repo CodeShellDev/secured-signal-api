@@ -35,8 +35,6 @@ func NormalizeTokens() {
 
 		Normalize(tmpConf, "overrides", &structure.SETTINGS{})
 
-		tmpConf.ApplyTransformFuncs(&structure.SETTINGS{}, "overrides", transformFuncs)
-
 		configArray = append(configArray, tmpConf.Layer.All())
 	}
 
