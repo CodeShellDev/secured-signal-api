@@ -9,7 +9,7 @@ import (
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
-type TOKEN_CONFIG_ struct {
+type TOKEN_CONFIG struct {
 	TOKENS    []string 				`koanf:"tokens"`
 	OVERRIDES structure.SETTINGS 	`koanf:"overrides"`
 }
@@ -45,7 +45,7 @@ func NormalizeTokens() {
 func InitTokens() {
 	apiTokens := mainConf.Layer.Strings("api.tokens")
 
-	var tokenConfigs []TOKEN_CONFIG_
+	var tokenConfigs []TOKEN_CONFIG
 
 	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
 
@@ -76,7 +76,7 @@ func InitTokens() {
 	}
 }
 
-func parseTokenConfigs(configs []TOKEN_CONFIG_) map[string]structure.SETTINGS {
+func parseTokenConfigs(configs []TOKEN_CONFIG) map[string]structure.SETTINGS {
 	settings := map[string]structure.SETTINGS{}
 
 	for _, config := range configs {
