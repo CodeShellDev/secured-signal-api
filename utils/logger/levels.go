@@ -51,7 +51,9 @@ func LevelString(l zapcore.Level) string {
 func CapitalLevel(l zapcore.Level) string {
 	switch l {
 	case DeveloperLevel:
-		return "DEV"
+		return ColorCode("DEV  ", color.RGBA{
+			R: 95, G: 175, B: 135,
+		})
 	default:
 		return l.CapitalString()
 	}
