@@ -37,6 +37,8 @@ func main() {
 		log.Dev("CTRL+S config to Print to Console")
 	}
 
+	config.Log()
+
 	proxy = reverseProxy.Create(ENV.API_URL)
 
 	handler := proxy.Init()

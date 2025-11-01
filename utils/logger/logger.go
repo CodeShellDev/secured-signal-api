@@ -2,8 +2,11 @@ package logger
 
 import (
 	"fmt"
+	"image/color"
+	"strconv"
 	"strings"
 
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -47,36 +50,55 @@ func Init(level string) {
 	}
 }
 
+func Format(data ...any) string {
+	res := ""
+
+	for _, item := range data {
+		switch value := item.(type) {
+		case string:
+			res += value
+		case int:
+			res += strconv.Itoa(value)
+		default:
+			res += "\n" + ColorCode(jsonutils.Pretty(value), color.RGBA{
+				R: 0, G: 215, B: 135,
+			})
+		}
+	}
+
+	return res
+}
+
 func Level() string {
 	return LevelString(_log.Level())
 }
 
-func Info(msg ...string) {
-	_log.Info(strings.Join(msg, ""))
+func Info(data ...any) {
+	_log.Info(Format(data...))
 }
 
-func Debug(msg ...string) {
-	_log.Debug(strings.Join(msg, ""))
+func Debug(data ...any) {
+	_log.Debug(Format(data...))
 }
 
-func Dev(msg ...string) {
-	ok := _log.Check(DeveloperLevel, strings.Join(msg, ""))
+func Dev(data ...any) {
+	ok := _log.Check(DeveloperLevel, Format(data...))
 
 	if ok != nil {
 		ok.Write()
 	}
 }
 
-func Error(msg ...string) {
-	_log.Error(strings.Join(msg, ""))
+func Error(data ...any) {
+	_log.Error(Format(data...))
 }
 
-func Fatal(msg ...string) {
-	_log.Fatal(strings.Join(msg, ""))
+func Fatal(data ...any) {
+	_log.Fatal(Format(data...))
 }
 
-func Warn(msg ...string) {
-	_log.Warn(strings.Join(msg, ""))
+func Warn(data ...any) {
+	_log.Warn(Format(data...))
 }
 
 func Sync() {
