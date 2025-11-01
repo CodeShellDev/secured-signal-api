@@ -29,14 +29,17 @@ You can modify endpoints by configuring `access.endpoints` in your config:
 settings:
   access:
     endpoints:
-      - !/v1/register
-      - !/v1/unregister
-      - !/v1/qrcodelink
-      - !/v1/contacts
+      - "!/v1/register"
+      - "!/v1/unregister"
+      - "!/v1/qrcodelink"
+      - "!/v1/contacts"
       - /v2/send
 ```
 
 By default adding an endpoint explictly allows access to it, use `!` to block it instead.
+
+> [!IMPORTANT]
+> When using `!` to block you must enclose the endpoint in quotes, like in the example above
 
 | Config (Allow) | (Block)        |   Result   |     |                   |     |
 | :------------- | :------------- | :--------: | --- | :---------------: | --- |
