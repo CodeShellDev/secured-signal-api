@@ -19,10 +19,10 @@ func policyHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		settings := getSettingsByReq(req)
 
-		policies := settings.ACCESS.FIELD_POLOCIES
+		policies := settings.ACCESS.FIELD_POLICIES
 
 		if policies == nil {
-			policies = getSettings("*").ACCESS.FIELD_POLOCIES
+			policies = getSettings("*").ACCESS.FIELD_POLICIES
 		}
 
 		body, err := request.GetReqBody(req)

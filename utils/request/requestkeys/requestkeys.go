@@ -11,8 +11,8 @@ var BodyPrefix = "@"
 var HeaderPrefix = "#"
 
 func Parse(str string) Field {
-	prefix := str[1:]
-	key := str[:1]
+	prefix := str[:1]
+	key := str[1:]
 
 	return Field{
 		Prefix: prefix,
