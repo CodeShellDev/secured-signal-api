@@ -131,6 +131,8 @@ func (config *Config) LoadDir(path string, dir string, ext string, parser koanf.
 	for _, f := range files {
 		tmp := New()
 
+		tmp.OnLoad(config.LoadFunc)
+
 		_, err := tmp.LoadFile(f, parser)
 
 		if err != nil {
