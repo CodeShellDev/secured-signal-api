@@ -139,10 +139,14 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 
 			childKey, childValue := applyTransform(fullKey, v, targets, funcs)
 
-			res[childKey] = childValue
+			keyParts := getKeyParts(childKey)
+
+			res[keyParts[len(keyParts)-1]] = childValue
 		}
 
-		return newKey, res
+		keyParts := getKeyParts(newKey)
+
+		return keyParts[len(keyParts)-1], res
 	case []any:
 		res := []any{}
 		
@@ -166,7 +170,9 @@ func applyTransform(key string, value any, transformTargets map[string]Transform
 			res = append(res, childValue)
 		}
 
-		return newKey, res
+		keyParts := getKeyParts(newKey)
+
+		return keyParts[len(keyParts)-1], res
 	default:
 		return applyTransformToAny(key, asserted, transformTargets, funcs)
 	}
