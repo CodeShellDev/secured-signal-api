@@ -5,6 +5,7 @@ import (
 
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/configutils"
+	"github.com/codeshelldev/secured-signal-api/utils/jsonutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 )
@@ -34,6 +35,8 @@ func NormalizeTokens() {
 		tmpConf.Load(config.All(), "")
 
 		Normalize(tmpConf, "overrides", &structure.SETTINGS{})
+
+		log.Dev("Tokenconfig:\n------------------------------\n", jsonutils.ToJson(tmpConf.Layer.All()), "------------------------------")
 
 		configArray = append(configArray, tmpConf.Layer.All())
 	}
