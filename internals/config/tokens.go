@@ -7,7 +7,6 @@ import (
 	"github.com/codeshelldev/secured-signal-api/utils/configutils"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/v2"
 )
 
 type TOKEN_CONFIG_ struct {
@@ -28,8 +27,6 @@ func LoadTokens() {
 }
 
 func NormalizeTokens() {
-	// Create temporary configs
-	configs := koanf.New(".")
 	configArray := []map[string]any{}
 
 	for _, config := range tokenConf.Layer.Slices("tokenconfigs") {
@@ -44,7 +41,7 @@ func NormalizeTokens() {
 	}
 
 	// Merge token configs together into new temporary config
-	configs.Set("tokenconfigs", configArray)
+	tokenConf.Layer.Set("tokenconfigs", configArray)
 }
 
 func InitTokens() {
