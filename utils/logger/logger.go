@@ -60,9 +60,14 @@ func Format(data ...any) string {
 		case int:
 			res += strconv.Itoa(value)
 		default:
-			res += "\n" + ColorCode(jsonutils.Pretty(value), color.RGBA{
-				R: 0, G: 215, B: 135,
-			})
+			lines := strings.Split(jsonutils.Pretty(value), "\n")
+
+			lineStr := ""
+
+			for _, line := range lines {
+				lineStr += "\n" + startColor(color.RGBA{ R: 0, G: 135, B: 95,}) + line + endColor()
+			}
+			res += lineStr
 		}
 	}
 
