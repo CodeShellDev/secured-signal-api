@@ -252,7 +252,7 @@ By default adding an endpoint explictly allows access to it, use `!` to block it
 | :------------- | :------------- | :--------: | --- | :---------------: | --- |
 | `/v2/send`     | `unset`        |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
 | `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
-| `/v2*`         | `!/v2/send`    | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
+| `!/v2*`        | `/v2/send`     | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
 
 ### Variables
 
