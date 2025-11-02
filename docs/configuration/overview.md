@@ -63,8 +63,14 @@ settings:
 
   access:
     endpoints:
-      - !/v1/about
+      - "!/v1/about"
       - /v2/send
+
+    fieldPolicies:
+      "@number": {
+        value: "+123400003",
+        action: block
+      }
 ```
 
 ### Token Configs
@@ -90,5 +96,5 @@ overrides:
 
   access:
     endpoints: # Disable Sending
-      - !/v2/send
+      - "!/v2/send"
 ```

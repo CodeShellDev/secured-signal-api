@@ -220,15 +220,15 @@ Since Secured Signal API is just a Proxy you can use all of the [Signal REST API
 
 | Endpoint              |                    |
 | :-------------------- | ------------------ |
-| **/v1/about**         | **/v1/unregister** |
-| **/v1/configuration** | **/v1/qrcodelink** |
+| **/v1/configuration** | **/v1/unregister** |
 | **/v1/devices**       | **/v1/contacts**   |
 | **/v1/register**      | **/v1/accounts**   |
+| **/v1/qrcodelink**    |                    |
 
 These Endpoints are blocked by default due to Security Risks.
 
 > [!NOTE]
-> Matching works by checking if the requested Endpoints starts with a Blocked or an Allowed Endpoint
+> Matching uses [glob-style patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html): `*` matches any sequence of characters, `?` matches a single character and `[abc]` matches one of the characters in the brackets
 
 You can modify endpoints by configuring `access.endpoints` in your config:
 
@@ -252,7 +252,7 @@ By default adding an endpoint explictly allows access to it, use `!` to block it
 | :------------- | :------------- | :--------: | --- | :---------------: | --- |
 | `/v2/send`     | `unset`        |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
 | `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
-| `/v2`          | `!/v2/send`    | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
+| `!/v2*`        | `/v2/send`     | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
 
 ### Variables
 
