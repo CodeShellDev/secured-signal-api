@@ -46,7 +46,6 @@ func authHandler(next http.Handler) http.Handler {
 				if isValidToken(tokens, authToken) {
 					success = true
 				}
-
 			case Basic:
 				basicAuthBody, err := base64.StdEncoding.DecodeString(authToken)
 
@@ -55,11 +54,12 @@ func authHandler(next http.Handler) http.Handler {
 				}
 
 				basicAuth := string(basicAuthBody)
-				basicAuthParams := strings.Split(basicAuth, ":")
+				basicAuthParts := strings.Split(basicAuth, ":")
 
 				user := "api"
+				authToken = basicAuthParts[1]
 
-				if basicAuthParams[0] == user && isValidToken(tokens, basicAuthParams[1]) {
+				if basicAuthParams[0] == user && isValidToken(tokens, authToken) {
 					success = true
 				}
 			}
