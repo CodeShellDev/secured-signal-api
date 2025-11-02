@@ -228,7 +228,7 @@ Since Secured Signal API is just a Proxy you can use all of the [Signal REST API
 These Endpoints are blocked by default due to Security Risks.
 
 > [!NOTE]
-> Matching works by checking if the requested Endpoints starts with a Blocked or an Allowed Endpoint
+> Matching uses glob-style patterns: `*` matches any sequence of characters, `?` matches a single character and `[abc]` matches one of the characters in the brackets
 
 You can modify endpoints by configuring `access.endpoints` in your config:
 
