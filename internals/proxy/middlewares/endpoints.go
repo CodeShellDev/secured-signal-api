@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"slices"
 	"strings"
+	"path"
 
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
@@ -52,38 +53,45 @@ func getEndpoints(endpoints []string) ([]string, []string) {
 	return allowedEndpoints, blockedEndpoints
 }
 
+func matchesPattern(endpoint, pattern string) bool {
+	ok, _ := path.Match(pattern, endpoint)
+	return ok
+}
+
 func isBlocked(endpoint string, endpoints []string) bool {
-	if endpoints == nil {
-		return false
-	} else if len(endpoints) <= 0 {
-		return false
+	if len(endpoints) == 0 {
+		// default: block all
+		return true
 	}
 
 	allowed, blocked := getEndpoints(endpoints)
 
+	isExplicitlyAllowed := slices.ContainsFunc(allowed, func(try string) bool {
+		return matchesPattern(endpoint, try)
+	})
 	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try string) bool {
-		return strings.HasPrefix(endpoint, try)
+		return matchesPattern(endpoint, try)
 	})
 
-	isExplictlyAllowed := slices.ContainsFunc(allowed, func(try string) bool {
-		return strings.HasPrefix(endpoint, try)
-	})
-
-	// Block all except explicitly Allowed
-	if len(blocked) == 0 && len(allowed) != 0 {
-		return !isExplictlyAllowed
+	// explicit allow > block
+	if isExplicitlyAllowed {
+		return false
+	}
+	
+	if isExplicitlyBlocked {
+		return true
 	}
 
-	// Allow all except explicitly Blocked
-	if len(allowed) == 0 && len(blocked) != 0 {
-		return isExplicitlyBlocked
+	// only allowed endpoints -> block anything not allowed
+	if len(allowed) > 0 && len(blocked) == 0 {
+		return true
 	}
 
-	// Excplicitly Blocked except excplictly Allowed
-	if len(blocked) != 0 && len(allowed) != 0 {
-		return isExplicitlyBlocked && !isExplictlyAllowed
+	// only blocked endpoints -> allow anything not blocked
+	if len(blocked) > 0 && len(allowed) == 0 {
+		return false
 	}
 
-	// Block all
+	// no match -> default: block all
 	return true
 }
