@@ -55,7 +55,7 @@ func getEndpoints(endpoints []string) ([]string, []string) {
 
 func matchesPattern(endpoint, pattern string) bool {
 	ok, _ := path.Match(pattern, endpoint)
-	return
+	return ok
 }
 
 func isBlocked(endpoint string, endpoints []string) bool {
