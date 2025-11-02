@@ -59,7 +59,7 @@ func authHandler(next http.Handler) http.Handler {
 				user := "api"
 				authToken = basicAuthParts[1]
 
-				if basicAuthParams[0] == user && isValidToken(tokens, authToken) {
+				if basicAuthParts[0] == user && isValidToken(tokens, authToken) {
 					success = true
 				}
 			}
