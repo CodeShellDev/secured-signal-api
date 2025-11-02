@@ -32,7 +32,6 @@ settings:
 
   access:
     endpoints:
-      - "!/v1/about"
       - "!/v1/configuration"
       - "!/v1/devices"
       - "!/v1/register"
