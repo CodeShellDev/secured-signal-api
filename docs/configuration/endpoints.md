@@ -13,15 +13,15 @@ but by default the following endpoints are **blocked**, because of Security Conc
 
 | Endpoint              |                    |
 | :-------------------- | ------------------ |
-| **/v1/about**         | **/v1/unregister** |
-| **/v1/configuration** | **/v1/qrcodelink** |
+| **/v1/configuration** | **/v1/unregister** |
 | **/v1/devices**       | **/v1/contacts**   |
 | **/v1/register**      | **/v1/accounts**   |
+| **/v1/qrcodelink**    |                    |
 
 ## Customize
 
 > [!NOTE]
-> Matching works by checking if the requested Endpoints starts with a Blocked or an Allowed Endpoint
+> Matching uses [glob-like patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html): `*` matches any sequence of characters, `?` matches a single character and `[abc]` matches one of the characters in the brackets
 
 You can modify endpoints by configuring `access.endpoints` in your config:
 
