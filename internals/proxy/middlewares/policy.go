@@ -3,6 +3,7 @@ package middlewares
 import (
 	"errors"
 	"net/http"
+	"reflect"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
@@ -78,6 +79,18 @@ func getField(key string, body map[string]any, headers map[string][]string) (any
 	return value, errors.New("field not found")
 }
 
+func doPoliciesApply(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicy) (bool, string) {
+	for key, policy := range policies {
+		value, err := getField(key, body, headers)
+
+		if reflect.DeepEqual(value, policy.Value) && err == nil {
+			return true, key
+		}
+	}
+
+	return false, ""
+}
+
 func doBlock(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicy) (bool, string) {
 	if policies == nil {
 		return false, ""
@@ -89,43 +102,28 @@ func doBlock(body map[string]any, headers map[string][]string, policies map[stri
 
 	var cause string
 
-	var isExplictlyAllowed, isExplicitlyBlocked bool
-
-	for field, policy := range allowed {
-		value, err := getField(field, body, headers)
-
-		if value == policy.Value && err == nil {
-			isExplictlyAllowed = true
-			cause = field
-			break
-		}
+	isExplicitlyAllowed, cause := doPoliciesApply(body, headers, allowed)
+	isExplicitlyBlocked, cause := doPoliciesApply(body, headers, blocked)
+	
+	// explicit allow > block
+	if isExplicitlyAllowed {
+		return false, cause
+	}
+	
+	if isExplicitlyBlocked {
+		return true, cause
 	}
 
-	for field, policy := range blocked {
-		value, err := getField(field, body, headers)
-
-		if value == policy.Value && err == nil {
-			isExplicitlyBlocked = true
-			cause = field
-			break
-		}
+	// only allowed endpoints -> block anything not allowed
+	if len(allowed) > 0 && len(blocked) == 0 {
+		return true, cause
 	}
 
-	// Block all except explicitly Allowed
-	if len(blocked) == 0 && len(allowed) != 0 {
-		return !isExplictlyAllowed, cause
+	// only blocked endpoints -> allow anything not blocked
+	if len(blocked) > 0 && len(allowed) == 0 {
+		return false, cause
 	}
 
-	// Allow all except explicitly Blocked
-	if len(allowed) == 0 && len(blocked) != 0 {
-		return isExplicitlyBlocked, cause
-	}
-
-	// Excplicitly Blocked except excplictly Allowed
-	if len(blocked) != 0 && len(allowed) != 0 {
-		return isExplicitlyBlocked && !isExplictlyAllowed, cause
-	}
-
-	// Block all
-	return true, ""
+	// no match -> default: block all
+	return true, cause
 }
