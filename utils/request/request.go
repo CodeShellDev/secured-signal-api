@@ -47,6 +47,8 @@ func (body *Body) Write(req *http.Request) error {
 	}
 
 	req.Body = io.NopCloser(bytes.NewReader(body.Raw))
+
+	return nil
 }
 
 func CreateBody(data map[string]any) (Body, error) {
