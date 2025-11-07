@@ -61,9 +61,14 @@ func mappingHandler(next http.Handler) http.Handler {
 		if modifiedBody {
 			body.Data = bodyData
 
-			log.Debug("Applied Data Aliasing: ", body.Data)
+			err := body.Write(req)
 
-			body.Write(req)
+			if err != nil {
+				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				return
+			}
+
+			log.Debug("Applied Data Aliasing: ", body.Data)
 		}
 
 		next.ServeHTTP(w, req)

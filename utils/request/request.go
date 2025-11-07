@@ -30,7 +30,15 @@ func (body Body) ToString() string {
 	return string(body.Raw)
 }
 
-func (body Body) Write(req *http.Request) {
+func (body *Body) Write(req *http.Request) error {
+	newBody, err := CreateBody(body.Data)
+
+	if err != nil {
+		return err
+	}
+
+	body = &newBody
+
 	bodyLength := len(body.Raw)
 
 	if req.ContentLength != int64(bodyLength) {
@@ -39,6 +47,8 @@ func (body Body) Write(req *http.Request) {
 	}
 
 	req.Body = io.NopCloser(bytes.NewReader(body.Raw))
+
+	return nil
 }
 
 func CreateBody(data map[string]any) (Body, error) {
