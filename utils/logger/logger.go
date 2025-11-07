@@ -60,6 +60,12 @@ func Format(data ...any) string {
 			res += value
 		case int:
 			res += strconv.Itoa(value)
+		case bool:
+			if value {
+				res += "true"
+			} else {
+				res += "false"
+			}
 		default:
 			lines := strings.Split(jsonutils.Pretty(value), "\n")
 
