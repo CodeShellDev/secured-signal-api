@@ -99,9 +99,6 @@ const config = {
 					},
 				],
 			},
-			docs: {
-				breadcrumbs: true,
-			},
 			footer: {
 				style: "dark",
 				links: [
