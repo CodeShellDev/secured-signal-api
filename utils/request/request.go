@@ -96,7 +96,7 @@ func GetFormData(body []byte) (map[string]any, error) {
 }
 
 func GetBody(req *http.Request) ([]byte, error) {
-	bodyBytes, err := io.ReadAll(req.Body)
+	bodyBytes, err := io.ReadAll(io.LimitReader(req.Body, 1<<20))
 
 	req.Body.Close()
 
