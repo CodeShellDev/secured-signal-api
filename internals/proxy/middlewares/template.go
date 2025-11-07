@@ -75,6 +75,10 @@ func templateHandler(next http.Handler) http.Handler {
 			log.Debug("Applied Body Templating: ", body.Data)
 
 			body.Write(req)
+
+			test, _ := request.GetReqBody(req)
+
+			log.Dev("TEST:", test)
 		}
 
 		if req.URL.Path != "" {
