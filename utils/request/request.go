@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/codeshelldev/secured-signal-api/utils/query"
@@ -27,6 +28,17 @@ type Body struct {
 
 func (body Body) ToString() string {
 	return string(body.Raw)
+}
+
+func (body Body) Write(req *http.Request) {
+	bodyLength := len(body.Raw)
+
+	if req.ContentLength != int64(bodyLength) {
+		req.ContentLength = int64(bodyLength)
+		req.Header.Set("Content-Length", strconv.Itoa(bodyLength))
+	}
+
+	req.Body = io.NopCloser(bytes.NewReader(body.Raw))
 }
 
 func CreateBody(data map[string]any) (Body, error) {
@@ -84,7 +96,7 @@ func GetFormData(body []byte) (map[string]any, error) {
 }
 
 func GetBody(req *http.Request) ([]byte, error) {
-	bodyBytes, err := io.ReadAll(req.Body)
+	bodyBytes, err := io.ReadAll(io.LimitReader(req.Body, 5<<20))
 
 	req.Body.Close()
 
