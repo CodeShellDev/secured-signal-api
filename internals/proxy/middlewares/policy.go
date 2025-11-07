@@ -93,8 +93,8 @@ func doPoliciesApply(body map[string]any, headers map[string][]string, policies 
 
 func doBlock(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicy) (bool, string) {
 	if len(policies) == 0 {
-		// default: block all
-		return true, ""
+		// default: allow all
+		return false, ""
 	}
 
 	allowed, blocked := getPolicies(policies)
