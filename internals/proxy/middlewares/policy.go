@@ -128,6 +128,8 @@ func doBlock(body map[string]any, headers map[string][]string, policies map[stri
 
 	isExplicitlyAllowed, cause := doPoliciesApply(body, headers, allowed)
 	isExplicitlyBlocked, cause := doPoliciesApply(body, headers, blocked)
+
+	log.Dev("Blocked: ", isExplicitlyBlocked, "; Allowed: ", isExplicitlyAllowed)
 	
 	// explicit allow > block
 	if isExplicitlyAllowed {
