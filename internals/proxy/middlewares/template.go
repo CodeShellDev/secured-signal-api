@@ -72,13 +72,14 @@ func templateHandler(next http.Handler) http.Handler {
 		if modifiedBody {
 			body.Data = bodyData
 
+			err := body.Write(req)
+
+			if err != nil {
+				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				return
+			}
+
 			log.Debug("Applied Body Templating: ", body.Data)
-
-			body.Write(req)
-
-			test, _ := request.GetReqBody(req)
-
-			log.Dev("TEST:", test)
 		}
 
 		if req.URL.Path != "" {

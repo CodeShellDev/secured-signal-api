@@ -60,9 +60,14 @@ func messageHandler(next http.Handler) http.Handler {
 		if modifiedBody {
 			body.Data = bodyData
 
-			log.Debug("Applied Message Templating: ", body.Data)
+			err := body.Write(req)
 
-			body.Write(req)
+			if err != nil {
+				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				return
+			}
+
+			log.Debug("Applied Message Templating: ", body.Data)
 		}
 
 		next.ServeHTTP(w, req)
