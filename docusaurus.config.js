@@ -99,6 +99,9 @@ const config = {
 					},
 				],
 			},
+			docs: {
+				breadcrumbs: true,
+			},
 			footer: {
 				style: "dark",
 				links: [
@@ -141,7 +144,9 @@ const config = {
 			metadata: [
     			{ name: 'google-site-verification', content: 'g8d_0UGQgwAYseQGOOqRvsTPup3xawCbb-i2jT9HyVc' },
   			]
-		}),
+	}),
+
+	plugins: ['@docusaurus/plugin-sitemap'],
 }
 
 export default config
