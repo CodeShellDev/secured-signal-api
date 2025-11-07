@@ -46,9 +46,15 @@ func PrefixHeaders(headers map[string][]string) map[string][]string {
 	return res
 }
 
-func GetFromBodyAndHeaders(field Field, body map[string]any, headers map[string][]string) any {
+func PrefixBodyAndHeaders(body map[string]any, headers map[string][]string) (map[string]any, map[string][]string) {
 	body = PrefixBody(body)
 	headers = PrefixHeaders(headers)
+
+	return body, headers
+}
+
+func GetFromBodyAndHeaders(field Field, body map[string]any, headers map[string][]string) any {
+	body, headers = PrefixBodyAndHeaders(body, headers)
 
 	switch(field.Prefix) {
 	case BodyPrefix:
