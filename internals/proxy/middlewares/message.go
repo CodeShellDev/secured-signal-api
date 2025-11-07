@@ -1,10 +1,7 @@
 package middlewares
 
 import (
-	"bytes"
-	"io"
 	"net/http"
-	"strconv"
 
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	request "github.com/codeshelldev/secured-signal-api/utils/request"
@@ -61,24 +58,12 @@ func messageHandler(next http.Handler) http.Handler {
 		}
 
 		if modifiedBody {
-			modifiedBody, err := request.CreateBody(bodyData)
+			body.Data = bodyData
 
-			if err != nil {
-				http.Error(w, "Internal Error", http.StatusInternalServerError)
-				return
-			}
+			log.Debug("Applied Message Templating: ", body.Data)
 
-			body = modifiedBody
-
-			strData := body.ToString()
-
-			log.Debug("Applied Message Templating: ", strData)
-
-			req.ContentLength = int64(len(strData))
-			req.Header.Set("Content-Length", strconv.Itoa(len(strData)))
+			body.Write(req)
 		}
-
-		req.Body = io.NopCloser(bytes.NewReader(body.Raw))
 
 		next.ServeHTTP(w, req)
 	})
