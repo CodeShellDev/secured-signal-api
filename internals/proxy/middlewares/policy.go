@@ -83,8 +83,33 @@ func doPoliciesApply(body map[string]any, headers map[string][]string, policies 
 	for key, policy := range policies {
 		value, err := getField(key, body, headers)
 
-		if reflect.DeepEqual(value, policy.Value) && err == nil {
-			return true, key
+		if err != nil {
+			continue
+		}
+
+		switch asserted := value.(type) {
+		case string:
+			policyValue, ok := policy.Value.(string)
+
+			if ok && asserted == policyValue {
+				return true, key
+			}
+		case int:
+			policyValue, ok := policy.Value.(int);
+
+			if ok && asserted == policyValue {
+				return true, key
+			}
+		case bool:
+			policyValue, ok := policy.Value.(bool)
+
+			if ok && asserted == policyValue {
+				return true, key
+			}
+		default:
+			if reflect.DeepEqual(value, policy.Value) {
+				return true, key
+			}
 		}
 	}
 
@@ -113,12 +138,12 @@ func doBlock(body map[string]any, headers map[string][]string, policies map[stri
 		return true, cause
 	}
 
-	// only allowed endpoints -> block anything not allowed
+	// only allow policies -> block anything not allowed
 	if len(allowed) > 0 && len(blocked) == 0 {
 		return true, cause
 	}
 
-	// only blocked endpoints -> allow anything not blocked
+	// only block polcicies -> allow anything not blocked
 	if len(blocked) > 0 && len(allowed) == 0 {
 		return false, cause
 	}
