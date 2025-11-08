@@ -36,13 +36,14 @@ func messageHandler(next http.Handler) http.Handler {
 
 		bodyData := map[string]any{}
 
+		log.Dev("BodyData: ", body.Data)
+
 		var modifiedBody bool
 
 		if !body.Empty {
 			bodyData = body.Data
 
 			log.Dev("Template: ", messageTemplate)
-			log.Dev("BodyData: ", bodyData)
 
 			if messageTemplate != "" {
 				headerData := request.GetReqHeaders(req)

@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/query"
 )
 
@@ -149,6 +150,7 @@ func GetReqBody(req *http.Request) (Body, error) {
 	var isEmpty bool
 
 	if err != nil {
+		logger.Dev("Error getting Body: ", err.Error())
 		return Body{Empty: true}, err
 	}
 
