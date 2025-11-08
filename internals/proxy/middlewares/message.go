@@ -63,7 +63,7 @@ func messageHandler(next http.Handler) http.Handler {
 			err := body.Write(req)
 
 			if err != nil {
-				log.Error("Could write to Request Body: ", err.Error())
+				log.Error("Could not write to Request Body: ", err.Error())
 				http.Error(w, "Internal Error", http.StatusInternalServerError)
 				return
 			}
