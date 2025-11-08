@@ -67,6 +67,12 @@ const config = {
 				theme: {
 					customCss: ["./src/css/custom.css"],
 				},
+        		sitemap: {
+          			lastmod: 'date',
+          			changefreq: 'weekly',
+          			priority: 0.5,
+          			filename: 'sitemap.xml',
+				},
 			}),
 		],
 	],
@@ -138,7 +144,10 @@ const config = {
 				additionalLanguages: ["bash", "apacheconf"],
 				plugins: ["line-numbers", "command-line"],
 			},
-		}),
+			metadata: [
+    			{ name: 'google-site-verification', content: 'g8d_0UGQgwAYseQGOOqRvsTPup3xawCbb-i2jT9HyVc' },
+  			]
+	}),
 }
 
 export default config
