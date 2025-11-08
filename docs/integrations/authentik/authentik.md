@@ -4,7 +4,7 @@ title: Authentik
 
 # Authentik
 
-This guide will show you how to use **Secured Signal API** as an Authenticator.
+This guide will show you how to use **Secured Signal API** as an Authenticator in [authentik](https://github.com/goauthentik/authentik).
 
 ## Setup
 
