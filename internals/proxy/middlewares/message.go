@@ -57,6 +57,8 @@ func messageHandler(next http.Handler) http.Handler {
 			}
 		}
 
+		log.Dev("IsBodyEmpty: ", modifiedBody)
+
 		if modifiedBody {
 			body.Data = bodyData
 
