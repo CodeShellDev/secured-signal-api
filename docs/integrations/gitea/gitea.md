@@ -4,7 +4,7 @@ title: Gitea
 
 # Gitea
 
-Here's how you can use **Secured Signal API** as a notification service for gitea.
+Here's how you can use **Secured Signal API** as a notification service for [gitea](https://github.com/go-gitea/gitea).
 
 ## Setup
 
