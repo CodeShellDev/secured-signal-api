@@ -19,7 +19,7 @@ func loggingHandler(next http.Handler) http.Handler {
 		} else {
 			body, _ := request.GetReqBody(req)
 
-			log.Dev(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery, body)
+			log.Dev(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery, body.Data)
 		}
 
 		next.ServeHTTP(w, req)
