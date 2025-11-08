@@ -75,6 +75,7 @@ func templateHandler(next http.Handler) http.Handler {
 			err := body.Write(req)
 
 			if err != nil {
+				log.Error("Could not write to Request Body: ", err.Error())
 				http.Error(w, "Internal Error", http.StatusInternalServerError)
 				return
 			}
@@ -182,7 +183,9 @@ func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES ma
 	// Prefix Header Data with header_key_
 	prefixedHeaders := prefixData("header_key_", request.ParseHeaders(headers))
 
-	variables := VARIABLES
+	variables := map[string]any{}
+
+	maps.Copy(variables, VARIABLES)
 
 	maps.Copy(variables, prefixedBody)
 	maps.Copy(variables, prefixedHeaders)
