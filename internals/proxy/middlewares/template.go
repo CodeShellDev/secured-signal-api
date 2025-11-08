@@ -188,6 +188,8 @@ func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES ma
 	maps.Copy(variables, prefixedBody)
 	maps.Copy(variables, prefixedHeaders)
 
+	log.Dev(normalizedBody)
+
 	templatedData, err := templating.RenderJSON("body", normalizedBody, variables)
 
 	if err != nil {
