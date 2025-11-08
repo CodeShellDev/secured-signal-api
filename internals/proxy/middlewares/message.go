@@ -41,6 +41,9 @@ func messageHandler(next http.Handler) http.Handler {
 		if !body.Empty {
 			bodyData = body.Data
 
+			log.Dev("Template: ", messageTemplate)
+			log.Dev("BodyData: ", bodyData)
+
 			if messageTemplate != "" {
 				headerData := request.GetReqHeaders(req)
 
@@ -56,8 +59,6 @@ func messageHandler(next http.Handler) http.Handler {
 				}
 			}
 		}
-
-		log.Dev("IsBodyEmpty: ", modifiedBody)
 
 		if modifiedBody {
 			body.Data = bodyData
