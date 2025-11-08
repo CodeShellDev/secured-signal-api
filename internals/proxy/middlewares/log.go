@@ -22,7 +22,7 @@ func loggingHandler(next http.Handler) http.Handler {
 			if body.Data != nil && !body.Empty {
 				log.Dev(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery, body.Data)
 			} else {
-				log.Dev(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
+				log.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
 			}
 		}
 
