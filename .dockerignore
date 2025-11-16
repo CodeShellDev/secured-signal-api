@@ -1,6 +1,16 @@
-.gitignore
+# env file
+*.env
+
+# Exclude git folders
 .git*
-.github
+!.github
+
+# Ignore yml files
 *.yaml
+*.yml
+
+# Markdown files
 *.md
+
+# Include data/
 !data/*
