@@ -25,3 +25,4 @@ go.sum
 
 # Include build
 app
+dist/*
