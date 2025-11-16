@@ -22,4 +22,6 @@ COPY . .
 
 COPY dist/${TARGETOS}/${TARGETARCH}/app .
 
+RUN rm dist/ -r
+
 CMD ["./app"]

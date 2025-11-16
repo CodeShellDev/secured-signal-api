@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"reflect"
 
+	log "github.com/codeshelldev/gotl/pkg/logger"
+	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
-	request "github.com/codeshelldev/secured-signal-api/utils/request"
-	"github.com/codeshelldev/secured-signal-api/utils/request/requestkeys"
+	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
 
 var Policy Middleware = Middleware{
