@@ -13,6 +13,7 @@ import (
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 
 	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/confmap"
 )
 
 var ENV *structure.ENV = &structure.ENV{
@@ -93,6 +94,8 @@ func Normalize(config *configutils.Config, path string, structure any) {
 	data := config.Layer.Get(path)
 	old, ok := data.(map[string]any)
 
+	log.Debug("Get:", old)
+
 	if !ok {
 		log.Warn("Could not load `"+path+"`")
 		return
@@ -101,23 +104,45 @@ func Normalize(config *configutils.Config, path string, structure any) {
 	// Create temporary config
 	tmpConf := configutils.New()
 	tmpConf.Load(old, "")
-
-	log.Debug("Loaded:", tmpConf.Layer.All())
 	
 	// Apply transforms to the new config
 	tmpConf.ApplyTransformFuncs(structure, "", transformFuncs)
 
-	log.Debug("Applied Transform:", tmpConf.Layer.All())
-
 	// Lowercase actual config
 	LowercaseKeys(config)
-
-	log.Debug("Lowercase:", config.Layer.All())
 
 	// Load temporary config back into paths
 	config.Layer.Delete(path)
 	
 	config.Load(tmpConf.Layer.Get("").(map[string]any), path)
+}
+
+func LoadConfigFromConfigutils(config *configutils.Config, data any, path string) error {
+	parts := strings.Split(path, ".")
+
+	log.Debug("Parts: ", parts)
+
+	if len(parts) <= 0 {
+		return errors.New("invalid path")
+	}
+
+	res := map[string]any{}
+
+	for i, key := range parts {
+		if i == 0 {
+			res[key] = data
+		} else {
+			sub := map[string]any{}
+
+			sub[key] = res
+
+			res = sub
+		}
+	}
+
+	log.Debug("Res: ", res)
+
+	return config.Layer.Load(confmap.Provider(res, "."), nil)
 }
 
 func InitReload() {
