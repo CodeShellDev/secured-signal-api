@@ -27,7 +27,7 @@ func LoadTokens() {
 }
 
 func NormalizeTokens() {
-	log.Dev("Tokens: ", tokenConf.Layer.All())
+	log.Dev("Tokens: ", tokenConf.Layer.Slices("tokenconfigs"))
 
 	data := []map[string]any{}
 
