@@ -159,6 +159,8 @@ func LoadConfig() {
 	log.Debug("Loading Config ", ENV.CONFIG_PATH)
 	_, err := userConf.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
 
+	log.Debug("Loaded Config:", userConf.Layer.All())
+
 	if err != nil {
 		_, fsErr := os.Stat(ENV.CONFIG_PATH)
 
