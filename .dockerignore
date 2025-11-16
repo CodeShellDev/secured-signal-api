@@ -1,3 +1,6 @@
+# Ignore all
+*
+
 # env file
 *.env
 
@@ -14,3 +17,11 @@
 
 # Include data/
 !data/*
+
+# Ignore source files
+*.go
+go.mod
+go.sum
+
+# Include build
+app
