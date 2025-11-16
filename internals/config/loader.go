@@ -115,14 +115,15 @@ func Normalize(config *configutils.Config, path string, structure any) {
 }
 
 func InitReload() {
-	reload := func() {
+	reload := func(path string) {
+		log.Debug(path)
 		Load()
 		Log()
 	}
 	
-	defaultsConf.OnLoad(reload)
-	userConf.OnLoad(reload)
-	tokenConf.OnLoad(reload)
+	defaultsConf.OnReload(reload)
+	userConf.OnReload(reload)
+	tokenConf.OnReload(reload)
 }
 
 func InitEnv() {
@@ -140,6 +141,7 @@ func InitEnv() {
 }
 
 func LoadDefaults() {
+	log.Debug("Loading defaults from ", ENV.DEFAULTS_PATH)
 	_, err := defaultsConf.LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
 
 	if err != nil {
@@ -148,6 +150,7 @@ func LoadDefaults() {
 }
 
 func LoadConfig() {
+	log.Debug("Loading Config ", ENV.CONFIG_PATH)
 	_, err := userConf.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
 
 	if err != nil {
