@@ -44,9 +44,6 @@ func Load() {
 
 	userConf.LoadEnv(normalizeEnv)
 
-	log.Debug("Loaded Config:", userConf.Layer.All())
-	log.Debug("Loaded Token Configs:", tokenConf.Layer.All())
-
 	NormalizeConfig(defaultsConf)
 	NormalizeConfig(userConf)
 	
@@ -104,6 +101,8 @@ func Normalize(config *configutils.Config, path string, structure any) {
 	// Create temporary config
 	tmpConf := configutils.New()
 	tmpConf.Load(old, "")
+
+	log.Debug("Loaded:", tmpConf.Layer.All())
 	
 	// Apply transforms to the new config
 	tmpConf.ApplyTransformFuncs(structure, "", transformFuncs)
