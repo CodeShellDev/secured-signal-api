@@ -2,11 +2,11 @@ package middlewares
 
 import (
 	"net/http"
+	"path"
 	"slices"
 	"strings"
-	"path"
 
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
+	log "github.com/codeshelldev/gotl/pkg/logger"
 )
 
 var Endpoints Middleware = Middleware{

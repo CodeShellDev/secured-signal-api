@@ -7,12 +7,12 @@ import (
 	"regexp"
 	"strings"
 
-	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
-	query "github.com/codeshelldev/secured-signal-api/utils/query"
-	request "github.com/codeshelldev/secured-signal-api/utils/request"
-	"github.com/codeshelldev/secured-signal-api/utils/request/requestkeys"
-	templating "github.com/codeshelldev/secured-signal-api/utils/templating"
+	jsonutils "github.com/codeshelldev/gotl/pkg/jsonutils"
+	log "github.com/codeshelldev/gotl/pkg/logger"
+	query "github.com/codeshelldev/gotl/pkg/query"
+	request "github.com/codeshelldev/gotl/pkg/request"
+	templating "github.com/codeshelldev/gotl/pkg/templating"
+	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
 
 var Template Middleware = Middleware{
@@ -190,7 +190,7 @@ func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES ma
 	maps.Copy(variables, prefixedBody)
 	maps.Copy(variables, prefixedHeaders)
 
-	templatedData, err := templating.RenderJSON("body", normalizedBody, variables)
+	templatedData, err := templating.RenderJSON(normalizedBody, variables)
 
 	if err != nil {
 		return body, false, err
@@ -235,10 +235,16 @@ func TemplateQuery(reqUrl *url.URL, data map[string]any, VARIABLES any) (string,
 
 	originalQueryData := reqUrl.Query()
 
-	addedData := query.ParseTypedQuery(templatedQuery, "@")
+	addedData, _ := query.ParseTypedQuery(templatedQuery)
 
 	for key, val := range addedData {
-		data[key] = val
+		keyWithoutPrefix, match := strings.CutPrefix(key, "@")
+
+		if !match {
+			continue
+		}
+
+		data[keyWithoutPrefix] = val
 
 		originalQueryData.Del(key)
 

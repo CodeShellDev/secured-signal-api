@@ -3,9 +3,9 @@ package config
 import (
 	"strconv"
 
+	"github.com/codeshelldev/gotl/pkg/configutils"
+	log "github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
-	"github.com/codeshelldev/secured-signal-api/utils/configutils"
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
