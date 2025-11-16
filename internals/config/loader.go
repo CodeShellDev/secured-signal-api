@@ -52,6 +52,9 @@ func Load() {
 	
 	NormalizeTokens()
 
+	log.Debug("Loaded Config:", userConf.Layer.All())
+	log.Debug("Loaded Token Configs:", tokenConf.Layer.All())
+
 	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
 	mainConf.TemplateConfig()
