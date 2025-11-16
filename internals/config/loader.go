@@ -111,7 +111,7 @@ func Normalize(config *configutils.Config, path string, structure any) {
 	// Load temporary config back into paths
 	config.Layer.Delete(path)
 	
-	config.Load(tmpConf.Layer.Get("").(map[string]any), path)
+	config.Load(tmpConf.Layer.Raw(), path)
 }
 
 func InitReload() {
