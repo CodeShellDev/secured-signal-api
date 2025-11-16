@@ -6,7 +6,7 @@
 
 # Exclude git folders
 .git*
-!.github
+.github
 
 # Ignore yml files
 *.yaml
