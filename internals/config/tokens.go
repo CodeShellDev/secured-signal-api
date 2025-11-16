@@ -38,8 +38,12 @@ func NormalizeTokens() {
 		data = append(data, tmpConf.Layer.Get("").(map[string]any))
 	}
 
+	log.Dev("Tokens: ", tokenConf.Layer.All())
+
 	// Merge token configs together into new temporary config
 	tokenConf.Load(data, "tokenconfigs")
+
+	log.Dev("Tokens: ", tokenConf.Layer.All())
 }
 
 func InitTokens() {

@@ -93,8 +93,6 @@ func Normalize(config *configutils.Config, path string, structure any) {
 	data := config.Layer.Get(path)
 	old, ok := data.(map[string]any)
 
-	log.Debug("Get:", old)
-
 	if !ok {
 		log.Warn("Could not load `"+path+"`")
 		return
@@ -154,8 +152,6 @@ func LoadDefaults() {
 func LoadConfig() {
 	log.Debug("Loading Config ", ENV.CONFIG_PATH)
 	_, err := userConf.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
-
-	log.Debug("Loaded Config:", userConf.Layer.All())
 
 	if err != nil {
 		_, fsErr := os.Stat(ENV.CONFIG_PATH)
