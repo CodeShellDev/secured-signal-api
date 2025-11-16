@@ -39,9 +39,7 @@ func NormalizeTokens() {
 	}
 
 	// Merge token configs together into new temporary config
-	tokenConf.Load(map[string]any{
-		"tokenconfigs": data,
-	}, "")
+	tokenConf.Load(data, "tokenconfigs")
 }
 
 func InitTokens() {

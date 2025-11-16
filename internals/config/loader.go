@@ -52,9 +52,6 @@ func Load() {
 	
 	NormalizeTokens()
 
-	log.Debug("Loaded Config:", userConf.Layer.All())
-	log.Debug("Loaded Token Configs:", tokenConf.Layer.All())
-
 	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
 	mainConf.TemplateConfig()
@@ -111,8 +108,12 @@ func Normalize(config *configutils.Config, path string, structure any) {
 	// Apply transforms to the new config
 	tmpConf.ApplyTransformFuncs(structure, "", transformFuncs)
 
+	log.Debug("Applied Transform:", tmpConf.Layer.All())
+
 	// Lowercase actual config
 	LowercaseKeys(config)
+
+	log.Debug("Lowercase:", config.Layer.All())
 
 	// Load temporary config back into paths
 	config.Layer.Delete(path)
