@@ -31,3 +31,7 @@ go.work.sum
 # Exclude git folders
 .git*
 !.github
+
+# Docusaurus
+.docusaurus
+node_modules
