@@ -33,12 +33,15 @@ func NormalizeTokens() {
 		tmpConf := configutils.New()
 		tmpConf.Load(config.Get("").(map[string]any), "")
 
+		log.Dev("TmpConf: ", tmpConf.Layer.All())
+		log.Dev("Config: ", config.All())
+
 		Normalize(tmpConf, "overrides", &structure.SETTINGS{})
+
+		log.Dev("Normalized: ", tmpConf.Layer.All())
 		
 		data = append(data, tmpConf.Layer.Get("").(map[string]any))
 	}
-
-	log.Dev("Tokens: ", data)
 
 	// Merge token configs together into new temporary config
 	tokenConf.Load(data, "tokenconfigs")
