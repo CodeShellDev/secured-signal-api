@@ -46,7 +46,7 @@ services:
           - secured-signal-api
 
 networks:
-  backend: {}
+  backend:
   proxy:
     external: true
 ```
