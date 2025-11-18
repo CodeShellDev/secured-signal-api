@@ -62,7 +62,11 @@ const config = {
 					beforeDefaultRemarkPlugins: [
 						require("remark-github-admonitions-to-directives"),
 					],
-					remarkPlugins: [require("remark-gfm"), require("remark-directive")],
+					remarkPlugins: [
+						require("remark-gfm"),
+						require("remark-directive"),
+						require("./prettier-ignore"),
+					],
 				},
 				theme: {
 					customCss: ["./src/css/custom.css"],
