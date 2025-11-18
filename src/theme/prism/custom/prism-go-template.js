@@ -9,7 +9,7 @@ const lang = "go-template"
 			alias: "comment",
 			inside: {
 				delimiter: /^\{\{\/\*|\*\/\}\}/,
-				content: /[\s\S]+/, // the inner comment content
+				content: /[\s\S]+/,
 			},
 		},
 
@@ -20,7 +20,7 @@ const lang = "go-template"
 			alias: "variable",
 			inside: {
 				delimiter: /^\{\{|\}\}$/,
-				expression: /[\s\S]+/, // the inner expression
+				expression: /[\s\S]+/,
 			},
 		},
 	}
