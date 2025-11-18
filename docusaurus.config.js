@@ -144,7 +144,6 @@ const config = {
 				additionalLanguages: [
 					"bash",
 					"apacheconf",
-					"custom-yaml-scalar",
 					"custom-go-template",
 					"custom-yaml-go-template",
 					"custom-yaml-empty-key",
