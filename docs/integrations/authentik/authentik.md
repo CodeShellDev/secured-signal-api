@@ -77,11 +77,11 @@ settings:
     # prettier-ignore
     template: |
       **Your Verification Code**
-      
+       
       Use the verification code below to complete your sign-in:
-      
+       
       {{ @token }}
-      
+       
       This code expires in 5 minutes⏱️. 
       If you didn’t request it, you can ignore this message.
 ```
