@@ -148,6 +148,7 @@ const config = {
 					"custom-go-template",
 					"custom-yaml-go-template",
 					"custom-yaml-empty-key",
+					"custom-json-go-template",
 				],
 			},
 			metadata: [
