@@ -72,17 +72,7 @@ return {
 Since you have decided to go the advanced way, you will have to use [**Message Templates**](../configuration/message-templates), here is an example:
 
 ```yaml
-settings:
-  message:
-    template: |
-      **Your Verification Code**
-
-      Use the verification code below to complete your sign-in:
-
-      {{ @token }}
-
-      This code expires in 5 minutes⏱️. 
-      If you didn’t request it, you can ignore this message.
+{{{ #://./message-template.yaml }}}
 ```
 
 ### 4. Enable SMS-Verification
