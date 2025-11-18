@@ -11,7 +11,7 @@ Here are some of the highlights of using **Secured Signal API**
 
 ## Message Template
 
-> _Incredible fun and useful_
+> _Structure your messages_
 
 **Message Templates** are used to customize your final message after preprocessing.
 Look at this complex template for example:
@@ -40,7 +40,7 @@ Take a look at the [Usage](./usage/advanced).
 
 ## Field Mappings
 
-> _Boring, but sooo definetly needed_
+> _Standardize output_
 
 **Field Mappings** are also very useful for when your favorite service does not officially support **Secured Signal API** (or Signal CLI REST API).
 With this feature you have the power to do it yourself, just extract what's needed and then integrate with any of the other features.
@@ -51,7 +51,7 @@ Interested? [Take a look](./configuration/field-mappings).
 
 ## Endpoints
 
-> _why do you need write access for reading messages?!_
+> _Block unwanted access_
 
 **Endpoints** or rather their subfeatures:
 
