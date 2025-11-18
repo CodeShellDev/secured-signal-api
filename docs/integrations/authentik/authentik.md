@@ -69,7 +69,7 @@ return {
 > [!TIP]
 > Take a look at authentiks [expression documentation](https://next.goauthentik.io/add-secure-apps/providers/property-mappings/expression) for all of the available variables.
 
-Since you have decided to go the advanced way, you will have to use [**Message Templates**](../configuration/message-templates), here is an example:
+Since you have decided to go the advanced way, you will have to use [**Message Templates**](../configuration/message-template), here is an example:
 
 ```yaml
 {{{ #://./message-template.yml }}}
