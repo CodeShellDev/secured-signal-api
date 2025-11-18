@@ -1,0 +1,39 @@
+const lang = "go-template"
+
+;(function (Prism) {
+	Prism.languages[lang] = {
+		// Go template comments {{/* ... */}}
+		"go-template-comment": {
+			pattern: /\{\{\/\*[\s\S]*?\*\/\}\}/,
+			greedy: true,
+			alias: "comment",
+			inside: {
+				delimiter: /^\{\{\/\*|\*\/\}\}/,
+				content: /[\s\S]+/, // the inner comment content
+			},
+		},
+
+		// Regular Go template expressions {{ ... }}
+		"go-template-variable": {
+			pattern: /\{\{(?!\/\*)[\s\S]+?\}\}/,
+			greedy: true,
+			alias: "variable",
+			inside: {
+				delimiter: /^\{\{|\}\}$/,
+				expression: /[\s\S]+/, // the inner expression
+			},
+		},
+	}
+})(Prism)
+
+export function implement(Prism, object) {
+	if (!object) return
+
+	const base = Prism.languages[lang]
+
+	object.inside = object.inside || {}
+
+	Object.keys(base).forEach((attribute) => {
+		object.inside[attribute] = base[attribute]
+	})
+}

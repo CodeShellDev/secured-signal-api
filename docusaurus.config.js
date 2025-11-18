@@ -67,11 +67,11 @@ const config = {
 				theme: {
 					customCss: ["./src/css/custom.css"],
 				},
-        		sitemap: {
-          			lastmod: 'date',
-          			changefreq: 'weekly',
-          			priority: 0.5,
-          			filename: 'sitemap.xml',
+				sitemap: {
+					lastmod: "date",
+					changefreq: "weekly",
+					priority: 0.5,
+					filename: "sitemap.xml",
 				},
 			}),
 		],
@@ -141,14 +141,23 @@ const config = {
 			prism: {
 				theme: prismThemes.github,
 				darkTheme: prismThemes.oneDark,
-				additionalLanguages: ["bash", "apacheconf"],
-				plugins: ["line-numbers", "command-line"],
+				additionalLanguages: [
+					"bash",
+					"apacheconf",
+					"custom-yaml-scalar",
+					"custom-go-template",
+					"custom-yaml-go-template",
+					"custom-yaml-empty-key",
+				],
 			},
 			metadata: [
-    			{ name: "google-site-verification", content: "g8d_0UGQgwAYseQGOOqRvsTPup3xawCbb-i2jT9HyVc" },
+				{
+					name: "google-site-verification",
+					content: "g8d_0UGQgwAYseQGOOqRvsTPup3xawCbb-i2jT9HyVc",
+				},
 				{ name: "og:site_name", content: "Secured Signal API" },
-  			]
-	}),
+			],
+		}),
 }
 
 export default config
