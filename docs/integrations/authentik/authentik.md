@@ -72,7 +72,18 @@ return {
 Since you have decided to go the advanced way, you will have to use [**Message Templates**](../configuration/message-templates), here is an example:
 
 ```yaml
-file not found: /home/runner/work/secured-signal-api/secured-signal-api/docs/integrations/authentik/message-template.yaml
+settings:
+  message:
+    # prettier-ignore
+    template: |
+      **Your Verification Code**
+      
+      Use the verification code below to complete your sign-in:
+      
+      {{ @token }}
+      
+      This code expires in 5 minutes⏱️. 
+      If you didn’t request it, you can ignore this message.
 ```
 
 ### 4. Enable SMS-Verification
