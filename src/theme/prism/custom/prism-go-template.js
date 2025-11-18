@@ -4,7 +4,7 @@ const lang = "go-template"
 	Prism.languages[lang] = {
 		// Go template comments {{/* ... */}}
 		"go-template-comment": {
-			pattern: /\{\{\/\*[\s\S]*?\*\/\}\}/,
+			pattern: /\{\{[\s\-]*\/\*[\s\S]*?\*\/[\s\-]*\}\}/,
 			greedy: true,
 			alias: "comment",
 			inside: {
@@ -15,7 +15,7 @@ const lang = "go-template"
 
 		// Regular Go template expressions {{ ... }}
 		"go-template-variable": {
-			pattern: /\{\{(?!\/\*)[\s\S]+?\}\}/,
+			pattern: /\{\{[\s\-]*(?!\/\*)[\s\S]+?[\s\-]*\}\}/,
 			greedy: true,
 			alias: "variable",
 			inside: {
