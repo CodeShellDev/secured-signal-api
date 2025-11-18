@@ -18,18 +18,21 @@ Here is an example:
 settings:
   message:
     template: |
+      {{- /* === ISSUE === */ - }}
       {{- if and @issue (ne @issue nil) (not @is_pull) -}}
       📝 **#{{@issue.number}} {{@issue.title}}**  
       {{ if eq @issue.state "open" -}}🟢{{- else if eq @issue.state "closed" -}}🔴{{- else -}}{{@issue.state}}{{- end }} | 👤 {{@sender.full_name}}
       🔗 {{@issue.html_url}}
       {{- end -}}
 
+      {{- /* === PULL REQUEST === */ - }}
       {{- if and @pull_request (ne @pull_request nil) -}}
       🚀 **#{{@pull_request.number}} {{@pull_request.title}}**  
       {{ if eq @pull_request.state "open" -}}🟢{{- else if eq @pull_request.state "closed" -}}🔴{{- else if eq @pull_request.state "merged" -}}🟣{{- else -}}{{@pull_request.state}}{{- end }} | 👤 {{@sender.full_name}}
       🔗 {{@pull_request.html_url}}
       {{- end -}}
 
+      {{- /* === COMMIT === */ - }}
       {{- if and @commits (gt (len @commits) 0) }}
       📥️ **Push** → *{{@ref}}*  
       📁 {{@repository.full_name}} | 👤 {{@pusher.full_name}} | 🔢 {{@total_commits}}  

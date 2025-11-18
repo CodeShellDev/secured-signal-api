@@ -46,7 +46,7 @@ endpoint restrictions, placeholders, flexible configuration
 
 ## Contents
 
-Check out the official [Documentation](https://codeshelldev.github.io/secured-signal-api) for up-to-date Instructions and additional Content.
+Check out the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) for up-to-date Instructions and additional Content.
 
 - [Getting Started](#getting-started)
 - [Setup](#setup)
