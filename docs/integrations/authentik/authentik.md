@@ -72,7 +72,7 @@ return {
 Since you have decided to go the advanced way, you will have to use [**Message Templates**](../configuration/message-templates), here is an example:
 
 ```yaml
-{{{ #://./message-template.yaml }}}
+{{{ #://./message-template.yml }}}
 ```
 
 ### 4. Enable SMS-Verification
