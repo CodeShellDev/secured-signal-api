@@ -83,7 +83,7 @@ settings:
       {{ @token }}
        
       This code expires in 5 minutes⏱️. 
-      If you didn’t request it, you can ignore this message.
+      If you didn't request it, you can ignore this message.
 ```
 
 ### 4. Enable SMS-Verification
