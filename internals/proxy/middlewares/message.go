@@ -14,17 +14,17 @@ var Message Middleware = Middleware{
 
 func messageHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		settings := getSettingsByReq(req)
+		conf := getConfigByReq(req)
 
-		variables := settings.MESSAGE.VARIABLES
-		messageTemplate := settings.MESSAGE.TEMPLATE
+		variables := conf.SETTINGS.MESSAGE.VARIABLES
+		messageTemplate := conf.SETTINGS.MESSAGE.TEMPLATE
 
 		if variables == nil {
-			variables = getSettings("*").MESSAGE.VARIABLES
+			variables = getConfig("").SETTINGS.MESSAGE.VARIABLES
 		}
 
 		if messageTemplate == "" {
-			messageTemplate = getSettings("*").MESSAGE.TEMPLATE
+			messageTemplate = getConfig("").SETTINGS.MESSAGE.TEMPLATE
 		}
 
 		body, err := request.GetReqBody(req)

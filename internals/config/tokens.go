@@ -9,11 +9,6 @@ import (
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
-type TOKEN_CONFIG struct {
-	TOKENS    []string 				`koanf:"tokens"`
-	OVERRIDES structure.SETTINGS 	`koanf:"overrides"`
-}
-
 func LoadTokens() {
 	log.Debug("Loading Configs in ", ENV.TOKENS_DIR)
 
@@ -47,16 +42,16 @@ func NormalizeTokens() {
 func InitTokens() {
 	apiTokens := mainConf.Layer.Strings("api.tokens")
 
-	var tokenConfigs []TOKEN_CONFIG
+	var tokenConfigs []structure.CONFIG
 
 	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
 
-	overrides := parseTokenConfigs(tokenConfigs)
+	config := parseTokenConfigs(tokenConfigs)
 
-	for token, override := range overrides {
+	for token, config := range config {
 		apiTokens = append(apiTokens, token)
 
-		ENV.SETTINGS[token] = &override
+		ENV.CONFIGS[token] = &config
 	}
 
 	if len(apiTokens) <= 0 {
@@ -73,19 +68,17 @@ func InitTokens() {
 
 	if len(apiTokens) > 0 {
 		log.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")
-
-		ENV.API_TOKENS = apiTokens
 	}
 }
 
-func parseTokenConfigs(configs []TOKEN_CONFIG) map[string]structure.SETTINGS {
-	settings := map[string]structure.SETTINGS{}
+func parseTokenConfigs(configArray []structure.CONFIG) map[string]structure.CONFIG {
+	configs := map[string]structure.CONFIG{}
 
-	for _, config := range configs {
-		for _, token := range config.TOKENS {
-			settings[token] = config.OVERRIDES
+	for _, config := range configArray {
+		for _, token := range config.API.TOKENS {
+			configs[token] = config
 		}
 	}
 
-	return settings
+	return configs
 }

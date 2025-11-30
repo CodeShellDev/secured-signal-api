@@ -3,6 +3,7 @@ package middlewares
 import (
 	"context"
 	"encoding/base64"
+	"maps"
 	"net/http"
 	"slices"
 	"strings"
@@ -17,7 +18,12 @@ var Auth Middleware = Middleware{
 }
 
 func authHandler(next http.Handler) http.Handler {
-	tokens := config.ENV.API_TOKENS
+	tokenKeys := maps.Keys(config.ENV.CONFIGS)
+	tokens := slices.Collect(tokenKeys)
+
+	if tokens == nil {
+		tokens = []string{}
+	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if len(tokens) <= 0 {

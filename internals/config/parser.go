@@ -5,12 +5,13 @@ import (
 )
 
 var transformFuncs = map[string]func(string, any) (string, any) {
-	"default": defaultTransform,
+	"default": lowercaseTransform,
 	"lower": lowercaseTransform,
 	"upper": uppercaseTransform,
+	"keep":  keepTransform,
 }
 
-func defaultTransform(key string, value any) (string, any) {
+func keepTransform(key string, value any) (string, any) {
 	return key, value
 }
 
