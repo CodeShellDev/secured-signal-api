@@ -34,6 +34,9 @@ Add your logs below (in `debug` log level), be sure to redact sensitive informat
 Add your config(s) below (Use ```yaml ... ```).
 Please specify if token config or not.
 -->
+```yaml
+
+```
 
 ### Additional Context
 <!--
