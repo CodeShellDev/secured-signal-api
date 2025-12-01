@@ -67,6 +67,7 @@ func Load() {
 }
 
 func Log() {
+	// TODO: back to dev
 	log.Info("Loaded Config:", mainConf.Layer.All())
 	log.Info("Loaded Token Configs:", tokenConf.Layer.All())
 	log.Info("Parsed Configs: ", ENV)
