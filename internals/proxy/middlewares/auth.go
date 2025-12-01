@@ -8,8 +8,8 @@ import (
 	"slices"
 	"strings"
 
+	log "github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 var Auth Middleware = Middleware{

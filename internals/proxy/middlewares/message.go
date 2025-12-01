@@ -3,8 +3,8 @@ package middlewares
 import (
 	"net/http"
 
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
-	request "github.com/codeshelldev/secured-signal-api/utils/request"
+	log "github.com/codeshelldev/gotl/pkg/logger"
+	request "github.com/codeshelldev/gotl/pkg/request"
 )
 
 var Message Middleware = Middleware{

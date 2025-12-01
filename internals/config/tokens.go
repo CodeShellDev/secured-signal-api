@@ -3,9 +3,9 @@ package config
 import (
 	"strconv"
 
+	"github.com/codeshelldev/gotl/pkg/configutils"
+	log "github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
-	"github.com/codeshelldev/secured-signal-api/utils/configutils"
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
@@ -26,17 +26,15 @@ func NormalizeTokens() {
 
 	for _, config := range tokenConf.Layer.Slices("tokenconfigs") {
 		tmpConf := configutils.New()
-		tmpConf.Load(config.Get("").(map[string]any), "")
+		tmpConf.Load(config.Raw(), "")
 
 		Normalize(tmpConf, "overrides", &structure.SETTINGS{})
 		
-		data = append(data, tmpConf.Layer.Get("").(map[string]any))
+		data = append(data, tmpConf.Layer.Raw())
 	}
 
 	// Merge token configs together into new temporary config
-	tokenConf.Load(map[string]any{
-		"tokenconfigs": data,
-	}, "")
+	tokenConf.Load(data, "tokenconfigs")
 }
 
 func InitTokens() {

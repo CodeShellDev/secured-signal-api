@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"os"
 
+	log "github.com/codeshelldev/gotl/pkg/logger"
 	config "github.com/codeshelldev/secured-signal-api/internals/config"
 	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 var proxy reverseProxy.Proxy

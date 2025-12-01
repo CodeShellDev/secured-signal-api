@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/codeshelldev/secured-signal-api/utils/logger"
+	"github.com/codeshelldev/gotl/pkg/logger"
 )
 
 type Middleware struct {
