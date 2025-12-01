@@ -13,17 +13,17 @@ type ENV struct {
 type CONFIG struct {
 	SERVICE				SERVICE 					`koanf:"service"`
 	API					API						    `koanf:"api"`
-	SETTINGS      		SETTINGS					`koanf:"settings"        aliases:"overrides"`
+	SETTINGS      		SETTINGS					`koanf:"settings"        token>aliases:"overrides"`
 }
 
 type SERVICE struct {
-	PORT				string						`koanf:"port"`
-	LOG_LEVEL			string						`koanf:"loglevel"`
+	PORT				string						`koanf:"port"            env>aliases:".port"`
+	LOG_LEVEL			string						`koanf:"loglevel"        env>aliases:".loglevel"`
 }
 
 type API struct {
-	URL					string						`koanf:"url"`
-	TOKENS				[]string					`koanf:"tokens"          aliases:"token"`
+	URL					string						`koanf:"url"             env>aliases:".apiurl"`
+	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken"     aliases:"token"`
 }
 
 type SETTINGS struct {

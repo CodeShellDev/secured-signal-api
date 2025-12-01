@@ -42,10 +42,12 @@ func Load() {
 
 	LoadTokens()
 
+	NormalizeConfig("", defaultsConf)
+	NormalizeConfig("config", userConf)
+
 	userConf.LoadEnv(normalizeEnv)
 
-	NormalizeConfig(defaultsConf)
-	NormalizeConfig(userConf)
+	NormalizeConfig("env", userConf)
 	
 	NormalizeTokens()
 
@@ -85,11 +87,11 @@ func LowercaseKeys(config *configutils.Config) {
 	config.Load(data, "")
 }
 
-func NormalizeConfig(config *configutils.Config) {
-	Normalize(config, "", &structure.CONFIG{})
+func NormalizeConfig(id string, config *configutils.Config) {
+	Normalize(id, config, "", &structure.CONFIG{})
 }
 
-func Normalize(config *configutils.Config, path string, structure any) {
+func Normalize(id string, config *configutils.Config, path string, structure any) {
 	data := config.Layer.Get(path)
 	old, ok := data.(map[string]any)
 
@@ -103,7 +105,7 @@ func Normalize(config *configutils.Config, path string, structure any) {
 	tmpConf.Load(old, "")
 	
 	// Apply transforms to the new config
-	tmpConf.ApplyTransformFuncs(structure, "", transformFuncs)
+	tmpConf.ApplyTransformFuncs(id, structure, "", transformFuncs)
 
 	// Lowercase actual config
 	LowercaseKeys(config)
