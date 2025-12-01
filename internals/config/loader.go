@@ -161,3 +161,11 @@ func LoadConfig() {
 		log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
 	}
 }
+
+func normalizeEnv(key string, value string) (string, any) {
+	key = strings.ToLower(key)
+	key = strings.ReplaceAll(key, "__", ".")
+	key = strings.ReplaceAll(key, "_", "")
+
+	return key, stringutils.ToType(value)
+}
