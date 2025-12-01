@@ -49,16 +49,18 @@ func Load() {
 	envConf.LoadEnv(normalizeEnv)
 
 	NormalizeConfig("env", envConf)
-	
-	NormalizeTokens()
 
-	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer, envConf.Layer)
+	userConf.MergeLayers(envConf.Layer)
+	
+	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
 	mainConf.TemplateConfig()
 
-	InitTokens()
+	NormalizeTokens()
 
-	InitEnv()
+	InitConfig()
+
+	InitTokens()
 
 	log.Info("Finished Loading Configuration")
 }
@@ -130,7 +132,7 @@ func InitReload() {
 	tokenConf.OnReload(reload)
 }
 
-func InitEnv() {
+func InitConfig() {
 	var config structure.CONFIG
 
 	mainConf.Layer.Unmarshal("", &config)
