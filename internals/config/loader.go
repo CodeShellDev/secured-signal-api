@@ -7,9 +7,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/codeshelldev/gotl/pkg/configutils"
+	log "github.com/codeshelldev/gotl/pkg/logger"
+	"github.com/codeshelldev/gotl/pkg/stringutils"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
-	"github.com/codeshelldev/secured-signal-api/utils/configutils"
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 
 	"github.com/knadh/koanf/parsers/yaml"
 )
@@ -41,7 +42,7 @@ func Load() {
 
 	LoadTokens()
 
-	userConf.LoadEnv()
+	userConf.LoadEnv(normalizeEnv)
 
 	NormalizeConfig(defaultsConf)
 	NormalizeConfig(userConf)
@@ -110,18 +111,19 @@ func Normalize(config *configutils.Config, path string, structure any) {
 	// Load temporary config back into paths
 	config.Layer.Delete(path)
 	
-	config.Load(tmpConf.Layer.Get("").(map[string]any), path)
+	config.Load(tmpConf.Layer.Raw(), path)
 }
 
 func InitReload() {
-	reload := func() {
+	reload := func(path string) {
+		log.Debug(path, " changed, reloading...")
 		Load()
 		Log()
 	}
 	
-	defaultsConf.OnLoad(reload)
-	userConf.OnLoad(reload)
-	tokenConf.OnLoad(reload)
+	defaultsConf.OnReload(reload)
+	userConf.OnReload(reload)
+	tokenConf.OnReload(reload)
 }
 
 func InitEnv() {
@@ -139,6 +141,7 @@ func InitEnv() {
 }
 
 func LoadDefaults() {
+	log.Debug("Loading defaults ", ENV.DEFAULTS_PATH)
 	_, err := defaultsConf.LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
 
 	if err != nil {
@@ -147,6 +150,7 @@ func LoadDefaults() {
 }
 
 func LoadConfig() {
+	log.Debug("Loading Config ", ENV.CONFIG_PATH)
 	_, err := userConf.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
 
 	if err != nil {
@@ -160,4 +164,12 @@ func LoadConfig() {
 
 		log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
 	}
+}
+
+func normalizeEnv(key string, value string) (string, any) {
+	key = strings.ToLower(key)
+	key = strings.ReplaceAll(key, "__", ".")
+	key = strings.ReplaceAll(key, "_", "")
+
+	return key, stringutils.ToType(value)
 }

@@ -3,10 +3,10 @@ package middlewares
 import (
 	"net/http"
 
+	jsonutils "github.com/codeshelldev/gotl/pkg/jsonutils"
+	log "github.com/codeshelldev/gotl/pkg/logger"
+	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
-	jsonutils "github.com/codeshelldev/secured-signal-api/utils/jsonutils"
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
-	request "github.com/codeshelldev/secured-signal-api/utils/request"
 )
 
 var Mapping Middleware = Middleware{
