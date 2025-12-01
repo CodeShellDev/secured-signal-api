@@ -1,6 +1,6 @@
 package requestkeys
 
-import "github.com/codeshelldev/secured-signal-api/utils/request"
+import "github.com/codeshelldev/gotl/pkg/request"
 
 type Field struct {
 	Prefix string

@@ -4,34 +4,24 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
-	log "github.com/codeshelldev/secured-signal-api/utils/logger"
+	"github.com/codeshelldev/gotl/pkg/docker"
+	log "github.com/codeshelldev/gotl/pkg/logger"
 )
-
-var stop chan os.Signal
 
 func Init() {
 	log.Info("Running ", os.Getenv("IMAGE_TAG"), " Image")
 }
 
 func Run(main func()) chan os.Signal {
-	stop = make(chan os.Signal, 1)
-	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
-
-	go main()
-
-	return stop
+	return docker.Run(main)
 }
 
 func Exit(code int) {
 	log.Info("Exiting...")
 
-	os.Exit(code)
-
-	stop <- syscall.SIGTERM
+	docker.Exit(code)
 }
 
 func Shutdown(server *http.Server) {
