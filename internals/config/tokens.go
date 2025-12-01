@@ -28,7 +28,7 @@ func NormalizeTokens() {
 		tmpConf := configutils.New()
 		tmpConf.Load(config.Raw(), "")
 
-		Normalize("token", tmpConf, "overrides", &structure.SETTINGS{})
+		Normalize("token", tmpConf, "", &structure.SETTINGS{})
 		
 		data = append(data, tmpConf.Layer.Raw())
 	}
