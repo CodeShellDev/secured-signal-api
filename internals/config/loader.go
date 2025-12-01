@@ -67,7 +67,7 @@ func Load() {
 }
 
 func Log() {
-	// TODO: back to dev
+	// TODO: Change back to `log.Dev()` after testing
 	log.Info("Loaded Config:", mainConf.Layer.All())
 	log.Info("Loaded Token Configs:", tokenConf.Layer.All())
 	log.Info("Parsed Configs: ", ENV)
