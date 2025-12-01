@@ -27,6 +27,7 @@ var DEFAULT	*structure.CONFIG
 
 var defaultsConf *configutils.Config
 var userConf *configutils.Config
+var envConf *configutils.Config
 var tokenConf *configutils.Config
 
 var mainConf *configutils.Config
@@ -45,13 +46,13 @@ func Load() {
 	NormalizeConfig("", defaultsConf)
 	NormalizeConfig("config", userConf)
 
-	userConf.LoadEnv(normalizeEnv)
+	envConf.LoadEnv(normalizeEnv)
 
-	NormalizeConfig("env", userConf)
+	NormalizeConfig("env", envConf)
 	
 	NormalizeTokens()
 
-	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer)
+	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer, envConf.Layer)
 
 	mainConf.TemplateConfig()
 
@@ -70,6 +71,7 @@ func Log() {
 func Clear() {
 	defaultsConf = configutils.New()
 	userConf = configutils.New()
+	envConf = configutils.New()
 	tokenConf = configutils.New()
 	mainConf = configutils.New()
 }
