@@ -5,15 +5,12 @@ import (
 	"os"
 
 	config "github.com/codeshelldev/secured-signal-api/internals/config"
-	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	log "github.com/codeshelldev/secured-signal-api/utils/logger"
 )
 
 var proxy reverseProxy.Proxy
-
-var ENV *structure.ENV
 
 func main() {
 	logLevel := os.Getenv("LOG_LEVEL")
@@ -24,10 +21,8 @@ func main() {
 
 	config.Load()
 
-	ENV = config.ENV
-
-	if ENV.LOG_LEVEL != log.Level() {
-		log.Init(ENV.LOG_LEVEL)
+	if config.DEFAULT.SERVICE.LOG_LEVEL != log.Level() {
+		log.Init(config.DEFAULT.SERVICE.LOG_LEVEL)
 	}
 
 	log.Info("Initialized Logger with Level of ", log.Level())
@@ -39,13 +34,13 @@ func main() {
 
 	config.Log()
 
-	proxy = reverseProxy.Create(ENV.API_URL)
+	proxy = reverseProxy.Create(config.DEFAULT.API.URL)
 
 	handler := proxy.Init()
 
 	log.Info("Initialized Middlewares")
 
-	addr := "0.0.0.0:" + ENV.PORT
+	addr := "0.0.0.0:" + config.DEFAULT.SERVICE.PORT
 
 	log.Info("Server Listening on ", addr)
 
