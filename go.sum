@@ -2,6 +2,8 @@ github.com/codeshelldev/gotl v0.0.2 h1:PQbipYHut3DNvwcrdkQmIGo2p6X6a889Glmba/KIe
 github.com/codeshelldev/gotl v0.0.2/go.mod h1:OzawxKcFw9QEgbeR5H2UXryhYeeLo8xSLme1r8viE+U=
 github.com/codeshelldev/gotl v0.0.3 h1:LjtrG1BlP3fLlJWQ0sfl2P7PfLS09h9bgeANX+nEXCM=
 github.com/codeshelldev/gotl v0.0.3/go.mod h1:Mfb+Lb+DV3DUXdA1sixJb2pLawaJGGFFeC29gUZQLcg=
+github.com/codeshelldev/gotl v0.0.4-2 h1:zCbsSTKE7R5EWVzoZLoiP1I5MItNr28mFwEjgmGMCl0=
+github.com/codeshelldev/gotl v0.0.4-2/go.mod h1:Mfb+Lb+DV3DUXdA1sixJb2pLawaJGGFFeC29gUZQLcg=
 github.com/codeshelldev/gotl v0.0.4 h1:W2cup8Pw9LzFLxmS5QUzY+NSE3ZgiRSUM7FiGd6qJrI=
 github.com/codeshelldev/gotl v0.0.4/go.mod h1:Mfb+Lb+DV3DUXdA1sixJb2pLawaJGGFFeC29gUZQLcg=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
