@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/fs"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/configutils"
@@ -20,10 +19,11 @@ var ENV *structure.ENV = &structure.ENV{
 	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
 	TOKENS_DIR:    os.Getenv("TOKENS_DIR"),
 	FAVICON_PATH:  os.Getenv("FAVICON_PATH"),
-	API_TOKENS:    []string{},
-	SETTINGS:      map[string]*structure.SETTINGS{},
+	CONFIGS:      	map[string]*structure.CONFIG{},
 	INSECURE:      false,
 }
+
+var DEFAULT	*structure.CONFIG
 
 var defaultsConf *configutils.Config
 var userConf *configutils.Config
@@ -86,7 +86,7 @@ func LowercaseKeys(config *configutils.Config) {
 }
 
 func NormalizeConfig(config *configutils.Config) {
-	Normalize(config, "settings", &structure.SETTINGS{})
+	Normalize(config, "", &structure.CONFIG{})
 }
 
 func Normalize(config *configutils.Config, path string, structure any) {
@@ -127,17 +127,13 @@ func InitReload() {
 }
 
 func InitEnv() {
-	ENV.PORT = strconv.Itoa(mainConf.Layer.Int("service.port"))
+	var config structure.CONFIG
 
-	ENV.LOG_LEVEL = strings.ToLower(mainConf.Layer.String("loglevel"))
+	mainConf.Layer.Unmarshal("", &config)
 
-	ENV.API_URL = mainConf.Layer.String("api.url")
+	ENV.CONFIGS["*"] = &config
 
-	var settings structure.SETTINGS
-
-	mainConf.Layer.Unmarshal("settings", &settings)
-
-	ENV.SETTINGS["*"] = &settings
+	DEFAULT = ENV.CONFIGS["*"]
 }
 
 func LoadDefaults() {
@@ -164,12 +160,4 @@ func LoadConfig() {
 
 		log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
 	}
-}
-
-func normalizeEnv(key string, value string) (string, any) {
-	key = strings.ToLower(key)
-	key = strings.ReplaceAll(key, "__", ".")
-	key = strings.ReplaceAll(key, "_", "")
-
-	return key, stringutils.ToType(value)
 }

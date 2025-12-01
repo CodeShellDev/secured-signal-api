@@ -5,36 +5,49 @@ type ENV struct {
 	DEFAULTS_PATH 		string
 	FAVICON_PATH  		string
 	TOKENS_DIR    		string
-	LOG_LEVEL     		string
-	PORT          		string
-	API_URL       		string
-	API_TOKENS    		[]string
-	SETTINGS      		map[string]*SETTINGS		`koanf:"settings"`
 	INSECURE      		bool
+
+	CONFIGS      		map[string]*CONFIG
+}
+
+type CONFIG struct {
+	SERVICE				SERVICE 					`koanf:"service"`
+	API					API						    `koanf:"api"`
+	SETTINGS      		SETTINGS					`koanf:"settings"        aliases:"overrides"`
+}
+
+type SERVICE struct {
+	PORT				string						`koanf:"port"`
+	LOG_LEVEL			string						`koanf:"loglevel"`
+}
+
+type API struct {
+	URL					string						`koanf:"url"`
+	TOKENS				[]string					`koanf:"tokens"          aliases:"token"`
 }
 
 type SETTINGS struct {
-	ACCESS 				ACCESS_SETTINGS 			`koanf:"access"        transform:"lower"`
-	MESSAGE				MESSAGE_SETTINGS			`koanf:"message"       transform:"lower"`
+	ACCESS 				ACCESS_SETTINGS 			`koanf:"access"`
+	MESSAGE				MESSAGE_SETTINGS			`koanf:"message"`
 }
 
 type MESSAGE_SETTINGS struct {
-	VARIABLES         	map[string]any              `koanf:"variables"                       childtransform:"upper"`
-	FIELD_MAPPINGS      map[string][]FieldMapping	`koanf:"fieldmappings"                   childtransform:"default"`
-	TEMPLATE  			string                      `koanf:"template"      transform:"lower"`
+	VARIABLES         	map[string]any              `koanf:"variables"       childtransform:"upper"`
+	FIELD_MAPPINGS      map[string][]FieldMapping	`koanf:"fieldmappings"   childtransform:"default"`
+	TEMPLATE  			string                      `koanf:"template"`
 }
 
 type FieldMapping struct {
-	Field 				string 						`koanf:"field"         transform:"lower"`
-	Score 				int    						`koanf:"score"         transform:"lower"`
+	Field 				string 						`koanf:"field"`
+	Score 				int    						`koanf:"score"`
 }
 
 type ACCESS_SETTINGS struct {
-	ENDPOINTS			[]string					`koanf:"endpoints"     transform:"lower"`
-	FIELD_POLICIES		map[string]FieldPolicy		`koanf:"fieldpolicies" transform:"lower" childtransform:"default"`
+	ENDPOINTS			[]string					`koanf:"endpoints"`
+	FIELD_POLICIES		map[string]FieldPolicy		`koanf:"fieldpolicies"   childtransform:"default"`
 }
 
 type FieldPolicy struct {
-	Value				any						    `koanf:"value"         transform:"lower"`
-	Action				string						`koanf:"action"        transform:"lower"`
+	Value				any						    `koanf:"value"`
+	Action				string						`koanf:"action"`
 }

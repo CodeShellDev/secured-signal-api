@@ -16,16 +16,17 @@ var Mapping Middleware = Middleware{
 
 func mappingHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		settings := getSettingsByReq(req)
+		conf := getConfigByReq(req)
 
-		fieldMappings := settings.MESSAGE.FIELD_MAPPINGS
+		variables := conf.SETTINGS.MESSAGE.VARIABLES
+		fieldMappings := conf.SETTINGS.MESSAGE.FIELD_MAPPINGS
 
 		if fieldMappings == nil {
-			fieldMappings = getSettings("*").MESSAGE.FIELD_MAPPINGS
+			fieldMappings = getConfig("").SETTINGS.MESSAGE.FIELD_MAPPINGS
 		}
 
-		if settings.MESSAGE.VARIABLES == nil {
-			settings.MESSAGE.VARIABLES = getSettings("*").MESSAGE.VARIABLES
+		if variables == nil {
+			variables = getConfig("").SETTINGS.MESSAGE.VARIABLES
 		}
 
 		body, err := request.GetReqBody(req)
@@ -53,7 +54,7 @@ func mappingHandler(next http.Handler) http.Handler {
 					bodyData[keyWithoutPrefix] = value
 					modifiedBody = true
 				case ".":
-					settings.MESSAGE.VARIABLES[keyWithoutPrefix] = value
+					variables[keyWithoutPrefix] = value
 				}
 			}
 		}

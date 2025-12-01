@@ -18,12 +18,12 @@ var Policy Middleware = Middleware{
 
 func policyHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		settings := getSettingsByReq(req)
+		conf := getConfigByReq(req)
 
-		policies := settings.ACCESS.FIELD_POLICIES
+		policies := conf.SETTINGS.ACCESS.FIELD_POLICIES
 
 		if policies == nil {
-			policies = getSettings("*").ACCESS.FIELD_POLICIES
+			policies = getConfig("").SETTINGS.ACCESS.FIELD_POLICIES
 		}
 
 		body, err := request.GetReqBody(req)
