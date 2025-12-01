@@ -15,12 +15,12 @@ import (
 )
 
 var ENV *structure.ENV = &structure.ENV{
-	CONFIG_PATH:   os.Getenv("CONFIG_PATH"),
-	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
-	TOKENS_DIR:    os.Getenv("TOKENS_DIR"),
-	FAVICON_PATH:  os.Getenv("FAVICON_PATH"),
-	CONFIGS:      	map[string]*structure.CONFIG{},
-	INSECURE:      false,
+	CONFIG_PATH:   	os.Getenv("CONFIG_PATH"),
+	DEFAULTS_PATH: 	os.Getenv("DEFAULTS_PATH"),
+	TOKENS_DIR:    	os.Getenv("TOKENS_DIR"),
+	FAVICON_PATH:  	os.Getenv("FAVICON_PATH"),
+	CONFIGS:       	map[string]*structure.CONFIG{},
+	INSECURE:      	false,
 }
 
 var DEFAULT	*structure.CONFIG
