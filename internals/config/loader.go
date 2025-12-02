@@ -44,12 +44,12 @@ func Load() {
 
 	LoadTokens()
 
-	//NormalizeConfig("", defaultsConf)
+	NormalizeConfig("", defaultsConf)
 	//NormalizeConfig("config", userConf)
 
 	envConf.LoadEnv(normalizeEnv)
 
-	NormalizeConfig("env", envConf)
+	//NormalizeConfig("env", envConf)
 
 	userConf.MergeLayers(envConf.Layer)
 	
