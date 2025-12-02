@@ -44,8 +44,8 @@ func Load() {
 
 	LoadTokens()
 
-	NormalizeConfig("", defaultsConf)
-	NormalizeConfig("config", userConf)
+	//NormalizeConfig("", defaultsConf)
+	//NormalizeConfig("config", userConf)
 
 	envConf.LoadEnv(normalizeEnv)
 
@@ -57,7 +57,7 @@ func Load() {
 
 	mainConf.TemplateConfig()
 
-	NormalizeTokens()
+	//NormalizeTokens()
 
 	InitConfig()
 
