@@ -20,6 +20,8 @@ github.com/codeshelldev/gotl v0.0.4-27 h1:SV8Oad50uYpwMSdLpS6uOkJlSHrvSKi0KBe0Sf
 github.com/codeshelldev/gotl v0.0.4-27/go.mod h1:Mfb+Lb+DV3DUXdA1sixJb2pLawaJGGFFeC29gUZQLcg=
 github.com/codeshelldev/gotl v0.0.4-28 h1:Q1lWa0hcvRp1jVJmWicGNsQyupBy/s7N8gi++Jgvf4E=
 github.com/codeshelldev/gotl v0.0.4-28/go.mod h1:Mfb+Lb+DV3DUXdA1sixJb2pLawaJGGFFeC29gUZQLcg=
+github.com/codeshelldev/gotl v0.0.4-29 h1:c1fRnCQsP7DgqyRgYE2+9jg7FlgGsVAdFbeHX1gxe5A=
+github.com/codeshelldev/gotl v0.0.4-29/go.mod h1:Mfb+Lb+DV3DUXdA1sixJb2pLawaJGGFFeC29gUZQLcg=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fsnotify/fsnotify v1.9.0 h1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=
