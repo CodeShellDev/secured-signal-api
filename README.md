@@ -463,7 +463,7 @@ No worries check out the [Discussions](https://github.com/codeshelldev/secured-s
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+This Project is licensed under the [MIT License](./LICENSE).
 
 ## Legal
 
