@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.22
 RUN apk --no-cache add ca-certificates
 
 ARG IMAGE_TAG
