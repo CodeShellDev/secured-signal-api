@@ -22,10 +22,12 @@ var Template Middleware = Middleware{
 
 func templateHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		variables := getSettingsByReq(req).MESSAGE.VARIABLES
+		conf := getConfigByReq(req)
+		
+		variables := conf.SETTINGS.MESSAGE.VARIABLES
 
 		if variables == nil {
-			variables = getSettings("*").MESSAGE.VARIABLES
+			variables = getConfig("").SETTINGS.MESSAGE.VARIABLES
 		}
 
 		body, err := request.GetReqBody(req)

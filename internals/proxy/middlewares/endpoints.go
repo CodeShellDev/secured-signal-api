@@ -16,12 +16,12 @@ var Endpoints Middleware = Middleware{
 
 func endpointsHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		settings := getSettingsByReq(req)
+		conf := getConfigByReq(req)
 
-		endpoints := settings.ACCESS.ENDPOINTS
+		endpoints := conf.SETTINGS.ACCESS.ENDPOINTS
 
 		if endpoints == nil {
-			endpoints = getSettings("*").ACCESS.ENDPOINTS
+			endpoints = getConfig("").SETTINGS.ACCESS.ENDPOINTS
 		}
 
 		reqPath := req.URL.Path

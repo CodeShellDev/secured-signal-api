@@ -24,22 +24,18 @@ type contextKey string
 
 const tokenKey contextKey = "token"
 
-func getSettingsByReq(req *http.Request) *structure.SETTINGS {
-	token, ok := req.Context().Value(tokenKey).(string)
+func getConfigByReq(req *http.Request) *structure.CONFIG {
+	token := req.Context().Value(tokenKey).(string)
 
-	if !ok {
-		token = "*"
-	}
-
-	return getSettings(token)
+	return getConfig(token)
 }
 
-func getSettings(token string) *structure.SETTINGS {
-	settings, exists := config.ENV.SETTINGS[token]
+func getConfig(token string) *structure.CONFIG {
+	conf, exists := config.ENV.CONFIGS[token]
 
-	if !exists || settings == nil {
-		settings = config.ENV.SETTINGS["*"]
+	if !exists || conf == nil {
+		conf = config.DEFAULT
 	}
 
-	return settings
+	return conf
 }
