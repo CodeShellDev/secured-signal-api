@@ -15,18 +15,20 @@ import (
 )
 
 var ENV *structure.ENV = &structure.ENV{
-	CONFIG_PATH:   os.Getenv("CONFIG_PATH"),
-	DEFAULTS_PATH: os.Getenv("DEFAULTS_PATH"),
-	TOKENS_DIR:    os.Getenv("TOKENS_DIR"),
-	FAVICON_PATH:  os.Getenv("FAVICON_PATH"),
-	CONFIGS:      	map[string]*structure.CONFIG{},
-	INSECURE:      false,
+	CONFIG_PATH:   	os.Getenv("CONFIG_PATH"),
+	DEFAULTS_PATH: 	os.Getenv("DEFAULTS_PATH"),
+	TOKENS_DIR:    	os.Getenv("TOKENS_DIR"),
+	FAVICON_PATH:  	os.Getenv("FAVICON_PATH"),
+	INSECURE:      	false,
+
+	CONFIGS:       	map[string]*structure.CONFIG{},
 }
 
 var DEFAULT	*structure.CONFIG
 
 var defaultsConf *configutils.Config
 var userConf *configutils.Config
+var envConf *configutils.Config
 var tokenConf *configutils.Config
 
 var mainConf *configutils.Config
@@ -42,32 +44,38 @@ func Load() {
 
 	LoadTokens()
 
-	userConf.LoadEnv(normalizeEnv)
+	NormalizeConfig("", defaultsConf)
+	NormalizeConfig("config", userConf)
 
-	NormalizeConfig(defaultsConf)
-	NormalizeConfig(userConf)
+	envConf.LoadEnv(normalizeEnv)
+
+	NormalizeConfig("env", envConf)
+
+	userConf.MergeLayers(envConf.Layer)
 	
-	NormalizeTokens()
-
 	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer)
 
 	mainConf.TemplateConfig()
 
-	InitTokens()
+	NormalizeTokens()
 
-	InitEnv()
+	InitConfig()
+
+	InitTokens()
 
 	log.Info("Finished Loading Configuration")
 }
 
 func Log() {
-	log.Dev("Loaded Config:", mainConf.Layer.All())
-	log.Dev("Loaded Token Configs:", tokenConf.Layer.All())
+	log.Dev("Loaded Config:", mainConf.Layer.Get(""))
+	log.Dev("Loaded Token Configs:", tokenConf.Layer.Get(""))
+	log.Dev("Parsed Configs: ", ENV)
 }
 
 func Clear() {
 	defaultsConf = configutils.New()
 	userConf = configutils.New()
+	envConf = configutils.New()
 	tokenConf = configutils.New()
 	mainConf = configutils.New()
 }
@@ -85,11 +93,11 @@ func LowercaseKeys(config *configutils.Config) {
 	config.Load(data, "")
 }
 
-func NormalizeConfig(config *configutils.Config) {
-	Normalize(config, "", &structure.CONFIG{})
+func NormalizeConfig(id string, config *configutils.Config) {
+	Normalize(id, config, "", &structure.CONFIG{})
 }
 
-func Normalize(config *configutils.Config, path string, structure any) {
+func Normalize(id string, config *configutils.Config, path string, structure any) {
 	data := config.Layer.Get(path)
 	old, ok := data.(map[string]any)
 
@@ -103,7 +111,7 @@ func Normalize(config *configutils.Config, path string, structure any) {
 	tmpConf.Load(old, "")
 	
 	// Apply transforms to the new config
-	tmpConf.ApplyTransformFuncs(structure, "", transformFuncs)
+	tmpConf.ApplyTransformFuncs(id, structure, "", transformFuncs)
 
 	// Lowercase actual config
 	LowercaseKeys(config)
@@ -126,7 +134,7 @@ func InitReload() {
 	tokenConf.OnReload(reload)
 }
 
-func InitEnv() {
+func InitConfig() {
 	var config structure.CONFIG
 
 	mainConf.Layer.Unmarshal("", &config)
@@ -160,4 +168,12 @@ func LoadConfig() {
 
 		log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
 	}
+}
+
+func normalizeEnv(key string, value string) (string, any) {
+	key = strings.ToLower(key)
+	key = strings.ReplaceAll(key, "__", ".")
+	key = strings.ReplaceAll(key, "_", "")
+
+	return key, stringutils.ToType(value)
 }
