@@ -67,10 +67,9 @@ func Load() {
 }
 
 func Log() {
-	// TODO: Change back to `log.Dev()` as soon as config parsing is working again
-	log.Info("Loaded Config:", mainConf.Layer.Get(""))
-	log.Info("Loaded Token Configs:", tokenConf.Layer.Get(""))
-	log.Info("Parsed Configs: ", ENV)
+	log.Dev("Loaded Config:", mainConf.Layer.Get(""))
+	log.Dev("Loaded Token Configs:", tokenConf.Layer.Get(""))
+	log.Dev("Parsed Configs: ", ENV)
 }
 
 func Clear() {
