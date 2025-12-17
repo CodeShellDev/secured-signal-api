@@ -28,7 +28,7 @@ func NormalizeTokens() {
 		tmpConf := configutils.New()
 		tmpConf.Load(config.Raw(), "")
 
-		Normalize("token", tmpConf, "", &structure.SETTINGS{})
+		Normalize("token", tmpConf, "", &structure.CONFIG{})
 		
 		data = append(data, tmpConf.Layer.Raw())
 	}
@@ -43,9 +43,6 @@ func InitTokens() {
 	var tokenConfigs []structure.CONFIG
 
 	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
-
-	log.Dev("TokenConfig:", tokenConf.Layer.Get(""))
-	log.Dev("TokenConfigs:", tokenConfigs)
 
 	config := parseTokenConfigs(tokenConfigs)
 
