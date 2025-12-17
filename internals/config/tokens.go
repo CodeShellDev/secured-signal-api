@@ -44,6 +44,7 @@ func InitTokens() {
 
 	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
 
+	log.Dev("TokenConfig:", tokenConf.Layer.Get(""))
 	log.Dev("TokenConfigs:", tokenConfigs)
 
 	config := parseTokenConfigs(tokenConfigs)
