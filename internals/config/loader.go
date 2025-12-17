@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/configutils"
-	"github.com/codeshelldev/gotl/pkg/logger"
 	log "github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/stringutils"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
@@ -114,8 +113,6 @@ func Normalize(id string, config *configutils.Config, path string, structure any
 	
 	// Apply transforms to the new config
 	tmpConf.ApplyTransformFuncs(id, structure, "", transformFuncs)
-	
-	logger.Dev("Transformed:", tmpConf.Layer.Get(""))
 
 	// Lowercase actual config
 	LowercaseKeys(config)

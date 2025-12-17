@@ -44,6 +44,8 @@ func InitTokens() {
 
 	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
 
+	log.Dev("TokenConfigs:", tokenConfigs)
+
 	config := parseTokenConfigs(tokenConfigs)
 
 	for token, config := range config {
