@@ -23,7 +23,8 @@ type SERVICE struct {
 
 type API struct {
 	URL					string						`koanf:"url"             env>aliases:".apiurl"`
-	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken"     aliases:"token"`
+																													//TODO: deprecate .token for tkconfigs
+	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken"     token>aliases:".tokens,.token"       aliases:"token"`
 }
 
 type SETTINGS struct {
