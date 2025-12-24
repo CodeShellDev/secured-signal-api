@@ -13,6 +13,7 @@ type ENV struct {
 type CONFIG struct {
 	SERVICE				SERVICE 					`koanf:"service"`
 	API					API						    `koanf:"api"`
+																			//TODO: deprecate overrides for tkconfigs
 	SETTINGS      		SETTINGS					`koanf:"settings"        token>aliases:"overrides"`
 }
 
