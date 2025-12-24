@@ -40,6 +40,10 @@ func NormalizeTokens() {
 func InitTokens() {
 	apiTokens := DEFAULT.API.TOKENS
 
+	for _, token := range apiTokens {
+		ENV.CONFIGS[token] = DEFAULT
+	}
+
 	var tokenConfigs []structure.CONFIG
 
 	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
