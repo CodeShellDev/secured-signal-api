@@ -29,7 +29,7 @@ const config = {
 
 	// GitHub pages deployment config.
 	// If you aren't using GitHub pages, you don't need these.^
-	organizationName: "CodeShell", // Usually your GitHub org/user name.
+	organizationName: "codeshelldev", // Usually your GitHub org/user name.
 	projectName: "secured-signal-api", // Usually your repo name.
 
 	onBrokenLinks: "throw",
