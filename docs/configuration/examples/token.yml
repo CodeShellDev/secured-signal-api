@@ -1,4 +1,5 @@
-tokens: [LOOOONG_STRING]
+api:
+  tokens: [LOOOONG_STRING]
 
 overrides:
   message:
