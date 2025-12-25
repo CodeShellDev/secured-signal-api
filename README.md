@@ -244,9 +244,10 @@ This way you can permission tokens by further restricting or adding [Endpoints](
 Here is an example:
 
 ```yaml
-tokens: [LOOOONG_STRING]
+api:
+  tokens: [LOOOONG_STRING]
 
-overrides:
+settings:
   message:
     fieldMappings: # Disable Mappings
     variables: # Disable Placeholder
