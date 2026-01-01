@@ -1,4 +1,3 @@
-import clsx from "clsx"
 import Heading from "@theme/Heading"
 import styles from "./styles.module.css"
 
@@ -7,47 +6,49 @@ import { useColorMode } from "@docusaurus/theme-common"
 const FeatureList = [
 	{
 		title: "Secure Layer",
-		lightSvg: require("@site/static/img/light/shield.svg").default,
-		darkSvg: require("@site/static/img/dark/shield.svg").default,
+		Svg: require("@site/static/img/features/shield.svg").default,
 		description: (
 			<>
-				Secured Signal API main focus is and was to be a secure layer for
-				signal-cli-rest-api using Bearer, Basic and Query Auth.
+				The main focus of Secured Signal API is to provide a secure layer for
+				signal-cli-rest-api, supporting <a href="docs/usage#auth">Bearer</a>,{" "}
+				<a href="docs/usage#auth">Basic</a>, and{" "}
+				<a href="docs/usage#auth">Query Auth</a>.
 			</>
 		),
 	},
 	{
 		title: "Quality of Life",
-		lightSvg: require("@site/static/img/light/heart.svg").default,
-		darkSvg: require("@site/static/img/dark/heart.svg").default,
+		Svg: require("@site/static/img/features/heart.svg").default,
 		description: (
 			<>
-				Implements many Quality of Life features, to elevate the Developer and
-				User Experience.
+				Implements many <a href="docs/features">Quality-of-Life features</a>, to
+				enhance the developer and user experience.
 			</>
 		),
 	},
 	{
 		title: "Compatibility in Mind",
-		lightSvg: require("@site/static/img/light/chain.svg").default,
-		darkSvg: require("@site/static/img/dark/chain.svg").default,
+		Svg: require("@site/static/img/features/chain.svg").default,
 		description: (
 			<>
-				Secured Signal API was built with Compatibility in Mind. And supports
-				almost any signal-cli-rest-api-compatible Programm.
+				Secured Signal API was built with{" "}
+				<a href="docs/integrations#the-solution">compatibility in mind</a>, and
+				it supports almost any signal-cli-rest-api-compatible program.
 			</>
 		),
 	},
 ]
 
-function Feature({ title, description, lightSvg, darkSvg }) {
+function Feature({ title, description, Svg }) {
 	const { colorMode } = useColorMode()
-	const Svg = colorMode === "dark" ? darkSvg : lightSvg
+
+	const svgStyle =
+		colorMode === "dark" ? { filter: "brightness(0) invert(1)" } : {}
 
 	return (
-		<div className={clsx("col col--4")}>
+		<div className="col col--4">
 			<div className="text--center">
-				<Svg className={styles.featureSvg} role="img" />
+				<Svg className={styles.featureSvg} role="img" style={svgStyle} />
 			</div>
 			<div className="text--center padding-horiz--md">
 				<Heading as="h3">{title}</Heading>
@@ -56,7 +57,6 @@ function Feature({ title, description, lightSvg, darkSvg }) {
 		</div>
 	)
 }
-
 export default function HomepageFeatures() {
 	return (
 		<section className={styles.features}>
