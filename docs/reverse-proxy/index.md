@@ -1,13 +1,11 @@
 ---
 sidebar_position: 1
-title: Overview
+title: Reverse Proxy
 ---
 
-# Overview
+# Reverse Proxy
 
 In this section we will be explaining why a **tls-enabled Reverse Proxy** is a must have.
-
----
 
 ## Why another Proxy
 

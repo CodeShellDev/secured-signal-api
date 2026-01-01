@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: Overview
+title: Configuration
 ---
 
 # Configuration
@@ -11,7 +11,7 @@ Here is how you configure **Secured Signal API**
 
 While being a bit **restrictive** environment variables are a great way to configure Secured Signal API.
 
-Suppose you want to set a new [Placeholder](../usage/advanced) `NUMBER` in your Environment...
+Suppose you want to set a new [Placeholder](../usage/advanced#placeholders) `NUMBER` in your Environment...
 
 ```yaml
 environment:
@@ -30,7 +30,7 @@ they are **flexible**, **extensible** and really **easy to use**.
 
 Config files allow **YAML** formatting and also `${ENV}` to get environment variables.
 
-> [!NOTE]
+> [!TIP]
 > To change the internal config file location set `CONFIG_PATH` in your **Environment** to an absolute path. (default: `/config/config.yml`)
 
 This example config shows all of the individual settings that can be applied:
@@ -45,7 +45,7 @@ This example config shows all of the individual settings that can be applied:
 
 Token Configs are used to create **per-toke**n defined **overrides** and settings.
 
-> [!NOTE]
+> [!IMPORTANT]
 > Create them under `TOKENS_PATH` (default: `config/tokens/`)
 
 This way you can permission tokens by further restricting or adding [Endpoints](../configuration/endpoints), [Placeholders](../configuration/variables), etc.

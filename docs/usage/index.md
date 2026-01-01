@@ -1,9 +1,9 @@
 ---
 sidebar_position: 1
-title: Overview
+title: Usage
 ---
 
-# Overview
+# Usage
 
 In this section we'll be taking a look at how to use **Secured Signal API**.
 
