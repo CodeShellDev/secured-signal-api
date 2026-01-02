@@ -3,7 +3,7 @@ import { themes as prismThemes } from "prism-react-renderer"
 /** @type {import('@docusaurus/types').Config} */
 const config = {
 	title: "Secured Signal API",
-	tagline: "Secure Proxy for Signal Messenger API",
+	tagline: "Secure Proxy for Signal CLI REST API",
 	favicon: "img/favicon.ico",
 
 	future: {
