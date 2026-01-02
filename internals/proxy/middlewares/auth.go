@@ -130,7 +130,7 @@ var PathAuth = AuthMethod {
 			return false, nil
 		}
 
-		auth, exists := strings.CutPrefix(unescaped, "auth:")
+		auth, exists := strings.CutPrefix(unescaped, "auth=")
 
 		if !exists {
 			return false, nil
