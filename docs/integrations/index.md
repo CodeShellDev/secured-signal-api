@@ -17,7 +17,7 @@ But with one flaw:
 
 > _manual configuration_
 
-In order for **Secured Signal API** to be compatible and integratable with a service, you still need to manually define [**Field Mappings**](../configuration/field-mappings) and [**Message Templates**](../configuration/message-template).
+In order for **Secured Signal API** to be compatible and integratable with a service, you still need to manually define [**Field Mappings**](./configuration/field-mappings) and [**Message Templates**](./configuration/message-template).
 
 This process is straightforward, provided you know what the service uses as its payload — for example, you can test by sending a request to a debugging endpoint.
 
