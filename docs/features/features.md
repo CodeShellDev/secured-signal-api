@@ -41,16 +41,16 @@ With this feature you have the power to do it yourself, just extract what's need
 
 Interested? [Take a look](./configuration/field-mappings).
 
-## Endpoints
-
-> _Block unwanted access_
-
-**Endpoints** for restricting unauthorized access and for ensuring least privilege.
-[Let's start blocking then!](./configuration/endpoints)
-
 ## Field Policies
 
 **Field Policies** are a great way to disallow specific fields or even disallowing fields with unwanted values.
 This is really helpful when trying to block certain numbers from using certain tokens, and therefor mitigating risks of unwanted use of a token.
 
 Find more about this feature [here](./configuration/field-policies).
+
+## Endpoints
+
+> _Block unwanted access_
+
+**Endpoints** are used for restricting unauthorized access and for ensuring least privilege.
+[Let's start blocking then!](./configuration/endpoints)
