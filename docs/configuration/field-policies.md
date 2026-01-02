@@ -19,5 +19,9 @@ settings:
 
 Set the wanted action on encounter, available options are `block` and `allow`.
 
-> [!IMPORTANT]
-> Use `@` for Body Keys and `#` for Headers ([formatting](../usage/formatting)).
+> [!NOTE]
+> Supported [placeholder types](../usage/advanced#placeholders):
+>
+> | `.` Variables | `@` Body | `#` Headers |
+> | ------------- | -------- | ----------- |
+> | ❌            | ✅       | ✅          |

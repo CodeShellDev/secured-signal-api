@@ -3,9 +3,9 @@ api:
 
 settings:
   message:
-    fieldMappings: # Disable Mappings
-    variables: # Disable Placeholder
+    fieldMappings: # Disable mappings
+    variables: # Disable variable placeholders
 
   access:
-    endpoints: # Disable Sending
+    endpoints: # Disable sending
       - "!/v2/send"

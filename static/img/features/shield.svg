@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="552.29138"
-   height="552.29138"
-   viewBox="0 0 552.29138 552.29138"
+   width="385.53705"
+   height="415.77133"
+   viewBox="0 0 385.53705 415.77133"
    version="1.1"
    id="svg5"
    xml:space="preserve"
@@ -64,7 +64,7 @@
          d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
          id="Dot1-5-6-3" /></marker></defs><g
      id="g672"
-     transform="matrix(0.73122246,0,0,0.73122246,210.01564,-55.703731)"
+     transform="matrix(0.73122246,0,0,0.73122246,127.43926,-134.16878)"
      style="display:none"><rect
        style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:48.9602;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        id="rect652"
@@ -93,15 +93,15 @@
        transform="matrix(0.86447914,0,0,0.86447914,340.34558,-13.883113)"><tspan
          x="-286.84369"
          y="780.7309"
-         id="tspan5472">Secured<tspan
+         id="tspan5926">Secured<tspan
    y="780.7309"
-   id="tspan5474"> </tspan></tspan><tspan
+   id="tspan5928"> </tspan></tspan><tspan
          x="-286.84369"
          y="894.0639"
-         id="tspan5476">Signal API</tspan></text></g><g
+         id="tspan5930">Signal API</tspan></text></g><g
      id="layer1"
-     style="display:inline"
-     transform="translate(20.145689,20.145691)"><rect
+     style="display:none"
+     transform="translate(-62.430687,-58.319359)"><rect
        style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:35.8008;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        id="rect8832"
        width="552.29138"
@@ -122,7 +122,7 @@
          id="path8230" /></g></g><g
      id="g731"
      style="display:none"
-     transform="translate(20.145689,20.145691)"><path
+     transform="translate(-62.430687,-58.319359)"><path
        id="path1356"
        style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#06266c;stroke-width:30;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        d="m 256,73.318359 c -40.22974,0 -178.570312,37.198821 -178.570312,49.697261 V 259.0332 c 0,0 -3.552302,129.16402 178.570312,200.0586 C 438.12262,388.19722 432.96875,259.0332 432.96875,259.0332 V 123.01562 C 432.96875,110.51718 296.75147,73.318359 256,73.318359 Z" /><path
@@ -137,7 +137,7 @@
          d="m 206.27507,275 c 0,0 2.55742,-45.79893 48.43434,-47 45.87692,-1.20107 49.32304,47 49.32304,47"
          id="path727" /></g></g><g
      id="g854"
-     transform="matrix(0.73122246,0,0,0.73122246,210.01564,-55.703731)"
+     transform="matrix(0.73122246,0,0,0.73122246,127.43926,-134.16878)"
      style="display:none"><rect
        style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:69.8003;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        id="rect838"
@@ -166,9 +166,9 @@
        transform="matrix(0.86447914,0,0,0.86447914,706.85511,44.277912)"><tspan
          x="-286.84369"
          y="780.7309"
-         id="tspan5478">Secured Signal API</tspan></text></g><g
+         id="tspan5932">Secured Signal API</tspan></text></g><g
      id="g502"
-     transform="matrix(0.73122246,0,0,0.73122246,210.01564,-55.703731)"
+     transform="matrix(0.73122246,0,0,0.73122246,127.43926,-134.16878)"
      style="display:none"><rect
        style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:69.8003;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        id="rect486"
@@ -185,7 +185,7 @@
        transform="matrix(0.77873857,0,0,0.77873857,682.0688,62.025814)"><tspan
          x="-286.84369"
          y="780.7309"
-         id="tspan5480">Secured Signal API</tspan></text><text
+         id="tspan5934">Secured Signal API</tspan></text><text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:113.333px;line-height:1;font-family:Roboto;-inkscape-font-specification:'Roboto, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:0px;text-anchor:middle;white-space:pre;inline-size:2351.09;display:inline;opacity:1;fill:#052f76;fill-opacity:1;stroke:none;stroke-width:30;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        x="-286.84369"
@@ -194,7 +194,7 @@
        transform="matrix(0.40542777,0,0,0.40542777,574.15026,422.49044)"><tspan
          x="-286.84369"
          y="780.7309"
-         id="tspan5482">Secure Proxy for Signal REST API</tspan></text><g
+         id="tspan5936">Secure Proxy for Signal REST API</tspan></text><g
        id="g870"
        transform="matrix(1.0074192,0,0,1.0074192,199.8546,84.419252)"
        style="display:inline"><path
@@ -210,7 +210,7 @@
            id="path866" /></g></g></g><g
      id="layer1-9"
      style="display:none"
-     transform="matrix(0.96202739,0,0,0.96202739,29.244741,20.736808)"><path
+     transform="matrix(0.96202739,0,0,0.96202739,-53.331635,-57.728242)"><path
        id="path5909-2"
        style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:30;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        d="m 124.24219,81.679688 c -16.16236,0.04105 -31.299912,5.21367 -43.917971,15.335937 -42.126108,33.793765 -19.131781,111.514085 0,162.017575 86.629621,228.62202 244.625451,277.6136 352.644531,-5e-5 19.13178,-50.50349 42.12611,-128.22381 0,-162.017575 C 399.32059,70.022914 347.74829,78.226191 306.63867,125.08398 288.47464,145.78781 257.4971,190.01172 256.64648,191.22656 255.79587,190.01172 224.81833,145.78781 206.6543,125.08398 180.96079,95.797864 151.17945,81.611265 124.24219,81.679688 Z" /><path
@@ -230,14 +230,14 @@
          d="m 111.72798,339.6613 c 0,0 2.06958,-37.06264 39.19533,-38.0346 37.12575,-0.97196 39.91451,38.0346 39.91451,38.0346"
          id="path2443" /></g></g><g
      id="g2688"
-     style="display:none"
-     transform="translate(20.145689,20.145691)"><path
+     style="display:inline"
+     transform="translate(-62.430687,-58.319359)"><path
        id="path2680"
        style="opacity:1;fill:none;fill-opacity:1;stroke:#06266c;stroke-width:29.998;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        d="m 256,73.318359 c -40.22974,0 -178.570312,37.198821 -178.570312,49.697261 V 259.0332 c 0,0 -3.552302,129.16402 178.570312,200.0586 C 438.12262,388.19722 432.96875,259.0332 432.96875,259.0332 V 123.01562 C 432.96875,110.51718 296.75147,73.318359 256,73.318359 Z" /></g><g
      id="g4067"
      style="display:none"
-     transform="translate(20.145689,20.145691)"><path
+     transform="translate(-62.430687,-58.319359)"><path
        style="display:inline;fill:none;fill-opacity:1;stroke:#0095ac;stroke-width:29.998;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Dot-7-3-5);marker-end:url(#Dot-7-3-5);paint-order:stroke markers fill"
        d="m 462.29452,160.85505 c 0,0 -90.2121,4.97815 -92.55004,94.27996 -2.33793,89.3018 92.55004,96.00985 92.55004,96.00985"
        id="path6845-9-7-5" /><circle

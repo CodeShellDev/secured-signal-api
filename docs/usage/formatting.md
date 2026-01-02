@@ -9,43 +9,39 @@ title: Formatting
 
 ## Templates
 
-**Secured Signal API** is built with Go and hence uses Go's [Standard Templating Library](https://pkg.go.dev/text/template).
-Which means that any valid Go template string will also work in Secured Signal API.
+**Secured Signal API** is built with Go and therefore uses Go’s [standard templating library](https://pkg.go.dev/text/template).
+As a result, any valid Go template string works in Secured Signal API.
 
-> [!NOTE]
-> Go's templating library is used in the following features:
-> <br/>- [Message Templates](../configuration/message-template) <br/>- [Placeholders](./advanced)
+> [!IMPORTANT]
+> The following features use Go’s templating library:
+>
+> - [Message Templates](../configuration/message-template)
+> - [Query-to-Body Injection](./advanced#query-to-body-injection)
+> - [Placeholders](./advanced#placeholders)
 
-But you will mostly be using `{{.VAR}}`.
-
-### Keys
-
-`{{.VAR}}` might be the most common, but there is also `{{@data.key}}` (Body Keys) and `{{#Content_Type}}` (Headers), that can be used,
-when using any of these keys make sure that you understand how each key will be parsed and transformed:
-
-| Type                                   | Example             | Note             |
-| :------------------------------------- | :------------------ | :--------------- |
-| Body                                   | `{{@data.key}}`     |                  |
-| Header                                 | `{{#Content_Type}}` | `-` becomes `_`  |
-| [Variable](../configuration/variables) | `{{.VAR}}`          | always uppercase |
+| Scope                                   | Example             | Note             |
+| :-------------------------------------- | :------------------ | :--------------- |
+| Body                                    | `{{@data.key}}`     |                  |
+| Headers                                 | `{{#Content_Type}}` | `-` becomes `_`  |
+| [Variables](../configuration/variables) | `{{.VAR}}`          | Always uppercase |
 
 ## String to Type
 
 > [!TIP]
-> This formatting applies to **almost every situation** where the only (allowed) **Input Type** is a string and **other** **Output Types** are **needed**.
+> This formatting applies to **almost every situation** where the only (allowed) **input type is a string** and **other output types are needed**
 
 If you are using environment variables for example there would be no way of using arrays or even dictionaries as values, for these cases we have **String to Type** conversion shown below.
 
-| type       | example             |
-| :--------- | :------------------ |
-| string     | abc                 |
-| string     | +123                |
-| int        | 123                 |
-| int        | -123                |
-| json       | \{"a":"b","c":"d"\} |
-| array(int) | [1,2,3]             |
-| array(str) | [a,b,c]             |
+| Type          | Example      |
+| :------------ | :----------- |
+| string        | abc          |
+| string        | +123         |
+| int           | 123          |
+| int           | -123         |
+| JSON          | \{"a": "b"\} |
+| array(int)    | [1, 2, 3]    |
+| array(string) | [a, b, c]    |
 
-> [!NOTE]
-> Escape Type Denotations, like `[]` or `{}` (also `-`) with a `\` **backslash**.
-> An **odd** number of **backslashes** **escape** the character in front of them.
+> [!IMPORTANT]
+> Escape type denotations such as `[]`, `{}`, or `-` by prefixing them with a **backslash** (`\`).  
+> An **odd number** of backslashes will **escape** the character immediately following them
