@@ -142,64 +142,65 @@ const config = {
 				},
 
 				{
-					name: "og:site_name",
+					property: "og:site_name",
 					content: "Secured Signal API",
 				},
 			],
-			headTags: [
-				{
-					tagName: "link",
-					attributes: {
-						rel: "icon",
-						type: "image/png",
-						sizes: "32x32",
-						href: "/favicon/favicon-32x32.png",
-					},
-				},
-				{
-					tagName: "link",
-					attributes: {
-						rel: "icon",
-						type: "image/png",
-						sizes: "16x16",
-						href: "/favicon/favicon-16x16.png",
-					},
-				},
-				{
-					tagName: "link",
-					attributes: {
-						rel: "apple-touch-icon",
-						sizes: "180x180",
-						href: "/favicon/apple-touch-icon.png",
-					},
-				},
-				{
-					tagName: "link",
-					attributes: {
-						rel: "manifest",
-						href: "/favicon/site.webmanifest",
-					},
-				},
-				{
-					tagName: "link",
-					attributes: {
-						rel: "icon",
-						type: "image/png",
-						sizes: "192x192",
-						href: "/favicon/android-chrome-192x192.png",
-					},
-				},
-				{
-					tagName: "link",
-					attributes: {
-						rel: "icon",
-						type: "image/png",
-						sizes: "512x512",
-						href: "/favicon/android-chrome-512x512.png",
-					},
-				},
-			],
 		}),
+
+	headTags: [
+		{
+			tagName: "link",
+			attributes: {
+				rel: "icon",
+				type: "image/png",
+				sizes: "32x32",
+				href: "/favicon/favicon-32x32.png",
+			},
+		},
+		{
+			tagName: "link",
+			attributes: {
+				rel: "icon",
+				type: "image/png",
+				sizes: "16x16",
+				href: "/favicon/favicon-16x16.png",
+			},
+		},
+		{
+			tagName: "link",
+			attributes: {
+				rel: "apple-touch-icon",
+				sizes: "180x180",
+				href: "/favicon/apple-touch-icon.png",
+			},
+		},
+		{
+			tagName: "link",
+			attributes: {
+				rel: "manifest",
+				href: "/favicon/site.webmanifest",
+			},
+		},
+		{
+			tagName: "link",
+			attributes: {
+				rel: "icon",
+				type: "image/png",
+				sizes: "192x192",
+				href: "/favicon/android-chrome-192x192.png",
+			},
+		},
+		{
+			tagName: "link",
+			attributes: {
+				rel: "icon",
+				type: "image/png",
+				sizes: "512x512",
+				href: "/favicon/android-chrome-512x512.png",
+			},
+		},
+	],
 }
 
 export default config
