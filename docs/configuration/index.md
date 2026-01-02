@@ -11,7 +11,7 @@ Here is how you configure **Secured Signal API**
 
 Whilst being a bit **restrictive** environment variables are a great way to configure Secured Signal API.
 
-Suppose you want to set a new [placeholder](../usage/advanced#placeholders) `NUMBER` in your environment…
+Suppose you want to set a new [placeholder](./usage/advanced#placeholders) `NUMBER` in your environment…
 
 ```yaml
 environment:
