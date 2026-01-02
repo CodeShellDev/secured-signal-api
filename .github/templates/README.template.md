@@ -46,7 +46,7 @@ endpoint restrictions, placeholders, flexible configuration
 
 ## Contents
 
-Check out the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) for up-to-date instructions and additional content.
+Check out the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) for up-to-date instructions and additional content!
 
 - [Getting Started](#getting-started)
 - [Setup](#setup)
@@ -292,8 +292,12 @@ settings:
       Sent with Secured Signal API.
 ```
 
-Message Templates use [Go templates](#templating)
-Use `@data.key` to reference body keys, `#Content_Type` for Headers and `.KEY` for Variables.
+> [!NOTE]
+> Supported [placeholder types](#placeholders):
+>
+> | `.` Variables | `@` Body | `#` Headers |
+> | ------------- | -------- | ----------- |
+> | ✅            | ✅       | ✅          |
 
 ### Field Policies
 
@@ -310,7 +314,12 @@ settings:
 
 Set the wanted action on encounter, available options are `block` and `allow`.
 
-Use `@` for body keys and `#` for headers.
+> [!NOTE]
+> Supported [placeholder types](#placeholders):
+>
+> | `.` Variables | `@` Body | `#` Headers |
+> | ------------- | -------- | ----------- |
+> | ❌            | ✅       | ✅          |
 
 ### Field Mappings
 
@@ -348,7 +357,12 @@ settings:
       ".NUMBER": [{ field: "phone_number", score: 100 }]
 ```
 
-Use `@` for mapping to body keys and `.` for mapping to variables.
+> [!NOTE]
+> Supported [placeholder types](#placeholders):
+>
+> | `.` Variables | `@` Body | `#` Headers |
+> | ------------- | -------- | ----------- |
+> | ✅            | ✅       | ❌          |
 
 ## Contributing
 
