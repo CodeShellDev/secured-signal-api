@@ -6,7 +6,7 @@ title: API Tokens
 
 > [!IMPORTANT]
 > Using API tokens is highly **recommended**, but not mandatory.
-> Some important Security Features won't be available (like default blocked endpoints)
+> Some important Security Features won't be available (for example the default [blocked endpoints](./endpoints#default))
 
 Defined API tokens for accessing **Secured Signal API** endpoints.
 

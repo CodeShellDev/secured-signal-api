@@ -16,7 +16,7 @@ In this section we'll take you quickly through what's needed.
 
 > [!TIP]
 > Run setup directly with Signal CLI REST API.
-> Setup requests via Secured Signal API will be [blocked by default](../configuration/endpoints)
+> Setup requests via Secured Signal API will be [blocked by default](../configuration/endpoints#default)
 
 ## Register
 
