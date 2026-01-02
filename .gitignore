@@ -22,4 +22,8 @@ yarn-error.log*
 # VSCode
 .vscode
 
+# Ignore all by default
 .*
+
+# Allow .github
+!.github
