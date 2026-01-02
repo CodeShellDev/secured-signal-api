@@ -4,8 +4,9 @@ on:
   push:
     branches:
       - docs
-    paths:
-      - docs/**
+    paths-ignore:
+      - .github/**
+      - .git
   workflow_dispatch:
 
 jobs:
