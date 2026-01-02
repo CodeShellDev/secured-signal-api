@@ -4,7 +4,7 @@ import { themes as prismThemes } from "prism-react-renderer"
 const config = {
 	title: "Secured Signal API",
 	tagline: "Secure Proxy for Signal CLI REST API",
-	favicon: "img/favicon.ico",
+	favicon: "favicon/favicon.ico",
 
 	future: {
 		v4: true,
@@ -66,7 +66,7 @@ const config = {
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
-			image: "img/social-card.png",
+			image: "img/banner.png",
 			colorMode: {
 				respectPrefersColorScheme: true,
 			},
@@ -140,7 +140,64 @@ const config = {
 					name: "google-site-verification",
 					content: "g8d_0UGQgwAYseQGOOqRvsTPup3xawCbb-i2jT9HyVc",
 				},
-				{ name: "og:site_name", content: "Secured Signal API" },
+
+				{
+					name: "og:site_name",
+					content: "Secured Signal API",
+				},
+			],
+			headTags: [
+				{
+					tagName: "link",
+					attributes: {
+						rel: "icon",
+						type: "image/png",
+						sizes: "32x32",
+						href: "/favicon/favicon-32x32.png",
+					},
+				},
+				{
+					tagName: "link",
+					attributes: {
+						rel: "icon",
+						type: "image/png",
+						sizes: "16x16",
+						href: "/favicon/favicon-16x16.png",
+					},
+				},
+				{
+					tagName: "link",
+					attributes: {
+						rel: "apple-touch-icon",
+						sizes: "180x180",
+						href: "/favicon/apple-touch-icon.png",
+					},
+				},
+				{
+					tagName: "link",
+					attributes: {
+						rel: "manifest",
+						href: "/favicon/site.webmanifest",
+					},
+				},
+				{
+					tagName: "link",
+					attributes: {
+						rel: "icon",
+						type: "image/png",
+						sizes: "192x192",
+						href: "/favicon/android-chrome-192x192.png",
+					},
+				},
+				{
+					tagName: "link",
+					attributes: {
+						rel: "icon",
+						type: "image/png",
+						sizes: "512x512",
+						href: "/favicon/android-chrome-512x512.png",
+					},
+				},
 			],
 		}),
 }
