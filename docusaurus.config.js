@@ -1,5 +1,6 @@
-import useBaseUrl from "@docusaurus/useBaseUrl"
 import { themes as prismThemes } from "prism-react-renderer"
+
+const baseUrl = "/secured-signal-api/"
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -13,7 +14,7 @@ const config = {
 
 	url: "https://codeshelldev.github.io",
 
-	baseUrl: "/secured-signal-api/",
+	baseUrl: baseUrl,
 	deploymentBranch: "docs-build",
 	trailingSlash: false,
 
@@ -107,7 +108,7 @@ const config = {
 						title: "Community",
 						items: [
 							{
-								label: "GitHub Discussions",
+								label: "Github Discussions",
 								href: "https://github.com/codeshelldev/secured-signal-api/discussions",
 							},
 						],
@@ -156,7 +157,7 @@ const config = {
 				rel: "icon",
 				type: "image/png",
 				sizes: "32x32",
-				href: useBaseUrl("/favicon/favicon-32x32.png"),
+				href: `${baseUrl}/favicon/favicon-32x32.png`,
 			},
 		},
 		{
@@ -165,7 +166,7 @@ const config = {
 				rel: "icon",
 				type: "image/png",
 				sizes: "16x16",
-				href: useBaseUrl("favicon/favicon-16x16.png"),
+				href: `${baseUrl}favicon/favicon-16x16.png`,
 			},
 		},
 		{
@@ -173,14 +174,14 @@ const config = {
 			attributes: {
 				rel: "apple-touch-icon",
 				sizes: "180x180",
-				href: useBaseUrl("favicon/apple-touch-icon.png"),
+				href: `${baseUrl}favicon/apple-touch-icon.png`,
 			},
 		},
 		{
 			tagName: "link",
 			attributes: {
 				rel: "manifest",
-				href: useBaseUrl("favicon/site.webmanifest"),
+				href: `${baseUrl}favicon/site.webmanifest`,
 			},
 		},
 		{
@@ -189,7 +190,7 @@ const config = {
 				rel: "icon",
 				type: "image/png",
 				sizes: "192x192",
-				href: useBaseUrl("favicon/android-chrome-192x192.png"),
+				href: `${baseUrl}favicon/android-chrome-192x192.png`,
 			},
 		},
 		{
@@ -198,7 +199,7 @@ const config = {
 				rel: "icon",
 				type: "image/png",
 				sizes: "512x512",
-				href: useBaseUrl("favicon/android-chrome-512x512.png"),
+				href: `${baseUrl}favicon/android-chrome-512x512.png`,
 			},
 		},
 	],
