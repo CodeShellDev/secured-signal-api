@@ -1,3 +1,4 @@
+import useBaseUrl from "@docusaurus/useBaseUrl"
 import { themes as prismThemes } from "prism-react-renderer"
 
 /** @type {import('@docusaurus/types').Config} */
@@ -106,7 +107,7 @@ const config = {
 						title: "Community",
 						items: [
 							{
-								label: "Github Discussions",
+								label: "GitHub Discussions",
 								href: "https://github.com/codeshelldev/secured-signal-api/discussions",
 							},
 						],
@@ -155,7 +156,7 @@ const config = {
 				rel: "icon",
 				type: "image/png",
 				sizes: "32x32",
-				href: "/favicon/favicon-32x32.png",
+				href: useBaseUrl("/favicon/favicon-32x32.png"),
 			},
 		},
 		{
@@ -164,7 +165,7 @@ const config = {
 				rel: "icon",
 				type: "image/png",
 				sizes: "16x16",
-				href: "/favicon/favicon-16x16.png",
+				href: useBaseUrl("favicon/favicon-16x16.png"),
 			},
 		},
 		{
@@ -172,14 +173,14 @@ const config = {
 			attributes: {
 				rel: "apple-touch-icon",
 				sizes: "180x180",
-				href: "/favicon/apple-touch-icon.png",
+				href: useBaseUrl("favicon/apple-touch-icon.png"),
 			},
 		},
 		{
 			tagName: "link",
 			attributes: {
 				rel: "manifest",
-				href: "/favicon/site.webmanifest",
+				href: useBaseUrl("favicon/site.webmanifest"),
 			},
 		},
 		{
@@ -188,7 +189,7 @@ const config = {
 				rel: "icon",
 				type: "image/png",
 				sizes: "192x192",
-				href: "/favicon/android-chrome-192x192.png",
+				href: useBaseUrl("favicon/android-chrome-192x192.png"),
 			},
 		},
 		{
@@ -197,7 +198,7 @@ const config = {
 				rel: "icon",
 				type: "image/png",
 				sizes: "512x512",
-				href: "/favicon/android-chrome-512x512.png",
+				href: useBaseUrl("favicon/android-chrome-512x512.png"),
 			},
 		},
 	],
