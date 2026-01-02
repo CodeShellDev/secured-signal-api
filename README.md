@@ -320,7 +320,7 @@ api:
 
 ### Endpoints
 
-Since Secured Signal API is just a proxy you can use all the [Signal REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md) endpoints except for…
+Since Secured Signal API is just a proxy you can use all the [Signal CLI REST API](https://github.com/bbernhard/signal-cli-rest-api/blob/master/doc/EXAMPLES.md) endpoints except for…
 
 | Endpoint              |                    |
 | :-------------------- | ------------------ |
