@@ -22,7 +22,7 @@ func NewChain() *Chain {
 func (chain *Chain) Use(middleware Middleware) *Chain {
     chain.middlewares = append(chain.middlewares, middleware)
 
-	logger.Debug("Registered ", middleware.Name)
+	logger.Debug("Registered ", middleware.Name, " middleware")
 
     return chain
 }
