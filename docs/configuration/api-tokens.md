@@ -5,15 +5,15 @@ title: API Tokens
 # API Tokens
 
 > [!IMPORTANT]
-> Using API Tokens is highly **recommended**, but not mandatory.
-> Some important Security Features won't be available (like default Blocked Endpoints).
+> Using API tokens is highly **recommended**, but not mandatory.
+> Some important Security Features won't be available (like default blocked endpoints)
 
-Defined API Tokens for accessing **Secured Signal API** endpoints.
+Defined API tokens for accessing **Secured Signal API** endpoints.
 
 ```yaml
 api:
   tokens: [token1, token2, token3]
 ```
 
-> [!NOTE]
-> Blocked Endpoints can be reactivated by manually configuring them
+> [!TIP]
+> Blocked endpoints can be reactivated by manually configuring them

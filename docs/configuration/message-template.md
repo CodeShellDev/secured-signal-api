@@ -4,11 +4,11 @@ title: Message Template
 
 # Message Template
 
-Message Templates are the best way to **structure** and **customize** your messages and also very useful for **compatiblity** between different services.
+**Message Templates** are the best way to **structure** and **customize** your messages and can be very useful for **compatibility** between different services.
 
 Configure them by using the `message.template` attribute in you config.
 
-These support Go Templates (See [Templates](../usage/formatting)) and work by templating the `message` attribute in the request's body.
+These support Go templates (see [Formatting](../usage/formatting#templates)) and work by templating the `message` field in the request's body.
 
 Here is an example:
 
@@ -17,8 +17,8 @@ Here is an example:
 ```
 
 > [!IMPORTANT]
-> Message Templates support [Standard Golang Templating](../usage/formatting).
-> Use `@data.key` to reference Body Keys, `#Content_Type` for Headers and `.KEY` for [Variables](./variables).
-
-> [!WARNING]
-> Templating using the `Authorization` header results in a redacted string.
+> Supported [placeholder types](../usage/advanced#placeholders):
+>
+> | `.` Variables | `@` Body | `#` Headers |
+> | ------------- | -------- | ----------- |
+> | ✅            | ✅       | ✅          |

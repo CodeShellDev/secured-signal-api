@@ -4,12 +4,12 @@ title: Field Mappings
 
 # Field Mappings
 
-A Compatibility Layer for **Secured Signal API**.
+A compatibility layer for **Secured Signal API**.
 
-To improve compatibility with other services Secured Signal API provides **Field Mappings** and even a built-in `message` Mapping.
+To improve compatibility with other services Secured Signal API provides **Field Mappings** and even a built-in `message` mapping.
 
 <details>
-<summary><strong>Default `message` Mapping</strong></summary>
+<summary><strong>Default `message` mapping</strong></summary>
 
 | Field        | Score | Field            | Score |
 | ------------ | ----- | ---------------- | ----- |
@@ -23,7 +23,7 @@ To improve compatibility with other services Secured Signal API provides **Field
 
 </details>
 
-Secured Signal API will pick the highest scoring **Field** (if available) to set the key to the correct value **using the request body**.
+Secured Signal API will pick the highest scoring field (if available) to set the key to the correct value **using the request body**.
 
 Field Mappings can be added by setting `message.fieldMappings` in your config:
 
@@ -41,4 +41,8 @@ settings:
 ```
 
 > [!IMPORTANT]
-> Use `@` for mapping to Body Keys and `.` for mapping to Variables.
+> Supported [placeholder types](../usage/advanced#placeholders):
+>
+> | `.` Variables | `@` Body | `#` Headers |
+> | ------------- | -------- | ----------- |
+> | ✅            | ✅       | ❌          |

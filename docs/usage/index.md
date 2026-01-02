@@ -9,7 +9,7 @@ In this section we'll be taking a look at how to use **Secured Signal API**.
 
 ## Basic
 
-Here is a quick command to see if you've correctly followed the [Setup Instructions](../getting-started/setup):
+Here is a quick command to see if you've correctly followed the [setup instructions](../getting-started/setup):
 
 ```bash
 curl -X POST \
@@ -18,11 +18,11 @@ curl -X POST \
     'http://sec-signal-api:8880/v2/send'
 ```
 
-Which will send `Hello, World!` to `<to>` from `<from>`.
+This will send `Hello, World!` to `<to>` from `<from>`.
 
 ## Auth
 
-**Secured Signal API** implements 3 Auth Methods:
+**Secured Signal API** implements 3 auth methods:
 
 | Method      | Example                                                    |
 | :---------- | :--------------------------------------------------------- |

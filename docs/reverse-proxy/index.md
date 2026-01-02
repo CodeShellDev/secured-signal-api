@@ -5,21 +5,20 @@ title: Reverse Proxy
 
 # Reverse Proxy
 
-In this section we will be explaining why a **tls-enabled Reverse Proxy** is a must have.
+In this section we will be explaining why a **tls-enabled reverse proxy** is a must-have.
 
 ## Why another Proxy
 
-**Secured Signal API** itself is already a **Reverse Proxy**, lacking one important feature: **SSL Certificates**.
+**Secured Signal API** itself is already a **reverse proxy**, lacking one important feature: **SSL certificates**.
 
 ### SSL Certificates
 
-If you want to deploy anything on the Internet a **SSL Certificate** is almost a necessity, same goes for **Secured Signal API**,
-even if you don't plan on exposing your instance to the Internet it is always good to have an extra layer of **Security**,
-**SSL Certificates** are needed for establishing **secure HTTP requests**.
+When deploying anything on the internet an **SSL certificate** is almost a necessity.
+Same goes for **Secured Signal API**, even if you don't plan on exposing your instance to the internet it is always good to have an extra layer of **security**.
 
-### Port forwarding
+### Port Forwarding
 
-Furthermore if you want to have multiple services **on the same port** using **HTTP** you'd also need a **tls-enabled Reverse Proxy**,
+Furthermore, if you want to have multiple services **on the same port** using **HTTP** you'd also need a **tls-enabled reverse proxy**,
 to route requests to the correct backend based on hostnames and routing rules.
 
 ### Not Convinced?

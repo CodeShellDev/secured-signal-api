@@ -4,19 +4,19 @@ title: NGINX
 
 # NGINX
 
-Want to use [**nginx**](https://github.com/nginx/nginx) as your **Reverse Proxy**?
-No problem here are the instructions.
+Want to use [**Nginx**](https://github.com/nginx/nginx) as your **reverse proxy**?
+No problem here are the instructions…
 
 ## Prerequisites
 
 Before moving on you must have
 
-- some knowledge of **nginx**
-- valid **SSL Certificates**
+- some knowledge of **Nginx**
+- valid **SSL certificates**
 
 ## Installation
 
-To implement nginx infront of **Secured Signal API** you need to update your `docker-compose.yaml` file.
+To implement Nginx in front of **Secured Signal API** you need to update your `docker-compose.yaml` file.
 
 ```yaml
 {{{ #://./examples/nginx.docker-compose.yaml }}}
@@ -24,7 +24,7 @@ To implement nginx infront of **Secured Signal API** you need to update your `do
 
 To include the needed mounts for your certificates and your config.
 
-Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `/etc/nginx/conf.d/default.conf` in your nginx container.
+Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `/etc/nginx/conf.d/default.conf` in your Nginx container.
 
 ```apacheconf
 {{{ #://./examples/nginx.conf }}}

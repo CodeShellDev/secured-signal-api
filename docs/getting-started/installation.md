@@ -12,10 +12,12 @@ Get the latest version of the `docker-compose.yaml` file:
 ```
 
 > [!IMPORTANT]
-> In this documentation, we use `sec-signal-api:8880` as the host for simplicity.
-> Replace it with your actual container/host IP, port, or hostname.
+> In this documentation, we'll be using `sec-signal-api:8880` as the host for simplicity,
+> please replace it with your actual container/host IP, port, or hostname
 
 ## API Tokens
 
-Now head to [Configuration](../configuration/api-tokens) and define some **API Tokens**.
-This recommendation is part of the [**Best Practices**](../best-practices).
+Now head to [configuration](../configuration/api-tokens) and define some **API tokens**.
+
+> [!TIP]
+> This recommendation is part of the [**best practices**](../best-practices)

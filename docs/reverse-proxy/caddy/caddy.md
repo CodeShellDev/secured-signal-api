@@ -4,25 +4,25 @@ title: Caddy
 
 # Caddy
 
-Want to use [**caddy**](https://github.com/caddyserver/caddy) as your **Reverse Proxy**?
+Want to use [**Caddy**](https://github.com/caddyserver/caddy) as your **reverse proxy**?
 These instructions will take you through the steps.
 
 ## Prerequisites
 
 Before moving on you must have
 
-- some knowledge of **caddy**
-- already deployed **caddy**
+- some knowledge of **Caddy**
+- already deployed **Caddy**
 
 ## Installation
 
-Add caddy to your `docker-compose.yaml` file.
+Add Caddy to your `docker-compose.yaml` file.
 
 ```yaml
 {{{ #://./examples/caddy.docker-compose.yaml }}}
 ```
 
-Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your caddy container.
+Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your Caddy container.
 
 ```apacheconf
 {{{ #://./examples/Caddyfile }}}

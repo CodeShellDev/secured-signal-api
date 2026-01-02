@@ -5,24 +5,27 @@ title: Advanced
 
 # Advanced
 
-Here you will be explained all of the neat tricks and quirks for **Secured Signal API**
+Here you will be explained all the neat tricks and quirks for **Secured Signal API**
 
-## Placeholders
+## placeholders
 
 Placeholders do exactly what you think they do: They **replace** actual values.
-These can be especially **helpful** if have to manage multiple **Variables** and don't want to hardcode them into your request every time.
+These can be especially **helpful** when managing **variables** across multiple services.
 
-### How to use
+### How to Use
 
-| Type                                   | Example             | Note             |
-| :------------------------------------- | :------------------ | :--------------- |
-| Body                                   | `{{@data.key}}`     |                  |
-| Header (except `Authorization`)        | `{{#Content_Type}}` | `-` becomes `_`  |
-| [Variable](../configuration/variables) | `{{.VAR}}`          | always uppercase |
+| Scope                                  | Example             |
+| :------------------------------------- | :------------------ |
+| Body                                   | `{{@data.key}}`     |
+| Header (except `Authorization`)        | `{{#Content_Type}}` |
+| [Variable](../configuration/variables) | `{{.VAR}}`          |
 
-### Where to use
+> [!IMPORTANT]
+> Formatting rules (capitalization, escaping, and typing) are defined in [Formatting](./formatting)
 
-| Type  | Example                                                          |
+### Where to Use
+
+| Scope | Example                                                          |
 | :---- | :--------------------------------------------------------------- |
 | Body  | `{"number": "{{ .NUMBER }}", "recipients": "{{ .RECIPIENTS }}"}` |
 | Query | `http://sec-signal-api:8880/v1/receive/?@number={{.NUMBER}}`     |
@@ -40,18 +43,32 @@ These can be especially **helpful** if have to manage multiple **Variables** and
 "message": "{{#X_Forwarded_For}} just send from {{.NUMBER}}"
 ```
 
-## KeyValue Pair Injection
+> [IMPORTANT]
+> Placeholders follow strict formatting rules ([See Formatting](./formatting#templates))
 
-> _OoOhhh scary..._ 🫣
+## Query-to-Body Injection
 
-They may sound a bit dangerous (and can be), but **KeyValue Pair Injections** are **extremely useful** in **limited environments**.
+> _Sounds scary… but it really isn't._ 🫣
 
-In some setups you could be dealing with a very **limited control of webhooks**, for example you only can set a webhook url and cannot modify the body.
-This is very annoying since this means **every programm** needs to support **Signal CLI REST API** and you cannot just use a **generic webhook**.
-This is why we have **KeyValue Pair Injection** which lets you inject query values into the request's body:
+**Query-to-Body Injection** is a powerful feature designed for **restricted or inflexible environments**.
+
+In some setups, webhook configuration is extremely limited.
+For example, you may **only** be able to define a webhook URL, without any control over the **request body**.
+This becomes a problem when every receiving service is expected to support the **Signal CLI REST API** format.
+In such cases, using a simple, generic webhook is not possible.
+
+**Query-to-Body Injection** solves this by allowing you to inject values directly into the request body via query parameters.
 
 `http://sec-signal-api:8880/?@key=value`
 
 > [!IMPORTANT]
-> Prefix with `@` for injecting into the Body.
-> Supported types include **strings**, **ints**, **arrays** and **json dictionaries**. See [Formatting](./formatting).
+>
+> - Supported value types include **strings**, **integers**, **arrays**, and **JSON objects**
+> - See [Formatting](./formatting#string-to-type) for details on supported structures and syntax
+
+> [!IMPORTANT]
+> Supported [placeholder types](./advanced#placeholders):
+>
+> | `.` Variables | `@` Body | `#` Headers |
+> | ------------- | -------- | ----------- |
+> | ❌            | ✅       | ❌          |

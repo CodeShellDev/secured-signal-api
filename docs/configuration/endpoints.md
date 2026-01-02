@@ -8,8 +8,8 @@ Restrict access to your **Secured Signal API**.
 
 ## Default
 
-Secured Signal API is just a Proxy, which means any and **all** of the **Signal CLI REST API** **endpoints are available**,
-but by default the following endpoints are **blocked**, because of Security Concerns:
+Secured Signal API is just a proxy, which means any and all the **Signal CLI REST API** **endpoints are available**,
+because of security concerns the following endpoints are blocked:
 
 | Endpoint              |                    |
 | :-------------------- | ------------------ |
@@ -21,7 +21,11 @@ but by default the following endpoints are **blocked**, because of Security Conc
 ## Customize
 
 > [!NOTE]
-> Matching uses [glob-like patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html): `*` matches any sequence of characters, `?` matches a single character and `[abc]` matches one of the characters in the brackets
+> Matching uses [glob-like patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html):
+>
+> - `*` matches any sequence of characters
+> - `?` matches a single character
+> - `[abc]` matches one of the characters in the brackets
 
 You can modify endpoints by configuring `access.endpoints` in your config:
 
@@ -36,7 +40,7 @@ settings:
       - /v2/send
 ```
 
-By default adding an endpoint explictly allows access to it, use `!` to block it instead.
+By default, adding an endpoint explicitly allows access to it, use `!` to block it instead.
 
 > [!IMPORTANT]
 > When using `!` to block you must enclose the endpoint in quotes, like in the example above
