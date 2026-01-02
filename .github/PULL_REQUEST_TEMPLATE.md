@@ -14,10 +14,6 @@ List of all changes below.
 
 ### Checklist
 
-<!--
-Describe what this PR does.
--->
-
 - [ ] PR tested
 - [ ] Docs updated (if applicable)
 
@@ -29,5 +25,4 @@ Only include this section in the Code PR.
 -->
 
 - Docs PR:
-- Code PR:
 - Issues:
