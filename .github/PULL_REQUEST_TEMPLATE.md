@@ -1,19 +1,33 @@
 ### Summary
+
 <!--
 Describe what this PR does.
 -->
 
 ### Changes
+
 <!--
 List of all changes below.
 -->
-* list of changes
+
+- list of changes
 
 ### Checklist
+
+<!--
+Describe what this PR does.
+-->
+
 - [ ] PR tested
 - [ ] Docs updated (if applicable)
 
 ### Related
-- Docs PR: 
-- Code PR: 
-- Issues: 
+
+<!--
+Link PRs and issues related to this PR.
+Only include this section in the Code PR.
+-->
+
+- Docs PR:
+- Code PR:
+- Issues:
