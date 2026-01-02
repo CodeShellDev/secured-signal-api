@@ -16,7 +16,7 @@ Here is an example:
 {{{ #://./examples/message-template.yml }}}
 ```
 
-> [!IMPORTANT]
+> [!NOTE]
 > Supported [placeholder types](../usage/advanced#placeholders):
 >
 > | `.` Variables | `@` Body | `#` Headers |

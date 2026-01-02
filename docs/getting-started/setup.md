@@ -14,7 +14,7 @@ title: Setup
 To use **Secured Signal API** for the first time you will need to set up and link your **signal account**.
 In this section we'll take you quickly through what's needed.
 
-> [!TIP]
+> [!IMPORTANT]
 > Run setup directly with Signal CLI REST API.
 > Setup requests via Secured Signal API will be [blocked by default](../configuration/endpoints#default)
 

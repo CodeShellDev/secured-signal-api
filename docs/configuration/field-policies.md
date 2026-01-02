@@ -19,7 +19,7 @@ settings:
 
 Set the wanted action on encounter, available options are `block` and `allow`.
 
-> [!IMPORTANT]
+> [!NOTE]
 > Supported [placeholder types](../usage/advanced#placeholders):
 >
 > | `.` Variables | `@` Body | `#` Headers |

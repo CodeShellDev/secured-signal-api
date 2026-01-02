@@ -40,7 +40,7 @@ settings:
       ".NUMBER": [{ field: "phone_number", score: 100 }]
 ```
 
-> [!IMPORTANT]
+> [!NOTE]
 > Supported [placeholder types](../usage/advanced#placeholders):
 >
 > | `.` Variables | `@` Body | `#` Headers |
