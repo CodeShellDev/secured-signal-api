@@ -292,12 +292,11 @@ settings:
       Sent with Secured Signal API.
 ```
 
-> [!NOTE]
-> Supported [placeholder types](#placeholders):
->
-> | `.` Variables | `@` Body | `#` Headers |
-> | ------------- | -------- | ----------- |
-> | ✅            | ✅       | ✅          |
+Supported [placeholder types](#placeholders):
+
+| `.` Variables | `@` Body | `#` Headers |
+| ------------- | -------- | ----------- |
+| ✅            | ✅       | ✅          |
 
 ### Field Policies
 
@@ -314,12 +313,11 @@ settings:
 
 Set the wanted action on encounter, available options are `block` and `allow`.
 
-> [!NOTE]
-> Supported [placeholder types](#placeholders):
->
-> | `.` Variables | `@` Body | `#` Headers |
-> | ------------- | -------- | ----------- |
-> | ❌            | ✅       | ✅          |
+Supported [placeholder types](#placeholders):
+
+| `.` Variables | `@` Body | `#` Headers |
+| ------------- | -------- | ----------- |
+| ❌            | ✅       | ✅          |
 
 ### Field Mappings
 
@@ -357,12 +355,11 @@ settings:
       ".NUMBER": [{ field: "phone_number", score: 100 }]
 ```
 
-> [!NOTE]
-> Supported [placeholder types](#placeholders):
->
-> | `.` Variables | `@` Body | `#` Headers |
-> | ------------- | -------- | ----------- |
-> | ✅            | ✅       | ❌          |
+Supported [placeholder types](#placeholders):
+
+| `.` Variables | `@` Body | `#` Headers |
+| ------------- | -------- | ----------- |
+| ✅            | ✅       | ❌          |
 
 ## Contributing
 
