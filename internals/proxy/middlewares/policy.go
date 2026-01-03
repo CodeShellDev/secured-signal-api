@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"reflect"
 
-	log "github.com/codeshelldev/gotl/pkg/logger"
+	"github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
@@ -29,7 +29,7 @@ func policyHandler(next http.Handler) http.Handler {
 		body, err := request.GetReqBody(req)
 
 		if err != nil {
-			log.Error("Could not get Request Body: ", err.Error())
+			logger.Error("Could not get Request Body: ", err.Error())
 			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
 		}
 
@@ -42,7 +42,7 @@ func policyHandler(next http.Handler) http.Handler {
 		shouldBlock, field := doBlock(body.Data, headerData, policies)
 
 		if shouldBlock {
-			log.Warn("User tried to use blocked field: ", field)
+			logger.Warn("User tried to use blocked field: ", field)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}

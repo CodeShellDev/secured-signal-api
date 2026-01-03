@@ -4,18 +4,18 @@ import (
 	"strconv"
 
 	"github.com/codeshelldev/gotl/pkg/configutils"
-	log "github.com/codeshelldev/gotl/pkg/logger"
+	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
 func LoadTokens() {
-	log.Debug("Loading Configs in ", ENV.TOKENS_DIR)
+	logger.Debug("Loading Configs in ", ENV.TOKENS_DIR)
 
 	err := tokenConf.LoadDir("tokenconfigs", ENV.TOKENS_DIR, ".yml", yaml.Parser())
 
 	if err != nil {
-		log.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
+		logger.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
 	}
 
 	tokenConf.TemplateConfig()
@@ -57,9 +57,9 @@ func InitTokens() {
 	}
 
 	if len(apiTokens) <= 0 {
-		log.Warn("No API Tokens provided this is NOT recommended")
+		logger.Warn("No API Tokens provided this is NOT recommended")
 
-		log.Info("Disabling Security Features due to incomplete Congfiguration")
+		logger.Info("Disabling Security Features due to incomplete Congfiguration")
 
 		ENV.INSECURE = true
 
@@ -69,7 +69,7 @@ func InitTokens() {
 	}
 
 	if len(apiTokens) > 0 {
-		log.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")
+		logger.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")
 	}
 }
 
