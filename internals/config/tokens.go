@@ -106,9 +106,11 @@ func getSchemeTagByPointer(config any, tag string, fieldPointer any) string {
 }
 
 func setTokenConfigName(config *configutils.Config, path string) {
-	schema := reflect.TypeOf(structure.CONFIG{})
+	schema := structure.CONFIG{
+		NAME: "",
+	}
 
-	nameField := getSchemeTagByPointer(schema, "koanf", structure.CONFIG{}.NAME)
+	nameField := getSchemeTagByPointer(&schema, "koanf", &schema.NAME)
 
 	config.Layer.Set(nameField, path)
 }
