@@ -18,6 +18,8 @@ func portHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		conf := getConfigByReq(req)
 
+		logger.Dev(req.Context().Value(tokenKey).(string), conf)
+
 		allowedPort := conf.SERVICE.PORT
 
 		if strings.TrimSpace(allowedPort) == "" {
