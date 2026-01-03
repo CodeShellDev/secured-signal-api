@@ -26,8 +26,8 @@ Requests behave as follows:
 | Token     | Port   | Result |
 | :-------- | :----- | :----: |
 | `TOKEN_1` | `8880` |   ✅   |
-| `TOKEN_2` | `8880` |   ❌   |
-| `TOKEN_1` | `8890` |   ❌   |
+| `TOKEN_2` | `8880` |  ⛔️   |
+| `TOKEN_1` | `8890` |  ⛔️   |
 | `TOKEN_2` | `8890` |   ✅   |
 
 If a token config does not specify a port, it automatically gets assigned to the default realm.
