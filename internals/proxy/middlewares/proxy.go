@@ -5,8 +5,6 @@ import (
 	"net"
 	"net/http"
 	"strings"
-
-	"github.com/codeshelldev/gotl/pkg/logger"
 )
 
 var InternalProxy Middleware = Middleware{
@@ -19,6 +17,8 @@ const clientIPKey contextKey = "clientIP"
 
 func proxyHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+		
 		conf := getConfigByReq(req)
 
 		rawTrustedProxies := conf.SETTINGS.ACCESS.TRUSTED_PROXIES
@@ -37,7 +37,7 @@ func proxyHandler(next http.Handler) http.Handler {
 		if len(rawTrustedProxies) != 0 {
 			trustedProxies := parseIPsAndIPNets(rawTrustedProxies)
 
-			trusted = isTrustedProxy(ip, trustedProxies)
+			trusted = isIPInList(ip, trustedProxies)
 		}
 
 		if trusted {
@@ -54,8 +54,6 @@ func proxyHandler(next http.Handler) http.Handler {
 
 		req = setContext(req, clientIPKey, ip)
 		req = setContext(req, trustedProxyKey, trusted)
-
-		logger.Dev(ip.String(), trusted)
 
 		next.ServeHTTP(w, req)
 	})
@@ -134,8 +132,8 @@ func getRealIP(req *http.Request) (net.IP, error) {
 	return nil, errors.New("no x-forwarded-for header present")
 }
 
-func isTrustedProxy(ip net.IP, proxies []*net.IPNet) bool {
-	for _, net := range proxies {
+func isIPInList(ip net.IP, list []*net.IPNet) bool {
+	for _, net := range list {
 		if net.Contains(ip) {
 			return true
 		}

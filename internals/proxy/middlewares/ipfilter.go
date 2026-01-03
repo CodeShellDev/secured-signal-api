@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"slices"
 	"strings"
-
-	"github.com/codeshelldev/gotl/pkg/logger"
 )
 
 var IPFilter Middleware = Middleware{
@@ -14,10 +12,10 @@ var IPFilter Middleware = Middleware{
 	Use: ipFilterHandler,
 }
 
-var trustedClientKey contextKey = "isClientTrusted"
-
 func ipFilterHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+
 		conf := getConfigByReq(req)
 
 		ipFilter := conf.SETTINGS.ACCESS.IP_FILTER
@@ -30,21 +28,13 @@ func ipFilterHandler(next http.Handler) http.Handler {
 
 		ip := getContext[net.IP](req, clientIPKey)
 
-		block, trusted := blockIPOrTrust(ip, ipFilter)
-
-		logger.Dev(block, trusted)
+		block := blockIP(ip, ipFilter)
 
 		if block {
 			logger.Warn("Client IP is blocked by filter: ", ip.String())
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
-
-		if trusted {
-			logger.Dev("Connection from trusted Client: ", ip.String())
-		}
-
-		req = setContext(req, trustedClientKey, trusted)
 
 		next.ServeHTTP(w, req)
 	})
@@ -67,10 +57,10 @@ func getIPNets(ipNets []string) ([]string, []string) {
 	return allowedIPNets, blockedIPNets
 }
 
-func blockIPOrTrust(ip net.IP, ipfilter []string) (bool, bool) {
+func blockIP(ip net.IP, ipfilter []string) (bool) {
 	if len(ipfilter) == 0 {
-		// default: allow all, but do not trust
-		return false, false
+		// default: allow all
+		return false
 	}
 
 	rawAllowed, rawBlocked := getIPNets(ipfilter)
@@ -87,13 +77,23 @@ func blockIPOrTrust(ip net.IP, ipfilter []string) (bool, bool) {
 
 	// explicit allow > block
 	if isExplicitlyAllowed {
-		return false, true
+		return false
 	}
 	
 	if isExplicitlyBlocked {
-		return true, false
+		return true
 	}
 
-	// default: allow all, but do not trust
-	return false, false
+	// only allowed ips -> block anything not allowed
+	if len(allowed) > 0 && len(blocked) == 0 {
+		return true
+	}
+
+	// only blocked ips -> allow anything not blocked
+	if len(blocked) > 0 && len(allowed) == 0 {
+		return false
+	}
+
+	// default: allow all
+	return false
 }
