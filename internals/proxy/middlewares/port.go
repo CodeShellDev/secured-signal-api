@@ -18,8 +18,6 @@ func portHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		conf := getConfigByReq(req)
 
-		logger.Dev(req.Context().Value(tokenKey).(string), conf)
-
 		allowedPort := conf.SERVICE.PORT
 
 		if strings.TrimSpace(allowedPort) == "" {
@@ -28,8 +26,6 @@ func portHandler(next http.Handler) http.Handler {
 		}
 
 		port, err := getPort(req)
-
-		logger.Dev("Port: ", port, "; AllowedPort: ", allowedPort)
 
 		if err != nil {
 			logger.Error("Could not get Port: ", err.Error())
