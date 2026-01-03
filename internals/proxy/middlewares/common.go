@@ -13,8 +13,6 @@ type Context struct {
 
 type contextKey string
 
-const tokenKey contextKey = "token"
-
 func getConfigByReq(req *http.Request) *structure.CONFIG {
 	token := req.Context().Value(tokenKey).(string)
 
