@@ -11,6 +11,7 @@ type ENV struct {
 }
 
 type CONFIG struct {
+	NAME				string						`koanf:"name"`
 	SERVICE				SERVICE 					`koanf:"service"`
 	API					API						    `koanf:"api"`
 																			//TODO: deprecate overrides for tkconfigs

@@ -1,5 +1,5 @@
-github.com/codeshelldev/gotl v0.0.9 h1:cdLA6XzPt+f4RIW24Yx3dqBbRAq5JO0obzuwhaOgsEo=
-github.com/codeshelldev/gotl v0.0.9/go.mod h1:rDkJma6eQSRfCr7ieX9/esn3/uAWNzjHfpjlr9j6FFk=
+github.com/codeshelldev/gotl v0.0.10 h1:/2HOPXTlG1HplbXvkB1cZG6NQlGHCiZfWR1pMj6X55M=
+github.com/codeshelldev/gotl v0.0.10/go.mod h1:rDkJma6eQSRfCr7ieX9/esn3/uAWNzjHfpjlr9j6FFk=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fsnotify/fsnotify v1.9.0 h1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=

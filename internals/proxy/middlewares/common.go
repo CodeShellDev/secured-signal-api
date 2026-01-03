@@ -1,8 +1,10 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 
+	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 )
@@ -13,10 +15,32 @@ type Context struct {
 
 type contextKey string
 
-func getConfigByReq(req *http.Request) *structure.CONFIG {
-	token := req.Context().Value(tokenKey).(string)
+func setContext(req *http.Request, key, value any) *http.Request {
+	ctx := context.WithValue(req.Context(), key, value)
+	return req.WithContext(ctx)
+}
 
-	return getConfig(token)
+func getContext[T any](req *http.Request, key any) T {
+	value, ok := req.Context().Value(key).(T)
+
+	if !ok {
+		var zero T
+		return zero
+	}
+
+	return value
+}
+
+func getLogger(req *http.Request) *logger.Logger {
+	return getContext[*logger.Logger](req, loggerKey)
+}
+
+func getToken(req *http.Request) string {
+	return getContext[string](req, tokenKey)
+}
+
+func getConfigByReq(req *http.Request) *structure.CONFIG {
+	return getConfig(getToken(req))
 }
 
 func getConfig(token string) *structure.CONFIG {

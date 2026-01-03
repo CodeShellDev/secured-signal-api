@@ -5,8 +5,6 @@ import (
 	"path"
 	"slices"
 	"strings"
-
-	"github.com/codeshelldev/gotl/pkg/logger"
 )
 
 var Endpoints Middleware = Middleware{
@@ -16,6 +14,8 @@ var Endpoints Middleware = Middleware{
 
 func endpointsHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+
 		conf := getConfigByReq(req)
 
 		endpoints := conf.SETTINGS.ACCESS.ENDPOINTS

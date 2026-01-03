@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"context"
 	"encoding/base64"
 	"errors"
 	"maps"
@@ -21,13 +20,67 @@ var Auth Middleware = Middleware{
 }
 
 const tokenKey contextKey = "token"
+const isAuthKey contextKey = "isAuthenticated"
+
+func authHandler(next http.Handler) http.Handler {
+	tokenKeys := maps.Keys(config.ENV.CONFIGS)
+	tokens := slices.Collect(tokenKeys)
+
+	if tokens == nil {
+		tokens = []string{}
+	}
+
+	var authChain = NewAuthChain().
+		Use(BearerAuth).
+		Use(BasicAuth).
+		Use(BodyAuth).
+		Use(QueryAuth).
+		Use(PathAuth)
+
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if len(tokens) <= 0 {
+			next.ServeHTTP(w, req)
+			return
+		}
+
+		token, _ := authChain.Eval(w, req, tokens)
+
+		if token == "" {
+			onUnauthorized(w)
+
+			req = setContext(req, isAuthKey, false)
+		} else {
+			req = setContext(req, isAuthKey, true)
+			req = setContext(req, tokenKey, token)
+		}
+
+		next.ServeHTTP(w, req)
+	})
+}
+
+var InternalAuthRequirement Middleware = Middleware{
+	Name: "_Auth_Requirement",
+	Use: authRequirementHandler,
+}
+
+func authRequirementHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		isAuthenticated := getContext[bool](req, isAuthKey)
+
+		if !isAuthenticated {
+			return
+		}
+
+		next.ServeHTTP(w, req)
+	})
+}
 
 type AuthMethod struct {
 	Name string
 	Authenticate func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error)
 }
 
-var BearerAuth = AuthMethod {
+var BearerAuth = AuthMethod{
 	Name: "Bearer",
 	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		header := req.Header.Get("Authorization")
@@ -50,7 +103,7 @@ var BearerAuth = AuthMethod {
 	},
 }
 
-var BasicAuth = AuthMethod {
+var BasicAuth = AuthMethod{
 	Name: "Basic",
 	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		header := req.Header.Get("Authorization")
@@ -92,7 +145,7 @@ var BasicAuth = AuthMethod {
 	},
 }
 
-var BodyAuth = AuthMethod {
+var BodyAuth = AuthMethod{
 	Name: "Body",
 	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		const authField = "auth"
@@ -133,7 +186,7 @@ var BodyAuth = AuthMethod {
 	},
 }
 
-var QueryAuth = AuthMethod {
+var QueryAuth = AuthMethod{
 	Name: "Query",
 	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		const authQuery = "@authorization"
@@ -158,7 +211,7 @@ var QueryAuth = AuthMethod {
 	},
 }
 
-var PathAuth = AuthMethod {
+var PathAuth = AuthMethod{
 	Name: "Path",
 	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		parts := strings.Split(req.URL.Path, "/")
@@ -185,41 +238,6 @@ var PathAuth = AuthMethod {
 
 		return "", errors.New("invalid Path token")
 	},
-}
-
-func authHandler(next http.Handler) http.Handler {
-	tokenKeys := maps.Keys(config.ENV.CONFIGS)
-	tokens := slices.Collect(tokenKeys)
-
-	if tokens == nil {
-		tokens = []string{}
-	}
-
-	var authChain = NewAuthChain().
-		Use(BearerAuth).
-		Use(BasicAuth).
-		Use(BodyAuth).
-		Use(QueryAuth).
-		Use(PathAuth)
-
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if len(tokens) <= 0 {
-			next.ServeHTTP(w, req)
-			return
-		}
-
-		token, _ := authChain.Eval(w, req, tokens)
-
-		if token == "" {
-			onUnauthorized(w)
-			return
-		}
-
-		ctx := context.WithValue(req.Context(), tokenKey, token)
-		req = req.WithContext(ctx)
-
-		next.ServeHTTP(w, req)
-	})
 }
 
 func onUnauthorized(w http.ResponseWriter) {

@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	jsonutils "github.com/codeshelldev/gotl/pkg/jsonutils"
-	"github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 )
@@ -16,6 +15,8 @@ var Mapping Middleware = Middleware{
 
 func mappingHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+
 		conf := getConfigByReq(req)
 
 		variables := conf.SETTINGS.MESSAGE.VARIABLES

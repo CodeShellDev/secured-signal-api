@@ -1,7 +1,10 @@
 package config
 
 import (
+	"path/filepath"
+	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/configutils"
 	"github.com/codeshelldev/gotl/pkg/logger"
@@ -12,7 +15,7 @@ import (
 func LoadTokens() {
 	logger.Debug("Loading Configs in ", ENV.TOKENS_DIR)
 
-	err := tokenConf.LoadDir("tokenconfigs", ENV.TOKENS_DIR, ".yml", yaml.Parser())
+	err := tokenConf.LoadDir("tokenconfigs", ENV.TOKENS_DIR, ".yml", yaml.Parser(), setTokenConfigName)
 
 	if err != nil {
 		logger.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
@@ -83,4 +86,40 @@ func parseTokenConfigs(configArray []structure.CONFIG) map[string]structure.CONF
 	}
 
 	return configs
+}
+
+func getSchemeTagByPointer(config any, tag string, fieldPointer any) string {
+	v := reflect.ValueOf(config)
+	if v.Kind() == reflect.Pointer {
+		v = v.Elem()
+	}
+
+	fieldValue := reflect.ValueOf(fieldPointer).Elem()
+
+	for i := 0; i < v.NumField(); i++ {
+		if v.Field(i).Addr().Interface() == fieldValue.Addr().Interface() {
+			field := v.Type().Field(i)
+
+			return field.Tag.Get(tag)
+		}
+	}
+
+	return ""
+}
+
+func setTokenConfigName(config *configutils.Config, p string) {
+	schema := structure.CONFIG{
+		NAME: "",
+	}
+
+	nameField := getSchemeTagByPointer(&schema, "koanf", &schema.NAME)
+
+	filename := filepath.Base(p)
+	filenameWithoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
+
+	name := config.Layer.String(nameField)
+
+	if strings.TrimSpace(name) == "" {
+		config.Layer.Set(nameField, filenameWithoutExt)
+	}
 }
