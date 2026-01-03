@@ -26,7 +26,7 @@ func endpointsHandler(next http.Handler) http.Handler {
 
 		reqPath := req.URL.Path
 
-		if isBlocked(reqPath, endpoints) {
+		if isEndpointBlocked(reqPath, endpoints) {
 			logger.Warn("Client tried to access blocked endpoint: ", reqPath)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -58,8 +58,8 @@ func matchesPattern(endpoint, pattern string) bool {
 	return ok
 }
 
-func isBlocked(endpoint string, endpoints []string) bool {
-	if len(endpoints) == 0 {
+func isEndpointBlocked(endpoint string, endpoints []string) bool {
+	if len(endpoints) == 0 || endpoints == nil {
 		// default: block all
 		return true
 	}
