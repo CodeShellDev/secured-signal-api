@@ -28,7 +28,7 @@ func loggingHandler(next http.Handler) http.Handler {
 
 		options := logger.DefaultOptions()
 		options.EncodeCaller = func(caller zapcore.EntryCaller, enc zapcore.PrimitiveArrayEncoder) {
-			enc.AppendString(caller.TrimmedPath() + conf.NAME)
+			enc.AppendString(caller.TrimmedPath() + " " + conf.NAME)
 		}
 
 		l, err := logger.New(logLevel, options)
