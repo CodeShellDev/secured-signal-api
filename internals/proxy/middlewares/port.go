@@ -29,7 +29,7 @@ func portHandler(next http.Handler) http.Handler {
 
 		if err != nil {
 			logger.Error("Could not get Port: ", err.Error())
-			http.Error(w, "Bad Request: invalid scheme", http.StatusBadRequest)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 
