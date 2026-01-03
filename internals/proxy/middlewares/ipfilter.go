@@ -22,15 +22,13 @@ func ipFilterHandler(next http.Handler) http.Handler {
 
 		ipFilter := conf.SETTINGS.ACCESS.IP_FILTER
 
-		logger.Dev(ipFilter)
-
 		if ipFilter == nil {
 			ipFilter = getConfig("").SETTINGS.ACCESS.ENDPOINTS
 		}
 
 		ip := getContext[net.IP](req, clientIPKey)
 
-		if blockIP(ip, ipFilter) {
+		if isIPBlocked(ip, ipFilter) {
 			logger.Warn("Client IP is blocked by filter: ", ip.String())
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -57,8 +55,8 @@ func getIPNets(ipNets []string) ([]string, []string) {
 	return allowedIPNets, blockedIPNets
 }
 
-func blockIP(ip net.IP, ipfilter []string) (bool) {
-	if len(ipfilter) == 0 {
+func isIPBlocked(ip net.IP, ipfilter []string) (bool) {
+	if len(ipfilter) == 0 || ipfilter == nil {
 		// default: allow all
 		return false
 	}
@@ -89,13 +87,11 @@ func blockIP(ip net.IP, ipfilter []string) (bool) {
 
 	// only allowed ips -> block anything not allowed
 	if len(allowed) > 0 && len(blocked) == 0 {
-		log.Dev("Block all except allowed")
 		return true
 	}
 
 	// only blocked ips -> allow anything not blocked
 	if len(blocked) > 0 && len(allowed) == 0 {
-		log.Dev("Allow all except blocked")
 		return false
 	}
 
