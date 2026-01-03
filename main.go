@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
@@ -59,9 +60,9 @@ func main() {
 	ports := []string{}
 
 	for _, config := range config.ENV.CONFIGS {
-		port := config.SERVICE.PORT
+		port := strings.TrimSpace(config.SERVICE.PORT)
 
-		if strings.TrimSpace(port) != "" {
+		if port != "" && !slices.Contains(ports, port) {
 			ports = append(ports, port)
 		}
 	}
