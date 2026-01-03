@@ -34,7 +34,7 @@ func portHandler(next http.Handler) http.Handler {
 		}
 
 		if port != allowedPort {
-			logger.Warn("User tried using Token on wrong Port")
+			logger.Warn("Client tried using Token on wrong Port")
 			onUnauthorized(w)
 			return
 		}

@@ -49,6 +49,9 @@ type ACCESS struct {
 	ENDPOINTS			[]string					`koanf:"endpoints"`
 	FIELD_POLICIES		map[string]FieldPolicy		`koanf:"fieldpolicies"   childtransform:"default"`
 	RATE_LIMITING		RateLimiting				`koanf:"ratelimiting"`
+	IP_FILTER			[]string					`koanf:"ipfilter"`
+	TRUSTED_IPS			[]string					`koanf:"trustedips"`
+	TRUSTED_PROXIES		[]string					`koanf:"trustedproxies"`
 }
 
 type FieldPolicy struct {
