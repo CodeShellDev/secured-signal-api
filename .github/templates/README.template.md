@@ -257,9 +257,9 @@ By default adding an endpoint explicitly allows access to it, use `!` to block i
 
 | Config (Allow) | (Block)        |   Result   |     |                   |     |
 | :------------- | :------------- | :--------: | --- | :---------------: | --- |
-| `/v2/send`     | `unset`        |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
-| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
-| `!/v2*`        | `/v2/send`     | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
+| `/v2/send`     | `unset`        |  **all**   | ⛔️ |  **`/v2/send`**   | ✅  |
+| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | ⛔️ |
+| `!/v2*`        | `/v2/send`     | **`/v2*`** | ⛔️ |  **`/v2/send`**   | ✅  |
 
 ### Variables
 
