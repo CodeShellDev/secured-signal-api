@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	jsonutils "github.com/codeshelldev/gotl/pkg/jsonutils"
-	"github.com/codeshelldev/gotl/pkg/logger"
 	query "github.com/codeshelldev/gotl/pkg/query"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	templating "github.com/codeshelldev/gotl/pkg/templating"
@@ -22,6 +21,8 @@ var Template Middleware = Middleware{
 
 func templateHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+
 		conf := getConfigByReq(req)
 		
 		variables := conf.SETTINGS.MESSAGE.VARIABLES

@@ -5,8 +5,6 @@ import (
 	"net"
 	"net/http"
 	"strings"
-
-	"github.com/codeshelldev/gotl/pkg/logger"
 )
 
 var Port Middleware = Middleware{
@@ -16,6 +14,8 @@ var Port Middleware = Middleware{
 
 func portHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+
 		conf := getConfigByReq(req)
 
 		allowedPort := conf.SERVICE.PORT

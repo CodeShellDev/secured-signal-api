@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"net/http"
+	"strings"
 
-	"github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 )
 
@@ -14,6 +14,8 @@ var Message Middleware = Middleware{
 
 func messageHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+
 		conf := getConfigByReq(req)
 
 		variables := conf.SETTINGS.MESSAGE.VARIABLES
@@ -23,7 +25,7 @@ func messageHandler(next http.Handler) http.Handler {
 			variables = getConfig("").SETTINGS.MESSAGE.VARIABLES
 		}
 
-		if messageTemplate == "" {
+		if strings.TrimSpace(messageTemplate) == "" {
 			messageTemplate = getConfig("").SETTINGS.MESSAGE.TEMPLATE
 		}
 
