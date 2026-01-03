@@ -24,45 +24,45 @@ const tokenKey contextKey = "token"
 
 type AuthMethod struct {
 	Name string
-	Authenticate func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error)
+	Authenticate func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error)
 }
 
 var BearerAuth = AuthMethod {
 	Name: "Bearer",
-	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
+	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		header := req.Header.Get("Authorization")
 
 		headerParts := strings.SplitN(header, " ", 2)
 
 		if len(headerParts) != 2 {
-			return false, nil
+			return "", nil
 		}
 
 		if strings.ToLower(headerParts[0]) == "bearer" {
 			if isValidToken(tokens, headerParts[1]) {
-				return true, nil
+				return headerParts[1], nil
 			}
 
-			return false, errors.New("invalid Bearer token")
+			return "", errors.New("invalid Bearer token")
 		}
 
-		return false, nil
+		return "", nil
 	},
 }
 
 var BasicAuth = AuthMethod {
 	Name: "Basic",
-	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
+	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		header := req.Header.Get("Authorization")
 
 		if strings.TrimSpace(header) == "" {
-			return false, nil
+			return "", nil
 		}
 
 		headerParts := strings.SplitN(header, " ", 2)
 
 		if len(headerParts) != 2 {
-			return false, nil
+			return "", nil
 		}
 
 		if strings.ToLower(headerParts[0]) == "basic" {
@@ -70,55 +70,55 @@ var BasicAuth = AuthMethod {
 
 			if err != nil {
 				logger.Error("Could not decode Basic auth payload: ", err.Error())
-				return false, errors.New("invalid base64 in Basic auth")
+				return "", errors.New("invalid base64 in Basic auth")
 			}
 
 			parts := strings.SplitN(string(base64Bytes), ":", 2)
 
 			if len(parts) != 2 {
-				return false, errors.New("Basic auth must be user:password")
+				return "", errors.New("Basic auth must be user:password")
 			}
 
 			user, password := parts[0], parts[1]
 
 			if strings.ToLower(user) == "api" && isValidToken(tokens, password) {
-				return true, nil
+				return password, nil
 			}
 
-			return false, errors.New("invalid user:password")
+			return "", errors.New("invalid user:password")
 		}
 
-		return false, nil
+		return "", nil
 	},
 }
 
 var BodyAuth = AuthMethod {
 	Name: "Body",
-	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
+	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		const authField = "auth"
 
 		body, err := request.GetReqBody(req)
 
 		if err != nil {
-			return false, nil
+			return "", nil
 		}
 
 		body.Write(req)
 
 		if body.Empty {
-			return false, nil
+			return "", nil
 		}
 
 		value, exists := body.Data[authField]
 
 		if !exists {
-			return false, nil
+			return "", nil
 		}
 
 		auth, ok := value.(string)
 
 		if !ok {
-			return false, nil
+			return "", nil
 		}
 
 		if isValidToken(tokens, auth) {
@@ -126,22 +126,22 @@ var BodyAuth = AuthMethod {
 
 			body.Write(req)
 
-			return true, nil
+			return auth, nil
 		}
 
-		return false, errors.New("invalid Body token")
+		return "", errors.New("invalid Body token")
 	},
 }
 
 var QueryAuth = AuthMethod {
 	Name: "Query",
-	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
+	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		const authQuery = "@authorization"
 
 		auth := req.URL.Query().Get(authQuery)
 
 		if strings.TrimSpace(auth) == "" {
-			return false, nil
+			return "", nil
 		}
 
 		if isValidToken(tokens, auth) {
@@ -151,39 +151,39 @@ var QueryAuth = AuthMethod {
 
 			req.URL.RawQuery = query.Encode()
 
-			return true, nil
+			return auth, nil
 		}
 
-		return false, errors.New("invalid Query token")
+		return "", errors.New("invalid Query token")
 	},
 }
 
 var PathAuth = AuthMethod {
 	Name: "Path",
-	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
+	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		parts := strings.Split(req.URL.Path, "/")
 
 		if len(parts) == 0 {
-			return false, nil
+			return "", nil
 		}
 
 		unescaped, err := url.PathUnescape(parts[1])
 
 		if err != nil {
-			return false, nil
+			return "", nil
 		}
 
 		auth, exists := strings.CutPrefix(unescaped, "auth=")
 
 		if !exists {
-			return false, nil
+			return "", nil
 		}
 
 		if isValidToken(tokens, auth) {
-			return true, nil
+			return auth, nil
 		}
 
-		return false, errors.New("invalid Path token")
+		return "", errors.New("invalid Path token")
 	},
 }
 
@@ -208,16 +208,14 @@ func authHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		var authToken string
+		token, _ := authChain.Eval(w, req, tokens)
 
-		success, _ := authChain.Eval(w, req, tokens)
-
-		if !success {
+		if token == "" {
 			onUnauthorized(w)
 			return
 		}
 
-		ctx := context.WithValue(req.Context(), tokenKey, authToken)
+		ctx := context.WithValue(req.Context(), tokenKey, token)
 		req = req.WithContext(ctx)
 
 		next.ServeHTTP(w, req)
@@ -250,21 +248,21 @@ func (chain *AuthChain) Use(method AuthMethod) *AuthChain {
     return chain
 }
 
-func (chain *AuthChain) Eval(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
+func (chain *AuthChain) Eval(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 	var err error
-	var success bool
+	var token string
 
 	for _, method := range chain.methods {
-		success, err = method.Authenticate(w, req, tokens)
+		token, err = method.Authenticate(w, req, tokens)
 
 		if err != nil {
 			logger.Warn("User failed ", method.Name, " auth: ", err.Error())
 		}
 
-		if success {
-			return success, nil
+		if token != "" {
+			return token, nil
 		}
 	}
 
-	return false, err
+	return "", err
 }
