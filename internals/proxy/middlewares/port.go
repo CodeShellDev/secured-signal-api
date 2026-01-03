@@ -27,8 +27,6 @@ func portHandler(next http.Handler) http.Handler {
 
 		port, err := getPort(req)
 
-		logger.Dev(port)
-
 		if err != nil {
 			logger.Error("Could not get Port: ", err.Error())
 			http.Error(w, "Bad Request", http.StatusBadRequest)
