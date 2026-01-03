@@ -41,7 +41,7 @@ func loggingHandler(next http.Handler) http.Handler {
 			l = logger.Get()
 		}
 
-		setContext(req, loggerKey, l)
+		req = setContext(req, loggerKey, l)
 
 		if !l.IsDev() {
 			l.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
