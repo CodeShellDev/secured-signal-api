@@ -27,7 +27,7 @@ func endpointsHandler(next http.Handler) http.Handler {
 		reqPath := req.URL.Path
 
 		if isBlocked(reqPath, endpoints) {
-			logger.Warn("User tried to access blocked endpoint: ", reqPath)
+			logger.Warn("Client tried to access blocked endpoint: ", reqPath)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}

@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"net"
 	"net/http"
 	"strings"
 
@@ -49,15 +50,17 @@ func loggingHandler(next http.Handler) http.Handler {
 
 		req = setContext(req, loggerKey, l)
 
+		ip := getContext[net.IPNet](req, clientIPKey)
+
 		if !l.IsDev() {
-			l.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
+			l.Info(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
 		} else {
 			body, _ := request.GetReqBody(req)
 
 			if body.Data != nil && !body.Empty {
-				l.Dev(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery, body.Data)
+				l.Dev(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery, body.Data)
 			} else {
-				l.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
+				l.Info(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
 			}
 		}
 

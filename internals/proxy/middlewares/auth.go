@@ -274,7 +274,7 @@ func (chain *AuthChain) Eval(w http.ResponseWriter, req *http.Request, tokens []
 		token, err = method.Authenticate(w, req, tokens)
 
 		if err != nil {
-			logger.Warn("User failed ", method.Name, " auth: ", err.Error())
+			logger.Warn("Client failed ", method.Name, " auth: ", err.Error())
 		}
 
 		if token != "" {

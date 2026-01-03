@@ -43,7 +43,7 @@ func policyHandler(next http.Handler) http.Handler {
 		shouldBlock, field := doBlock(body.Data, headerData, policies)
 
 		if shouldBlock {
-			logger.Warn("User tried to use blocked field: ", field)
+			logger.Warn("Client tried to use blocked field: ", field)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
