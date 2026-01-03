@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
+	"github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 )
 
@@ -23,12 +24,12 @@ const tokenKey contextKey = "token"
 
 type AuthMethod struct {
 	Name string
-	Authenticate func(req *http.Request, tokens []string) (bool, error)
+	Authenticate func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error)
 }
 
 var BearerAuth = AuthMethod {
 	Name: "Bearer",
-	Authenticate: func(req *http.Request, tokens []string) (bool, error) {
+	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
 		header := req.Header.Get("Authorization")
 
 		headerParts := strings.SplitN(header, " ", 2)
@@ -51,7 +52,7 @@ var BearerAuth = AuthMethod {
 
 var BasicAuth = AuthMethod {
 	Name: "Basic",
-	Authenticate: func(req *http.Request, tokens []string) (bool, error) {
+	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
 		header := req.Header.Get("Authorization")
 
 		if strings.TrimSpace(header) == "" {
@@ -91,9 +92,50 @@ var BasicAuth = AuthMethod {
 	},
 }
 
+var BodyAuth = AuthMethod {
+	Name: "Body",
+	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
+		const authField = "auth"
+
+		body, err := request.GetReqBody(req)
+
+		if err != nil {
+			return false, nil
+		}
+
+		body.Write(req)
+
+		if body.Empty {
+			return false, nil
+		}
+
+		value, exists := body.Data[authField]
+
+		if !exists {
+			return false, nil
+		}
+
+		auth, ok := value.(string)
+
+		if !ok {
+			return false, nil
+		}
+
+		if isValidToken(tokens, auth) {
+			delete(body.Data, authField)
+
+			body.Write(req)
+
+			return true, nil
+		}
+
+		return false, errors.New("invalid Body token")
+	},
+}
+
 var QueryAuth = AuthMethod {
 	Name: "Query",
-	Authenticate: func(req *http.Request, tokens []string) (bool, error) {
+	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
 		const authQuery = "@authorization"
 
 		auth := req.URL.Query().Get(authQuery)
@@ -118,7 +160,7 @@ var QueryAuth = AuthMethod {
 
 var PathAuth = AuthMethod {
 	Name: "Path",
-	Authenticate: func(req *http.Request, tokens []string) (bool, error) {
+	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
 		parts := strings.Split(req.URL.Path, "/")
 
 		if len(parts) == 0 {
@@ -156,6 +198,7 @@ func authHandler(next http.Handler) http.Handler {
 	var authChain = NewAuthChain().
 		Use(BearerAuth).
 		Use(BasicAuth).
+		Use(BodyAuth).
 		Use(QueryAuth).
 		Use(PathAuth)
 
@@ -167,7 +210,7 @@ func authHandler(next http.Handler) http.Handler {
 
 		var authToken string
 
-		success, _ := authChain.Eval(req, tokens)
+		success, _ := authChain.Eval(w, req, tokens)
 
 		if !success {
 			onUnauthorized(w)
@@ -207,12 +250,12 @@ func (chain *AuthChain) Use(method AuthMethod) *AuthChain {
     return chain
 }
 
-func (chain *AuthChain) Eval(req *http.Request, tokens []string) (bool, error) {
+func (chain *AuthChain) Eval(w http.ResponseWriter, req *http.Request, tokens []string) (bool, error) {
 	var err error
 	var success bool
 
 	for _, method := range chain.methods {
-		success, err = method.Authenticate(req, tokens)
+		success, err = method.Authenticate(w, req, tokens)
 
 		if err != nil {
 			logger.Warn("User failed ", method.Name, " auth: ", err.Error())
