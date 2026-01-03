@@ -35,6 +35,13 @@ func ratelimitHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		logger := getLogger(req)
 
+		trusted := getContext[bool](req, trustedClientKey)
+
+		if trusted {
+			next.ServeHTTP(w, req)
+			return
+		}
+
 		conf := getConfigByReq(req)
 
 		rateLimiting := conf.SETTINGS.ACCESS.RATE_LIMITING
