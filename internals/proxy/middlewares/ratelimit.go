@@ -65,7 +65,8 @@ func ratelimitHandler(next http.Handler) http.Handler {
 			tokenLimiter, exists := tokenLimiters[token]
 
 			if !exists {
-				tokenLimiters[token] = NewTokenLimiter(limit, period)
+				tokenLimiter = NewTokenLimiter(limit, period)
+				tokenLimiters[token] = tokenLimiter
 			}
 
 			if !tokenLimiter.Allow() {
