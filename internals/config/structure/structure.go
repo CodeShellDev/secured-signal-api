@@ -30,11 +30,11 @@ type API struct {
 }
 
 type SETTINGS struct {
-	ACCESS 				ACCESS_SETTINGS 			`koanf:"access"`
-	MESSAGE				MESSAGE_SETTINGS			`koanf:"message"`
+	ACCESS 				ACCESS 			`koanf:"access"`
+	MESSAGE				MESSAGE			`koanf:"message"`
 }
 
-type MESSAGE_SETTINGS struct {
+type MESSAGE struct {
 	VARIABLES         	map[string]any              `koanf:"variables"       childtransform:"upper"`
 	FIELD_MAPPINGS      map[string][]FieldMapping	`koanf:"fieldmappings"   childtransform:"default"`
 	TEMPLATE  			string                      `koanf:"template"`
@@ -45,12 +45,18 @@ type FieldMapping struct {
 	Score 				int    						`koanf:"score"`
 }
 
-type ACCESS_SETTINGS struct {
+type ACCESS struct {
 	ENDPOINTS			[]string					`koanf:"endpoints"`
 	FIELD_POLICIES		map[string]FieldPolicy		`koanf:"fieldpolicies"   childtransform:"default"`
+	RATE_LIMITING		RateLimiting				`koanf:"ratelimiting"`
 }
 
 type FieldPolicy struct {
 	Value				any						    `koanf:"value"`
 	Action				string						`koanf:"action"`
+}
+
+type RateLimiting struct {
+	Limit				int							`koanf:"limit"`
+	Period				string						`koanf:"period"`
 }
