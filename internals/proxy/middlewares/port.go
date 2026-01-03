@@ -1,8 +1,9 @@
 package middlewares
 
 import (
+	"errors"
+	"net"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
@@ -24,10 +25,10 @@ func portHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		port := getPort(req.URL)
+		port, err := getPort(req)
 
-		if port == "" {
-			logger.Error("Could not get Port: invalid scheme")
+		if err != nil {
+			logger.Error("Could not get Port: ", err.Error())
 			http.Error(w, "Bad Request: invalid scheme", http.StatusBadRequest)
 			return
 		}
@@ -40,19 +41,14 @@ func portHandler(next http.Handler) http.Handler {
 	})
 }
 
-func getPort(url *url.URL) string {
- 	port := url.Port()
+func getPort(req *http.Request) (string, error) {
+    addr, ok := req.Context().Value(http.LocalAddrContextKey).(net.Addr)
 
-	if port == "" {
-		return port 
-	}
+    if !ok {
+        return "", errors.New("no local addr in context")
+    }
 
-	switch url.Scheme {
-	case "https":
-		return "443"
-	case "http":
-		return "80"
-	default:
-		return ""
-	}
+    _, port, err := net.SplitHostPort(addr.String())
+
+    return port, err
 }
