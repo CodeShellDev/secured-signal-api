@@ -23,19 +23,21 @@ func proxyHandler(next http.Handler) http.Handler {
 
 		rawTrustedProxies := conf.SETTINGS.ACCESS.TRUSTED_PROXIES
 
+		if rawTrustedProxies == nil {
+			rawTrustedProxies = getConfig("").SETTINGS.ACCESS.TRUSTED_PROXIES
+		}
+
 		var trusted bool
 		var ip net.IP
 
+		host, _, _ := net.SplitHostPort(req.RemoteAddr)
+
+		ip = net.ParseIP(host)
+
 		if len(rawTrustedProxies) != 0 {
-			host, _, _ := net.SplitHostPort(req.RemoteAddr)
+			trustedProxies := parseIPsAndIPNets(rawTrustedProxies)
 
-			ip = net.ParseIP(host)
-
-			if ip != nil {
-				trustedProxies := parseIPsAndIPNets(rawTrustedProxies)
-
-				trusted = isTrustedProxy(ip, trustedProxies)
-			}
+			trusted = isTrustedProxy(ip, trustedProxies)
 		}
 
 		if trusted {
@@ -52,6 +54,8 @@ func proxyHandler(next http.Handler) http.Handler {
 
 		req = setContext(req, clientIPKey, ip)
 		req = setContext(req, trustedProxyKey, trusted)
+
+		logger.Dev(ip.String(), trusted)
 
 		next.ServeHTTP(w, req)
 	})

@@ -22,6 +22,8 @@ func ipFilterHandler(next http.Handler) http.Handler {
 
 		ipFilter := conf.SETTINGS.ACCESS.IP_FILTER
 
+		logger.Dev(ipFilter)
+
 		if ipFilter == nil {
 			ipFilter = getConfig("").SETTINGS.ACCESS.ENDPOINTS
 		}
@@ -29,6 +31,8 @@ func ipFilterHandler(next http.Handler) http.Handler {
 		ip := getContext[net.IP](req, clientIPKey)
 
 		block, trusted := blockIPOrTrust(ip, ipFilter)
+
+		logger.Dev(block, trusted)
 
 		if block {
 			logger.Warn("Client IP is blocked by filter: ", ip.String())
