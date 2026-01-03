@@ -15,9 +15,9 @@ type Context struct {
 
 type contextKey string
 
-func setContext(req *http.Request, key, value any) {
+func setContext(req *http.Request, key, value any) *http.Request {
 	ctx := context.WithValue(req.Context(), key, value)
-	req = req.WithContext(ctx)
+	return req.WithContext(ctx)
 }
 
 func getContext[T any](req *http.Request, key any) T {

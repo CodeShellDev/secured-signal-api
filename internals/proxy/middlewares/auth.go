@@ -45,18 +45,14 @@ func authHandler(next http.Handler) http.Handler {
 
 		token, _ := authChain.Eval(w, req, tokens)
 
-		logger.Dev("Eval(): ", token)
-
 		if token == "" {
 			onUnauthorized(w)
 
-			setContext(req, isAuthKey, false)
+			req = setContext(req, isAuthKey, false)
 		} else {
-			setContext(req, isAuthKey, true)
-			setContext(req, tokenKey, token)
+			req = setContext(req, isAuthKey, true)
+			req = setContext(req, tokenKey, token)
 		}
-
-		logger.Dev(req.Context().Value(isAuthKey))
 
 		next.ServeHTTP(w, req)
 	})
@@ -72,7 +68,6 @@ func authRequirementHandler(next http.Handler) http.Handler {
 		isAuthenticated := getContext[bool](req, isAuthKey)
 
 		if !isAuthenticated {
-			logger.Dev("Unauthenticated: returning")
 			return
 		}
 
