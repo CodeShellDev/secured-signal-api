@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"slices"
 	"strings"
+
+	log "github.com/codeshelldev/gotl/pkg/logger"
 )
 
 var IPFilter Middleware = Middleware{
@@ -28,9 +30,7 @@ func ipFilterHandler(next http.Handler) http.Handler {
 
 		ip := getContext[net.IP](req, clientIPKey)
 
-		block := blockIP(ip, ipFilter)
-
-		if block {
+		if blockIP(ip, ipFilter) {
 			logger.Warn("Client IP is blocked by filter: ", ip.String())
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -75,6 +75,9 @@ func blockIP(ip net.IP, ipfilter []string) (bool) {
 		return try.Contains(ip)
 	})
 
+	log.Dev(allowed, blocked)
+	log.Dev(isExplicitlyAllowed, " ", isExplicitlyBlocked)
+
 	// explicit allow > block
 	if isExplicitlyAllowed {
 		return false
@@ -86,11 +89,13 @@ func blockIP(ip net.IP, ipfilter []string) (bool) {
 
 	// only allowed ips -> block anything not allowed
 	if len(allowed) > 0 && len(blocked) == 0 {
+		log.Dev("Block all except allowed")
 		return true
 	}
 
 	// only blocked ips -> allow anything not blocked
 	if len(blocked) > 0 && len(allowed) == 0 {
+		log.Dev("Allow all except blocked")
 		return false
 	}
 
