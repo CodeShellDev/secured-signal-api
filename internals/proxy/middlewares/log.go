@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	log "github.com/codeshelldev/gotl/pkg/logger"
+	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/request"
 )
 
@@ -14,15 +14,15 @@ var Logging Middleware = Middleware{
 
 func loggingHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if !log.IsDev() {
-			log.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
+		if !logger.IsDev() {
+			logger.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
 		} else {
 			body, _ := request.GetReqBody(req)
 
 			if body.Data != nil && !body.Empty {
-				log.Dev(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery, body.Data)
+				logger.Dev(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery, body.Data)
 			} else {
-				log.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
+				logger.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
 			}
 		}
 

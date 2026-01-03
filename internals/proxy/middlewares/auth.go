@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
-	log "github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 )
 
@@ -67,7 +66,7 @@ var BasicAuth = AuthMethod {
 			base64Bytes, err := base64.StdEncoding.DecodeString(headerParts[1])
 
 			if err != nil {
-				log.Error("Could not decode Basic auth payload: ", err.Error())
+				logger.Error("Could not decode Basic auth payload: ", err.Error())
 				return false, errors.New("invalid base64 in Basic auth")
 			}
 
