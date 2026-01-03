@@ -19,6 +19,8 @@ var Auth Middleware = Middleware{
 	Use: authHandler,
 }
 
+const tokenKey contextKey = "token"
+
 type AuthMethod struct {
 	Name string
 	Authenticate func(req *http.Request, tokens []string) (bool, error)
@@ -168,9 +170,7 @@ func authHandler(next http.Handler) http.Handler {
 		success, _ := authChain.Eval(req, tokens)
 
 		if !success {
-			w.Header().Set("WWW-Authenticate", "Basic realm=\"Login Required\", Bearer realm=\"Access Token Required\"")
-
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			onUnauthorized(w)
 			return
 		}
 
@@ -179,6 +179,12 @@ func authHandler(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, req)
 	})
+}
+
+func onUnauthorized(w http.ResponseWriter) {
+	w.Header().Set("WWW-Authenticate", "Basic realm=\"Login Required\", Bearer realm=\"Access Token Required\"")
+
+	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 }
 
 func isValidToken(tokens []string, match string) bool {

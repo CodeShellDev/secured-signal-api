@@ -66,7 +66,7 @@ func mappingHandler(next http.Handler) http.Handler {
 
 			if err != nil {
 				logger.Error("Could not write to Request Body: ", err.Error())
-				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 
