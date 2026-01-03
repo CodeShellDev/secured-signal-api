@@ -50,7 +50,7 @@ func loggingHandler(next http.Handler) http.Handler {
 
 		req = setContext(req, loggerKey, l)
 
-		ip := getContext[net.IPNet](req, clientIPKey)
+		ip := getContext[net.IP](req, clientIPKey)
 
 		if !l.IsDev() {
 			l.Info(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
