@@ -68,6 +68,7 @@ func authRequirementHandler(next http.Handler) http.Handler {
 		isAuthenticated := getContext[bool](req, isAuthKey)
 
 		if !isAuthenticated {
+			logger.Dev("Unauthenticated: returning")
 			return
 		}
 

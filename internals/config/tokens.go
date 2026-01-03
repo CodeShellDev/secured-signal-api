@@ -1,8 +1,10 @@
 package config
 
 import (
+	"path/filepath"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/configutils"
 	"github.com/codeshelldev/gotl/pkg/logger"
@@ -105,12 +107,15 @@ func getSchemeTagByPointer(config any, tag string, fieldPointer any) string {
 	return ""
 }
 
-func setTokenConfigName(config *configutils.Config, path string) {
+func setTokenConfigName(config *configutils.Config, p string) {
 	schema := structure.CONFIG{
 		NAME: "",
 	}
 
 	nameField := getSchemeTagByPointer(&schema, "koanf", &schema.NAME)
 
-	config.Layer.Set(nameField, path)
+	filename := filepath.Base(p)
+	filenameWithoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
+
+	config.Layer.Set(nameField, filenameWithoutExt)
 }

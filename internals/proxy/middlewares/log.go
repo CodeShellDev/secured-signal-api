@@ -55,6 +55,8 @@ func loggingHandler(next http.Handler) http.Handler {
 			}
 		}
 
+		l.Info("Init")
+
 		next.ServeHTTP(w, req)
 	})
 }
