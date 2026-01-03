@@ -117,5 +117,9 @@ func setTokenConfigName(config *configutils.Config, p string) {
 	filename := filepath.Base(p)
 	filenameWithoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 
-	config.Layer.Set(nameField, filenameWithoutExt)
+	name := config.Layer.String(nameField)
+
+	if strings.TrimSpace(name) == "" {
+		config.Layer.Set(nameField, filenameWithoutExt)
+	}
 }
