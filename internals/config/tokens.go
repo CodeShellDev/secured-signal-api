@@ -90,7 +90,7 @@ func parseTokenConfigs(configArray []structure.CONFIG) map[string]structure.CONF
 
 func getSchemeTagByPointer(config any, tag string, fieldPointer any) string {
 	v := reflect.ValueOf(config)
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Pointer {
 		v = v.Elem()
 	}
 
