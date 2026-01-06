@@ -54,3 +54,8 @@ Find more about this feature [here](./configuration/field-policies).
 
 **Endpoints** are used for restricting unauthorized access and for ensuring least privilege.
 [Let's start blocking then!](./configuration/endpoints)
+
+## IP Filters
+
+**IP Filters** are used for restricting access to **Secured Signal API** by blocking or specifically allowing IPs and IP subnets.
+Configure your _mini firewall_ [here](./configuration/ip-filters).
