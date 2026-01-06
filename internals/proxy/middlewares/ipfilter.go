@@ -73,9 +73,6 @@ func isIPBlocked(ip net.IP, ipfilter []string) (bool) {
 		return try.Contains(ip)
 	})
 
-	log.Dev(allowed, blocked)
-	log.Dev(isExplicitlyAllowed, " ", isExplicitlyBlocked)
-
 	// explicit allow > block
 	if isExplicitlyAllowed {
 		return false
@@ -85,13 +82,13 @@ func isIPBlocked(ip net.IP, ipfilter []string) (bool) {
 		return true
 	}
 
-	// only allowed ips -> block anything not allowed
-	if len(allowed) > 0 && len(blocked) == 0 {
+	// if any allow rules exist, default is deny
+	if len(allowed) > 0 {
 		return true
 	}
-
+	
 	// only blocked ips -> allow anything not blocked
-	if len(blocked) > 0 && len(allowed) == 0 {
+	if len(blocked) > 0 {
 		return false
 	}
 
