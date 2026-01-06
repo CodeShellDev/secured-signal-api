@@ -24,12 +24,14 @@ settings:
       "@message": [{ field: "msg", score: 100 }]
 
   access:
+    ipFilter:
+      - 192.168.1.10
+      - 192.168.2.0/24
+      - "!192.168.2.44"
+
     endpoints:
       - "!/v1/about"
       - /v2/send
 
     fieldPolicies:
-      "@number": {
-        value: "+123400003",
-        action: block
-      }
+      "@number": { value: "+123400003", action: block }
