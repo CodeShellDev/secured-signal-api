@@ -40,12 +40,12 @@ By default, adding an IP or range explicitly allows it, use `!` to block it inst
 
 ## Behavior
 
-| Allow          | Block                   | Result                                    |
-| -------------- | ----------------------- | ----------------------------------------- |
-| `192.168.1.10` | —                       | Only `192.168.1.10` allowed               |
-| —              | `!123.456.78.9`         | All allowed, except `123.456.78.9`        |
-| `10.0.0.0/24`  | `!10.0.0.10`            | `10.0.0.0/24` allowed, except `10.0.0.10` |
-| —              | `!0.0.0.0/0`<br>`!::/0` | All IPv4 & IPv6 blocked                   |
+| Allow          | Block                    | Result                                    |
+| -------------- | ------------------------ | ----------------------------------------- |
+| `192.168.1.10` | —                        | Only `192.168.1.10` allowed               |
+| —              | `!123.456.78.9`          | All allowed, except `123.456.78.9`        |
+| `10.0.0.0/24`  | `!10.0.0.10`             | `10.0.0.0/24` allowed, except `10.0.0.10` |
+| —              | `!0.0.0.0/0`<br/>`!::/0` | All IPv4 & IPv6 blocked                   |
 
 ### Rules
 
