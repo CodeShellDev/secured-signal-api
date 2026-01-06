@@ -189,9 +189,9 @@ var BodyAuth = AuthMethod{
 var QueryAuth = AuthMethod{
 	Name: "Query",
 	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
-		const authQuery = "@authorization"
+		const authQuery = "auth"
 
-		auth := req.URL.Query().Get(authQuery)
+		auth := req.URL.Query().Get("@" + authQuery)
 
 		if strings.TrimSpace(auth) == "" {
 			return "", nil
@@ -200,7 +200,7 @@ var QueryAuth = AuthMethod{
 		if isValidToken(tokens, auth) {
 			query := req.URL.Query()
 
-			query.Del(authQuery)
+			query.Del("@" + authQuery)
 
 			req.URL.RawQuery = query.Encode()
 
