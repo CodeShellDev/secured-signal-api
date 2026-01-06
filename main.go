@@ -30,7 +30,7 @@ func main() {
 	logger.Info("Initialized Logger with Level of ", logger.Level())
 
 	if logger.Level() == "dev" {
-		logger.Dev("Welcome back Developer!")
+		logger.Dev("Welcome back, Developer!")
 		logger.Dev("CTRL+S config to Print to Console")
 	}
 
