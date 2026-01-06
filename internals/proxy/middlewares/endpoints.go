@@ -58,7 +58,7 @@ func matchesPattern(endpoint, pattern string) bool {
 	return ok
 }
 
-func isBlocked(endpoint string, endpoints []string) bool {
+func isEndpointBlocked(endpoint string, endpoints []string) bool {
 	if len(endpoints) == 0 || endpoints == nil {
 		// default: allow all
 		return false
