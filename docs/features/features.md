@@ -58,6 +58,6 @@ Find more about this feature [here](./configuration/field-policies).
 
 ## IP Filters
 
-**IP Filters** are used for restricting access to **Secured Signal API** by blocking or specifically allowing IPs and IP ranges.
+**IP Filters** are used for restricting access to **Secured Signal API** by blocking or specifically allowing IPs and CIDR ranges.
 
 Configure your _mini firewall_ [here](./configuration/ip-filters).
