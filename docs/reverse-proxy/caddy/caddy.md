@@ -22,10 +22,23 @@ Add Caddy to your `docker-compose.yaml` file.
 {{{ #://./examples/caddy.docker-compose.yaml }}}
 ```
 
+## Setup
+
 Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your Caddy container.
 
 ```apacheconf
 {{{ #://./examples/Caddyfile }}}
+```
+
+## Configuration
+
+Now you can switch over to **Secured Signal API** and add Caddy to your [trusted proxies](../../configuration/trusted-proxies.md):
+
+```yaml
+settings:
+  access:
+    trustedProxies:
+      - 172.20.0.100
 ```
 
 Then spin up your stack:

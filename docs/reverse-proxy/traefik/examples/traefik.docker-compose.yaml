@@ -23,7 +23,22 @@ services:
         aliases:
           - secured-signal-api
 
+  traefik:
+    image: traefik:v3.6.5
+    container_name: traefik
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/traefik.yaml:/etc/traefik/traefik.yaml:ro
+      - certs:/var/traefik/certs/:rw
+      - logs:/var/log/traefik
+    restart: unless-stopped
+    networks:
+      proxy:
+        ipv4_address: 172.20.0.100
+
 networks:
   backend:
   proxy:
-    external: true
