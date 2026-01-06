@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"slices"
 	"strings"
-
-	log "github.com/codeshelldev/gotl/pkg/logger"
 )
 
 var IPFilter Middleware = Middleware{

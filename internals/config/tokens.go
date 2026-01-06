@@ -66,7 +66,7 @@ func InitTokens() {
 
 		ENV.INSECURE = true
 
-		// Set Blocked Endpoints on Config to Client Layer Value
+		// Set Blocked Endpoints on Config to User Layer Value
 		// => effectively ignoring Default Layer
 		DEFAULT.SETTINGS.ACCESS.ENDPOINTS = userConf.Layer.Strings("settings.access.endpoints")
 	}
