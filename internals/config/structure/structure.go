@@ -14,8 +14,7 @@ type CONFIG struct {
 	NAME				string						`koanf:"name"`
 	SERVICE				SERVICE 					`koanf:"service"`
 	API					API						    `koanf:"api"`
-																			//TODO: deprecate overrides for tkconfigs
-	SETTINGS      		SETTINGS					`koanf:"settings"        token>aliases:"overrides"`
+	SETTINGS      		SETTINGS					`koanf:"settings"`
 }
 
 type SERVICE struct {
@@ -25,8 +24,7 @@ type SERVICE struct {
 
 type API struct {
 	URL					string						`koanf:"url"             env>aliases:".apiurl"`
-																													//TODO: deprecate .token for tkconfigs
-	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken"     token>aliases:".tokens,.token"       aliases:"token"`
+	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken"       aliases:"token"`
 }
 
 type SETTINGS struct {
