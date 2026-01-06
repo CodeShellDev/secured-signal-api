@@ -21,7 +21,7 @@ Look at this complex template for example:
 It can extract needed data from the body and headers to then process them using Go's templating library
 and finally output a message packed with so much information.
 
-Head to [configuration](./configuration/message-template) to see how-to use.
+Head to [Configuration](./configuration/message-template) to see how-to use.
 
 ## Placeholders
 
