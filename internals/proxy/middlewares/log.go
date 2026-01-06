@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"net"
 	"net/http"
 	"strings"
 
@@ -17,6 +18,33 @@ var RequestLogger Middleware = Middleware{
 const loggerKey contextKey = "logger"
 
 func loggingHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+
+		ip := getContext[net.IP](req, clientIPKey)
+
+		if !logger.IsDev() {
+			logger.Info(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
+		} else {
+			body, _ := request.GetReqBody(req)
+
+			if body.Data != nil && !body.Empty {
+				logger.Dev(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery, body.Data)
+			} else {
+				logger.Info(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
+			}
+		}
+
+		next.ServeHTTP(w, req)
+	})
+}
+
+var InternalMiddlewareLogger Middleware = Middleware{
+	Name: "_Middleware_Logger",
+	Use: middlewareLoggerHandler,
+}
+
+func middlewareLoggerHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		conf := getConfigByReq(req)
 
@@ -48,18 +76,6 @@ func loggingHandler(next http.Handler) http.Handler {
 		}
 
 		req = setContext(req, loggerKey, l)
-
-		if !l.IsDev() {
-			l.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
-		} else {
-			body, _ := request.GetReqBody(req)
-
-			if body.Data != nil && !body.Empty {
-				l.Dev(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery, body.Data)
-			} else {
-				l.Info(req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
-			}
-		}
 
 		next.ServeHTTP(w, req)
 	})
