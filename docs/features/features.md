@@ -5,7 +5,7 @@ title: Features
 
 # Features
 
-Here are some of the highlights of using **Secured Signal API**
+Here are some of the highlights of using **Secured Signal API**.
 
 ## Message Template
 
@@ -58,6 +58,6 @@ Find more about this feature [here](./configuration/field-policies).
 
 ## IP Filters
 
-**IP Filters** are used for restricting access to **Secured Signal API** by blocking or specifically allowing IPs and IP subnets.
+**IP Filters** are used for restricting access to **Secured Signal API** by blocking or specifically allowing IPs and IP ranges.
 
 Configure your _mini firewall_ [here](./configuration/ip-filters).
