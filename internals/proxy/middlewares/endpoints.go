@@ -58,10 +58,10 @@ func matchesPattern(endpoint, pattern string) bool {
 	return ok
 }
 
-func isEndpointBlocked(endpoint string, endpoints []string) bool {
+func isBlocked(endpoint string, endpoints []string) bool {
 	if len(endpoints) == 0 || endpoints == nil {
-		// default: block all
-		return true
+		// default: allow all
+		return false
 	}
 
 	allowed, blocked := getEndpoints(endpoints)
@@ -92,6 +92,6 @@ func isEndpointBlocked(endpoint string, endpoints []string) bool {
 		return false
 	}
 
-	// no match -> default: block all
-	return true
+	// default: allow all
+	return false
 }
