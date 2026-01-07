@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"regexp"
 
-	"github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
@@ -43,7 +42,7 @@ func policyHandler(next http.Handler) http.Handler {
 
 		headerData := request.GetReqHeaders(req)
 
-		shouldBlock, field := doBlock(body.Data, headerData, policies)
+		shouldBlock, field := isBlockedByPolicy(body.Data, headerData, policies)
 
 		if shouldBlock {
 			logger.Warn("Client tried to use blocked field: ", field)
@@ -98,7 +97,9 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 			re, err := regexp.Compile(policyValue)
 
 			if err == nil {
-				return re.MatchString(asserted), key
+				if re.MatchString(asserted) {
+					return true, key
+				}
 			}
 
 			if ok && asserted == policyValue {
@@ -126,7 +127,7 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 	return false, ""
 }
 
-func doBlock(body map[string]any, headers map[string][]string, policies map[string][]structure.FieldPolicy) (bool, string) {
+func isBlockedByPolicy(body map[string]any, headers map[string][]string, policies map[string][]structure.FieldPolicy) (bool, string) {
 	if len(policies) == 0 || policies == nil {
 		// default: allow all
 		return false, ""
@@ -143,14 +144,8 @@ func doBlock(body map[string]any, headers map[string][]string, policies map[stri
 
 		allowed, blocked := getPolicies(policy)
 
-		logger.Dev(allowed, blocked)
-
 		isExplicitlyAllowed, cause := doPoliciesApply(field, body, headers, allowed)
 		isExplicitlyBlocked, cause := doPoliciesApply(field, body, headers, blocked)
-
-		logger.Dev(field, isExplicitlyAllowed, isExplicitlyBlocked)
-
-		logger.Dev(policy)
 
 		// block if explicitly blocked and no explicit allow exists
 		if isExplicitlyBlocked && !isExplicitlyAllowed {
