@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"regexp"
 
+	"github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
@@ -142,8 +143,14 @@ func doBlock(body map[string]any, headers map[string][]string, policies map[stri
 
 		allowed, blocked := getPolicies(policy)
 
+		logger.Dev(allowed, blocked)
+
 		isExplicitlyAllowed, cause := doPoliciesApply(field, body, headers, allowed)
 		isExplicitlyBlocked, cause := doPoliciesApply(field, body, headers, blocked)
+
+		logger.Dev(field, isExplicitlyAllowed, isExplicitlyBlocked)
+
+		logger.Dev(policy)
 
 		// block if explicitly blocked and no explicit allow exists
 		if isExplicitlyBlocked && !isExplicitlyAllowed {
