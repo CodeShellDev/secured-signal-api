@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"regexp"
 
-	"github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
@@ -99,7 +98,6 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 
 			if err == nil {
 				if re.MatchString(asserted) {
-					logger.Dev(asserted)
 					return true, key
 				}
 				continue
@@ -136,9 +134,11 @@ func isBlockedByPolicy(body map[string]any, headers map[string][]string, policie
 		return false, ""
 	}
 
-	var cause string
-
 	for field, policy := range policies {
+		if len(policy) == 0 || policy == nil {
+			continue
+		}
+
 		value, _ := getField(field, body, headers)
 
 		if value == nil {
@@ -150,12 +150,29 @@ func isBlockedByPolicy(body map[string]any, headers map[string][]string, policie
 		isExplicitlyAllowed, cause := doPoliciesApply(field, body, headers, allowed)
 		isExplicitlyBlocked, cause := doPoliciesApply(field, body, headers, blocked)
 
-		// block if explicitly blocked and no explicit allow exists
-		if isExplicitlyBlocked && !isExplicitlyAllowed {
+		// explicit allow > block
+		if isExplicitlyAllowed {
+			return false, cause
+		}
+		
+		if isExplicitlyBlocked {
 			return true, cause
 		}
+
+		// allow rules -> default deny
+		if len(allowed) > 0 {
+			return true, cause
+		}
+		
+		// only block rules -> default allow
+		if len(blocked) > 0 {
+			return false, cause
+		}
+
+		// safety net -> block
+		return true, "safety net"
 	}
 
 	// default: allow all
-	return false, cause
+	return false, ""
 }

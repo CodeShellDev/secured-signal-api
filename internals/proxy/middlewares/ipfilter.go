@@ -80,16 +80,16 @@ func isIPBlocked(ip net.IP, ipfilter []string) (bool) {
 		return true
 	}
 
-	// if any allow rules exist, default is deny
+	// allow rules -> default deny
 	if len(allowed) > 0 {
 		return true
 	}
 	
-	// only blocked ips -> allow anything not blocked
+	// only block rules -> default allow
 	if len(blocked) > 0 {
 		return false
 	}
 
-	// default: allow all
-	return false
+	// safety net -> block
+	return true
 }
