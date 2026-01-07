@@ -58,12 +58,12 @@ func getPolicies(policies []structure.FieldPolicy) ([]structure.FieldPolicy, []s
 	blocked := []structure.FieldPolicy{}
 	allowed := []structure.FieldPolicy{}
 
-	for i, policy := range policies {
+	for _, policy := range policies {
 		switch policy.Action {
 		case "block":
-			blocked[i] = policy
+			blocked = append(blocked, policy)
 		case "allow":
-			allowed[i] = policy
+			allowed = append(allowed, policy)
 		}
 	}
 
