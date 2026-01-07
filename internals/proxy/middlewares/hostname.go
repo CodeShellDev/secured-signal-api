@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"net/http"
+	"net/url"
 	"slices"
 )
 
@@ -23,7 +24,9 @@ func hostnameHandler(next http.Handler) http.Handler {
 		}
 
 		if len(hostnames) > 0 {
-			hostname := req.URL.Hostname()
+			URL := getContext[*url.URL](req, originURLKey)
+
+			hostname := URL.Hostname()
 
 			if hostname == "" {
 				logger.Error("Encountered empty hostname")
