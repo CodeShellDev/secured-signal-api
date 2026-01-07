@@ -12,7 +12,7 @@ import (
 func LoadTokens() {
 	log.Debug("Loading Configs in ", ENV.TOKENS_DIR)
 
-	err := tokenConf.LoadDir("tokenconfigs", ENV.TOKENS_DIR, ".yml", yaml.Parser())
+	err := tokenConf.LoadDir("tokenconfigs", ENV.TOKENS_DIR, ".yml", yaml.Parser(), func(c *configutils.Config, s string) {})
 
 	if err != nil {
 		log.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
