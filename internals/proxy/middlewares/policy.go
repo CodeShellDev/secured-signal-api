@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"reflect"
+	"regexp"
 
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
@@ -92,6 +93,12 @@ func doPoliciesApply(body map[string]any, headers map[string][]string, policies 
 		case string:
 			policyValue, ok := policy.Value.(string)
 
+			re, err := regexp.Compile(policyValue)
+
+			if err == nil {
+				return re.MatchString(asserted), key
+			}
+
 			if ok && asserted == policyValue {
 				return true, key
 			}
@@ -118,7 +125,7 @@ func doPoliciesApply(body map[string]any, headers map[string][]string, policies 
 }
 
 func doBlock(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicy) (bool, string) {
-	if len(policies) == 0 {
+	if len(policies) == 0 || policies == nil {
 		// default: allow all
 		return false, ""
 	}
@@ -149,6 +156,6 @@ func doBlock(body map[string]any, headers map[string][]string, policies map[stri
 		return false, cause
 	}
 
-	// no match -> default: block all
-	return true, cause
+	// default: allow all
+	return false, cause
 }
