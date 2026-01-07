@@ -106,7 +106,7 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 				return true, key
 			}
 		case int:
-			policyValue, ok := policy.Value.(int);
+			policyValue, ok := policy.Value.(int)
 
 			if ok && asserted == policyValue {
 				return true, key
