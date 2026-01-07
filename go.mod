@@ -2,7 +2,7 @@ module github.com/codeshelldev/secured-signal-api
 
 go 1.25.5
 
-require github.com/codeshelldev/gotl v0.0.10
+require github.com/codeshelldev/gotl v0.0.11-1
 
 require go.uber.org/zap v1.27.1
 
