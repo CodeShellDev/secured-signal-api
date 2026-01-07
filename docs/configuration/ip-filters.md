@@ -57,7 +57,7 @@ By default, adding an IP or range explicitly allows it, use `!` to block it inst
 
 ## Clients behind Proxies
 
-For clients behind proxies IPs cannot be reliably determined without trusting the `X-Forwarded-For` HTTP header.
+For clients behind proxies, IPs cannot be reliably determined without trusting the `X-Forwarded-For` HTTP header.
 In order for **Secured Signal API** to trust the _XFF_ header it has to trust the request's originating proxy.
 
 Read more about trusted proxies [here](./trusted-proxies).
