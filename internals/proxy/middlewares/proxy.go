@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -14,6 +15,7 @@ var InternalProxy Middleware = Middleware{
 
 const trustedProxyKey contextKey = "isProxyTrusted"
 const clientIPKey contextKey = "clientIP"
+const originURLKey contextKey = "originURL"
 
 func proxyHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -31,6 +33,8 @@ func proxyHandler(next http.Handler) http.Handler {
 		var ip net.IP
 
 		host, _, _ := net.SplitHostPort(req.RemoteAddr)
+
+		originUrl := req.Proto + "://" + req.URL.Host
 
 		ip = net.ParseIP(host)
 
@@ -50,10 +54,30 @@ func proxyHandler(next http.Handler) http.Handler {
 			if realIP != nil {
 				ip = realIP
 			}
+
+			XFHost := req.Header.Get("X-Forwarded-Host")
+			XFProto := req.Header.Get("X-Forwarded-Proto")
+			XFPort := req.Header.Get("X-Forwarded-Port")
+
+			if XFHost == "" || XFProto == "" || XFPort == "" {
+				logger.Warn("Missing X-Forwarded-* headers")
+			}
+
+			originUrl = XFProto + "://" + XFHost + ":" + XFPort
 		}
 
-		req = setContext(req, clientIPKey, ip)
+		originURL, err := url.Parse(originUrl)
+
+		if err != nil {
+			logger.Error("Could not parse Url: ", originUrl)
+			http.Error(w, "Bad Request: invalid Url", http.StatusBadRequest)
+			return
+		}
+
 		req = setContext(req, trustedProxyKey, trusted)
+		req = setContext(req, originURLKey, originURL)
+
+		req = setContext(req, clientIPKey, ip)
 
 		next.ServeHTTP(w, req)
 	})
@@ -123,13 +147,13 @@ func getRealIP(req *http.Request) (net.IP, error) {
 		realIP := net.ParseIP(strings.TrimSpace(ips[0]))
 
 		if realIP == nil {
-			return nil, errors.New("malformed x-forwarded-for header")
+			return nil, errors.New("malformed X-Forwarded-For header")
 		}
 
 		return realIP, nil
 	}
 
-	return nil, errors.New("no x-forwarded-for header present")
+	return nil, errors.New("no X-Forwarded-For header present")
 }
 
 func isIPInList(ip net.IP, list []*net.IPNet) bool {

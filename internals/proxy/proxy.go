@@ -38,8 +38,9 @@ func (proxy Proxy) Init() http.Handler {
 		Use(m.InternalClientIP).
 		Use(m.RequestLogger).
 		Use(m.InternalAuthRequirement).
-		Use(m.IPFilter).
 		Use(m.Port).
+		Use(m.Hostname).
+		Use(m.IPFilter).
 		Use(m.RateLimit).
 		Use(m.Template).
 		Use(m.Endpoints).

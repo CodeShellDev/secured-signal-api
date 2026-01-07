@@ -18,6 +18,7 @@ type CONFIG struct {
 }
 
 type SERVICE struct {
+	HOSTNAMES			[]string					`koanf:"hostnames"       env>aliases:".hostnames"`
 	PORT				string						`koanf:"port"            env>aliases:".port"`
 	LOG_LEVEL			string						`koanf:"loglevel"        env>aliases:".loglevel"`
 }
