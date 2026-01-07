@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"regexp"
 
-	"github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
@@ -55,20 +54,20 @@ func policyHandler(next http.Handler) http.Handler {
 	})
 }
 
-func getPolicies(policies map[string]structure.FieldPolicy) (map[string]structure.FieldPolicy, map[string]structure.FieldPolicy) {
-	blockedFields := map[string]structure.FieldPolicy{}
-	allowedFields := map[string]structure.FieldPolicy{}
+func getPolicies(policies []structure.FieldPolicy) ([]structure.FieldPolicy, []structure.FieldPolicy) {
+	blocked := []structure.FieldPolicy{}
+	allowed := []structure.FieldPolicy{}
 
-	for field, policy := range policies {
+	for i, policy := range policies {
 		switch policy.Action {
 		case "block":
-			blockedFields[field] = policy
+			blocked[i] = policy
 		case "allow":
-			allowedFields[field] = policy
+			allowed[i] = policy
 		}
 	}
 
-	return allowedFields, blockedFields
+	return allowed, blocked
 }
 
 func getField(key string, body map[string]any, headers map[string][]string) (any, error) {
@@ -80,17 +79,17 @@ func getField(key string, body map[string]any, headers map[string][]string) (any
 		return value, nil
 	}
 
-	return value, errors.New("field not found")
+	return nil, errors.New("field not found")
 }
 
-func doPoliciesApply(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicy) (bool, string) {
-	for key, policy := range policies {
-		value, err := getField(key, body, headers)
+func doPoliciesApply(key string, body map[string]any, headers map[string][]string, policies []structure.FieldPolicy) (bool, string) {
+	value, err := getField(key, body, headers)
 
-		if err != nil {
-			continue
-		}
+	if err != nil {
+		return false, ""
+	}
 
+	for _, policy := range policies {
 		switch asserted := value.(type) {
 		case string:
 			policyValue, ok := policy.Value.(string)
@@ -126,40 +125,30 @@ func doPoliciesApply(body map[string]any, headers map[string][]string, policies 
 	return false, ""
 }
 
-func doBlock(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicy) (bool, string) {
+func doBlock(body map[string]any, headers map[string][]string, policies map[string][]structure.FieldPolicy) (bool, string) {
 	if len(policies) == 0 || policies == nil {
 		// default: allow all
 		return false, ""
 	}
 
-	allowed, blocked := getPolicies(policies)
-
-	logger.Dev(allowed, blocked)
-
 	var cause string
 
-	isExplicitlyAllowed, cause := doPoliciesApply(body, headers, allowed)
-	isExplicitlyBlocked, cause := doPoliciesApply(body, headers, blocked)
-	
-	logger.Dev(body, headers)
+	for field, policy := range policies {
+		value, _ := getField(field, body, headers)
 
-	// explicit block > allow
-	if isExplicitlyBlocked {
-		return true, cause
-	}
+		if value == nil {
+			continue
+		}
 
-	if isExplicitlyAllowed {
-		return false, cause
-	}
+		allowed, blocked := getPolicies(policy)
 
-	// only allow policies -> block anything not allowed
-	if len(allowed) > 0 && len(blocked) == 0 {
-		return true, cause
-	}
+		isExplicitlyAllowed, cause := doPoliciesApply(field, body, headers, allowed)
+		isExplicitlyBlocked, cause := doPoliciesApply(field, body, headers, blocked)
 
-	// only block polcicies -> allow anything not blocked
-	if len(blocked) > 0 && len(allowed) == 0 {
-		return false, cause
+		// block if explicitly blocked and no explicit allow exists
+		if isExplicitlyBlocked && !isExplicitlyAllowed {
+			return true, cause
+		}
 	}
 
 	// default: allow all
