@@ -73,6 +73,8 @@ func templateHandler(next http.Handler) http.Handler {
 			}
 		}
 
+		logger.Dev(body, bodyData)
+
 		if modifiedBody {
 			body.Data = bodyData
 
@@ -87,7 +89,7 @@ func templateHandler(next http.Handler) http.Handler {
 			logger.Debug("Applied Body Templating: ", body.Data)
 
 			logger.Dev(request.GetReqBody(req))
-			logger.Dev(body)
+			logger.Dev(body, body.Data)
 		}
 
 		if req.URL.Path != "" {
