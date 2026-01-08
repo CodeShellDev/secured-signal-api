@@ -98,13 +98,22 @@ Token configs can be used to create **per-token** defined **overrides** and sett
 Here is an example:
 
 ```yaml
+# Example Token Config (all configurations shown)
+
+name: abc
+
+service:
+  logLevel: debug
+  port: 1234
+
 api:
   tokens: [LOOOONG_STRING]
 
 settings:
   message:
     fieldMappings: # Disable mappings
-    variables: # Disable variable placeholders
+    variables: # Override variables
+      number: "+123400004"
 
   access:
     endpoints: # Disable sending
