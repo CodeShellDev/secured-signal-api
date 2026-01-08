@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"regexp"
 
-	"github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
@@ -110,15 +109,11 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 		case int:
 			policyValue, ok := policy.Value.(int)
 
-			logger.Dev("INT:", policyValue)
-
 			if ok && asserted == policyValue {
 				return true, key
 			}
 		case float64:
 			var policyValue float64
-
-			logger.Dev(policy.Value)
 
 			// needed for json
 			switch assertedValue := policy.Value.(type) {
@@ -130,13 +125,10 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 				continue
 			}
 
-			logger.Dev(policyValue, asserted)
-
 			if asserted == policyValue {
 				return true, key
 			}
 		default:
-			logger.Dev(reflect.TypeOf(value))
 			if reflect.DeepEqual(value, policy.Value) {
 				return true, key
 			}
@@ -162,8 +154,6 @@ func isBlockedByPolicy(body map[string]any, headers map[string][]string, policie
 		if value == nil {
 			continue
 		}
-
-		logger.Dev(value, reflect.TypeOf(value))
 
 		allowed, blocked := getPolicies(policy)
 
