@@ -45,8 +45,18 @@ By default, adding an endpoint explicitly allows access to it, use `!` to block 
 > [!IMPORTANT]
 > When using `!` to block you must enclose the endpoint in quotes, like in the example above
 
-| Config (Allow) | (Block)        |   Result   |     |                   |     |
-| :------------- | :------------- | :--------: | --- | :---------------: | --- |
-| `/v2/send`     | `unset`        |  **all**   | ⛔️ |  **`/v2/send`**   | ✅  |
-| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | ⛔️ |
-| `!/v2*`        | `/v2/send`     | **`/v2*`** | ⛔️ |  **`/v2/send`**   | ✅  |
+## Behavior
+
+| Allow      | Block          | Result                                       |
+| ---------- | -------------- | -------------------------------------------- |
+| `/v2/send` | —              | **Only** `/v2/send` allowed                  |
+| —          | `!/v1/receive` | **All** allowed **except** `/v1/receive`     |
+| `/v2/send` | `!/v2/*`       | `/v2*` allowed **except** `/v2/send` blocked |
+
+### Rules
+
+- Default: **allow all**
+- Allow rules add explicit access
+- Block rules deny matching endpoints
+- Explicit allow overrides block
+- Mixed allow + block rules keep permissive default

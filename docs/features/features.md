@@ -5,7 +5,7 @@ title: Features
 
 # Features
 
-Here are some of the highlights of using **Secured Signal API**
+Here are some of the highlights of using **Secured Signal API**.
 
 ## Message Template
 
@@ -21,7 +21,7 @@ Look at this complex template for example:
 It can extract needed data from the body and headers to then process them using Go's templating library
 and finally output a message packed with so much information.
 
-Head to [configuration](./configuration/message-template) to see how-to use.
+Head to [Configuration](./configuration/message-template) to see how-to use.
 
 ## Placeholders
 
@@ -48,9 +48,21 @@ This is really helpful when trying to block certain numbers from using certain t
 
 Find more about this feature [here](./configuration/field-policies).
 
+## Rate Limiting
+
+**Rate Limiting** is used for limiting requests and to stop server overload, because of DDoS attacks, malconfigured clients, or malicious actors.  
+It ensures fair usage per token by controlling how many requests can be processed within a defined period.
+
 ## Endpoints
 
 > _Block unwanted access_
 
 **Endpoints** are used for restricting unauthorized access and for ensuring least privilege.
+
 [Let's start blocking then!](./configuration/endpoints)
+
+## IP Filters
+
+**IP Filters** are used for restricting access to **Secured Signal API** by blocking or specifically allowing IPs and CIDR ranges.
+
+Configure your _mini firewall_ [here](./configuration/ip-filters).
