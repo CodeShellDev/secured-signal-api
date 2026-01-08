@@ -27,6 +27,21 @@ func main() {
 
 	log.Info("Initialized Logger with Level of ", log.Level())
 
+	log.Info(`
+	
+	[1;34m┌────────────────────────────────────────────────┐[0m
+	[1;34m│[0m [1;32m             🎄 Happy Holidays! 🎄            [0m [1;34m│[0m
+	[1;34m│[0m                                                [1;34m│[0m
+	[1;34m│[0m [0;37mThank you for using this project and for all  [0m [1;34m│[0m
+	[1;34m│[0m [0;37mthe downloads, stars, and support this year.  [0m [1;34m│[0m
+	[1;34m│[0m                                                [1;34m│[0m
+	[1;34m│[0m [1;32mYour support truly means a lot — here's to    [0m [1;34m│[0m
+	[1;34m│[0m [1;32man awesome year ahead! ✨                     [0m [1;34m│[0m
+	[1;34m│[0m                                                [1;34m│[0m
+	[1;34m│[0m [1;36m                 - CodeShell                  [0m [1;34m│[0m
+	[1;34m└────────────────────────────────────────────────┘[0m
+	`)
+
 	if log.Level() == "dev" {
 		log.Dev("Welcome back Developer!")
 		log.Dev("CTRL+S config to Print to Console")
