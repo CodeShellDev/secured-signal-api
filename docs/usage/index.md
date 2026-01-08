@@ -28,7 +28,7 @@ This will send `Hello, World!` to `<to>` from `<from>`.
 | :---------- | :--------------------------------------------------------- |
 | Bearer Auth | Add `Authorization: Bearer API_TOKEN` to headers           |
 | Basic Auth  | Add `Authorization: Basic BASE64_STRING` (`api:API_TOKEN`) |
-| Query Auth  | Append `@authorization=API_TOKEN` to request URL           |
+| Query Auth  | Append `@auth=API_TOKEN` to request URL                    |
 
 Example:
 
