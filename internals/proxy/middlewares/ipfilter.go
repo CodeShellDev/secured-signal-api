@@ -21,7 +21,7 @@ func ipFilterHandler(next http.Handler) http.Handler {
 		ipFilter := conf.SETTINGS.ACCESS.IP_FILTER
 
 		if ipFilter == nil {
-			ipFilter = getConfig("").SETTINGS.ACCESS.ENDPOINTS
+			ipFilter = getConfig("").SETTINGS.ACCESS.IP_FILTER
 		}
 
 		ip := getContext[net.IP](req, clientIPKey)
@@ -80,16 +80,16 @@ func isIPBlocked(ip net.IP, ipfilter []string) (bool) {
 		return true
 	}
 
-	// if any allow rules exist, default is deny
+	// allow rules -> default deny
 	if len(allowed) > 0 {
 		return true
 	}
 	
-	// only blocked ips -> allow anything not blocked
+	// only block rules -> default allow
 	if len(blocked) > 0 {
 		return false
 	}
 
-	// default: allow all
-	return false
+	// safety net -> block
+	return true
 }

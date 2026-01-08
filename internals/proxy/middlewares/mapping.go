@@ -35,6 +35,7 @@ func mappingHandler(next http.Handler) http.Handler {
 		if err != nil {
 			logger.Error("Could not get Request Body: ", err.Error())
 			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
+			return
 		}
 
 		var modifiedBody bool

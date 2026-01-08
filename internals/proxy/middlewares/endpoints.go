@@ -82,16 +82,16 @@ func isEndpointBlocked(endpoint string, endpoints []string) bool {
 		return true
 	}
 
-	// only allowed endpoints -> block anything not allowed
-	if len(allowed) > 0 && len(blocked) == 0 {
+	// allow rules -> default deny
+	if len(allowed) > 0 {
 		return true
 	}
-
-	// only blocked endpoints -> allow anything not blocked
-	if len(blocked) > 0 && len(allowed) == 0 {
+	
+	// only block rules -> default allow
+	if len(blocked) > 0 {
 		return false
 	}
 
-	// default: allow all
-	return false
+	// safety net -> block
+	return true
 }
