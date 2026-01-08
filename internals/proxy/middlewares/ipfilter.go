@@ -21,7 +21,7 @@ func ipFilterHandler(next http.Handler) http.Handler {
 		ipFilter := conf.SETTINGS.ACCESS.IP_FILTER
 
 		if ipFilter == nil {
-			ipFilter = getConfig("").SETTINGS.ACCESS.ENDPOINTS
+			ipFilter = getConfig("").SETTINGS.ACCESS.IP_FILTER
 		}
 
 		ip := getContext[net.IP](req, clientIPKey)
