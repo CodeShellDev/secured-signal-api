@@ -40,19 +40,20 @@ By default, adding an IP or range explicitly allows it, use `!` to block it inst
 
 ## Behavior
 
-| Allow          | Block                    | Result                                    |
-| -------------- | ------------------------ | ----------------------------------------- |
-| `192.168.1.10` | —                        | Only `192.168.1.10` allowed               |
-| —              | `!123.456.78.9`          | All allowed, except `123.456.78.9`        |
-| `10.0.0.0/24`  | `!10.0.0.10`             | `10.0.0.0/24` allowed, except `10.0.0.10` |
-| —              | `!0.0.0.0/0`<br/>`!::/0` | All IPv4 & IPv6 blocked                   |
+| Allow          | Block                    | Result                                        |
+| -------------- | ------------------------ | --------------------------------------------- |
+| `192.168.1.10` | —                        | **Only** `192.168.1.10` allowed               |
+| —              | `!123.456.78.9`          | **All** allowed, **except** `123.456.78.9`    |
+| `10.0.0.0/24`  | `!10.0.0.10`             | `10.0.0.0/24` allowed, **except** `10.0.0.10` |
+| —              | `!0.0.0.0/0`<br/>`!::/0` | All IPv4 & IPv6 blocked                       |
 
 ### Rules
 
 - Default: **allow all**
-- Allow rules restrict access **only if no block rules exist**
-- Block rules deny matching IPs
-- Explicit allow overrides block
+- Allow rules exist: default **block**
+- Only block rules exist: default **allow**
+- Explicit allow **overrides** block
+
 - IPv4 and IPv6 rules may be mixed
 
 ## Clients behind Proxies

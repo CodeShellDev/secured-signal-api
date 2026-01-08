@@ -47,16 +47,15 @@ By default, adding an endpoint explicitly allows access to it, use `!` to block 
 
 ## Behavior
 
-| Allow      | Block          | Result                                       |
-| ---------- | -------------- | -------------------------------------------- |
-| `/v2/send` | —              | **Only** `/v2/send` allowed                  |
-| —          | `!/v1/receive` | **All** allowed **except** `/v1/receive`     |
-| `/v2/send` | `!/v2/*`       | `/v2*` allowed **except** `/v2/send` blocked |
+| Allow      | Block          | Result                                    |
+| ---------- | -------------- | ----------------------------------------- |
+| `/v2/send` | —              | **Only** `/v2/send` allowed               |
+| —          | `!/v1/receive` | **All** allowed, **except** `/v1/receive` |
+| `/v2/send` | `!/v2/*`       | **Only** `/v2/send` allowed               |
 
 ### Rules
 
 - Default: **allow all**
-- Allow rules add explicit access
-- Block rules deny matching endpoints
-- Explicit allow overrides block
-- Mixed allow + block rules keep permissive default
+- Allow rules exist: default **block**
+- Only block rules exist: default **allow**
+- Explicit allow **overrides** block
