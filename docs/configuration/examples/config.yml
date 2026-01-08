@@ -1,6 +1,8 @@
 # Example Config (all configurations shown)
 service:
   port: 8880
+  hostnames:
+    - mydomain.com
 
 api:
   url: http://signal-api:8080
