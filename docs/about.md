@@ -15,10 +15,10 @@ The [Signal CLI REST API](https://github.com/bbernhard/signal-cli-rest-api) prov
 
 It's designed for developers who want to:
 
-- **Restrict** or **log** certain API calls,
-- Enforce **authentication**,
-- Add **templating** or **request preprocessing**,
-- And deploy everything neatly via **Docker**.
+- **Restrict** or **log** certain API calls
+- Enforce **authentication**
+- Add **templating** or **request preprocessing**
+- And deploy everything neatly via **Docker**
 
 ## Key Features
 
