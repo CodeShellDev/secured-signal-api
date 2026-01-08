@@ -259,22 +259,13 @@ You can also override the `config.yml` file for each individual token by adding 
 Here is an example:
 
 ```yaml
-# Example Token Config (all configurations shown)
-
-name: abc
-
-service:
-  logLevel: debug
-  port: 1234
-
 api:
   tokens: [LOOOONG_STRING]
 
 settings:
   message:
     fieldMappings: # Disable mappings
-    variables: # Override variables
-      number: "+123400004"
+    variables: # Disable variable placeholders
 
   access:
     endpoints: # Disable sending
