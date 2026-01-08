@@ -112,6 +112,12 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 			if ok && asserted == policyValue {
 				return true, key
 			}
+		case float64:
+			policyValue, ok := policy.Value.(float64)
+
+			if ok && asserted == policyValue {
+				return true, key
+			}
 		case bool:
 			policyValue, ok := policy.Value.(bool)
 
