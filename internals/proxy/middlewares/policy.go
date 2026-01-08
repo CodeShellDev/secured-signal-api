@@ -110,11 +110,15 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 		case int:
 			policyValue, ok := policy.Value.(int)
 
+			logger.Dev("INT:", policyValue)
+
 			if ok && asserted == policyValue {
 				return true, key
 			}
 		case float64:
 			var policyValue float64
+
+			logger.Dev(policy.Value)
 
 			// needed for json
 			switch assertedValue := policy.Value.(type) {
