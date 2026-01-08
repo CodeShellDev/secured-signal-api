@@ -163,6 +163,8 @@ func isBlockedByPolicy(body map[string]any, headers map[string][]string, policie
 			continue
 		}
 
+		logger.Dev(value, reflect.TypeOf(value))
+
 		allowed, blocked := getPolicies(policy)
 
 		isExplicitlyAllowed, cause := doPoliciesApply(field, body, headers, allowed)
