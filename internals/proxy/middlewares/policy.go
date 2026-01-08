@@ -136,6 +136,7 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 				return true, key
 			}
 		default:
+			logger.Dev(reflect.TypeOf(value))
 			if reflect.DeepEqual(value, policy.Value) {
 				return true, key
 			}
