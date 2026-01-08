@@ -38,6 +38,7 @@ This example config shows all the individual settings that can be applied:
 ```yaml
 # Example Config (all configurations shown)
 service:
+  logLevel: info
   port: 8880
   hostnames:
     - mydomain.com
@@ -45,8 +46,6 @@ service:
 api:
   url: http://signal-api:8080
   tokens: [token1, token2]
-
-logLevel: info
 
 settings:
   message:
@@ -78,6 +77,10 @@ settings:
     endpoints:
       - "!/v1/about"
       - /v2/send
+
+    rateLimiting:
+      limit: 100
+      period: 1h
 
     fieldPolicies:
       "@number": { value: "+123400003", action: block }
