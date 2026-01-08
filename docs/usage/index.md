@@ -29,6 +29,7 @@ This will send `Hello, World!` to `<to>` from `<from>`.
 | Bearer Auth | Add `Authorization: Bearer API_TOKEN` to headers           |
 | Basic Auth  | Add `Authorization: Basic BASE64_STRING` (`api:API_TOKEN`) |
 | Query Auth  | Append `@authorization=API_TOKEN` to request URL           |
+| Path Auth   | Prepend request path with `/auth=API_TOKEN/`               |
 | Body Auth   | Set `auth` to `API_TOKEN` in the request body              |
 
 Example:
