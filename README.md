@@ -204,13 +204,14 @@ This example config shows all the individual settings that can be applied:
 ```yaml
 # Example Config (all configurations shown)
 service:
+  logLevel: info
   port: 8880
+  hostnames:
+    - mydomain.com
 
 api:
   url: http://signal-api:8080
   tokens: [token1, token2]
-
-logLevel: info
 
 settings:
   message:
@@ -228,15 +229,27 @@ settings:
       "@message": [{ field: "msg", score: 100 }]
 
   access:
+    trustedIPs:
+      - 192.168.1.10
+
+    trustedProxies:
+      - 172.20.0.100
+
+    ipFilter:
+      - 192.168.1.10
+      - 192.168.2.0/24
+      - "!192.168.2.44"
+
     endpoints:
       - "!/v1/about"
       - /v2/send
 
+    rateLimiting:
+      limit: 100
+      period: 1h
+
     fieldPolicies:
-      "@number": {
-        value: "+123400003",
-        action: block
-      }
+      "@number": { value: "+123400003", action: block }
 ```
 
 #### Token Configs
@@ -358,9 +371,9 @@ By default adding an endpoint explicitly allows access to it, use `!` to block i
 
 | Config (Allow) | (Block)        |   Result   |     |                   |     |
 | :------------- | :------------- | :--------: | --- | :---------------: | --- |
-| `/v2/send`     | `unset`        |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
-| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
-| `!/v2*`        | `/v2/send`     | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
+| `/v2/send`     | `unset`        |  **all**   | ⛔️ |  **`/v2/send`**   | ✅  |
+| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | ⛔️ |
+| `!/v2*`        | `/v2/send`     | **`/v2*`** | ⛔️ |  **`/v2/send`**   | ✅  |
 
 ### Variables
 
