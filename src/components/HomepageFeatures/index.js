@@ -11,8 +11,9 @@ const FeatureList = [
 			<>
 				The main focus of Secured Signal API is to provide a secure layer for
 				signal-cli-rest-api, supporting <a href="docs/usage#auth">Bearer</a>,{" "}
-				<a href="docs/usage#auth">Basic</a>, <a href="docs/usage#auth">Query</a>{" "}
-				and <a href="docs/usage#auth">Path Auth</a>.
+				<a href="docs/usage#auth">Basic</a>,{" "}
+				<a href="docs/usage#auth">Query Auth</a> and{" "}
+				<a href="docs/usage#auth">more</a>.
 			</>
 		),
 	},
