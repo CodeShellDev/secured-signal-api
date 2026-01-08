@@ -23,13 +23,6 @@ const tokenKey contextKey = "token"
 const isAuthKey contextKey = "isAuthenticated"
 
 func authHandler(next http.Handler) http.Handler {
-	tokenKeys := maps.Keys(config.ENV.CONFIGS)
-	tokens := slices.Collect(tokenKeys)
-
-	if tokens == nil {
-		tokens = []string{}
-	}
-
 	var authChain = NewAuthChain().
 		Use(BearerAuth).
 		Use(BasicAuth).
@@ -38,6 +31,13 @@ func authHandler(next http.Handler) http.Handler {
 		Use(PathAuth)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		tokenKeys := maps.Keys(config.ENV.CONFIGS)
+		tokens := slices.Collect(tokenKeys)
+
+		if tokens == nil {
+			tokens = []string{}
+		}
+
 		if config.ENV.INSECURE || len(tokens) <= 0 {
 			next.ServeHTTP(w, req)
 			return
