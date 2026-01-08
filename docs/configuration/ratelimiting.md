@@ -21,3 +21,7 @@ settings:
 - `period`: The duration over which the limit is measured (supports Go duration format like `1m`, `10s`, `1h`)
 
 When a request exceeds the configured rate limit the server responds with `429` `Too Many Requests`.
+
+> [!IMPORTANT]
+>
+> [Trusted clients](./trusted-ips.md) are allowed to bypass rate limits
