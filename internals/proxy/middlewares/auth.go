@@ -92,8 +92,6 @@ var BearerAuth = AuthMethod{
 		}
 
 		if strings.ToLower(headerParts[0]) == "bearer" {
-			logger.Dev(headerParts)
-
 			if isValidToken(tokens, headerParts[1]) {
 				return headerParts[1], nil
 			}
