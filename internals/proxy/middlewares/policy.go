@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"regexp"
 
+	"github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
@@ -125,13 +126,9 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 				continue
 			}
 
-			if asserted == policyValue {
-				return true, key
-			}
-		case bool:
-			policyValue, ok := policy.Value.(bool)
+			logger.Dev(policyValue, asserted)
 
-			if ok && asserted == policyValue {
+			if asserted == policyValue {
 				return true, key
 			}
 		default:
