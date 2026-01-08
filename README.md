@@ -206,8 +206,6 @@ This example config shows all the individual settings that can be applied:
 service:
   logLevel: info
   port: 8880
-  hostnames:
-    - mydomain.com
 
 api:
   url: http://signal-api:8080
