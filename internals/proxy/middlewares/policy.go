@@ -113,9 +113,19 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 				return true, key
 			}
 		case float64:
-			policyValue, ok := policy.Value.(float64)
+			var policyValue float64
 
-			if ok && asserted == policyValue {
+			// needed for json
+			switch assertedValue := policy.Value.(type) {
+			case int:
+				policyValue = float64(assertedValue)
+			case float64:
+				policyValue = assertedValue
+			default:
+				continue
+			}
+
+			if asserted == policyValue {
 				return true, key
 			}
 		case bool:
