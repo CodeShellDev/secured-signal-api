@@ -39,6 +39,8 @@ This example config shows all the individual settings that can be applied:
 # Example Config (all configurations shown)
 service:
   port: 8880
+  hostnames:
+    - mydomain.com
 
 api:
   url: http://signal-api:8080
@@ -62,15 +64,23 @@ settings:
       "@message": [{ field: "msg", score: 100 }]
 
   access:
+    trustedIPs:
+      - 192.168.1.10
+
+    trustedProxies:
+      - 172.20.0.100
+
+    ipFilter:
+      - 192.168.1.10
+      - 192.168.2.0/24
+      - "!192.168.2.44"
+
     endpoints:
       - "!/v1/about"
       - /v2/send
 
     fieldPolicies:
-      "@number": {
-        value: "+123400003",
-        action: block
-      }
+      "@number": { value: "+123400003", action: block }
 ```
 
 ### Token Configs

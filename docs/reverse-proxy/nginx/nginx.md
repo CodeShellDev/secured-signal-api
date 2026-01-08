@@ -49,12 +49,15 @@ services:
     restart: unless-stopped
     networks:
       backend:
+        ipv4_address: 172.20.0.100
 
 networks:
   backend:
 ```
 
 To include the needed mounts for your certificates and your config.
+
+## Setup
 
 Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `/etc/nginx/conf.d/default.conf` in your Nginx container.
 
@@ -90,6 +93,17 @@ server {
 ```
 
 Add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/nginx/ssl`.
+
+## Configuration
+
+Now you can switch over to **Secured Signal API** and add Nginx to your [trusted proxies](../../configuration/trusted-proxies.md):
+
+```yaml
+settings:
+  access:
+    trustedProxies:
+      - 172.20.0.100
+```
 
 Lastly spin up your stack:
 

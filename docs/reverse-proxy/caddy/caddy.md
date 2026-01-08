@@ -45,6 +45,10 @@ services:
       - data:/data
     depends_on:
       - secured-signal
+    restart: unless-stopped
+    networks:
+      backend:
+        ipv4_address: 172.20.0.100
 
 networks:
   backend:
@@ -52,6 +56,8 @@ networks:
 volumes:
   data:
 ```
+
+## Setup
 
 Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your Caddy container.
 
@@ -74,6 +80,17 @@ domain.com {
 http://domain.com {
     redir https://{host}{uri} permanent
 }
+```
+
+## Configuration
+
+Now you can switch over to **Secured Signal API** and add Caddy to your [trusted proxies](../../configuration/trusted-proxies.md):
+
+```yaml
+settings:
+  access:
+    trustedProxies:
+      - 172.20.0.100
 ```
 
 Then spin up your stack:
