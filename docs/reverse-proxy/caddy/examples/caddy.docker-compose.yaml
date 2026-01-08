@@ -24,6 +24,10 @@ services:
       - data:/data
     depends_on:
       - secured-signal
+    restart: unless-stopped
+    networks:
+      backend:
+        ipv4_address: 172.20.0.100
 
 networks:
   backend:
