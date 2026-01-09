@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	jsonutils "github.com/codeshelldev/gotl/pkg/jsonutils"
-	log "github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 )
@@ -16,6 +15,8 @@ var Mapping Middleware = Middleware{
 
 func mappingHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+
 		conf := getConfigByReq(req)
 
 		variables := conf.SETTINGS.MESSAGE.VARIABLES
@@ -32,8 +33,9 @@ func mappingHandler(next http.Handler) http.Handler {
 		body, err := request.GetReqBody(req)
 
 		if err != nil {
-			log.Error("Could not get Request Body: ", err.Error())
+			logger.Error("Could not get Request Body: ", err.Error())
 			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
+			return
 		}
 
 		var modifiedBody bool
@@ -65,12 +67,12 @@ func mappingHandler(next http.Handler) http.Handler {
 			err := body.Write(req)
 
 			if err != nil {
-				log.Error("Could not write to Request Body: ", err.Error())
-				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				logger.Error("Could not write to Request Body: ", err.Error())
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 
-			log.Debug("Applied Data Aliasing: ", body.Data)
+			logger.Debug("Applied Data Aliasing: ", body.Data)
 		}
 
 		next.ServeHTTP(w, req)

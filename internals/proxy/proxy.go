@@ -31,9 +31,17 @@ func Create(targetUrl string) Proxy {
 
 func (proxy Proxy) Init() http.Handler {
 	handler := m.NewChain().
-		Use(m.Logging).
 		Use(m.Server).
 		Use(m.Auth).
+		Use(m.InternalMiddlewareLogger).
+		Use(m.InternalProxy).
+		Use(m.InternalClientIP).
+		Use(m.RequestLogger).
+		Use(m.InternalAuthRequirement).
+		Use(m.Port).
+		Use(m.Hostname).
+		Use(m.IPFilter).
+		Use(m.RateLimit).
 		Use(m.Template).
 		Use(m.Endpoints).
 		Use(m.Mapping).

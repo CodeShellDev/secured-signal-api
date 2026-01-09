@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"net/http"
+	"strings"
 
-	log "github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 )
 
@@ -14,6 +14,8 @@ var Message Middleware = Middleware{
 
 func messageHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+
 		conf := getConfigByReq(req)
 
 		variables := conf.SETTINGS.MESSAGE.VARIABLES
@@ -23,15 +25,16 @@ func messageHandler(next http.Handler) http.Handler {
 			variables = getConfig("").SETTINGS.MESSAGE.VARIABLES
 		}
 
-		if messageTemplate == "" {
+		if strings.TrimSpace(messageTemplate) == "" {
 			messageTemplate = getConfig("").SETTINGS.MESSAGE.TEMPLATE
 		}
 
 		body, err := request.GetReqBody(req)
 
 		if err != nil {
-			log.Error("Could not get Request Body: ", err.Error())
+			logger.Error("Could not get Request Body: ", err.Error())
 			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
+			return
 		}
 
 		bodyData := map[string]any{}
@@ -47,7 +50,7 @@ func messageHandler(next http.Handler) http.Handler {
 				newData, err := TemplateMessage(messageTemplate, bodyData, headerData, variables)
 
 				if err != nil {
-					log.Error("Error Templating Message: ", err.Error())
+					logger.Error("Error Templating Message: ", err.Error())
 				}
 
 				if newData["message"] != bodyData["message"] && newData["message"] != "" && newData["message"] != nil {
@@ -63,12 +66,12 @@ func messageHandler(next http.Handler) http.Handler {
 			err := body.Write(req)
 
 			if err != nil {
-				log.Error("Could not write to Request Body: ", err.Error())
-				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				logger.Error("Could not write to Request Body: ", err.Error())
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 
-			log.Debug("Applied Message Templating: ", body.Data)
+			logger.Debug("Applied Message Templating: ", body.Data)
 		}
 
 		next.ServeHTTP(w, req)

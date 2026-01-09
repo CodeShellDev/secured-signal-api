@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	jsonutils "github.com/codeshelldev/gotl/pkg/jsonutils"
-	log "github.com/codeshelldev/gotl/pkg/logger"
 	query "github.com/codeshelldev/gotl/pkg/query"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	templating "github.com/codeshelldev/gotl/pkg/templating"
@@ -22,6 +21,8 @@ var Template Middleware = Middleware{
 
 func templateHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger := getLogger(req)
+
 		conf := getConfigByReq(req)
 		
 		variables := conf.SETTINGS.MESSAGE.VARIABLES
@@ -33,8 +34,9 @@ func templateHandler(next http.Handler) http.Handler {
 		body, err := request.GetReqBody(req)
 
 		if err != nil {
-			log.Error("Could not get Request Body: ", err.Error())
+			logger.Error("Could not get Request Body: ", err.Error())
 			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
+			return
 		}
 
 		bodyData := map[string]any{}
@@ -49,7 +51,7 @@ func templateHandler(next http.Handler) http.Handler {
 			bodyData, modified, err = TemplateBody(body.Data, headerData, variables)
 
 			if err != nil {
-				log.Error("Error Templating JSON: ", err.Error())
+				logger.Error("Error Templating JSON: ", err.Error())
 			}
 
 			if modified {
@@ -63,7 +65,7 @@ func templateHandler(next http.Handler) http.Handler {
 			req.URL.RawQuery, bodyData, modified, err = TemplateQuery(req.URL, bodyData, variables)
 
 			if err != nil {
-				log.Error("Error Templating Query: ", err.Error())
+				logger.Error("Error Templating Query: ", err.Error())
 			}
 
 			if modified {
@@ -77,12 +79,12 @@ func templateHandler(next http.Handler) http.Handler {
 			err := body.Write(req)
 
 			if err != nil {
-				log.Error("Could not write to Request Body: ", err.Error())
-				http.Error(w, "Internal Error", http.StatusInternalServerError)
+				logger.Error("Could not write to Request Body: ", err.Error())
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 
-			log.Debug("Applied Body Templating: ", body.Data)
+			logger.Debug("Applied Body Templating: ", body.Data)
 		}
 
 		if req.URL.Path != "" {
@@ -91,11 +93,11 @@ func templateHandler(next http.Handler) http.Handler {
 			req.URL.Path, modified, err = TemplatePath(req.URL, variables)
 
 			if err != nil {
-				log.Error("Error Templating Path: ", err.Error())
+				logger.Error("Error Templating Path: ", err.Error())
 			}
 
 			if modified {
-				log.Debug("Applied Path Templating: ", req.URL.Path)
+				logger.Debug("Applied Path Templating: ", req.URL.Path)
 			}
 		}
 
