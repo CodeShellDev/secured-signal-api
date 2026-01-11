@@ -29,8 +29,8 @@ type API struct {
 }
 
 type SETTINGS struct {
-	ACCESS 				ACCESS 			`koanf:"access"`
-	MESSAGE				MESSAGE			`koanf:"message"`
+	ACCESS 				ACCESS 						`koanf:"access"`
+	MESSAGE				MESSAGE						`koanf:"message"`
 }
 
 type MESSAGE struct {

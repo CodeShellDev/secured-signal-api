@@ -111,7 +111,10 @@ func Normalize(id string, config *configutils.Config, path string, structure any
 	tmpConf.Load(old, "")
 	
 	// Apply transforms to the new config
-	tmpConf.ApplyTransformFuncs(id, structure, "", transformFuncs)
+	tmpConf.ApplyTransformFuncs(id, structure, "", configutils.TransformOptions{
+		Transforms: transformFuncs,
+		OnUse: onUseFuncs,
+	})
 
 	// Lowercase actual config
 	LowercaseKeys(config)
