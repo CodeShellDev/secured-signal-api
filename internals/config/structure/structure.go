@@ -11,29 +11,29 @@ type ENV struct {
 }
 
 type CONFIG struct {
+	NAME				string						`koanf:"name"`
 	SERVICE				SERVICE 					`koanf:"service"`
 	API					API						    `koanf:"api"`
-																			//TODO: deprecate overrides for tkconfigs
-	SETTINGS      		SETTINGS					`koanf:"settings"        token>aliases:"overrides"`
+	SETTINGS      		SETTINGS					`koanf:"settings"`
 }
 
 type SERVICE struct {
+	HOSTNAMES			[]string					`koanf:"hostnames"       env>aliases:".hostnames"`
 	PORT				string						`koanf:"port"            env>aliases:".port"`
 	LOG_LEVEL			string						`koanf:"loglevel"        env>aliases:".loglevel"`
 }
 
 type API struct {
 	URL					string						`koanf:"url"             env>aliases:".apiurl"`
-																													//TODO: deprecate .token for tkconfigs
-	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken"     token>aliases:".tokens,.token"       aliases:"token"`
+	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken"       aliases:"token"`
 }
 
 type SETTINGS struct {
-	ACCESS 				ACCESS_SETTINGS 			`koanf:"access"`
-	MESSAGE				MESSAGE_SETTINGS			`koanf:"message"`
+	ACCESS 				ACCESS 						`koanf:"access"`
+	MESSAGE				MESSAGE						`koanf:"message"`
 }
 
-type MESSAGE_SETTINGS struct {
+type MESSAGE struct {
 	VARIABLES         	map[string]any              `koanf:"variables"       childtransform:"upper"`
 	FIELD_MAPPINGS      map[string][]FieldMapping	`koanf:"fieldmappings"   childtransform:"default"`
 	TEMPLATE  			string                      `koanf:"template"`
@@ -44,12 +44,21 @@ type FieldMapping struct {
 	Score 				int    						`koanf:"score"`
 }
 
-type ACCESS_SETTINGS struct {
+type ACCESS struct {
 	ENDPOINTS			[]string					`koanf:"endpoints"`
-	FIELD_POLICIES		map[string]FieldPolicy		`koanf:"fieldpolicies"   childtransform:"default"`
+	FIELD_POLICIES		map[string][]FieldPolicy	`koanf:"fieldpolicies"   childtransform:"default"`
+	RATE_LIMITING		RateLimiting				`koanf:"ratelimiting"`
+	IP_FILTER			[]string					`koanf:"ipfilter"`
+	TRUSTED_IPS			[]string					`koanf:"trustedips"`
+	TRUSTED_PROXIES		[]string					`koanf:"trustedproxies"`
 }
 
 type FieldPolicy struct {
 	Value				any						    `koanf:"value"`
 	Action				string						`koanf:"action"`
+}
+
+type RateLimiting struct {
+	Limit				int							`koanf:"limit"`
+	Period				string						`koanf:"period"`
 }
