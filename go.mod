@@ -6,7 +6,7 @@ require (
 	github.com/codeshelldev/gotl/pkg/configutils v0.0.5
 	github.com/codeshelldev/gotl/pkg/docker v0.0.2
 	github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2
-	github.com/codeshelldev/gotl/pkg/logger v0.0.6-5
+	github.com/codeshelldev/gotl/pkg/logger v0.0.6
 	github.com/codeshelldev/gotl/pkg/pretty v0.0.8
 	github.com/codeshelldev/gotl/pkg/query v0.0.3
 	github.com/codeshelldev/gotl/pkg/request v0.0.3
@@ -15,6 +15,7 @@ require (
 )
 
 require (
+	github.com/codeshelldev/gotl/pkg/ioutils v0.0.2
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	golang.org/x/time v0.14.0
 )
