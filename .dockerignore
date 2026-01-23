@@ -10,7 +10,7 @@
 
 # Dev folders
 .dev
-.devenv
+*.local.*
 
 # Ignore yml files
 *.yaml
