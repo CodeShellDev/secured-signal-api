@@ -53,6 +53,10 @@ func middlewareLoggerHandler(next http.Handler) http.Handler {
 
 		if strings.TrimSpace(logLevel) != "" {
 			l = logger.Get().Sub(logLevel)
+
+			l.SetTransform(func(content string) string {
+				return conf.NAME + "\t" + content
+			})
 		}
 
 		req = setContext(req, loggerKey, l)

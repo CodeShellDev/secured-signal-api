@@ -1,10 +1,15 @@
 package proxy
 
 import (
+	"bytes"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 
+	"github.com/codeshelldev/gotl/pkg/ioutils"
+	"github.com/codeshelldev/gotl/pkg/logger"
 	m "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
 )
 
@@ -13,9 +18,31 @@ type Proxy struct {
 }
 
 func Create(targetUrl string) Proxy {
-	url, _ := url.Parse(targetUrl)
+	if strings.TrimSpace(targetUrl) == "" {
+		logger.Fatal("Missing API URL")
+		return Proxy{Use: func() *httputil.ReverseProxy {return nil}}
+	}
+
+	url, err := url.Parse(targetUrl)
+
+	if err != nil {
+		logger.Fatal("Invalid API URL: ", targetUrl)
+		return Proxy{Use: func() *httputil.ReverseProxy {return nil}}
+	}
 
 	proxy := httputil.NewSingleHostReverseProxy(url)
+
+	w := &ioutils.InterceptWriter{
+		Writer: &bytes.Buffer{},
+		Hook: func(bytes []byte) {
+			msg := string(bytes)
+			msg = strings.TrimSuffix(msg, "\n") 
+
+			logger.Error(msg)
+		},
+	}
+
+	proxy.ErrorLog = log.New(w, "", 0)
 
 	director := proxy.Director
 
