@@ -45,9 +45,13 @@ var InternalMiddlewareLogger Middleware = Middleware{
 
 func middlewareLoggerHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		conf := getConfigByReq(req)
+		conf := getConfigWithoutDefaultByReq(req)
 
-		logLevel := conf.SERVICE.LOG_LEVEL
+		var logLevel string
+
+		if conf != nil {
+			logLevel = conf.SERVICE.LOG_LEVEL
+		}
 
 		l := logger.Get()
 
