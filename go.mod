@@ -3,7 +3,7 @@ module github.com/codeshelldev/secured-signal-api
 go 1.25.5
 
 require (
-	github.com/codeshelldev/gotl/pkg/configutils v0.0.4
+	github.com/codeshelldev/gotl/pkg/configutils v0.0.5
 	github.com/codeshelldev/gotl/pkg/docker v0.0.2
 	github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2
 	github.com/codeshelldev/gotl/pkg/logger v0.0.3
@@ -12,15 +12,19 @@ require (
 	github.com/codeshelldev/gotl/pkg/request v0.0.3
 	github.com/codeshelldev/gotl/pkg/stringutils v0.0.3
 	github.com/codeshelldev/gotl/pkg/templating v0.0.3
+)
+
+require (
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	go.uber.org/zap v1.27.1
 	golang.org/x/time v0.14.0
 )
 
 require (
-	github.com/clipperhouse/uax29/v2 v2.2.0 // indirect
+	github.com/clipperhouse/stringish v0.1.1 // indirect
+	github.com/clipperhouse/uax29/v2 v2.3.1 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/knadh/koanf/providers/confmap v1.0.0 // indirect
 	github.com/knadh/koanf/providers/env/v2 v2.0.0 // indirect
