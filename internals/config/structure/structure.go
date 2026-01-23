@@ -14,8 +14,8 @@ type CONFIG struct {
 	NAME				string						`koanf:"name"`
 	SERVICE				SERVICE 					`koanf:"service"`
 	API					API						    `koanf:"api"`
-	SETTINGS      		SETTINGS					`koanf:"settings"`
-}
+	SETTINGS      		SETTINGS					`koanf:"settings"        token>aliases:"overrides" token>onuse:".overrides>>deprecated"       deprecation:"We have moved away from using 'overrides' in Token Configs"`
+}																														
 
 type SERVICE struct {
 	HOSTNAMES			[]string					`koanf:"hostnames"       env>aliases:".hostnames"`
@@ -25,13 +25,13 @@ type SERVICE struct {
 
 type API struct {
 	URL					string						`koanf:"url"             env>aliases:".apiurl"`
-	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken"       aliases:"token"`
+	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken" aliases:"token" token>aliases:".tokens,.token" token>onuse:".tokens>>deprecated,.token>>deprecated,token>>deprecated" onuse:"token>>deprecated" deprecation:"'tokens' and 'token' will not be at the root anymore\n'api.token' will be removed in favor of 'api.tokens'"`																					
 	AUTH				AUTH						`koanf:"auth"`
 }
 
 type AUTH struct {
 	METHODS				[]string					`koanf:"methods"         env>aliases:".authmethods"`
-	TOKENS				[]Token						`koanf:"tokens"          aliases:"token"`
+	TOKENS				[]Token						`koanf:"tokens"          aliases:"token" onuse:"token>>deprecated" deprecation:"'api.auth.token' will be removed in favor of 'api.auth.tokens'"`
 }
 
 type Token struct {

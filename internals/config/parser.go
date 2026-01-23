@@ -29,50 +29,97 @@ func uppercaseTransform(key string, value any) (string, any) {
 
 var onUseFuncs = map[string]func(source string, target configutils.TransformTarget) {
 	"deprecated": func(source string, target configutils.TransformTarget) {
-		box := pretty.NewAutoBox()
-		box.MinWidth = 50
-		box.PaddingX = 2
-		box.PaddingY = 1
+		deprecationHandler(source, target)
+	},
+}
 
-		box.Border.Style = pretty.BorderStyle{
-			Color: pretty.Basic(pretty.Yellow),
-		}
+var deprecationHandledMap = map[string]bool{}
 
-		box.AddBlock(pretty.Block{
-			Align: pretty.AlignCenter,
-			Style: pretty.Style{},
-			Segments: []pretty.Segment{
-				pretty.TextBlockSegment{
-					Text: "🚨 Deprecation 🚨",
-					Style: pretty.Style{
-						Bold: true,
-						Foreground: pretty.Basic(pretty.Yellow),
-					},
-				},
-				pretty.InlineSegment{},
-				pretty.TextBlockSegment{
-					Text: "Please refrain from using",
-				},
-				pretty.InlineSegment{},
-				pretty.TextBlockSegment{
-					Text: "`" + source + "`",
-					Style: pretty.Style{
-						Italic: true,
-						Bold: true,
-						Background: pretty.Basic(pretty.Red),
-					},
-				},
-				pretty.InlineSegment{},
-				pretty.InlineSegment{
-					Items: []pretty.Inline{
-						pretty.Span{
-							Text: "as it has been marked as deprecated",
-						},
-					},
+func deprecationHandler(source string, target configutils.TransformTarget) {
+	handled, _ := deprecationHandledMap[source]
+
+	if handled {
+		return
+	}
+
+	deprecationHandledMap[source] = true
+
+	deprecationMessage := target.Source.Tag.Get("deprecation")
+
+	box := pretty.NewAutoBox()
+	box.MinWidth = 50
+	box.PaddingX = 2
+	box.PaddingY = 1
+
+	box.Border.Style = pretty.BorderStyle{
+		Color: pretty.Basic(pretty.Yellow),
+	}
+
+	messageParts := strings.Split(deprecationMessage, "\n")
+	messageSegments := []pretty.Segment{}
+
+	for _, part := range messageParts {
+		messageSegments = append(messageSegments, pretty.InlineSegment{
+			Items: []pretty.Inline{
+				pretty.Span{
+					Text: part,
 				},
 			},
 		})
+	}
 
-		fmt.Println(box.Render())
-	},
+	box.AddBlock(pretty.Block{
+		Align: pretty.AlignCenter,
+		Style: pretty.Style{},
+		Segments: []pretty.Segment{
+			pretty.TextBlockSegment{
+				Text: "🚨 Deprecation 🚨",
+				Style: pretty.Style{
+					Bold: true,
+					Foreground: pretty.Basic(pretty.Yellow),
+				},
+			},
+			pretty.InlineSegment{},
+			pretty.TextBlockSegment{
+				Text: "Please refrain from using",
+			},
+			pretty.InlineSegment{},
+			pretty.TextBlockSegment{
+				Text: "`" + source + "`",
+				Style: pretty.Style{
+					Italic: true,
+					Bold: true,
+					Background: pretty.Basic(pretty.Red),
+				},
+			},
+			pretty.InlineSegment{},
+			pretty.InlineSegment{
+				Items: []pretty.Inline{
+					pretty.Span{
+						Text: "as it has been marked as ",
+					},
+					pretty.Span{
+						Text: "deprecated",
+						Style: pretty.Style{
+							Bold: true,
+						},
+					},
+					pretty.Span{
+						Text: ":",
+					},
+				},
+			},
+			pretty.InlineSegment{},
+		},
+	})
+
+	box.AddBlock(pretty.Block{
+		Segments: messageSegments,
+		Align: pretty.AlignCenter,
+		Style: pretty.Style{
+			Background: pretty.Basic(pretty.BrightBlack),
+		},
+	})
+
+	fmt.Println(box.Render())
 }
