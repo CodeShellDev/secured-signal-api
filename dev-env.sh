@@ -45,7 +45,6 @@ if [ -f "$DIR/dev-env.local.sh" ]; then
     cecho "${BLUE}Found overrides:${END} $DIR/dev-env.local.sh"
     source "$DIR/dev-env.local.sh"
 fi
-
 if [ -f "$DIR/dev.local.env" ]; then
     cecho "${BLUE}Found overrides:${END} $DIR/dev.local.env"
     source "$DIR/dev.local.env"
