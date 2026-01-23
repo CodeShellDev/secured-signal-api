@@ -9,8 +9,9 @@ Trusted clients can bypass some security features and are often local or interna
 To trust IPs or ranges add them to `access.trustedIPs`.
 
 ```yaml
-access:
-  trustedIPs:
-    - 192.168.1.10
-    - 192.168.2.0/24
+settings:
+  access:
+    trustedIPs:
+      - 192.168.1.10
+      - 192.168.2.0/24
 ```
