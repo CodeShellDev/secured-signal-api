@@ -38,6 +38,8 @@ export FAVICON_PATH=$DIR/data/favicon.ico
 export CONFIG_PATH=$DIR/.dev/config.yml
 export TOKENS_DIR=$DIR/.dev/tokens
 
+export API__URL=http://127.0.0.1:8881
+
 export LOG_LEVEL=dev
 
 # Load overrides if present
