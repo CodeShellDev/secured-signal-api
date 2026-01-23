@@ -121,5 +121,18 @@ func deprecationHandler(source string, target configutils.TransformTarget) {
 		},
 	})
 
+	box.AddBlock(pretty.Block{
+		Align: pretty.AlignCenter,
+		Segments: []pretty.Segment{
+			pretty.InlineSegment{},
+			pretty.TextBlockSegment{
+				Text: "Update your config before the next update,\nwhere it will be removed for good",
+				Style: pretty.Style{
+					Italic: true,
+				},
+			},
+		},
+	})
+
 	fmt.Println(box.Render())
 }

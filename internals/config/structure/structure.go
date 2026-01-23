@@ -31,7 +31,7 @@ type API struct {
 
 type AUTH struct {
 	METHODS				[]string					`koanf:"methods"         env>aliases:".authmethods"`
-	TOKENS				[]Token						`koanf:"tokens"          aliases:"token" onuse:"token>>deprecated" deprecation:"'api.auth.token' will be removed in favor of 'api.auth.tokens'"`
+	TOKENS				[]Token						`koanf:"tokens"          aliases:"token" onuse:"token>>deprecated" deprecation:"'api.auth.token' will change in to 'api.auth.tokens'"`
 }
 
 type Token struct {
