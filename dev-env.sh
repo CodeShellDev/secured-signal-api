@@ -33,6 +33,10 @@ cecho() {
 # Get directory path
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+#=-----------------------------------=#
+#= Environment Variables & Overrides =#
+#=-----------------------------------=#
+
 export DEFAULTS_PATH=$DIR/data/defaults.yml
 export FAVICON_PATH=$DIR/data/favicon.ico
 export CONFIG_PATH=$DIR/.dev/config.yml
@@ -53,3 +57,38 @@ if [ -f "$DIR/dev.local.env" ]; then
 fi
 
 cecho "${GREEN}Successfully loaded development environment!${END}"
+
+#=-----------------------------------=#
+#=            Mock server            =#
+#=-----------------------------------=#
+
+MOCK_BIN="/tmp/mockserver-$MOCK_PORT"
+MOCK_PID="/tmp/mockserver-$MOCK_PORT.pid"
+MOCK_PORT="8881"
+
+# Kill mockserver if still running
+if [ -f "$MOCK_PID" ]; then
+    OLD_PID=$(cat "$MOCK_PID")
+    if ps -p "$OLD_PID" > /dev/null 2>&1; then
+        cecho "${YELLOW}Stopping previous Mock server (PID $OLD_PID)${END}"
+        kill "$OLD_PID"
+        sleep 1
+    fi
+fi
+
+# Build mockserver
+go build -o "$MOCK_BIN" utils/mockserver/mockserver.go
+
+set +m
+
+if ! nc -z 127.0.0.1 "$MOCK_PORT" >/dev/null 2>&1; then
+    $MOCK_BIN > "$DIR/.dev/mock.log" 2>&1 &
+    NEW_PID=$!
+    disown
+
+    echo "$NEW_PID" > "$MOCK_PID"
+
+    echo "Mock server started at http://127.0.0.1:$MOCK_PORT"
+else
+    echo "There is already a Service running at http://127.0.0.1:$MOCK_PORT"
+fi

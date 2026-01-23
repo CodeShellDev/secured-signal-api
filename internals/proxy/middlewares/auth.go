@@ -282,5 +282,7 @@ func (chain *AuthChain) Eval(w http.ResponseWriter, req *http.Request, tokens []
 		}
 	}
 
+	logger.Warn("Client failed to provide any auth")
+
 	return "", err
 }

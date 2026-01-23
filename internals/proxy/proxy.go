@@ -31,6 +31,15 @@ func Create(targetUrl string) Proxy {
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(url)
+	proxy.ModifyResponse = func(res *http.Response) error {
+		res.Header.Set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0, private, proxy-revalidate")
+		res.Header.Set("Pragma", "no-cache")
+		res.Header.Set("Expires", "0")
+		res.Header.Set("Vary", "*")
+		res.Header.Set("Referrer-Policy", "no-referrer")
+
+		return nil
+	}
 
 	w := &ioutils.InterceptWriter{
 		Writer: &bytes.Buffer{},
