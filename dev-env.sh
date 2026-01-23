@@ -36,7 +36,9 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export DEFAULTS_PATH=$DIR/data/defaults.yml
 export FAVICON_PATH=$DIR/data/favicon.ico
 export CONFIG_PATH=$DIR/.dev/config.yml
-export TOKENS_PATH=$DIR/.dev/tokens
+export TOKENS_DIR=$DIR/.dev/tokens
+
+export API__URL=http://127.0.0.1:8881
 
 export LOG_LEVEL=dev
 
