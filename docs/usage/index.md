@@ -22,7 +22,7 @@ This will send `Hello, World!` to `<to>` from `<from>`.
 
 ## Auth
 
-**Secured Signal API** implements 3 auth methods:
+**Secured Signal API** implements 5 auth methods:
 
 | Method      | Example                                                    |
 | :---------- | :--------------------------------------------------------- |
@@ -32,7 +32,10 @@ This will send `Hello, World!` to `<to>` from `<from>`.
 | Path Auth   | Prepend request path with `/auth=API_TOKEN/`               |
 | Body Auth   | Set `auth` to `API_TOKEN` in the request body              |
 
-Example:
+> [!WARNING]
+> **Query** and **Path** auth are disabled by default and [must be enabled in the config](../configuration/auth.md)
+
+**Example:**
 
 ```bash
 curl -X POST \

@@ -9,9 +9,10 @@ Proxies can be marked as trusted.
 Add proxies to be trusted in `access.trustedProxies`.
 
 ```yaml
-access:
-  trustedProxies:
-    - 172.20.0.100
+settings:
+  access:
+    trustedProxies:
+      - 172.20.0.100
 ```
 
 ## `X-Forwarded-*` Headers
