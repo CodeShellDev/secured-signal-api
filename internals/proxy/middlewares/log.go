@@ -7,7 +7,6 @@ import (
 
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/request"
-	"go.uber.org/zap/zapcore"
 )
 
 var RequestLogger Middleware = Middleware{
@@ -50,29 +49,10 @@ func middlewareLoggerHandler(next http.Handler) http.Handler {
 
 		logLevel := conf.SERVICE.LOG_LEVEL
 
-		if strings.TrimSpace(logLevel) == "" {
-			logLevel = getConfig("").SERVICE.LOG_LEVEL
-		}
+		l := logger.Get()
 
-		options := logger.DefaultOptions()
-		options.EncodeCaller = func(caller zapcore.EntryCaller, enc zapcore.PrimitiveArrayEncoder) {
-			var name string
-			
-			if strings.TrimSpace(conf.NAME) != "" {
-				name = " " + conf.NAME
-			}
-
-			enc.AppendString(caller.TrimmedPath() + name)
-		}
-
-		l, err := logger.New(logLevel, options)
-
-		if err != nil {
-			logger.Error("Could not create Middleware Logger: ", err.Error())
-		}
-
-		if l == nil {
-			l = logger.Get()
+		if strings.TrimSpace(logLevel) != "" {
+			l = logger.Get().Sub(logLevel)
 		}
 
 		req = setContext(req, loggerKey, l)
