@@ -41,7 +41,7 @@ func NormalizeTokens() {
 }
 
 func InitTokens() {
-	apiTokens := DEFAULT.API.TOKENS
+	apiTokens := parseAuthTokens(*DEFAULT)
 
 	for _, token := range apiTokens {
 		ENV.CONFIGS[token] = DEFAULT
@@ -80,12 +80,23 @@ func parseTokenConfigs(configArray []structure.CONFIG) map[string]structure.CONF
 	configs := map[string]structure.CONFIG{}
 
 	for _, config := range configArray {
-		for _, token := range config.API.TOKENS {
+		tokens := parseAuthTokens(config)
+		for _, token := range tokens {
 			configs[token] = config
 		}
 	}
 
 	return configs
+}
+
+func parseAuthTokens(config structure.CONFIG) []string {
+	tokens := config.API.TOKENS
+
+	for _, token := range config.API.AUTH.TOKENS {
+		tokens = append(tokens, token.Set...)
+	}
+
+	return tokens
 }
 
 func getSchemeTagByPointer(config any, tag string, fieldPointer any) string {

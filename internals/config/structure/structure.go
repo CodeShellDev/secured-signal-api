@@ -26,6 +26,17 @@ type SERVICE struct {
 type API struct {
 	URL					string						`koanf:"url"             env>aliases:".apiurl"`
 	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken"       aliases:"token"`
+	AUTH				AUTH						`koanf:"auth"`
+}
+
+type AUTH struct {
+	METHODS				[]string					`koanf:"methods"         env>aliases:".authmethods"`
+	TOKENS				[]Token						`koanf:"tokens"          aliases:"token"`
+}
+
+type Token struct {
+	Set					[]string					`koanf:"set"`
+	Methods				[]string					`koanf:"methods"`
 }
 
 type SETTINGS struct {
