@@ -43,10 +43,24 @@ func getConfigByReq(req *http.Request) *structure.CONFIG {
 	return getConfig(getToken(req))
 }
 
-func getConfig(token string) *structure.CONFIG {
+func getConfigWithoutDefaultByReq(req *http.Request) *structure.CONFIG {
+	return getConfigWithoutDefault(getToken(req))
+}
+
+func getConfigWithoutDefault(token string) *structure.CONFIG {
 	conf, exists := config.ENV.CONFIGS[token]
 
-	if !exists || conf == nil {
+	if !exists {
+		return nil
+	}
+
+	return conf
+}
+
+func getConfig(token string) *structure.CONFIG {
+	conf := getConfigWithoutDefault(token)
+
+	if conf == nil {
 		conf = config.DEFAULT
 	}
 
