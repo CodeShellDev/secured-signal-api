@@ -37,6 +37,7 @@ jobs:
   image-tag:
     runs-on: ubuntu-latest
     name: Image Tag
+    needs: check-ref
     outputs:
       image_tag: ${{ steps.resolve.outputs.image_tag }}
 
