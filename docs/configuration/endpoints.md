@@ -20,8 +20,13 @@ because of security concerns the following endpoints are blocked:
 
 ## Customize
 
-> [!NOTE]
-> Matching uses [glob-like patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html):
+> [!IMPORTANT]
+>
+> 1. Matching uses [regex](https://regex101.com)
+> 2. On error [glob-style patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html) are used instead
+
+> [!TIP]
+> Quick reminder, how [glob-style patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html) work:
 >
 > - `*` matches any sequence of characters
 > - `?` matches a single character
@@ -51,7 +56,7 @@ By default, adding an endpoint explicitly allows access to it, use `!` to block 
 | ---------- | -------------- | ----------------------------------------- |
 | `/v2/send` | —              | **Only** `/v2/send` allowed               |
 | —          | `!/v1/receive` | **All** allowed, **except** `/v1/receive` |
-| `/v2/send` | `!/v2/*`       | **Only** `/v2/send` allowed               |
+| `/v2/send` | `!/v2/.*`      | **Only** `/v2/send` allowed               |
 
 ### Rules
 
