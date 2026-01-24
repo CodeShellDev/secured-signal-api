@@ -54,12 +54,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          IMAGE="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}"
           PREFIX="${{ inputs.base-tag }}-${{ inputs.type }}-"
 
+          IMAGE=${{ github.repository_owner }}/${{ github.event.repository.name }}
+
+          TOKEN="$(
+            curl "https://ghcr.io/token?scope=repository:${IMAGE}:pull" |
+            awk -F'"' '$0=$4'
+          )"
+
           TAGS=$(curl -fsSL \
-            -H "Authorization: Bearer ${{ secrets.GH_PCKG_TOKEN }}" \
-            "https://ghcr.io/v2/${{ github.repository_owner }}/${{ github.event.repository.name }}/tags/list" \
+            -H "Authorization: Bearer ${TOKEN}" \
+            "https://ghcr.io/v2/${IMAGE}/tags/list" \
             | jq -r '.tags[]?')
 
           MAX=0
