@@ -62,9 +62,10 @@ cecho "${GREEN}Successfully loaded development environment!${END}"
 #=            Mock server            =#
 #=-----------------------------------=#
 
+MOCK_PORT="8881"
+
 MOCK_BIN="/tmp/mockserver-$MOCK_PORT"
 MOCK_PID="/tmp/mockserver-$MOCK_PORT.pid"
-MOCK_PORT="8881"
 
 # Kill mockserver if still running
 if [ -f "$MOCK_PID" ]; then
