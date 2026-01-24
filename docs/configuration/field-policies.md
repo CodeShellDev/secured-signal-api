@@ -24,7 +24,7 @@ settings:
 Set the wanted action on encounter, available options are `block` and `allow`.
 
 > [!TIP]
-> String fields always try to use regex matching, on compile error exact match is used as fallback
+> String fields always try to use [regex matching](https://regex101.com), on compile error exact match is used as fallback
 
 > [!NOTE]
 > Supported [placeholder types](../usage/advanced#placeholders):
