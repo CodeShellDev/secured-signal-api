@@ -1,133 +1,76 @@
-name: Build & Push Image
+name: Build & Push Dev Image
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
-      username:
-        required: false
-        type: string
-        default: ${{ github.repository_owner }}
-
-      registry:
+      base-tag:
+        description: Base Tag to be used (`type-n` is automatically appended)
         required: true
-        type: string
+        default: latest
 
-      image:
-        required: false
-        type: string
-        default: ${{ github.repository }}
-
-      flavor:
-        required: false
-        type: string
-        default: |
-          latest=true
-
-      tags:
-        required: false
-        type: string
-        default: |
-          type=semver,pattern=v{{version}}
-          type=semver,pattern=v{{major}}.{{minor}}
-          type=semver,pattern=v{{major}}
-
-      context:
-        required: false
-        type: string
-        default: .
-
-      platforms:
-        required: false
-        type: string
-        default: linux/amd64, linux/arm64
-
-      go-version:
-        required: false
-        type: string
-        default: "1.25.x"
-
-    secrets:
-      GH_PCKG_TOKEN:
+      type:
+        description: Type of Build
         required: true
+        type: choice
+        default: dev
+        options:
+          - rc
+          - beta
+          - alpha
+          - dev
 
 jobs:
-  build:
+  image-tag:
     runs-on: ubuntu-latest
-    name: Build & Push
+    name: Image Tag
+    outputs:
+      image_tag: ${{ steps.resolve.outputs.image_tag }}
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ inputs.go-version }}
-
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Install dependencies
-        run: go mod tidy
-
-      - name: Run tests
-        run: go test ./... -v
-
-      - name: Cross-Compile Go binaries
+      - name: Login to Registry
         run: |
-          platforms="${{ inputs.platforms }}"
+          echo "${{ secrets.GITHUB_TOKEN }}" | \
+            docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-          IFS=', ' read -ra platforms <<< "$platforms"
+      - name: Resolve next Image Tag
+        id: resolve
+        run: |
+          set -euo pipefail
 
-          for platform in "${platforms[@]}"; do
-              IFS='/' read -ra platformData <<< "$platform"
+          IMAGE="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}"
+          PREFIX="${{ inputs.base-tag }}-${{ inputs.type }}-"
 
-              os="${platformData[0]}"
-              arch="${platformData[1]}"
+          TAGS=$(curl -fsSL \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://ghcr.io/v2/${{ github.repository_owner }}/${{ github.event.repository.name }}/tags/list" \
+            | jq -r '.tags[]?')
 
-              path="dist/$os/$arch/app"
-
-              mkdir -p "$(dirname "$path")"
-
-              echo "Created $path"
-
-              GOOS="$os" GOARCH="$arch" CGO_ENABLED=0 go build -ldflags="-w -s" -o "$path" .
-
-              echo "Built Binaries for $os/$arch"
+          MAX=0
+          for tag in $TAGS; do
+            if [[ "$tag" == ${PREFIX}* ]]; then
+              NUM="${tag#$PREFIX}"
+              if [[ "$NUM" =~ ^[0-9]+$ ]]; then
+                (( NUM > MAX )) && MAX=$NUM
+              fi
+            fi
           done
 
-      - name: Login to Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ inputs.registry }}
-          username: ${{ inputs.username }}
-          password: ${{ secrets.GH_PCKG_TOKEN }}
+          NEXT=$((MAX + 1))
+          FINAL_TAG="${PREFIX}${NEXT}"
 
-      - name: Setup Buildx
-        uses: docker/setup-buildx-action@v3
+          echo "Resolved tag: $FINAL_TAG"
+          echo "image_tag=$FINAL_TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Extract Labels and Tags
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ inputs.registry }}/${{ inputs.image }}
-          flavor: ${{ inputs.flavor }}
-          tags: ${{ inputs.tags }}
-
-      - name: Build and Push Image
-        uses: docker/build-push-action@v6
-        with:
-          context: ${{ inputs.context }}
-          platforms: ${{ inputs.platforms }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          push: true
-          build-args: |
-            IMAGE_TAG=${{ steps.meta.outputs.version }}
+  update:
+    needs: image-tag
+    uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
+    name: Development Image
+    with:
+      registry: ghcr.io
+      flavor: |
+        latest=false
+      tags: |
+        type=sha
+        type=raw,value=${{ needs.image-tag }}
+    secrets:
+      GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
