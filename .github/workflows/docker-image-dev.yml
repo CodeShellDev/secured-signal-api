@@ -43,9 +43,11 @@ jobs:
 
     steps:
       - name: Login to Registry
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | \
-            docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_PCKG_TOKEN }}
 
       - name: Resolve next Image Tag
         id: resolve
@@ -56,7 +58,7 @@ jobs:
           PREFIX="${{ inputs.base-tag }}-${{ inputs.type }}-"
 
           TAGS=$(curl -fsSL \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Authorization: Bearer ${{ secrets.GH_PCKG_TOKEN }}" \
             "https://ghcr.io/v2/${{ github.repository_owner }}/${{ github.event.repository.name }}/tags/list" \
             | jq -r '.tags[]?')
 
