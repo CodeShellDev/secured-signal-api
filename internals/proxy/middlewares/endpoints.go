@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"net/http"
-	"path"
 	"regexp"
 	"slices"
 	"strings"
@@ -58,9 +57,7 @@ func matchesPattern(endpoint, pattern string) bool {
 	re, err := regexp.Compile(pattern)
 
 	if err != nil {
-		ok, _ := path.Match(pattern, endpoint)
-
-		return ok
+		return endpoint == pattern
 	}
 
 	return re.MatchString(endpoint)
