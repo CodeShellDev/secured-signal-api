@@ -23,14 +23,7 @@ because of security concerns the following endpoints are blocked:
 > [!IMPORTANT]
 >
 > 1. Matching uses [regex](https://regex101.com)
-> 2. On error [glob-style patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html) are used instead
-
-> [!TIP]
-> Quick reminder, how [glob-style patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html) work:
->
-> - `*` matches any sequence of characters
-> - `?` matches a single character
-> - `[abc]` matches one of the characters in the brackets
+> 2. On compile error exact match is used instead
 
 You can modify endpoints by configuring `access.endpoints` in your config:
 
