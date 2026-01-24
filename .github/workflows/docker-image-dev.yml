@@ -93,7 +93,6 @@ jobs:
       flavor: |
         latest=false
       tags: |
-        type=sha
         type=raw,value=${{ needs.resolve-tag.outputs.image_tag }}
     secrets:
       GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
