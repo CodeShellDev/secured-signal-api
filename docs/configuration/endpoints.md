@@ -25,7 +25,7 @@ because of security concerns the following endpoints are blocked:
 > 1. Matching uses [regex](https://regex101.com)
 > 2. On error [glob-style patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html) are used instead
 
-> [!NOTE]
+> [!TIP]
 > Quick reminder, how [glob-style patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html) work:
 >
 > - `*` matches any sequence of characters
