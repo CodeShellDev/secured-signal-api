@@ -3,6 +3,7 @@ package middlewares
 import (
 	"net/http"
 	"path"
+	"regexp"
 	"slices"
 	"strings"
 )
@@ -54,8 +55,15 @@ func getEndpoints(endpoints []string) ([]string, []string) {
 }
 
 func matchesPattern(endpoint, pattern string) bool {
-	ok, _ := path.Match(pattern, endpoint)
-	return ok
+	re, err := regexp.Compile(pattern)
+
+	if err != nil {
+		ok, _ := path.Match(pattern, endpoint)
+
+		return ok
+	}
+
+	return re.MatchString(endpoint)
 }
 
 func isEndpointBlocked(endpoint string, endpoints []string) bool {
