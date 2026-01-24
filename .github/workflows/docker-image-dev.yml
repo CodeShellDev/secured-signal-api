@@ -54,7 +54,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          PREFIX="${{ inputs.base-tag }}-${{ inputs.type }}-"
+          PREFIX="${{ inputs.base-tag }}-${{ inputs.type }}"
 
           IMAGE=${{ github.repository_owner }}/${{ github.event.repository.name }}
 
