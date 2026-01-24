@@ -20,9 +20,24 @@ on:
           - dev
 
 jobs:
+  check-ref:
+    name: Check Ref
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fail if @main
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          echo "❌ This workflow cannot be run from the main branch."
+          echo "Please pin to a release, use another branch or commit SHA instead of @main."
+          exit 1
+
+          name: Build & Push Dev Image
+
   image-tag:
     runs-on: ubuntu-latest
     name: Image Tag
+    needs: check-ref
     outputs:
       image_tag: ${{ steps.resolve.outputs.image_tag }}
 
