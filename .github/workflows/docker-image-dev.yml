@@ -2,16 +2,89 @@ name: Build & Push Dev Image
 
 on:
   workflow_dispatch:
+    inputs:
+      base-tag:
+        description: Base Tag to be used (`type-n` is automatically appended)
+        required: true
+        default: latest
+
+      type:
+        description: Type of Build
+        required: true
+        type: choice
+        default: dev
+        options:
+          - rc
+          - beta
+          - alpha
+          - dev
 
 jobs:
-  update:
-    name: Development Image
+  check-ref:
+    name: Check Ref
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fail
+      - name: Fail if @main
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo "❌ This workflow cannot be run from the main branch."
           echo "Please pin to a release, use another branch or commit SHA instead of @main."
           exit 1
+
+          name: Build & Push Dev Image
+
+  image-tag:
+    runs-on: ubuntu-latest
+    name: Image Tag
+    outputs:
+      image_tag: ${{ steps.resolve.outputs.image_tag }}
+
+    steps:
+      - name: Login to Registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | \
+            docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Resolve next Image Tag
+        id: resolve
+        run: |
+          set -euo pipefail
+
+          IMAGE="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}"
+          PREFIX="${{ inputs.base-tag }}-${{ inputs.type }}-"
+
+          TAGS=$(curl -fsSL \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://ghcr.io/v2/${{ github.repository_owner }}/${{ github.event.repository.name }}/tags/list" \
+            | jq -r '.tags[]?')
+
+          MAX=0
+          for tag in $TAGS; do
+            if [[ "$tag" == ${PREFIX}* ]]; then
+              NUM="${tag#$PREFIX}"
+              if [[ "$NUM" =~ ^[0-9]+$ ]]; then
+                (( NUM > MAX )) && MAX=$NUM
+              fi
+            fi
+          done
+
+          NEXT=$((MAX + 1))
+          FINAL_TAG="${PREFIX}${NEXT}"
+
+          echo "Resolved tag: $FINAL_TAG"
+          echo "image_tag=$FINAL_TAG" >> "$GITHUB_OUTPUT"
+
+  update:
+    needs: image-tag
+    uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
+    name: Development Image
+    with:
+      registry: ghcr.io
+      flavor: |
+        latest=false
+      tags: |
+        type=sha
+        type=raw,value=${{ needs.image-tag }}
+    secrets:
+      GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
