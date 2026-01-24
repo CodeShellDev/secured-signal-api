@@ -34,7 +34,7 @@ jobs:
 
           name: Build & Push Dev Image
 
-  image-tag:
+  resolve-tag:
     runs-on: ubuntu-latest
     name: Image Tag
     needs: check-ref
@@ -85,7 +85,7 @@ jobs:
           echo "image_tag=$FINAL_TAG" >> "$GITHUB_OUTPUT"
 
   update:
-    needs: image-tag
+    needs: resolve-tag
     uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
     name: Development Image
     with:
@@ -94,6 +94,6 @@ jobs:
         latest=false
       tags: |
         type=sha
-        type=raw,value=${{ needs.image-tag }}
+        type=raw,value=${{ needs.resolve-tag.outputs.image_tag }}
     secrets:
       GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
