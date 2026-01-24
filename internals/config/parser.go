@@ -44,10 +44,10 @@ func deprecationHandler(source string, target configutils.TransformTarget) {
 
 	deprecationHandledMap[source] = true
 
-	deprecationMessage := target.Source.Tag.Get("deprecation")
+	msgMap := configutils.ParseTag(target.Source.Tag.Get("deprecation"))
 
 	box := pretty.NewAutoBox()
-	box.MinWidth = 50
+	box.MinWidth = 60
 	box.PaddingX = 2
 	box.PaddingY = 1
 
@@ -55,17 +55,22 @@ func deprecationHandler(source string, target configutils.TransformTarget) {
 		Color: pretty.Basic(pretty.Yellow),
 	}
 
-	messageParts := strings.Split(deprecationMessage, "\n")
+	messageParts := strings.Split(configutils.GetValueWithSource(source, target.Parent, msgMap), "\n")
 	messageSegments := []pretty.Segment{}
 
 	for _, part := range messageParts {
-		messageSegments = append(messageSegments, pretty.InlineSegment{
-			Items: []pretty.Inline{
-				pretty.Span{
-					Text: part,
-				},
-			},
+		messageSegments = append(messageSegments, pretty.StyledTextBlockSegment{
+			Raw: part,
 		})
+	}
+
+	atRoot := !strings.Contains(source, ".")
+	refrainPrefix := ""
+	refrainSuffix := ""
+
+	if atRoot {
+		refrainPrefix = "⇧ "
+		refrainSuffix = " (at root)"
 	}
 
 	box.AddBlock(pretty.Block{
@@ -84,12 +89,26 @@ func deprecationHandler(source string, target configutils.TransformTarget) {
 				Text: "Please refrain from using",
 			},
 			pretty.InlineSegment{},
-			pretty.TextBlockSegment{
-				Text: "`" + source + "`",
-				Style: pretty.Style{
-					Italic: true,
-					Bold: true,
-					Background: pretty.Basic(pretty.Red),
+			pretty.InlineSegment{
+				Items: []pretty.Inline{
+					pretty.Span{
+						Text: refrainPrefix,
+						Style: pretty.Style{
+							Bold: true,
+							Foreground: pretty.Basic(pretty.BrightWhite),
+						},
+					},
+					pretty.Span{
+						Text: "`" + source + "`",
+						Style: pretty.Style{
+							Italic: true,
+							Bold: true,
+							Background: pretty.Basic(pretty.Red),
+						},
+					},
+					pretty.Span{
+						Text: refrainSuffix,
+					},
 				},
 			},
 			pretty.InlineSegment{},

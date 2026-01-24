@@ -2,8 +2,8 @@ github.com/clipperhouse/stringish v0.1.1 h1:+NSqMOr3GR6k1FdRhhnXrLfztGzuG+VuFDfa
 github.com/clipperhouse/stringish v0.1.1/go.mod h1:v/WhFtE1q0ovMta2+m+UbpZ+2/HEXNWYXQgCt4hdOzA=
 github.com/clipperhouse/uax29/v2 v2.3.1 h1:RjM8gnVbFbgI67SBekIC7ihFpyXwRPYWXn9BZActHbw=
 github.com/clipperhouse/uax29/v2 v2.3.1/go.mod h1:Wn1g7MK6OoeDT0vL+Q0SQLDz/KpfsVRgg6W7ihQeh4g=
-github.com/codeshelldev/gotl/pkg/configutils v0.0.5 h1:Dv9PiiJhfRihnv0f2H8T4ebOBaA7SyISOK7ghJ6oA3k=
-github.com/codeshelldev/gotl/pkg/configutils v0.0.5/go.mod h1:WoWMBB8+84ePRnI2m+kbq1Rw8F/9iCWLHkVBsun3Qjc=
+github.com/codeshelldev/gotl/pkg/configutils v0.0.7 h1:54zv82v87xCrilbi7gfVFpC37dIpR4a9PXw8pYs1Few=
+github.com/codeshelldev/gotl/pkg/configutils v0.0.7/go.mod h1:WoWMBB8+84ePRnI2m+kbq1Rw8F/9iCWLHkVBsun3Qjc=
 github.com/codeshelldev/gotl/pkg/docker v0.0.2 h1:kpseReocEBoSzWe/tOhUrIrOYeAR/inw3EF2/d+N078=
 github.com/codeshelldev/gotl/pkg/docker v0.0.2/go.mod h1:odNnlRw4aO1n2hSkDZIaiuSXIoFoVeatmXtF64Yd33U=
 github.com/codeshelldev/gotl/pkg/ioutils v0.0.2 h1:IRcN2M6H4v59iodw1k7gFX9lirhbVy6RZ4yRtKNcFYg=
@@ -12,8 +12,8 @@ github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2 h1:ERsjkaWVrsyUZoEunCEeNYDXhua
 github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2/go.mod h1:oxgKaAoMu6iYVHfgR7AhkK22xbYx4K0KCkyVEfYVoWs=
 github.com/codeshelldev/gotl/pkg/logger v0.0.6 h1:heo6z6yZm5PpX78vxud9HJNfVU9J46HVlW8T4EOy9nQ=
 github.com/codeshelldev/gotl/pkg/logger v0.0.6/go.mod h1:pL/I7KYxbGHhyedallZlCkBvoalv9gAWNEYVXbF9BoM=
-github.com/codeshelldev/gotl/pkg/pretty v0.0.8 h1:buLobwNqZRlYGnfyFLi7A7z2m7362Wm9k5Y+Tv0tMsI=
-github.com/codeshelldev/gotl/pkg/pretty v0.0.8/go.mod h1:2Gk6UBrtkIME2RCSNytS/RJ5lHXYL/MDx0rYRpknobM=
+github.com/codeshelldev/gotl/pkg/pretty v0.0.9-3 h1:1zj79w0L+gWiXZhZi8GGzeJwNt3wdhTlV/iDslChDKM=
+github.com/codeshelldev/gotl/pkg/pretty v0.0.9-3/go.mod h1:2Gk6UBrtkIME2RCSNytS/RJ5lHXYL/MDx0rYRpknobM=
 github.com/codeshelldev/gotl/pkg/query v0.0.3 h1:Zy8k0R5HcJS00OMPRHybgFEiwMg7ceLyv6bA0G7NOfs=
 github.com/codeshelldev/gotl/pkg/query v0.0.3/go.mod h1:kKaPOKXluIid3qeS7xzrmfq3NxIa8/PhKYHM6GRbwJw=
 github.com/codeshelldev/gotl/pkg/request v0.0.3 h1:maRPHu366NARow8/m1Q8Cw1EU1Uy0pDIn1vlAsOatKM=
@@ -38,8 +38,8 @@ github.com/knadh/koanf/providers/env/v2 v2.0.0 h1:Ad5H3eun722u+FvchiIcEIJZsZ2M6o
 github.com/knadh/koanf/providers/env/v2 v2.0.0/go.mod h1:1g01PE+Ve1gBfWNNw2wmULRP0tc8RJrjn5p2N/jNCIc=
 github.com/knadh/koanf/providers/file v1.2.1 h1:bEWbtQwYrA+W2DtdBrQWyXqJaJSG3KrP3AESOJYp9wM=
 github.com/knadh/koanf/providers/file v1.2.1/go.mod h1:bp1PM5f83Q+TOUu10J/0ApLBd9uIzg+n9UgthfY+nRA=
-github.com/knadh/koanf/v2 v2.3.0 h1:Qg076dDRFHvqnKG97ZEsi9TAg2/nFTa9hCdcSa1lvlM=
-github.com/knadh/koanf/v2 v2.3.0/go.mod h1:gRb40VRAbd4iJMYYD5IxZ6hfuopFcXBpc9bbQpZwo28=
+github.com/knadh/koanf/v2 v2.3.1 h1:2uTWFib/W7LAaAH88C2Qa5woBW/efhhcy23FnkUiyuQ=
+github.com/knadh/koanf/v2 v2.3.1/go.mod h1:gRb40VRAbd4iJMYYD5IxZ6hfuopFcXBpc9bbQpZwo28=
 github.com/kr/pretty v0.2.1 h1:Fmg33tUaq4/8ym9TJN1x7sLJnHVwhP33CNkpYV/7rwI=
 github.com/kr/pretty v0.2.1/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfnI=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
