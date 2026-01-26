@@ -9,7 +9,7 @@ on:
 
 jobs:
   docs:
-    if: github.ref == 'ref/head/docs' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true)
+    if: github.ref == 'refs/heads/docs' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true)
     uses: codeshelldev/gh-actions/.github/workflows/docs-deploy.yml@main
     name: Deploy
     with:
