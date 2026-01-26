@@ -15,7 +15,7 @@ Here are some of the highlights of using **Secured Signal API**
 Look at this complex template for example:
 
 ```yaml
-{{{ #://configuration/examples/message-template.yml }}}
+{{{ #://../configuration/examples/message-template.yml }}}
 ```
 
 It can extract needed data from the body and headers to then process them using Go's templating library
