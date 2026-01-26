@@ -14,7 +14,7 @@
 		"write-heading-ids": "docusaurus write-heading-ids"
 	},
 	"dependencies": {
-		"@codeshelldev/goplater": "^1.0.9",
+		"@codeshelldev/goplater": "^1.0.14",
 		"@docusaurus/core": "3.9.2",
 		"@docusaurus/preset-classic": "3.9.2",
 		"@docusaurus/theme-mermaid": "^3.9.2",
