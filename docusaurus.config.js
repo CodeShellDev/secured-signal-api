@@ -1,5 +1,12 @@
 import { themes as prismThemes } from "prism-react-renderer"
 
+import remark_githubAdmonitionsToDirectives from "remark-github-admonitions-to-directives"
+import remark_gfm from "remark-gfm"
+import remark_directive from "remark-directive"
+import prettierIgnore from "./prettier-ignore.js"
+
+import goplater from "./goplater.js"
+
 const baseUrl = "/secured-signal-api/"
 
 /** @type {import('@docusaurus/types').Config} */
@@ -30,6 +37,9 @@ const config = {
 
 	markdown: {
 		mermaid: true,
+		preprocessor: ({ filePath, fileContent }) => {
+			return goplater({ path: filePath, content: fileContent })
+		},
 	},
 
 	themes: ["@docusaurus/theme-mermaid"],
@@ -43,14 +53,8 @@ const config = {
 					sidebarPath: "./sidebars.js",
 					editUrl:
 						"https://github.com/codeshelldev/secured-signal-api/tree/docs",
-					beforeDefaultRemarkPlugins: [
-						require("remark-github-admonitions-to-directives"),
-					],
-					remarkPlugins: [
-						require("remark-gfm"),
-						require("remark-directive"),
-						require("./prettier-ignore"),
-					],
+					beforeDefaultRemarkPlugins: [remark_githubAdmonitionsToDirectives],
+					remarkPlugins: [remark_gfm, remark_directive, prettierIgnore],
 				},
 				theme: {
 					customCss: ["./src/css/custom.css"],
@@ -84,6 +88,11 @@ const config = {
 						sidebarId: "documentationSidebar",
 						position: "left",
 						label: "Documentation",
+					},
+					{
+						type: "docsVersionDropdown",
+						position: "right",
+						dropdownActiveClassDisabled: true,
 					},
 					{
 						href: "https://github.com/codeshelldev/secured-signal-api",
