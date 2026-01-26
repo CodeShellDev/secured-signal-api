@@ -1,7 +1,7 @@
-module.exports = () => {
-	return (tree) => {
-		const visit = require("unist-util-visit").visit
+import { visit } from "unist-util-visit"
 
+export default function replacePrettierIgnore() {
+	return (tree) => {
 		visit(tree, "code", (node) => {
 			if (node.value) {
 				// Remove any line that contains "# prettier-ignore"
