@@ -1,19 +1,18 @@
 name: Deploy Documentation
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
-      - docs-build
-    paths:
-      - docs/**
-      - src/**
+      - docs
   workflow_dispatch:
 
 jobs:
   docs:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     uses: codeshelldev/gh-actions/.github/workflows/docs-deploy.yml@main
     name: Deploy
     with:
-      branch: docs-build
+      branch: ${{ github.ref_name }}
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
