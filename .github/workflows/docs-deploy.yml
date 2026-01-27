@@ -17,6 +17,10 @@ jobs:
           echo "Detected manual run."
 
       - if: github.event_name == 'push'
+        name: Checkout repository
+        uses: actions/checkout@v4
+
+      - if: github.event_name == 'push'
         name: Detect PR merge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
