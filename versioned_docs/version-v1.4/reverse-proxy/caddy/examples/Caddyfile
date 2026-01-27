@@ -1,0 +1,18 @@
+# Replace with your actual domain
+domain.com {
+    # Use whatever network alias you set in the docker-compose file
+    reverse_proxy secured-signal-api:8880
+
+    # Optional: basic security headers
+    header {
+        Strict-Transport-Security "max-age=31536000;"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer"
+    }
+}
+
+# HTTP redirect to HTTPS
+http://domain.com {
+    redir https://{host}{uri} permanent
+}

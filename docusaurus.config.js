@@ -1,5 +1,12 @@
 import { themes as prismThemes } from "prism-react-renderer"
 
+import remark_githubAlertsToDirectives from "./plugins/remark-alerts-to-directives/index.js"
+import remark_gfm from "remark-gfm"
+import remark_directive from "remark-directive"
+import remark_prettierIgnore from "./plugins/remark-prettier-ignore/index.js"
+
+import goplater from "./plugins/goplater/index.js"
+
 const baseUrl = "/secured-signal-api/"
 
 /** @type {import('@docusaurus/types').Config} */
@@ -30,6 +37,9 @@ const config = {
 
 	markdown: {
 		mermaid: true,
+		preprocessor: ({ filePath, fileContent }) => {
+			return goplater({ path: filePath, content: fileContent })
+		},
 	},
 
 	themes: ["@docusaurus/theme-mermaid"],
@@ -44,16 +54,19 @@ const config = {
 					editUrl:
 						"https://github.com/codeshelldev/secured-signal-api/tree/docs",
 					beforeDefaultRemarkPlugins: [
-						require("remark-github-admonitions-to-directives"),
+						[
+							remark_githubAlertsToDirectives,
+							{
+								mapping: {
+									CAUTION: "danger",
+								},
+							},
+						],
 					],
-					remarkPlugins: [
-						require("remark-gfm"),
-						require("remark-directive"),
-						require("./prettier-ignore"),
-					],
+					remarkPlugins: [remark_gfm, remark_directive, remark_prettierIgnore],
 				},
 				theme: {
-					customCss: ["./src/css/custom.css"],
+					customCss: ["./src/css/custom.css", "./src/css/alerts.css"],
 				},
 				sitemap: {
 					lastmod: "date",
@@ -84,6 +97,11 @@ const config = {
 						sidebarId: "documentationSidebar",
 						position: "left",
 						label: "Documentation",
+					},
+					{
+						type: "docsVersionDropdown",
+						position: "right",
+						dropdownActiveClassDisabled: true,
 					},
 					{
 						href: "https://github.com/codeshelldev/secured-signal-api",
@@ -126,7 +144,7 @@ const config = {
 				copyright: `Copyright © ${new Date().getFullYear()} CodeShellDev. Built with Docusaurus.`,
 			},
 			prism: {
-				theme: prismThemes.github,
+				theme: prismThemes.oneLight,
 				darkTheme: prismThemes.oneDark,
 				additionalLanguages: [
 					"bash",
