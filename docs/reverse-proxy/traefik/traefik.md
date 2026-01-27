@@ -25,8 +25,21 @@ To implement Traefik in front of **Secured Signal API** you need to update your 
 
 To include the Traefik router and service labels.
 
+## Configuration
+
+Now you can switch over to **Secured Signal API** and add Traefik to your [trusted proxies](../../configuration/trusted-proxies.md):
+
+```yaml
+settings:
+  access:
+    trustedProxies:
+      - 172.20.0.100
+```
+
 Then restart **Secured Signal API**:
 
 ```bash
 docker compose down && docker compose up -d
 ```
+
+That's it, have fun!

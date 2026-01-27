@@ -20,12 +20,10 @@ because of security concerns the following endpoints are blocked:
 
 ## Customize
 
-> [!NOTE]
-> Matching uses [glob-like patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html):
+> [!IMPORTANT]
 >
-> - `*` matches any sequence of characters
-> - `?` matches a single character
-> - `[abc]` matches one of the characters in the brackets
+> 1. Matching uses [regex](https://regex101.com)
+> 2. On compile error exact match is used instead
 
 You can modify endpoints by configuring `access.endpoints` in your config:
 
@@ -45,8 +43,17 @@ By default, adding an endpoint explicitly allows access to it, use `!` to block 
 > [!IMPORTANT]
 > When using `!` to block you must enclose the endpoint in quotes, like in the example above
 
-| Config (Allow) | (Block)        |   Result   |     |                   |     |
-| :------------- | :------------- | :--------: | --- | :---------------: | --- |
-| `/v2/send`     | `unset`        |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
-| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
-| `!/v2*`        | `/v2/send`     | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
+## Behavior
+
+| Allow      | Block          | Result                                    |
+| ---------- | -------------- | ----------------------------------------- |
+| `/v2/send` | —              | **Only** `/v2/send` allowed               |
+| —          | `!/v1/receive` | **All** allowed, **except** `/v1/receive` |
+| `/v2/send` | `!/v2/.*`      | **Only** `/v2/send` allowed               |
+
+### Rules
+
+- Default: **allow all**
+- Allow rules exist: default **block**
+- Only block rules exist: default **allow**
+- Explicit allow **overrides** block
