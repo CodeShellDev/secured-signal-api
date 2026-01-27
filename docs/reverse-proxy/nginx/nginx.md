@@ -22,8 +22,6 @@ To implement Nginx in front of **Secured Signal API** you need to update your `d
 {{{ #://./examples/nginx.docker-compose.yaml }}}
 ```
 
-To include the needed mounts for your certificates and your config.
-
 ## Setup
 
 Create a `nginx.conf` file in the `docker-compose.yaml` folder and mount it to `/etc/nginx/conf.d/default.conf` in your Nginx container.

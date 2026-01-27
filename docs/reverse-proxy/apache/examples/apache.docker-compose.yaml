@@ -1,18 +1,15 @@
 services:
   {{{ \\#://../../../examples/backend.sec-signal-api.yml }}}
 
-  caddy:
-    image: caddy:latest
-    container_name: caddy
+  apache:
+    image: httpd:latest
+    container_name: apache
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - data:/data
-    depends_on:
-      - secured-signal
-    restart: unless-stopped
+      - ./apache.conf:/usr/local/apache2/conf/httpd.conf:ro
+      - ./certs:/etc/ssl
     networks:
       proxy:
       backend:
@@ -21,6 +18,3 @@ services:
 networks:
   backend:
   proxy:
-
-volumes:
-  data:
