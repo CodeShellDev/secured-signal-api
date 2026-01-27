@@ -15,5 +15,5 @@ api:
   tokens: [token1, token2, token3]
 ```
 
-> [!TIP]
+> [!NOTE]
 > Blocked endpoints can be reactivated by manually configuring them
