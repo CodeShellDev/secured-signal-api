@@ -22,6 +22,6 @@ settings:
 
 When a request exceeds the configured rate limit the server responds with `429` `Too Many Requests`.
 
-> [!IMPORTANT]
+> [!NOTE]
 >
 > [Trusted clients](./trusted-ips.md) are allowed to bypass rate limits

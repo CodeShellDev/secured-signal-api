@@ -10,6 +10,9 @@ To change the port which **Secured Signal API** uses, you need to set `service.p
 
 You can additionally define a port per Token config.
 
+> [!NOTE]
+> Each port spawns a separate listener, beware that this _can_ affect performance
+
 When a token specifies a port, a new **realm** is created for that port.  
 Only tokens that explicitly belong to the same realm are accepted on that port.
 

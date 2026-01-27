@@ -30,7 +30,7 @@ settings:
 
 By default, adding an IP or range explicitly allows it, use `!` to block it instead.
 
-> [!IMPORTANT]
+> [!NOTE]
 > When using `!` to block an IP or range, you must enclose it in quotes
 
 **Supports:**

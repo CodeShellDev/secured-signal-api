@@ -40,7 +40,7 @@ settings:
 
 By default, adding an endpoint explicitly allows access to it, use `!` to block it instead.
 
-> [!IMPORTANT]
+> [!NOTE]
 > When using `!` to block you must enclose the endpoint in quotes, like in the example above
 
 ## Behavior

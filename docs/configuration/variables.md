@@ -7,7 +7,7 @@ title: Variables
 The most common type of [placeholders](../usage/advanced#placeholders) are **variables**.
 These can be set under `message.variables` in your config.
 
-> [!IMPORTANT]
+> [!NOTE]
 > Variables are always converted into an **uppercase** string.
 > Example: `number` ⇒ `NUMBER` in `{{.NUMBER}}`
 > (See [Formatting](../usage/formatting#templates))
