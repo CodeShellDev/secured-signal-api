@@ -42,6 +42,7 @@ jobs:
 
           if [ "$PR_COUNT" -eq 0 ]; then
             echo "Commit $GITHUB_SHA is not from a merged PR to 'docs'. Exiting."
+            echo "deploy=false" > deploy.txt
             exit 0
           fi
 
