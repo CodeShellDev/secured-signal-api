@@ -50,7 +50,7 @@ jobs:
 
       - name: Collect final deploy value
         id: collect
-        run: ""
+        run: "echo $GITHUB_OUTPUT"
 
   docs:
     needs: check
