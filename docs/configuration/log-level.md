@@ -1,8 +1,8 @@
 ---
-title: Log Levels
+title: Log Level
 ---
 
-# Log Levels
+# Log Level
 
 Log levels help to filter or explicitly allow certain information from the logs.
 
@@ -38,5 +38,5 @@ Each token logger is automatically named using the [`name` attribute](./name) to
 **Example output:**
 
 ```log
-11.11 11:11	INFO	middlewares/log.go:60 abc	GET /v2/send
+11.11 11:11	INFO	middlewares/log.go:60   abc   GET /v2/send
 ```

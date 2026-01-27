@@ -1,8 +1,8 @@
 ---
-title: Log Levels
+title: Log Level
 ---
 
-# Log Levels
+# Log Level
 
 Log levels help to filter or explicitly allow certain information from the logs.
 

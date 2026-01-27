@@ -147,6 +147,7 @@ const config = {
 				theme: prismThemes.oneLight,
 				darkTheme: prismThemes.oneDark,
 				additionalLanguages: [
+					"log",
 					"bash",
 					"apacheconf",
 					"custom-go-template",
