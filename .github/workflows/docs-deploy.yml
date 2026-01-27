@@ -51,6 +51,7 @@ jobs:
       - name: Output deploy value
         id: collect
         run: |
+          ls -la
           source deploy.txt
           echo "$deploy" >> "$GITHUB_OUTPUT"
           echo "Got deploy=$deploy"
