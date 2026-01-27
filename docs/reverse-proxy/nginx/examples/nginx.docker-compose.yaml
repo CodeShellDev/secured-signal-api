@@ -1,34 +1,24 @@
 services:
-  secured-signal:
-    image: ghcr.io/codeshelldev/secured-signal-api:latest
-    container_name: secured-signal-api
-    environment:
-      API__URL: http://signal-api:8080
-      SETTINGS__MESSAGE__VARIABLES__RECIPIENTS: "[+123400002,+123400003,+123400004]"
-      SETTINGS__MESSAGE__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: "[LOOOOOONG_STRING]"
-    restart: unless-stopped
-    networks:
-      backend:
-        aliases:
-          - secured-signal-api
+  {{{ \\#://../../../examples/backend.sec-signal-api.yml }}}
 
   nginx:
     image: nginx:latest
     container_name: secured-signal-proxy
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       # Load SSL certificates: cert.key, cert.crt
       - ./certs:/etc/nginx/ssl
     ports:
-      - "443:443"
       - "80:80"
+      - "443:443"
     depends_on:
       - secured-signal
     restart: unless-stopped
     networks:
+      proxy:
       backend:
         ipv4_address: 172.20.0.100
 
 networks:
   backend:
+  proxy:
