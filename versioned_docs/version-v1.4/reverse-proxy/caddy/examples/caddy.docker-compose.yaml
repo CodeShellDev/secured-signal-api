@@ -1,0 +1,32 @@
+services:
+  secured-signal:
+    image: ghcr.io/codeshelldev/secured-signal-api:latest
+    container_name: secured-signal-api
+    environment:
+      API__URL: http://signal-api:8080
+      SETTINGS__MESSAGE__VARIABLES__RECIPIENTS: "[+123400002,+123400003,+123400004]"
+      SETTINGS__MESSAGE__VARIABLES__NUMBER: "+123400001"
+      API__TOKENS: "[LOOOOOONG_STRING]"
+    restart: unless-stopped
+    networks:
+      backend:
+        aliases:
+          - secured-signal-api
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - data:/data
+    depends_on:
+      - secured-signal
+
+networks:
+  backend:
+
+volumes:
+  data:

@@ -1,0 +1,11 @@
+api:
+  tokens: [LOOOONG_STRING]
+
+settings:
+  message:
+    fieldMappings: # Disable mappings
+    variables: # Disable variable placeholders
+
+  access:
+    endpoints: # Disable sending
+      - "!/v2/send"

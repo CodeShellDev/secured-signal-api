@@ -1,0 +1,35 @@
+# Example Config (all configurations shown)
+service:
+  port: 8880
+
+api:
+  url: http://signal-api:8080
+  tokens: [token1, token2]
+
+logLevel: info
+
+settings:
+  message:
+    template: |
+      You've got a Notification:
+      {{@message}} 
+      At {{@data.timestamp}} on {{@data.date}}.
+      Send using {{.NUMBER}}.
+
+    variables:
+      number: "+123400001"
+      recipients: ["+123400002", "group.id", "user.id"]
+
+    fieldMappings:
+      "@message": [{ field: "msg", score: 100 }]
+
+  access:
+    endpoints:
+      - "!/v1/about"
+      - /v2/send
+
+    fieldPolicies:
+      "@number": {
+        value: "+123400003",
+        action: block
+      }

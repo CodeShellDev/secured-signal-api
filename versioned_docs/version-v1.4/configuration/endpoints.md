@@ -1,0 +1,52 @@
+---
+title: Endpoints
+---
+
+# Endpoints
+
+Restrict access to your **Secured Signal API**.
+
+## Default
+
+Secured Signal API is just a proxy, which means any and all the **Signal CLI REST API** **endpoints are available**,
+because of security concerns the following endpoints are blocked:
+
+| Endpoint              |                    |
+| :-------------------- | ------------------ |
+| **/v1/configuration** | **/v1/unregister** |
+| **/v1/devices**       | **/v1/contacts**   |
+| **/v1/register**      | **/v1/accounts**   |
+| **/v1/qrcodelink**    |                    |
+
+## Customize
+
+> [!NOTE]
+> Matching uses [glob-like patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html):
+>
+> - `*` matches any sequence of characters
+> - `?` matches a single character
+> - `[abc]` matches one of the characters in the brackets
+
+You can modify endpoints by configuring `access.endpoints` in your config:
+
+```yaml
+settings:
+  access:
+    endpoints:
+      - "!/v1/register"
+      - "!/v1/unregister"
+      - "!/v1/qrcodelink"
+      - "!/v1/contacts"
+      - /v2/send
+```
+
+By default, adding an endpoint explicitly allows access to it, use `!` to block it instead.
+
+> [!IMPORTANT]
+> When using `!` to block you must enclose the endpoint in quotes, like in the example above
+
+| Config (Allow) | (Block)        |   Result   |     |                   |     |
+| :------------- | :------------- | :--------: | --- | :---------------: | --- |
+| `/v2/send`     | `unset`        |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
+| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
+| `!/v2*`        | `/v2/send`     | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
