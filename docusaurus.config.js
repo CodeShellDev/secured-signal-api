@@ -1,11 +1,11 @@
 import { themes as prismThemes } from "prism-react-renderer"
 
-import remark_githubAdmonitionsToDirectives from "remark-github-admonitions-to-directives"
+import remark_githubAlertsToDirectives from "./plugins/remark-alerts-to-directives/index.js"
 import remark_gfm from "remark-gfm"
 import remark_directive from "remark-directive"
-import prettierIgnore from "./prettier-ignore.js"
+import remark_prettierIgnore from "./plugins/remark-prettier-ignore/index.js"
 
-import goplater from "./goplater.js"
+import goplater from "./plugins/goplater/index.js"
 
 const baseUrl = "/secured-signal-api/"
 
@@ -53,11 +53,20 @@ const config = {
 					sidebarPath: "./sidebars.js",
 					editUrl:
 						"https://github.com/codeshelldev/secured-signal-api/tree/docs",
-					beforeDefaultRemarkPlugins: [remark_githubAdmonitionsToDirectives],
-					remarkPlugins: [remark_gfm, remark_directive, prettierIgnore],
+					beforeDefaultRemarkPlugins: [
+						[
+							remark_githubAlertsToDirectives,
+							{
+								mapping: {
+									CAUTION: "danger",
+								},
+							},
+						],
+					],
+					remarkPlugins: [remark_gfm, remark_directive, remark_prettierIgnore],
 				},
 				theme: {
-					customCss: ["./src/css/custom.css"],
+					customCss: ["./src/css/custom.css", "./src/css/alerts.css"],
 				},
 				sitemap: {
 					lastmod: "date",
@@ -135,7 +144,7 @@ const config = {
 				copyright: `Copyright © ${new Date().getFullYear()} CodeShellDev. Built with Docusaurus.`,
 			},
 			prism: {
-				theme: prismThemes.github,
+				theme: prismThemes.oneLight,
 				darkTheme: prismThemes.oneDark,
 				additionalLanguages: [
 					"bash",
