@@ -26,7 +26,7 @@ Add Caddy to your `docker-compose.yaml` file.
 
 Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your Caddy container.
 
-```apacheconf
+```nginx
 {{{ #://./examples/Caddyfile }}}
 ```
 

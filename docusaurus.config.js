@@ -149,6 +149,7 @@ const config = {
 				additionalLanguages: [
 					"log",
 					"bash",
+					"nginx",
 					"apacheconf",
 					"custom-go-template",
 					"custom-yaml-go-template",
