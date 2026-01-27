@@ -20,7 +20,7 @@ jobs:
         name: Detect manual run
         run: |
           echo "Detected manual run."
-          echo "deploy=true" > /home/runner/deploy.txt
+          echo "deploy=true" > deploy.txt
 
       - if: github.event_name == 'push'
         name: Checkout repository
@@ -46,12 +46,14 @@ jobs:
           fi
 
           echo "Commit $GITHUB_SHA is from a merged PR."
-          echo "deploy=true" > /home/runner/deploy.txt
+          echo "deploy=true" > deploy.txt
+
+          ls -la
 
       - name: Output deploy value
         id: collect
         run: |
-          source /home/runner/deploy.txt
+          source deploy.txt
           echo "$deploy" >> "$GITHUB_OUTPUT"
           echo "Got deploy=$deploy"
 
