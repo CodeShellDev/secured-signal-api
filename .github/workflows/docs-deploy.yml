@@ -13,11 +13,14 @@ jobs:
   check:
     runs-on: ubuntu-latest
     name: Check requirements
+    outputs:
+      deploy: ${{ steps.collect.outputs.deploy }}
     steps:
       - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/docs'
         name: Detect manual run
         run: |
           echo "Detected manual run."
+          echo "deploy=true" >> "$GITHUB_OUTPUT"
 
       - if: github.event_name == 'push'
         name: Checkout repository
@@ -39,14 +42,20 @@ jobs:
 
           if [ "$PR_COUNT" -eq 0 ]; then
             echo "Commit $GITHUB_SHA is not from a merged PR to 'docs'. Exiting."
-            exit 1
+            exit 0
           fi
 
           echo "Commit $GITHUB_SHA is from a merged PR."
+          echo "deploy=true" >> "$GITHUB_OUTPUT"
+
+      - name: Collect final deploy value
+        id: collect
+        run: ""
 
   docs:
-    uses: codeshelldev/gh-actions/.github/workflows/docs-deploy.yml@main
     needs: check
+    if: needs.check.outputs.deploy == 'true'
+    uses: codeshelldev/gh-actions/.github/workflows/docs-deploy.yml@main
     name: Deploy
     with:
       branch: docs
