@@ -58,7 +58,7 @@ jobs:
 
   docs:
     needs: check
-    if: needs.check.outputs.deploy == 'true'
+    if: needs.check.outputs.deploy == true
     uses: codeshelldev/gh-actions/.github/workflows/docs-deploy.yml@main
     name: Deploy
     with:
