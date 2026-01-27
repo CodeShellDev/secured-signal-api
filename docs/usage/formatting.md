@@ -12,7 +12,7 @@ title: Formatting
 **Secured Signal API** is built with Go and therefore uses Go’s [standard templating library](https://pkg.go.dev/text/template).
 As a result, any valid Go template string works in Secured Signal API.
 
-> [!IMPORTANT]
+> [!NOTE]
 > The following features use Go’s templating library:
 >
 > - [Message Templates](../configuration/message-template)
@@ -42,6 +42,6 @@ If you are using environment variables for example there would be no way of usin
 | array(int)    | [1, 2, 3]    |
 | array(string) | [a, b, c]    |
 
-> [!IMPORTANT]
+> [!TIP]
 > Escape type denotations such as `[]`, `{}`, or `-` by prefixing them with a **backslash** (`\`).  
 > An **odd number** of backslashes will **escape** the character immediately following them

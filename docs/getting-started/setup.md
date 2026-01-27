@@ -6,9 +6,9 @@ title: Setup
 # Setup
 
 > [!WARNING]
-> These instructions are for **personal or educational use only**.
-> Using multiple accounts, automated messaging, or any activity that violates **Signal's Terms of Service** may result in **account suspension** or **legal action**.
-> We **do not** endorse **spam or fraudulent activity**!
+> These instructions are for **personal or educational use only**.<br/>
+> Using multiple accounts, automated messaging, or any activity that violates **Signal's Terms of Service** may result in **account suspension** or **legal action**.<br/>
+> We **do not** endorse **spam or fraudulent activity**!<br/>
 > Furthermore, we are **not in any way affiliated** with the **Signal Foundation**.
 
 To use **Secured Signal API** for the first time you will need to set up and link your **signal account**.

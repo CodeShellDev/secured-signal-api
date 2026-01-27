@@ -20,7 +20,7 @@ These can be especially **helpful** when managing **variables** across multiple 
 | Header (except `Authorization`)        | `{{#Content_Type}}` |
 | [Variable](../configuration/variables) | `{{.VAR}}`          |
 
-> [!IMPORTANT]
+> [!NOTE]
 > Formatting rules (capitalization, escaping, and typing) are defined in [Formatting](./formatting)
 
 ### Where to Use
@@ -43,7 +43,7 @@ These can be especially **helpful** when managing **variables** across multiple 
 "message": "{{#X_Forwarded_For}} just send from {{.NUMBER}}"
 ```
 
-> [IMPORTANT]
+> [!NOTE]
 > Placeholders follow strict formatting rules ([See Formatting](./formatting#templates))
 
 ## Query-to-Body Injection
