@@ -12,21 +12,7 @@ services:
         aliases:
           - signal-api
 
-  secured-signal:
-    image: ghcr.io/codeshelldev/secured-signal-api:latest
-    container_name: secured-signal
-    environment:
-      API__URL: http://signal-api:8080
-      SETTINGS__MESSAGE__VARIABLES__RECIPIENTS: "[+123400002, +123400003, +123400004]"
-      SETTINGS__MESSAGE__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: "[LOOOOOONG_STRING]"
-    ports:
-      - "8880:8880"
-    restart: unless-stopped
-    networks:
-      backend:
-        aliases:
-          - secured-signal-api
+  {{{ \\#://../../examples/frontend.sec-signal-api.yml }}}
 
 networks:
   backend:
