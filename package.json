@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"docusaurus": "docusaurus",
-		"start": "docusaurus start",
+		"start": "docusaurus start --no-open",
 		"build": "docusaurus build",
 		"swizzle": "docusaurus swizzle",
 		"deploy": "docusaurus deploy",
@@ -25,7 +25,6 @@
 		"react-dom": "^19.0.0",
 		"remark-directive": "^4.0.0",
 		"remark-gfm": "^4.0.1",
-		"remark-github-admonitions-to-directives": "^2.1.0",
 		"unist-util-visit": "^5.0.0"
 	},
 	"devDependencies": {
