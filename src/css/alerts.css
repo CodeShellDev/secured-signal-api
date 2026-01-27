@@ -1,14 +1,4 @@
 :root {
-	--ifm-color-secondary: #54c7ec;
-	--ifm-color-secondary-dark: rgb(76, 179, 212);
-	--ifm-color-secondary-darker: rgb(71, 169, 201);
-	--ifm-color-secondary-darkest: rgb(59, 139, 165);
-	--ifm-color-secondary-light: rgb(110, 207, 239);
-	--ifm-color-secondary-lighter: rgb(135, 216, 242);
-	--ifm-color-secondary-lightest: rgb(170, 227, 246);
-	--ifm-color-secondary-contrast-background: rgb(238, 249, 253);
-	--ifm-color-secondary-contrast-foreground: rgb(25, 60, 71);
-
 	--ifm-color-important: #6521e4;
 	--ifm-color-important-dark: #5a19d1;
 	--ifm-color-important-darker: #5518c6;
@@ -30,16 +20,6 @@
 	--ifm-color-important-lightest: #e8e0f6;
 	--ifm-color-important-contrast-background: rgb(45, 29, 76);
 	--ifm-color-important-contrast-foreground: rgb(238, 229, 253);
-
-	--ifm-color-secondary: #54c7ec;
-	--ifm-color-secondary-dark: rgb(76, 179, 212);
-	--ifm-color-secondary-darker: rgb(71, 169, 201);
-	--ifm-color-secondary-darkest: rgb(59, 139, 165);
-	--ifm-color-secondary-light: rgb(110, 207, 239);
-	--ifm-color-secondary-lighter: rgb(135, 216, 242);
-	--ifm-color-secondary-lightest: rgb(170, 227, 246);
-	--ifm-color-secondary-contrast-background: rgb(25, 60, 71);
-	--ifm-color-secondary-contrast-foreground: rgb(238, 249, 253);
 }
 
 .alert--important {
@@ -50,5 +30,29 @@
 }
 
 .theme-admonition-note {
+	--ifm-color-secondary: #54c7ec;
+	--ifm-color-secondary-dark: rgb(76, 179, 212);
+	--ifm-color-secondary-darker: rgb(71, 169, 201);
+	--ifm-color-secondary-darkest: rgb(59, 139, 165);
+	--ifm-color-secondary-light: rgb(110, 207, 239);
+	--ifm-color-secondary-lighter: rgb(135, 216, 242);
+	--ifm-color-secondary-lightest: rgb(170, 227, 246);
+	--ifm-color-secondary-contrast-background: rgb(238, 249, 253);
+	--ifm-color-secondary-contrast-foreground: rgb(25, 60, 71);
+
+	--ifm-alert-background-color-highlight: rgba(84, 199, 236, 0.15);
+}
+
+[data-theme="dark"] .theme-admonition-note {
+	--ifm-color-secondary: #54c7ec;
+	--ifm-color-secondary-dark: rgb(76, 179, 212);
+	--ifm-color-secondary-darker: rgb(71, 169, 201);
+	--ifm-color-secondary-darkest: rgb(59, 139, 165);
+	--ifm-color-secondary-light: rgb(110, 207, 239);
+	--ifm-color-secondary-lighter: rgb(135, 216, 242);
+	--ifm-color-secondary-lightest: rgb(170, 227, 246);
+	--ifm-color-secondary-contrast-background: rgb(25, 60, 71);
+	--ifm-color-secondary-contrast-foreground: rgb(238, 249, 253);
+
 	--ifm-alert-background-color-highlight: rgba(84, 199, 236, 0.15);
 }
