@@ -1,16 +1,45 @@
 name: Deploy Documentation
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - docs
   workflow_dispatch:
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    name: Check requirements
+    steps:
+      - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/docs'
+        name: Detect manual run
+        run: |
+          echo "Detected manual run."
+
+      - if: github.event_name == 'push'
+        name: Detect PR merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          PR_COUNT=$(gh pr list \
+            --state merged \
+            --base docs \
+            --search "${GITHUB_SHA}" \
+            --json number \
+            --jq length)
+
+          if [ "$PR_COUNT" -eq 0 ]; then
+            echo "Commit $GITHUB_SHA is not from a merged PR to 'docs'. Exiting."
+            exit 1
+          fi
+
+          echo "Commit $GITHUB_SHA is from a merged PR."
+
   docs:
-    if: github.ref == 'refs/heads/docs' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true)
     uses: codeshelldev/gh-actions/.github/workflows/docs-deploy.yml@main
+    needs: check
     name: Deploy
     with:
       branch: docs
