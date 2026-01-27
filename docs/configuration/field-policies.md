@@ -23,7 +23,7 @@ settings:
 
 Set the wanted action on encounter, available options are `block` and `allow`.
 
-> [!TIP]
+> [!IMPORTANT]
 > String fields always try to use
 >
 > 1. [Regex matching](https://regex101.com)
