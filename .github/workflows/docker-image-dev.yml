@@ -70,6 +70,12 @@ jobs:
           fi
 
           COUNT="${TAG##*[!0-9]}"
+
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ]; then
+            echo " ❌ $COUNT is invalid or negative. Exiting..."
+            exit 1
+          fi
+
           TAG_PART="${TAG%"$COUNT"}"
 
           BASE_TAG="${TAG_PART%-*}"
