@@ -26,12 +26,10 @@ jobs:
 
           TAG="${GITHUB_REF#refs/tags/}"
 
-          git fetch origin main:refs/remotes/origin/main
+          git fetch origin main:main
 
-          BRANCHES=$(git branch -r --contains "$TAG" | sed 's|origin/||')
-
-          if ! echo "$BRANCHES" | grep -qx "main"; then
-            echo "Detected non-main release. Skipping..."
+          if ! git merge-base --is-ancestor "$TAG" main; then
+            echo "Detected main release. Skipping..."
             echo "continue=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
