@@ -1,9 +1,12 @@
 name: Cleanup Untagged Images
 
 on:
-  workflow_dispatch:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ["Build & Push Image"]
+    branches:
+      - main
+    types:
+      - completed
 
 jobs:
   update:
