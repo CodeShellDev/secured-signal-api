@@ -5,8 +5,10 @@ on:
     branches:
       - docs
     paths-ignore:
-      - .github
-      - .git*
+      - .git*/**
+    paths:
+      - */**.md
+      - src/**
   workflow_dispatch:
 
 jobs:
