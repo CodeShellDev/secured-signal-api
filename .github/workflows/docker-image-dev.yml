@@ -27,7 +27,7 @@ jobs:
     name: Check requirements
     runs-on: ubuntu-latest
     outputs:
-      allowed: ${{ steps.collect.outputs.allowed }}
+      continue: ${{ steps.collect.outputs.continue }}
 
     steps:
       - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
@@ -38,9 +38,9 @@ jobs:
           exit 1
 
       - if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
-        name: Allow if run @main
+        name: Allow if not run @main
         run: |
-          echo "allowed=true" > allowed.txt
+          echo "continue=true" > continue.txt
 
       - if: github.event_name == 'release'
         name: Checkout repository
@@ -59,22 +59,22 @@ jobs:
 
           if echo "$BRANCHES" | grep -qx "main"; then
             echo "Detected main release. Skipping..."
-            echo "allowed=false" > allowed.txt
+            echo "continue=false" > continue.txt
             exit 0
           fi
 
-          echo "allowed=true" > allowed.txt
+          echo "continue=true" > continue.txt
 
-      - name: Output allowed value
+      - name: Output continue value
         id: collect
         run: |
-          source allowed.txt
-          echo "allowed=$allowed" >> "$GITHUB_OUTPUT"
-          echo "Got allowed=$allowed"
+          source continue.txt
+          echo "continue=$continue" >> "$GITHUB_OUTPUT"
+          echo "Got continue=$continue"
 
   resolve-tag:
     needs: check
-    if: needs.check.outputs.allowed == 'true'
+    if: needs.check.outputs.continue == 'true'
     runs-on: ubuntu-latest
     name: Image Tag
     outputs:
