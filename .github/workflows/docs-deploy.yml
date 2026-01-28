@@ -7,7 +7,7 @@ on:
     paths-ignore:
       - .git*/**
     paths:
-      - */**.md
+      - "**/*.md"
       - src/**
   workflow_dispatch:
 
