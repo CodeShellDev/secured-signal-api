@@ -82,6 +82,8 @@ jobs:
           BASE_TAG="${TAG_PART%-*}"
           TYPE="${TAG_PART##*-}"
 
+          echo "$TAG, $TAG_PART, $BASE_TAG, $TYPE"
+
           echo "continue=true" > continue.txt
 
       - name: Output continue value
