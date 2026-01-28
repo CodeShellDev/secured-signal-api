@@ -5,7 +5,40 @@ on:
     types: [published]
 
 jobs:
+  check:
+    name: Check requirements
+    runs-on: ubuntu-latest
+    outputs:
+      continue: ${{ steps.check.outputs.continue }}
+
+    steps:
+      - if: github.event_name == 'release'
+        name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - if: github.event_name == 'release'
+        name: Fail if release not @main
+        id: check
+        run: |
+          set -euo pipefail
+
+          TAG="${GITHUB_REF#refs/tags/}"
+
+          git fetch origin main:main
+
+          if ! git merge-base --is-ancestor "$TAG" main; then
+            echo "Detected main release. Skipping..."
+            echo "continue=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "continue=true" >> "$GITHUB_OUTPUT"
+
   update:
+    needs: check
+    if: needs.check.outputs.continue == 'true'
     uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
     name: Stable Image
     with:

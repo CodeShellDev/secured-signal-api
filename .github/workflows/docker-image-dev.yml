@@ -1,10 +1,13 @@
 name: Build & Push Dev Image
 
 on:
+  release:
+    types: [published]
+
   workflow_dispatch:
     inputs:
       base-tag:
-        description: Base Tag to be used (`type-n` is automatically appended)
+        description: Base Tag to be used (`base_tag-type` + `n`)
         required: true
         default: latest
 
@@ -19,29 +22,96 @@ on:
           - alpha
           - dev
 
+env:
+  TYPES: "rc,beta,alpha,dev"
+
+  TYPE: ${{ inputs.type }}
+  BASE_TAG: ${{ inputs.base-tag }}
+  COUNT: -1
+
 jobs:
-  check-ref:
-    name: Check Ref
+  check:
+    name: Check requirements
     runs-on: ubuntu-latest
+    outputs:
+      continue: ${{ steps.collect.outputs.continue }}
 
     steps:
-      - name: Fail if @main
-        if: ${{ github.ref == 'refs/heads/main' }}
+      - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        name: Fail if run @main
         run: |
           echo "❌ This workflow cannot be run from the main branch."
           echo "Please pin to a release, use another branch or commit SHA instead of @main."
           exit 1
 
-          name: Build & Push Dev Image
+      - if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+        name: Allow if not run @main
+        run: |
+          echo "continue=true" > continue.txt
+
+      - if: github.event_name == 'release'
+        name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - if: github.event_name == 'release'
+        name: Fail if release @main
+        run: |
+          set -euo pipefail
+
+          TAG="${GITHUB_REF#refs/tags/}"
+
+          git fetch origin main:main
+
+          if git merge-base --is-ancestor "$TAG" main; then
+            echo "Detected main release. Skipping..."
+            echo "continue=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          COUNT="${TAG##*[!0-9]}"
+
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ]; then
+            echo "$COUNT is invalid or negative. Skipping..."
+            echo "continue=false" > continue.txt
+            exit 0
+          fi
+
+          echo "continue=true" > continue.txt
+
+      - name: Output continue value
+        id: collect
+        run: |
+          source continue.txt
+          echo "continue=$continue" >> "$GITHUB_OUTPUT"
+          echo "Got continue=$continue"
 
   resolve-tag:
+    needs: check
+    if: needs.check.outputs.continue == 'true'
     runs-on: ubuntu-latest
     name: Image Tag
-    needs: check-ref
     outputs:
       image_tag: ${{ steps.resolve.outputs.image_tag }}
 
     steps:
+      - if: github.event_name == 'release'
+        name: Parse release tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+
+          COUNT="${TAG##*[!0-9]}"
+
+          TAG_PART="${TAG%"$COUNT"}"
+
+          BASE_TAG="${TAG_PART%-*}"
+          TYPE="${TAG_PART##*-}"
+
+          echo "TYPE=$TYPE" >> "$GITHUB_ENV"
+          echo "BASE_TAG=$BASE_TAG" >> "$GITHUB_ENV"
+          echo "COUNT=$COUNT" >> "$GITHUB_ENV"
+
       - name: Login to Registry
         uses: docker/login-action@v3
         with:
@@ -49,12 +119,23 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_PCKG_TOKEN }}
 
-      - name: Resolve next Image Tag
+      - name: Resolve Image Tag
         id: resolve
         run: |
           set -euo pipefail
 
-          PREFIX="${{ inputs.base-tag }}-${{ inputs.type }}"
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ] && [ "$COUNT" -ne -1 ]; then
+            echo "❌ Invalid count: $COUNT. May only be > 0."
+            exit 1
+          fi
+
+          ALLOWED_TYPES=(${TYPES//,/ })
+          if [[ ! " ${ALLOWED_TYPES[*]} " =~ " ${TYPE} " ]]; then
+            echo "❌ Invalid type: $TYPE. Allowed types are $ALLOWED_TYPES."
+            exit 1
+          fi
+
+          PREFIX="${{ env.BASE_TAG }}-${{ env.TYPE }}"
 
           IMAGE=${{ github.repository_owner }}/${{ github.event.repository.name }}
 
@@ -68,18 +149,32 @@ jobs:
             "https://ghcr.io/v2/${IMAGE}/tags/list" \
             | jq -r '.tags[]?')
 
-          MAX=0
-          for tag in $TAGS; do
-            if [[ "$tag" == ${PREFIX}* ]]; then
-              NUM="${tag#$PREFIX}"
-              if [[ "$NUM" =~ ^[0-9]+$ ]]; then
-                (( NUM > MAX )) && MAX=$NUM
+          if [ -z "$COUNT" ] || [ "$COUNT" -eq -1 ]; then
+            MAX=0
+            for tag in $TAGS; do
+              if [[ "$tag" == ${PREFIX}* ]]; then
+                NUM="${tag#$PREFIX}"
+                if [[ "$NUM" =~ ^[0-9]+$ ]]; then
+                  (( NUM > MAX )) && MAX=$NUM
+                fi
               fi
+            done
+
+            COUNT=$((MAX + 1))
+          fi
+
+          FINAL_TAG=${PREFIX}${COUNT}
+
+          if echo "$TAGS" | grep -qx "$FINAL_TAG"; then
+            echo "⚠️ Tag $FINAL_TAG already exists."
+
+            if [ "${GITHUB_ACTOR}" != "${{ github.repository_owner }}" ]; then
+              echo "🚨 User $GITHUB_ACTOR is not allowed to overwrite existing image."
+              exit 1
+            else
+              echo "User $GITHUB_ACTOR is the owner - allowed to proceed."
             fi
           done
-
-          NEXT=$((MAX + 1))
-          FINAL_TAG="${PREFIX}${NEXT}"
 
           echo "Resolved tag: $FINAL_TAG"
           echo "image_tag=$FINAL_TAG" >> "$GITHUB_OUTPUT"

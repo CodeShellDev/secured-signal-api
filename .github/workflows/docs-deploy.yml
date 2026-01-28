@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fail
-        if: ${{ github.ref == 'refs/heads/main' }}
+      - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        name: Fail if run @main
         run: |
           echo "❌ This workflow cannot be run from the main branch."
           echo "Please pin to a release, use another branch or commit SHA instead of @main."
