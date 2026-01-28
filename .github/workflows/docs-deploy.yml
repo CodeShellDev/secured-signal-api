@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - docs
-    paths-ignore:
-      - .git*/**
     paths:
+      - "!.git*/**"
       - "**/*.md"
       - src/**
   workflow_dispatch:
