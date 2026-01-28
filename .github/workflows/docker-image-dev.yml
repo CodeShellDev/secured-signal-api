@@ -23,8 +23,9 @@ on:
           - dev
 
 env:
-  TYPE: ${{ inputs.type }}
   TYPES: "rc,beta,alpha,dev"
+
+  TYPE: ${{ inputs.type }}
   BASE_TAG: ${{ inputs.base-tag }}
   COUNT: -1
 
@@ -83,6 +84,10 @@ jobs:
 
           BASE_TAG="${TAG_PART%-*}"
           TYPE="${TAG_PART##*-}"
+
+          echo "TYPE=$TYPE" >> $GITHUB_ENV
+          echo "BASE_TAG=$BASE_TAG" >> $GITHUB_ENV
+          echo "COUNT=$COUNT" >> $GITHUB_ENV
 
           echo "continue=true" > continue.txt
 
