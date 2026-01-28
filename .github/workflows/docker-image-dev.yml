@@ -22,6 +22,12 @@ on:
           - alpha
           - dev
 
+env:
+  TYPE: ${{ inputs.type }}
+  TYPES: rc,beta,alpha,dev
+  BASE_TAG: ${{ inputs.base-tag }}
+  COUNT: -1
+
 jobs:
   check:
     name: Check requirements
@@ -63,6 +69,12 @@ jobs:
             exit 0
           fi
 
+          COUNT="${TAG##*[!0-9]}"
+          TAG_PART="${TAG%"$COUNT"}"
+
+          BASE_TAG="${TAG_PART%-*}"
+          TYPE="${TAG_PART##*-}"
+
           echo "continue=true" > continue.txt
 
       - name: Output continue value
@@ -88,12 +100,18 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_PCKG_TOKEN }}
 
-      - name: Resolve next Image Tag
+      - name: Resolve Image Tag
         id: resolve
         run: |
           set -euo pipefail
 
-          PREFIX="${{ inputs.base-tag }}-${{ inputs.type }}"
+          ALLOWED_TYPES=(${TYPES//,/ })
+          if [[ ! " ${ALLOWED_TYPES[*]} " =~ " ${TYPE} " ]]; then
+            echo "❌ Invalid type: $TYPE. Allowed types are ${ALLOWED_TYPES}."
+            exit 1
+          fi
+
+          PREFIX="${{ env.BASE_TAG }}-${{ env.TYPE }}"
 
           IMAGE=${{ github.repository_owner }}/${{ github.event.repository.name }}
 
@@ -107,18 +125,32 @@ jobs:
             "https://ghcr.io/v2/${IMAGE}/tags/list" \
             | jq -r '.tags[]?')
 
-          MAX=0
-          for tag in $TAGS; do
-            if [[ "$tag" == ${PREFIX}* ]]; then
-              NUM="${tag#$PREFIX}"
-              if [[ "$NUM" =~ ^[0-9]+$ ]]; then
-                (( NUM > MAX )) && MAX=$NUM
+          if [ -z "$COUNT" ] || [ "$COUNT" -eq -1 ]; then
+            MAX=0
+            for tag in $TAGS; do
+              if [[ "$tag" == ${PREFIX}* ]]; then
+                NUM="${tag#$PREFIX}"
+                if [[ "$NUM" =~ ^[0-9]+$ ]]; then
+                  (( NUM > MAX )) && MAX=$NUM
+                fi
               fi
+            done
+
+            COUNT=$((MAX + 1))
+          fi
+
+          FINAL_TAG=${PREFIX}${COUNT}
+
+          if echo "$TAGS" | grep -qx "$FINAL_TAG"; then
+            echo "⚠️ Tag $FINAL_TAG already exists."
+
+            if [ "${GITHUB_ACTOR}" != "${{ github.repository_owner }}" ]; then
+              echo "🚨 User ${GITHUB_ACTOR} is not allowed to overwrite existing image."
+              exit 1
+            else
+              echo "User ${GITHUB_ACTOR} is the owner - allowed to proceed."
             fi
           done
-
-          NEXT=$((MAX + 1))
-          FINAL_TAG="${PREFIX}${NEXT}"
 
           echo "Resolved tag: $FINAL_TAG"
           echo "image_tag=$FINAL_TAG" >> "$GITHUB_OUTPUT"
