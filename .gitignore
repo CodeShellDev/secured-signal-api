@@ -27,3 +27,4 @@ yarn-error.log*
 
 # Allow .github
 !.github
+!.prettierignore
