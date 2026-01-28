@@ -72,8 +72,9 @@ jobs:
           COUNT="${TAG##*[!0-9]}"
 
           if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ]; then
-            echo " ❌ $COUNT is invalid or negative. Exiting..."
-            exit 1
+            echo "$COUNT is invalid or negative. Skipping..."
+            echo "continue=false" > continue.txt
+            exit 0
           fi
 
           TAG_PART="${TAG%"$COUNT"}"
@@ -111,9 +112,13 @@ jobs:
         run: |
           set -euo pipefail
 
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ]; then
+            echo "❌ Invalid count: $COUNT. May only be > 0."
+          fi
+
           ALLOWED_TYPES=(${TYPES//,/ })
           if [[ ! " ${ALLOWED_TYPES[*]} " =~ " ${TYPE} " ]]; then
-            echo "❌ Invalid type: $TYPE. Allowed types are ${ALLOWED_TYPES}."
+            echo "❌ Invalid type: $TYPE. Allowed types are $ALLOWED_TYPES."
             exit 1
           fi
 
@@ -151,10 +156,10 @@ jobs:
             echo "⚠️ Tag $FINAL_TAG already exists."
 
             if [ "${GITHUB_ACTOR}" != "${{ github.repository_owner }}" ]; then
-              echo "🚨 User ${GITHUB_ACTOR} is not allowed to overwrite existing image."
+              echo "🚨 User $GITHUB_ACTOR is not allowed to overwrite existing image."
               exit 1
             else
-              echo "User ${GITHUB_ACTOR} is the owner - allowed to proceed."
+              echo "User $GITHUB_ACTOR is the owner - allowed to proceed."
             fi
           done
 
