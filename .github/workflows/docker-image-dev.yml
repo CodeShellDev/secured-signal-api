@@ -24,7 +24,7 @@ on:
 
 env:
   TYPE: ${{ inputs.type }}
-  TYPES: rc,beta,alpha,dev
+  TYPES: "rc,beta,alpha,dev"
   BASE_TAG: ${{ inputs.base-tag }}
   COUNT: -1
 
@@ -112,7 +112,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ]; then
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ] && [ "$COUNT" -ne -1 ]; then
             echo "❌ Invalid count: $COUNT. May only be > 0."
           fi
 
