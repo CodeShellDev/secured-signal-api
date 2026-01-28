@@ -26,6 +26,8 @@ jobs:
 
           TAG="${GITHUB_REF#refs/tags/}"
 
+          git fetch origin main:refs/remotes/origin/main
+
           BRANCHES=$(git branch -r --contains "$TAG" | sed 's|origin/||')
 
           if ! echo "$BRANCHES" | grep -qx "main"; then
