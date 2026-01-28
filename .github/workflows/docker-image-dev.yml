@@ -174,7 +174,7 @@ jobs:
             else
               echo "User $GITHUB_ACTOR is the owner - allowed to proceed."
             fi
-          done
+          fi
 
           echo "Resolved tag: $FINAL_TAG"
           echo "image_tag=$FINAL_TAG" >> "$GITHUB_OUTPUT"
