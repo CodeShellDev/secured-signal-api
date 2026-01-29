@@ -1,4 +1,4 @@
-<img align="center" width="1048" height="512" alt="Secure Proxy for Signal CLI REST API" src="https://github.com/CodeShellDev/secured-signal-api/raw/refs/heads/docs/static/img/banner.png" />
+<img align="center" width="1048" height="512" alt="Secure Proxy for Signal CLI REST API" src="https://github.com/codeshelldev/secured-signal-api/raw/refs/heads/docs/static/img/banner.png" />
 
 <h3 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal CLI REST API</a></h3>
 
@@ -57,11 +57,13 @@ Check out the [**Official Documentation**](https://codeshelldev.github.io/secure
   - [Field Policies](#field-policies)
   - [Field Mappings](#field-mappings)
   - [Message Templates](#message-templates)
-- [Integrations](https://codeshelldev.github.io/secured-signal-api/docs/integrations/compatibility)
+- [Reverse Proxy](https://codeshelldev.github.io/secured-signal-api/docs/reverse-proxy)
+- [Integrations](https://codeshelldev.github.io/secured-signal-api/docs/integrations)
 - [Contributing](#contributing)
 - [Support](#support)
 - [Help](#help)
 - [License](#license)
+- [Legal](#legal)
 
 ## Getting Started
 
@@ -84,21 +86,7 @@ services:
         aliases:
           - signal-api
 
-  secured-signal:
-    image: ghcr.io/codeshelldev/secured-signal-api:latest
-    container_name: secured-signal
-    environment:
-      API__URL: http://signal-api:8080
-      SETTINGS__MESSAGE__VARIABLES__RECIPIENTS: "[+123400002, +123400003, +123400004]"
-      SETTINGS__MESSAGE__VARIABLES__NUMBER: "+123400001"
-      API__TOKENS: "[LOOOOOONG_STRING]"
-    ports:
-      - "8880:8880"
-    restart: unless-stopped
-    networks:
-      backend:
-        aliases:
-          - secured-signal-api
+  file not found: /home/runner/work/secured-signal-api/secured-signal-api/.github/templates/docs/examples/frontend.sec-signal-api.yml
 
 networks:
   backend:
@@ -134,7 +122,7 @@ Secured Signal API provides 3 ways to authenticate
 | :---------- | :--------------------------------------------------------- |
 | Bearer Auth | Add `Authorization: Bearer API_TOKEN` to headers           |
 | Basic Auth  | Add `Authorization: Basic BASE64_STRING` (`api:API_TOKEN`) |
-| Query Auth  | Append `@authorization=API_TOKEN` to request URL           |
+| Query Auth  | Append `@auth=API_TOKEN` to request URL                    |
 
 ### Example
 
@@ -204,13 +192,14 @@ This example config shows all the individual settings that can be applied:
 ```yaml
 # Example Config (all configurations shown)
 service:
+  logLevel: info
   port: 8880
+  hostnames:
+    - mydomain.com
 
 api:
   url: http://signal-api:8080
   tokens: [token1, token2]
-
-logLevel: info
 
 settings:
   message:
@@ -228,15 +217,27 @@ settings:
       "@message": [{ field: "msg", score: 100 }]
 
   access:
+    trustedIPs:
+      - 192.168.1.10
+
+    trustedProxies:
+      - 172.20.0.100
+
+    ipFilter:
+      - 192.168.1.10
+      - 192.168.2.0/24
+      - "!192.168.2.44"
+
     endpoints:
       - "!/v1/about"
       - /v2/send
 
+    rateLimiting:
+      limit: 100
+      period: 1h
+
     fieldPolicies:
-      "@number": {
-        value: "+123400003",
-        action: block
-      }
+      "@number": { value: "+123400003", action: block }
 ```
 
 #### Token Configs
@@ -246,13 +247,22 @@ You can also override the `config.yml` file for each individual token by adding 
 Here is an example:
 
 ```yaml
+# Example Token Config (all configurations shown)
+
+name: abc
+
+service:
+  logLevel: debug
+  port: 1234
+
 api:
   tokens: [LOOOONG_STRING]
 
 settings:
   message:
     fieldMappings: # Disable mappings
-    variables: # Disable variable placeholders
+    variables: # Override variables
+      number: "+123400004"
 
   access:
     endpoints: # Disable sending
@@ -358,9 +368,9 @@ By default adding an endpoint explicitly allows access to it, use `!` to block i
 
 | Config (Allow) | (Block)        |   Result   |     |                   |     |
 | :------------- | :------------- | :--------: | --- | :---------------: | --- |
-| `/v2/send`     | `unset`        |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
-| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
-| `!/v2*`        | `/v2/send`     | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
+| `/v2/send`     | `unset`        |  **all**   | ⛔️ |  **`/v2/send`**   | ✅  |
+| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | ⛔️ |
+| `!/v2*`        | `/v2/send`     | **`/v2*`** | ⛔️ |  **`/v2/send`**   | ✅  |
 
 ### Variables
 
