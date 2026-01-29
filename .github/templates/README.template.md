@@ -63,6 +63,7 @@ Check out the [**Official Documentation**](https://codeshelldev.github.io/secure
 - [Support](#support)
 - [Help](#help)
 - [License](#license)
+- [Legal](#legal)
 
 ## Getting Started
 
