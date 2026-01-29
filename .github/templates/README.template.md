@@ -1,4 +1,4 @@
-<img align="center" width="1048" height="512" alt="Secure Proxy for Signal CLI REST API" src="https://github.com/CodeShellDev/secured-signal-api/raw/refs/heads/docs/static/img/banner.png" />
+<img align="center" width="1048" height="512" alt="Secure Proxy for Signal CLI REST API" src="https://github.com/codeshelldev/secured-signal-api/raw/refs/heads/docs/static/img/banner.png" />
 
 <h3 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal CLI REST API</a></h3>
 
