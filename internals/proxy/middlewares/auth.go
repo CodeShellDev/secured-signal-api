@@ -236,11 +236,10 @@ func (chain *AuthChain) Eval(w http.ResponseWriter, req *http.Request, tokens []
 
 		if err != nil {
 			logger.Warn("Client failed ", method.Name, " auth: ", err.Error())
+			return AuthMethod{}, "", err
 		}
 
 		if token != "" {
-
-
 			return method, token, nil
 		}
 	}
