@@ -1,8 +1,8 @@
 ---
-title: IP Filters
+title: IP Filter
 ---
 
-# IP Filters
+# IP Filter
 
 Restrict access to your **Secured Signal API** based on client IP addresses.
 
@@ -54,7 +54,7 @@ By default, adding an IP or range explicitly allows it, use `!` to block it inst
 - Only block rules exist: default **allow**
 - Explicit allow **overrides** block
 
-- IPv4 and IPv6 rules may be mixed
+* IPv4 and IPv6 rules may be mixed
 
 ## Clients behind Proxies
 

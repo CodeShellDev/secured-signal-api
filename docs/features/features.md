@@ -65,4 +65,4 @@ It ensures fair usage per token by controlling how many requests can be processe
 
 **IP Filters** are used for restricting access to **Secured Signal API** by blocking or specifically allowing IPs and CIDR ranges.
 
-Configure your _mini firewall_ [here](./configuration/ip-filters).
+Configure your _mini firewall_ [here](./configuration/ip-filter).
