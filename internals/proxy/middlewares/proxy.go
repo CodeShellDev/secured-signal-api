@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 )
 
@@ -13,9 +14,20 @@ var InternalProxy Middleware = Middleware{
 	Use: proxyHandler,
 }
 
-const trustedProxyKey contextKey = "isProxyTrusted"
 const clientIPKey contextKey = "clientIP"
 const originURLKey contextKey = "originURL"
+
+type ForwardedEntry struct {
+	For		string
+	Host	string
+	Proto	string
+}
+
+type OriginInfo	struct {
+	IP		net.IP
+	Host	string
+	Proto	string
+}
 
 func proxyHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -29,41 +41,44 @@ func proxyHandler(next http.Handler) http.Handler {
 			rawTrustedProxies = getConfig("").SETTINGS.ACCESS.TRUSTED_PROXIES
 		}
 
-		var trusted bool
 		var ip net.IP
-
-		host, _, _ := net.SplitHostPort(req.RemoteAddr)
-
-		originUrl := req.Proto + "://" + req.Host
-
-		ip = net.ParseIP(host)
+		var originUrl string
 
 		if len(rawTrustedProxies) != 0 {
 			trustedProxies := parseIPsAndIPNets(rawTrustedProxies)
 
-			trusted = isIPInList(ip, trustedProxies)
+			var forwardedEntries []ForwardedEntry
+
+			if req.Header.Get("Forwarded") != "" {
+				forwardedEntries = parseForwarded(req.Header.Get("Forwarded"))
+			} else {
+				forwardedEntries = parseXForwardedHeaders(req.Header)
+			}
+
+			if len(forwardedEntries) != 0 {
+				originInfo := getOriginFromForwarded(forwardedEntries, trustedProxies)
+				ip = originInfo.IP
+
+				originUrl = originInfo.Proto + "://" + originInfo.Host
+			}
 		}
 
-		if trusted {
-			realIP, err := getRealIP(req)
+		if ip == nil {
+			host, _, _ := net.SplitHostPort(req.RemoteAddr)
 
-			if err != nil {
-				logger.Error("Could not get real IP: ", err.Error())
+			ip = net.ParseIP(host)
+		}
+
+		if originUrl == "" {
+			originUrl = req.Proto + "://" + req.Host
+
+			if !strings.Contains(req.Host, ":") {
+				if req.Proto == "https" {
+					originUrl += ":443"
+				} else {
+					originUrl += ":80"
+				}
 			}
-
-			if realIP != nil {
-				ip = realIP
-			}
-
-			XFHost := req.Header.Get("X-Forwarded-Host")
-			XFProto := req.Header.Get("X-Forwarded-Proto")
-			XFPort := req.Header.Get("X-Forwarded-Port")
-
-			if XFHost == "" || XFProto == "" || XFPort == "" {
-				logger.Warn("Missing X-Forwarded-* headers")
-			}
-
-			originUrl = XFProto + "://" + XFHost + ":" + XFPort
 		}
 
 		originURL, err := url.Parse(originUrl)
@@ -74,13 +89,50 @@ func proxyHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		req = setContext(req, trustedProxyKey, trusted)
 		req = setContext(req, originURLKey, originURL)
 
 		req = setContext(req, clientIPKey, ip)
 
 		next.ServeHTTP(w, req)
 	})
+}
+
+func getOriginFromForwarded(entries []ForwardedEntry, trusted []*net.IPNet) OriginInfo {
+    var origin OriginInfo
+
+	// reverse to place origin client last
+	slices.Reverse(entries)
+
+    for _, entry := range entries {
+        ip := parseForIP(entry.For)
+
+        if ip == nil {
+            continue
+        }
+
+		// ip not trusted => use as client ip
+        if !isIPInList(ip, trusted) {
+            origin.IP = ip
+            origin.Proto = entry.Proto
+            origin.Host = entry.Host
+            break
+        }
+    }
+
+    return origin
+}
+
+func parseForIP(value string) net.IP {
+    value = strings.TrimSpace(value)
+    value = strings.Trim(value, `"`)
+    value = strings.Trim(value, "[]")
+
+	host, _, err := net.SplitHostPort(value)
+    if err == nil {
+        value = host
+    }
+
+    return net.ParseIP(value)
 }
 
 func parseIP(str string) (*net.IPNet, error) {
@@ -127,22 +179,75 @@ func parseIPsAndIPNets(array []string) []*net.IPNet {
 	return ipNets
 }
 
-func getRealIP(req *http.Request) (net.IP, error) {
-	XFF := req.Header.Get("X-Forwarded-For")
+func parseXForwardedHeaders(headers http.Header) []ForwardedEntry {
+	var entries []ForwardedEntry
 
-	if XFF != "" {
-		ips := strings.Split(XFF, ",")
-		
-		realIP := net.ParseIP(strings.TrimSpace(ips[0]))
+    XFF := headers.Get("X-Forwarded-For")
+    if XFF == "" {
+        return nil
+    }
 
-		if realIP == nil {
-			return nil, errors.New("malformed X-Forwarded-For header")
-		}
+    parts := strings.Split(XFF, ",")
 
-		return realIP, nil
-	}
+    XFProto := headers.Get("X-Forwarded-Proto")
+    XFHost  := headers.Get("X-Forwarded-Host")
 
-	return nil, errors.New("no X-Forwarded-For header present")
+    for i, part := range parts {
+        ip := strings.TrimSpace(part)
+        if ip == "" {
+            continue
+        }
+
+        entry := ForwardedEntry{
+            For: ip,
+        }
+
+        if i == 0 {
+            if XFProto != "" {
+                entry.Proto = XFProto
+            }
+            if XFHost != "" {
+                entry.Host = XFHost
+            }
+        }
+
+        entries = append(entries, entry)
+    }
+
+    return entries
+}
+
+func parseForwarded(header string) []ForwardedEntry {
+    var entries []ForwardedEntry
+
+    for part := range strings.SplitSeq(header, ",") {
+        entry := ForwardedEntry{}
+        params := strings.SplitSeq(part, ";")
+
+        for param := range params {
+            keyValuePair := strings.SplitN(strings.TrimSpace(param), "=", 2)
+
+            if len(keyValuePair) != 2 {
+                continue
+            }
+
+            key := strings.ToLower(keyValuePair[0])
+            value := strings.Trim(keyValuePair[1], `"`)
+
+            switch key {
+            case "for":
+                entry.For = value
+            case "proto":
+                entry.Proto = value
+            case "host":
+                entry.Host = value
+            }
+        }
+
+        entries = append(entries, entry)
+    }
+
+    return entries
 }
 
 func isIPInList(ip net.IP, list []*net.IPNet) bool {
