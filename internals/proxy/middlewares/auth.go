@@ -41,6 +41,8 @@ var BearerAuth = AuthMethod{
 		}
 
 		if strings.ToLower(headerParts[0]) == "bearer" {
+			req.Header.Del("Authorization")
+
 			if isValidToken(tokens, headerParts[1]) {
 				return headerParts[1], nil
 			}
@@ -68,6 +70,8 @@ var BasicAuth = AuthMethod{
 		}
 
 		if strings.ToLower(headerParts[0]) == "basic" {
+			req.Header.Del("Authorization")
+
 			base64Bytes, err := base64.StdEncoding.DecodeString(headerParts[1])
 
 			if err != nil {
