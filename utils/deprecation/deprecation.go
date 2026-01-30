@@ -95,7 +95,7 @@ func Warn(id string, msg DeprecationMessage) {
 			Text: "🚧 Deprecation 🚧",
 			Style: pretty.Style{
 				Bold: true,
-				Foreground: pretty.Basic(pretty.Yellow),
+				Foreground: pretty.Basic(pretty.BrightYellow),
 			},
 		},
 		pretty.TextBlockSegment{
@@ -118,7 +118,7 @@ func Warn(id string, msg DeprecationMessage) {
 			},
 		},
 		pretty.BorderStyle{
-			Color: pretty.Basic(pretty.Yellow),
+			Color: pretty.Basic(pretty.BrightYellow),
 		},
 		msg,
 	)
@@ -130,7 +130,7 @@ func Error(id string, msg DeprecationMessage) {
 			Text: "🚨 Breaking Change 🚨",
 			Style: pretty.Style{
 				Bold: true,
-				Foreground: pretty.Basic(pretty.Red),
+				Foreground: pretty.Basic(pretty.BrightRed),
 			},
 		},
 		pretty.TextBlockSegment{
@@ -153,7 +153,7 @@ func Error(id string, msg DeprecationMessage) {
 			},
 		},
 		pretty.BorderStyle{
-			Color: pretty.Basic(pretty.Red),
+			Color: pretty.Basic(pretty.BrightRed),
 		},
 		msg,
 	)
