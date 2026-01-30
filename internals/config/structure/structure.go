@@ -14,7 +14,7 @@ type CONFIG struct {
 	NAME				string						`koanf:"name"`
 	SERVICE				SERVICE 					`koanf:"service"`
 	API					API						    `koanf:"api"`
-	SETTINGS      		SETTINGS					`koanf:"settings"        token>aliases:"overrides" token>onuse:".overrides>>deprecated"       deprecation:"{b,s,fg=orange}\x60overrides\x60{/} is no longer needed in {b}Token Configs{/}\nUse {b,fg=green}\x60settings\x60{/} instead"`
+	SETTINGS      		SETTINGS					`koanf:"settings"        token>aliases:"overrides" token>onuse:".overrides>>deprecated"       deprecation:"{b,fg=orange}\x60{s}overrides{/}\x60{/} is no longer needed in {b}Token Configs{/}\nUse {b,fg=green}\x60settings\x60{/} instead"`
 }																														
 
 type SERVICE struct {
@@ -25,13 +25,13 @@ type SERVICE struct {
 
 type API struct {
 	URL					string						`koanf:"url"             env>aliases:".apiurl"`
-	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken" aliases:"token" token>aliases:".tokens,.token" token>onuse:".tokens,.token,token>>deprecated" onuse:"token>>deprecated" deprecation:".tokens,.token>>{b,s,fg=orange}\x60tokens\x60{/} and {b,s,fg=orange}\x60token\x60{/} will not be at {b}root{/} anymore\nUse {b,fg=green}\x60api.tokens\x60{/} instead|token>>{b,s,fg=orange}\x60api.token\x60{/} will be {u}removed{/} in favor of {b,fg=green}\x60api.tokens\x60{/}"`																					
+	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken" aliases:"token" token>aliases:".tokens,.token" token>onuse:".tokens,.token,token>>deprecated" onuse:"token>>deprecated" deprecation:".tokens,.token>>{b,fg=orange}\x60{s}tokens{/}\x60{/} and {b,fg=orange}\x60{s}token{/}\x60{/} will not be at {b}root{/} anymore\nUse {b,fg=green}\x60api.tokens\x60{/} instead|token>>{b,fg=orange}\x60{s}api.token{/}\x60{/} will be {u}removed{/} in favor of {b,fg=green}\x60api.tokens\x60{/}"`																					
 	AUTH				AUTH						`koanf:"auth"`
 }
 
 type AUTH struct {
 	METHODS				[]string					`koanf:"methods"         env>aliases:".authmethods"`
-	TOKENS				[]Token						`koanf:"tokens"          aliases:"token" onuse:"token>>deprecated" deprecation:"{b,s,fg=orange}\x60api.auth.token\x60{/} will be removed\nUse {b,fg=green}\x60api.auth.tokens\x60{/} instead"`
+	TOKENS				[]Token						`koanf:"tokens"          aliases:"token" onuse:"token>>deprecated" deprecation:"{b,fg=orange}\x60{s}api.auth.token{/}\x60{/} will be removed\nUse {b,fg=green}\x60api.auth.tokens\x60{/} instead"`
 }
 
 type Token struct {
