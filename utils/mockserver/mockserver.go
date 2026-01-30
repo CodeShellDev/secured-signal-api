@@ -18,7 +18,7 @@ func main() {
         logLevel = "info"
     }
 
-    port := os.Getenv("PORT")
+    port := os.Getenv("MOCK_PORT")
 
     if strings.TrimSpace(port) == "" {
         port = "8881"
