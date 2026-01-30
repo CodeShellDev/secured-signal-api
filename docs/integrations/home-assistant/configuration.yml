@@ -2,6 +2,6 @@ notify:
   - name: signal
     platform: signal_messenger
     url: "http://sec-signal-api:8880/auth=API_TOKEN"
-    number: "+123400001" # tip: use a placeholder instead
+    number: "+123400001"
     recipients:
-      - "+123400002"
+      - "+123400002" # tip: use a placeholder instead
