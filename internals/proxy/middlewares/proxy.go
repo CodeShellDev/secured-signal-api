@@ -61,6 +61,8 @@ func proxyHandler(next http.Handler) http.Handler {
 				originInfo := getOriginFromForwarded(forwardedEntries, trustedProxies)
 				ip = originInfo.IP
 
+                logger.Dev(originInfo)
+
 				originUrl = originInfo.Proto + "://" + originInfo.Host
 			}
 		}
@@ -81,6 +83,8 @@ func proxyHandler(next http.Handler) http.Handler {
 					originUrl += ":80"
 				}
 			}
+
+            logger.Dev(originUrl)
 		}
 
 		originURL, err := url.Parse(originUrl)
