@@ -20,4 +20,4 @@ Here are some common best practices for running **Secured Signal API**, but thes
 - Be cautious when overriding [**blocked endpoints**](./features#endpoints)
 - Use per-token overrides to **enforce least privilege**
 - Always allow the least possible [**endpoints**](./features#endpoints)
-- Only allow access from [**IPs**](./features#ip-filter) **you trust**
+- Only allow access from [**IPs**](./features#ip-filters) **you trust**
