@@ -13,6 +13,7 @@ import (
 	"github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	"github.com/codeshelldev/secured-signal-api/utils/deprecation"
 )
 
 var Auth Middleware = Middleware{
@@ -140,6 +141,22 @@ var QueryAuth = AuthMethod{
 		const authQuery = "auth"
 
 		auth := req.URL.Query().Get("@" + authQuery)
+
+		// todo breaking-start
+		//* = v1.5.0
+		const oldAuthQuery = "authorization"
+
+		if req.URL.Query().Has("@" + oldAuthQuery) {
+			fullURL, _ := request.ParseRequestURL(req)
+			urlWithNewAuthQuery := strings.Replace(fullURL.String(), "@" + oldAuthQuery, "@{s,fg=bright_red}" + oldAuthQuery + "{/}{b,fg=green}" + authQuery + "{/}", 1)
+
+			deprecation.Error(req.URL.String(), deprecation.DeprecationMessage{
+				Using: "{b,i,bg=red}`@authorization`{/} in the query",
+				Message: "{b,fg=red}`/?@{s}authorization{/}`{/} has been renamed to {b,fg=green}`/?@auth`{}",
+				Fix: "\nChange the {b}url{/} to:\n`" + urlWithNewAuthQuery + "`",
+			})
+		}
+		// todo breaking-end
 
 		if strings.TrimSpace(auth) == "" {
 			return "", nil
