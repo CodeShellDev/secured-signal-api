@@ -146,8 +146,7 @@ var QueryAuth = AuthMethod{
 
 		auth := req.URL.Query().Get("@" + authQuery)
 
-		// todo breaking-start
-		//* = v1.5.0
+		// BREAKING @authorization Query
 		const oldAuthQuery = "authorization"
 
 		if req.URL.Query().Has("@" + oldAuthQuery) {
@@ -160,7 +159,6 @@ var QueryAuth = AuthMethod{
 				Fix: "\nChange the {b}url{/} to:\n`" + urlWithNewAuthQuery + "`",
 			})
 		}
-		// todo breaking-end
 
 		if strings.TrimSpace(auth) == "" {
 			return "", nil
@@ -284,10 +282,20 @@ func authHandler(next http.Handler) http.Handler {
 				allowedMethods = getConfig("").API.AUTH.METHODS
 			}
 
-			if isAuthMethodAllowed(method, token, conf.API.TOKENS, conf.API.AUTH.METHODS, conf.API.AUTH.TOKENS) {
+			if isAuthMethodAllowed(method, token, conf.API.TOKENS, allowedMethods, conf.API.AUTH.TOKENS) {
 				req = setContext(req, isAuthKey, true)
 				req = setContext(req, tokenKey, token)
 			} else {
+				// BREAKING Query & Path auth disabled (default)
+				if (method.Name == "Path" || method.Name == "Query") && conf.API.AUTH.METHODS == nil {
+					deprecation.Error(method.Name, deprecation.DeprecationMessage{
+						Message: "{b}Query{/} and {b}Path{/} auth are {u}disabled{/} by default\nTo be able to use them they must first be enabled",
+						Fix: "\n{b}Add{/} {b,fg=green}`" + strings.ToLower(method.Name) + "`{/} to {i}`api.auth.methods`{/}:" + 
+							"\napi.auth.methods: [" + strings.Join(append(allowedMethods, "{b,fg=green}" + strings.ToLower(method.Name) + "{/}"), ", ") + "]",
+						Note: "\n{i}Let us know what you think about this change at\n{i}{u,fg=blue}https://github.com/CodeShellDev/secured-signal-api/discussions/221{/}{/}",
+					})
+				}
+
 				logger.Warn("Client tried using disabled auth method: ", method.Name)
 
 				onUnauthorized(w)
