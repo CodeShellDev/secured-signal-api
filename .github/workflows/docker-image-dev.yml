@@ -66,7 +66,7 @@ jobs:
 
           if git merge-base --is-ancestor "$TAG" main; then
             echo "Detected main release. Skipping..."
-            echo "continue=false" >> "$GITHUB_OUTPUT"
+            echo "continue=false" >> continue.txt
             exit 0
           fi
 
