@@ -34,7 +34,7 @@ func proxyHandler(next http.Handler) http.Handler {
 
 		host, _, _ := net.SplitHostPort(req.RemoteAddr)
 
-		originUrl := req.Proto + "://" + req.URL.Host
+		originUrl := req.Proto + "://" + req.Host
 
 		ip = net.ParseIP(host)
 
@@ -102,21 +102,10 @@ func parseIP(str string) (*net.IPNet, error) {
         return &net.IPNet{IP: ip, Mask: mask}, nil
     }
 
-    ip, network, err := net.ParseCIDR(str)
+    _, network, err := net.ParseCIDR(str)
+
     if err != nil {
         return nil, err
-    }
-
-    if !ip.Equal(network.IP) {
-        var mask net.IPMask
-
-        if ip.To4() != nil {
-            mask = net.CIDRMask(32, 32) // IPv4 /32
-        } else {
-            mask = net.CIDRMask(128, 128) // IPv6 /128
-        }
-
-        return &net.IPNet{IP: ip, Mask: mask}, nil
     }
 
     return network, nil
