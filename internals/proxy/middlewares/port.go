@@ -38,6 +38,8 @@ func portHandler(next http.Handler) http.Handler {
 			onUnauthorized(w)
 			return
 		}
+
+		next.ServeHTTP(w, req)
 	})
 }
 
