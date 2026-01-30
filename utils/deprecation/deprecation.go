@@ -36,16 +36,24 @@ func base(id string, title, beforeUsing, afterUsing pretty.Segment, borderStyle 
 		Segments: []pretty.Segment{
 			title,
 			pretty.InlineSegment{},
-			beforeUsing,
-			pretty.InlineSegment{},
-			pretty.StyledTextBlockSegment{
-				Raw: msg.Using,
-			},
-			pretty.InlineSegment{},
-			afterUsing,
-			pretty.InlineSegment{},
 		},
 	})
+
+	if msg.Using != "" {
+		box.AddBlock(pretty.Block{
+			Align: pretty.AlignCenter,
+			Segments: []pretty.Segment{
+				beforeUsing,
+				pretty.InlineSegment{},
+				pretty.StyledTextBlockSegment{
+					Raw: msg.Using,
+				},
+				pretty.InlineSegment{},
+				afterUsing,
+				pretty.InlineSegment{},
+			},
+		})
+	}
 
 	box.AddBlock(pretty.Block{
 		Align: pretty.AlignCenter,
