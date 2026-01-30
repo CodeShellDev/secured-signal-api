@@ -183,11 +183,13 @@ var PathAuth = AuthMethod{
 	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		parts := strings.Split(req.URL.Path, "/")
 
-		if len(parts) == 0 {
+		if len(parts) <= 1 {
 			return "", nil
 		}
 
-		unescaped, err := url.PathUnescape(parts[1])
+		parts = parts[1:]
+
+		unescaped, err := url.PathUnescape(parts[0])
 
 		if err != nil {
 			return "", nil
@@ -198,6 +200,8 @@ var PathAuth = AuthMethod{
 		if !exists {
 			return "", nil
 		}
+
+		req.URL.Path = "/" + strings.Join(parts[1:], "/")
 
 		if isValidToken(tokens, auth) {
 			return auth, nil
