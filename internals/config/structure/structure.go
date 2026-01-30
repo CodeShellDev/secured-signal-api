@@ -5,7 +5,10 @@ type ENV struct {
 	DEFAULTS_PATH 		string
 	FAVICON_PATH  		string
 	TOKENS_DIR    		string
+	
 	INSECURE      		bool
+
+	TOKENS				[]string
 
 	CONFIGS      		map[string]*CONFIG
 }

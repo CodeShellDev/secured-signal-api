@@ -74,6 +74,8 @@ func InitTokens() {
 	if len(apiTokens) > 0 {
 		logger.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")
 	}
+
+	ENV.TOKENS = apiTokens
 }
 
 func parseTokenConfigs(configArray []structure.CONFIG) map[string]structure.CONFIG {

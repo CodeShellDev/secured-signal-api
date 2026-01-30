@@ -2,8 +2,6 @@ package middlewares
 
 import (
 	"encoding/base64"
-	"errors"
-	"maps"
 	"net/http"
 	"net/url"
 	"slices"
@@ -258,8 +256,7 @@ func authHandler(next http.Handler) http.Handler {
 		Use(PathAuth)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		tokenKeys := maps.Keys(config.ENV.CONFIGS)
-		tokens := slices.Collect(tokenKeys)
+		tokens := config.ENV.TOKENS
 
 		if tokens == nil {
 			tokens = []string{}
