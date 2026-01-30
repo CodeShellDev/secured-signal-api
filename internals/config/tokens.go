@@ -56,6 +56,8 @@ func InitTokens() {
 	for token, config := range config {
 		apiTokens = append(apiTokens, token)
 
+		config.TYPE = structure.TOKEN
+
 		ENV.CONFIGS[token] = &config
 	}
 

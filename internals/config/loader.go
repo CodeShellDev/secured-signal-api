@@ -142,6 +142,8 @@ func InitConfig() {
 
 	mainConf.Layer.Unmarshal("", &config)
 
+	config.TYPE = structure.MAIN
+
 	ENV.CONFIGS["*"] = &config
 
 	DEFAULT = ENV.CONFIGS["*"]

@@ -14,12 +14,20 @@ type ENV struct {
 }
 
 type CONFIG struct {
+	TYPE				ConfigType
 	NAME				string						`koanf:"name"`
 	SERVICE				SERVICE 					`koanf:"service"`
 	API					API						    `koanf:"api"`
 	// DEPRECATION overrides in Token Config
 	SETTINGS      		SETTINGS					`koanf:"settings"        token>aliases:"overrides" token>onuse:".overrides>>deprecated"       deprecation:"{b,fg=yellow}\x60{s}overrides{/}\x60{/} is no longer needed in {b}Token Configs{/}\nUse {b,fg=green}\x60settings\x60{/} instead"`
-}																														
+}
+
+type ConfigType string
+
+const (
+	TOKEN ConfigType = "token"
+	MAIN ConfigType = "main"
+)
 
 type SERVICE struct {
 	HOSTNAMES			[]string					`koanf:"hostnames"       env>aliases:".hostnames"`

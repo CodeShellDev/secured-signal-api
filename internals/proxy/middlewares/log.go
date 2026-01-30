@@ -7,6 +7,7 @@ import (
 
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/request"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 )
 
 var RequestLogger Middleware = Middleware{
@@ -49,7 +50,7 @@ func middlewareLoggerHandler(next http.Handler) http.Handler {
 
 		var logLevel string
 
-		if conf != nil {
+		if conf != nil && conf.TYPE != structure.MAIN {
 			logLevel = conf.SERVICE.LOG_LEVEL
 		}
 
