@@ -55,6 +55,8 @@ func proxyHandler(next http.Handler) http.Handler {
 				forwardedEntries = parseXForwardedHeaders(req.Header)
 			}
 
+			logger.Dev(forwardedEntries)
+
 			if len(forwardedEntries) != 0 {
 				originInfo := getOriginFromForwarded(forwardedEntries, trustedProxies)
 				ip = originInfo.IP
