@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"encoding/base64"
+	"errors"
 	"net/http"
 	"net/url"
 	"slices"
