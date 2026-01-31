@@ -46,20 +46,20 @@ These can be especially **helpful** when managing **variables** across multiple 
 > [!NOTE]
 > Placeholders follow strict formatting rules ([See Formatting](./formatting#templates))
 
-## Query-to-Body Injection
+## URL-to-Body Injection
 
 > _Sounds scary… but it really isn't._ 🫣
 
-**Query-to-Body Injection** is a powerful feature designed for **restricted or inflexible environments**.
+**URL-to-Body Injection** is a powerful feature designed for **restricted or inflexible environments**.
 
 In some setups, webhook configuration is extremely limited.
 For example, you may **only** be able to define a webhook URL, without any control over the **request body**.
 This becomes a problem when every receiving service is expected to support the **Signal CLI REST API** format.
 In such cases, using a simple, generic webhook is not possible.
 
-**Query-to-Body Injection** solves this by allowing you to inject values directly into the request body via query parameters.
+**URL-to-Body Injection** solves this by allowing you to inject values directly into the request body via query parameters or seperated path parameters.
 
-`http://sec-signal-api:8880/?@key=value`
+`http://sec-signal-api:8880/@key2=value2/?@key=value`
 
 > [!IMPORTANT]
 >

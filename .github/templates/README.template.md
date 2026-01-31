@@ -145,11 +145,11 @@ You can also combine them:
 }
 ```
 
-#### Query-to-Body Injection
+#### URL-to-Body Injection
 
-In some cases you may not be able to access / modify the request body, in that case specify needed values in the request query:
+In some cases you may not be able to access / modify the request body, in that case specify needed values in the request query or path:
 
-`http://sec-signal-api:8880/?@key=value`
+`http://sec-signal-api:8880/@key2=value2/?@key=value`
 
 > [!IMPORTANT]
 > To differentiate **injection queries** from _regular_ queries, **prefix the key with `@`**.
@@ -194,7 +194,7 @@ This means that any valid Go template string will also work in Secured Signal AP
 Go's templating library is used in the following features:
 
 - [Message Templates](#message-templates)
-- [Query-to-Body Injection](#query-to-body-injection)
+- [URL-to-Body Injection](#url-to-body-injection)
 - [Placeholders](#placeholders)
 
 This makes advanced [Message Templates](#message-templates) like this one possible:
@@ -259,9 +259,9 @@ By default adding an endpoint explicitly allows access to it, use `!` to block i
 
 | Config (Allow) | (Block)        |   Result   |     |                   |     |
 | :------------- | :------------- | :--------: | --- | :---------------: | --- |
-| `/v2/send`     | `unset`        |  **all**   | ⛔️ |  **`/v2/send`**   | ✅  |
-| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | ⛔️ |
-| `!/v2*`        | `/v2/send`     | **`/v2*`** | ⛔️ |  **`/v2/send`**   | ✅  |
+| `/v2/send`     | `unset`        |  **all**   | ⛔️  |  **`/v2/send`**   | ✅  |
+| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | ⛔️  |
+| `!/v2*`        | `/v2/send`     | **`/v2*`** | ⛔️  |  **`/v2/send`**   | ✅  |
 
 ### Variables
 
