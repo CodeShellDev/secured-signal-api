@@ -1,0 +1,20 @@
+services:
+  {{{ \\#://../../../examples/backend.sec-signal-api.yml }}}
+
+  apache:
+    image: httpd:latest
+    container_name: apache
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./apache.conf:/usr/local/apache2/conf/httpd.conf:ro
+      - ./certs:/etc/ssl
+    networks:
+      proxy:
+      backend:
+        ipv4_address: 172.20.0.100
+
+networks:
+  backend:
+  proxy:

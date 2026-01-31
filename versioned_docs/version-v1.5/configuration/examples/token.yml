@@ -1,0 +1,37 @@
+# Example Token Config (overwrites)
+service:
+  logLevel: info
+  port: 8880
+  hostnames:
+    - mydomain.com
+
+api:
+  tokens: [token1, token2]
+  auth:
+    methods: [bearer, basic, body, path] # add path auth
+
+settings:
+  message:
+    template: # disable
+    variables: # overwrite main config variables
+      number: "+123400010"
+      recipients: ["+123400020", "group.id", "user.id"]
+
+    fieldMappings: # overwrite @message from main config
+      "@message": [{ field: "msg", score: 100 }]
+
+  access:
+    trustedIPs: # disable
+    trustedProxies: # disable
+    ipFilter: # disable
+
+    endpoints: # overwrite main config endpoints
+      - "!/v1/about"
+      - /v1/receive
+      - /v2/send
+
+    rateLimiting:
+      limit: 100
+      period: 10h # overwrite main config period
+
+    fieldPolicies: # disable
