@@ -4,9 +4,13 @@
 # env file
 *.env
 
-# Exclude git folders
+# Git folders
 .git*
 .github
+
+# Dev folders
+.dev
+*.local.*
 
 # Ignore yml files
 *.yaml
