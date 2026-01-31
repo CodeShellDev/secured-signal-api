@@ -1,21 +1,24 @@
 package config
 
 import (
+	"path/filepath"
+	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/configutils"
-	log "github.com/codeshelldev/gotl/pkg/logger"
+	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
 func LoadTokens() {
-	log.Debug("Loading Configs in ", ENV.TOKENS_DIR)
+	logger.Debug("Loading Configs in ", ENV.TOKENS_DIR)
 
-	err := tokenConf.LoadDir("tokenconfigs", ENV.TOKENS_DIR, ".yml", yaml.Parser(), func(c *configutils.Config, s string) {})
+	err := tokenConf.LoadDir("tokenconfigs", ENV.TOKENS_DIR, ".yml", yaml.Parser(), setTokenConfigName)
 
 	if err != nil {
-		log.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
+		logger.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
 	}
 
 	tokenConf.TemplateConfig()
@@ -38,7 +41,7 @@ func NormalizeTokens() {
 }
 
 func InitTokens() {
-	apiTokens := DEFAULT.API.TOKENS
+	apiTokens := parseAuthTokens(*DEFAULT)
 
 	for _, token := range apiTokens {
 		ENV.CONFIGS[token] = DEFAULT
@@ -53,13 +56,15 @@ func InitTokens() {
 	for token, config := range config {
 		apiTokens = append(apiTokens, token)
 
+		config.TYPE = structure.TOKEN
+
 		ENV.CONFIGS[token] = &config
 	}
 
 	if len(apiTokens) <= 0 {
-		log.Warn("No API Tokens provided this is NOT recommended")
+		logger.Warn("No API Tokens provided this is NOT recommended")
 
-		log.Info("Disabling Security Features due to incomplete Congfiguration")
+		logger.Info("Disabling Security Features due to incomplete Congfiguration")
 
 		ENV.INSECURE = true
 
@@ -69,7 +74,7 @@ func InitTokens() {
 	}
 
 	if len(apiTokens) > 0 {
-		log.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")
+		logger.Debug("Registered " + strconv.Itoa(len(apiTokens)) + " Tokens")
 	}
 
 	ENV.TOKENS = apiTokens
@@ -79,10 +84,57 @@ func parseTokenConfigs(configArray []structure.CONFIG) map[string]structure.CONF
 	configs := map[string]structure.CONFIG{}
 
 	for _, config := range configArray {
-		for _, token := range config.API.TOKENS {
+		tokens := parseAuthTokens(config)
+		for _, token := range tokens {
 			configs[token] = config
 		}
 	}
 
 	return configs
+}
+
+func parseAuthTokens(config structure.CONFIG) []string {
+	tokens := config.API.TOKENS
+
+	for _, token := range config.API.AUTH.TOKENS {
+		tokens = append(tokens, token.Set...)
+	}
+
+	return tokens
+}
+
+func getSchemeTagByPointer(config any, tag string, fieldPointer any) string {
+	v := reflect.ValueOf(config)
+	if v.Kind() == reflect.Pointer {
+		v = v.Elem()
+	}
+
+	fieldValue := reflect.ValueOf(fieldPointer).Elem()
+
+	for i := 0; i < v.NumField(); i++ {
+		if v.Field(i).Addr().Interface() == fieldValue.Addr().Interface() {
+			field := v.Type().Field(i)
+
+			return field.Tag.Get(tag)
+		}
+	}
+
+	return ""
+}
+
+func setTokenConfigName(config *configutils.Config, p string) {
+	schema := structure.CONFIG{
+		NAME: "",
+	}
+
+	nameField := getSchemeTagByPointer(&schema, "koanf", &schema.NAME)
+
+	filename := filepath.Base(p)
+	filenameWithoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
+
+	name := config.Layer.String(nameField)
+
+	if strings.TrimSpace(name) == "" {
+		config.Layer.Set(nameField, filenameWithoutExt)
+	}
 }
