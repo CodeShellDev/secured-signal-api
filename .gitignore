@@ -28,10 +28,14 @@ go.work.sum
 # .idea/
 .vscode/
 
-# Exclude git folders
+# Git folders
 .git*
 !.github
 
 # Docusaurus
 .docusaurus
 node_modules
+
+# Dev folders
+.dev
+*.local.*
