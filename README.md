@@ -202,7 +202,8 @@ In some cases you may not be able to access / modify the request body, in that c
 
 `http://sec-signal-api:8880/@key2=value2/?@key=value`
 
-> [!IMPORTANT] To differentiate **injection queries** from _regular_ queries, **prefix the key with `@`**.
+> [!IMPORTANT]
+> To differentiate **injection queries** from _regular_ queries, **prefix the key with `@`**.
 > Only keys starting with `@` are injected into the request body.
 
 > [!NOTE]
