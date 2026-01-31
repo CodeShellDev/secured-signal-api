@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
 )
@@ -23,12 +22,7 @@ func NewChain() *Chain {
 func (chain *Chain) Use(middleware Middleware) *Chain {
     chain.middlewares = append(chain.middlewares, middleware)
 
-    if strings.HasPrefix(middleware.Name, "_") {
-        logger.Dev("Registered ", middleware.Name, " middleware")
-    } else {
-	    logger.Debug("Registered ", middleware.Name, " middleware")
-    }
-
+	logger.Debug("Registered ", middleware.Name)
 
     return chain
 }

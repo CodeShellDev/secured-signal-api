@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 	"reflect"
-	"regexp"
 
+	log "github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
@@ -18,8 +18,6 @@ var Policy Middleware = Middleware{
 
 func policyHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
-
 		conf := getConfigByReq(req)
 
 		policies := conf.SETTINGS.ACCESS.FIELD_POLICIES
@@ -31,9 +29,8 @@ func policyHandler(next http.Handler) http.Handler {
 		body, err := request.GetReqBody(req)
 
 		if err != nil {
-			logger.Error("Could not get Request Body: ", err.Error())
+			log.Error("Could not get Request Body: ", err.Error())
 			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
-			return
 		}
 
 		if body.Empty {
@@ -42,10 +39,10 @@ func policyHandler(next http.Handler) http.Handler {
 
 		headerData := request.GetReqHeaders(req)
 
-		shouldBlock, field := isBlockedByPolicy(body.Data, headerData, policies)
+		shouldBlock, field := doBlock(body.Data, headerData, policies)
 
 		if shouldBlock {
-			logger.Warn("Client tried to use blocked field: ", field)
+			log.Warn("User tried to use blocked field: ", field)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -54,20 +51,20 @@ func policyHandler(next http.Handler) http.Handler {
 	})
 }
 
-func getPolicies(policies []structure.FieldPolicy) ([]structure.FieldPolicy, []structure.FieldPolicy) {
-	blocked := []structure.FieldPolicy{}
-	allowed := []structure.FieldPolicy{}
+func getPolicies(policies map[string]structure.FieldPolicy) (map[string]structure.FieldPolicy, map[string]structure.FieldPolicy) {
+	blockedFields := map[string]structure.FieldPolicy{}
+	allowedFields := map[string]structure.FieldPolicy{}
 
-	for _, policy := range policies {
+	for field, policy := range policies {
 		switch policy.Action {
 		case "block":
-			blocked = append(blocked, policy)
+			blockedFields[field] = policy
 		case "allow":
-			allowed = append(allowed, policy)
+			allowedFields[field] = policy
 		}
 	}
 
-	return allowed, blocked
+	return allowedFields, blockedFields
 }
 
 func getField(key string, body map[string]any, headers map[string][]string) (any, error) {
@@ -79,53 +76,34 @@ func getField(key string, body map[string]any, headers map[string][]string) (any
 		return value, nil
 	}
 
-	return nil, errors.New("field not found")
+	return value, errors.New("field not found")
 }
 
-func doPoliciesApply(key string, body map[string]any, headers map[string][]string, policies []structure.FieldPolicy) (bool, string) {
-	value, err := getField(key, body, headers)
+func doPoliciesApply(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicy) (bool, string) {
+	for key, policy := range policies {
+		value, err := getField(key, body, headers)
 
-	if err != nil {
-		return false, ""
-	}
+		if err != nil {
+			continue
+		}
 
-	for _, policy := range policies {
 		switch asserted := value.(type) {
 		case string:
 			policyValue, ok := policy.Value.(string)
-
-			re, err := regexp.Compile(policyValue)
-
-			if err == nil {
-				if re.MatchString(asserted) {
-					return true, key
-				}
-				continue
-			}
 
 			if ok && asserted == policyValue {
 				return true, key
 			}
 		case int:
-			policyValue, ok := policy.Value.(int)
+			policyValue, ok := policy.Value.(int);
 
 			if ok && asserted == policyValue {
 				return true, key
 			}
-		case float64:
-			var policyValue float64
+		case bool:
+			policyValue, ok := policy.Value.(bool)
 
-			// needed for json
-			switch assertedValue := policy.Value.(type) {
-			case int:
-				policyValue = float64(assertedValue)
-			case float64:
-				policyValue = assertedValue
-			default:
-				continue
-			}
-
-			if asserted == policyValue {
+			if ok && asserted == policyValue {
 				return true, key
 			}
 		default:
@@ -138,51 +116,38 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 	return false, ""
 }
 
-func isBlockedByPolicy(body map[string]any, headers map[string][]string, policies map[string][]structure.FieldPolicy) (bool, string) {
-	if len(policies) == 0 || policies == nil {
+func doBlock(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicy) (bool, string) {
+	if len(policies) == 0 {
 		// default: allow all
 		return false, ""
 	}
 
-	for field, policy := range policies {
-		if len(policy) == 0 || policy == nil {
-			continue
-		}
+	allowed, blocked := getPolicies(policies)
 
-		value, _ := getField(field, body, headers)
+	var cause string
 
-		if value == nil {
-			continue
-		}
-
-		allowed, blocked := getPolicies(policy)
-
-		isExplicitlyAllowed, cause := doPoliciesApply(field, body, headers, allowed)
-		isExplicitlyBlocked, cause := doPoliciesApply(field, body, headers, blocked)
-
-		// explicit allow > block
-		if isExplicitlyAllowed {
-			return false, cause
-		}
-		
-		if isExplicitlyBlocked {
-			return true, cause
-		}
-
-		// allow rules -> default deny
-		if len(allowed) > 0 {
-			return true, cause
-		}
-		
-		// only block rules -> default allow
-		if len(blocked) > 0 {
-			return false, cause
-		}
-
-		// safety net -> block
-		return true, "safety net"
+	isExplicitlyAllowed, cause := doPoliciesApply(body, headers, allowed)
+	isExplicitlyBlocked, cause := doPoliciesApply(body, headers, blocked)
+	
+	// explicit allow > block
+	if isExplicitlyAllowed {
+		return false, cause
+	}
+	
+	if isExplicitlyBlocked {
+		return true, cause
 	}
 
-	// default: allow all
-	return false, ""
+	// only allow policies -> block anything not allowed
+	if len(allowed) > 0 && len(blocked) == 0 {
+		return true, cause
+	}
+
+	// only block polcicies -> allow anything not blocked
+	if len(blocked) > 0 && len(allowed) == 0 {
+		return false, cause
+	}
+
+	// no match -> default: block all
+	return true, cause
 }
