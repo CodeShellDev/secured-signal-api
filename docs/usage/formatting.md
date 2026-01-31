@@ -15,8 +15,8 @@ As a result, any valid Go template string works in Secured Signal API.
 > [!NOTE]
 > The following features use Go’s templating library:
 >
-> - [Message Templates](../configuration/message-template)
-> - [Query-to-Body Injection](./advanced#query-to-body-injection)
+> - [URL Templates](../configuration/message-template)
+> - [URL-to-Body Injection](./advanced#url-to-body-injection)
 > - [Placeholders](./advanced#placeholders)
 
 | Scope                                   | Example             | Note             |
