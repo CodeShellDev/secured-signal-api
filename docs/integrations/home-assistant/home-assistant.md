@@ -16,6 +16,9 @@ To be able to use the Signal Messenger integration in Home Assistant you need to
 {{{ #://./configuration.yml }}}
 ```
 
+> [!TIP]
+> If you want to use a recipients placeholder (_array_) instead of _single_ recipients, modify the `url` to `http://sec-signal-api/@auth=API_TOKEN/@recipients={{.RECIPIENTS}}`
+
 Here we are taking advantage of the `url` field for adding `/@auth=API_TOKEN` in order to use [Path Auth](../usage#auth).
 
 For more detailed configuration instructions read the [official Home Assistant docs](https://www.home-assistant.io/integrations/signal_messenger/).
