@@ -45,4 +45,6 @@ settings:
       period: 1h
 
     fieldPolicies:
-      "@number": { value: "+123400003", action: block }
+      "@number":
+        - value: "+123400003"
+          action: block

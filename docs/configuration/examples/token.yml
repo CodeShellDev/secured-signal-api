@@ -1,20 +1,35 @@
-# Example Token Config (all configurations shown)
-
-name: abc
-
+# Example Config (all configurations shown)
 service:
-  logLevel: debug
-  port: 1234
+  logLevel: info
+  port: 8880
+  hostnames:
+    - mydomain.com
 
 api:
-  tokens: [LOOOONG_STRING]
+  tokens: [token1, token2]
 
 settings:
   message:
-    fieldMappings: # Disable mappings
-    variables: # Override variables
-      number: "+123400004"
+    template: # disable
+    variables: # overwrite main config variables
+      number: "+123400010"
+      recipients: ["+123400020", "group.id", "user.id"]
+
+    fieldMappings: # overwrite @message from main config
+      "@message": [{ field: "msg", score: 100 }]
 
   access:
-    endpoints: # Disable sending
-      - "!/v2/send"
+    trustedIPs: # disable
+    trustedProxies: # disable
+    ipFilter: # disable
+
+    endpoints: # overwrite main config endpoints
+      - "!/v1/about"
+      - /v1/receive
+      - /v2/send
+
+    rateLimiting:
+      limit: 100
+      period: 10h # overwrite main config period
+
+    fieldPolicies: # disable
