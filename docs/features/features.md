@@ -53,6 +53,8 @@ Find more about this feature [here](./configuration/field-policies).
 **Rate Limiting** is used for limiting requests and to stop server overload, because of DDoS attacks, malconfigured clients, or malicious actors.  
 It ensures fair usage per token by controlling how many requests can be processed within a defined period.
 
+Limit those rates [here](./configuration/rate-limiting).
+
 ## Endpoints
 
 > _Block unwanted access_
