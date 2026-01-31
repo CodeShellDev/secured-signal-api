@@ -1,0 +1,26 @@
+services:
+  {{{ \\#://../../../examples/backend.sec-signal-api.yml }}}
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - data:/data
+    depends_on:
+      - secured-signal
+    restart: unless-stopped
+    networks:
+      proxy:
+      backend:
+        ipv4_address: 172.20.0.100
+
+networks:
+  backend:
+  proxy:
+
+volumes:
+  data:

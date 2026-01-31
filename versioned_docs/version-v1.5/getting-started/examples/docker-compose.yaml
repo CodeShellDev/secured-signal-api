@@ -1,0 +1,18 @@
+services:
+  signal-api:
+    image: bbernhard/signal-cli-rest-api:latest
+    container_name: signal-api
+    environment:
+      - MODE=normal
+    volumes:
+      - ./data:/home/.local/share/signal-cli
+    restart: unless-stopped
+    networks:
+      backend:
+        aliases:
+          - signal-api
+
+  {{{ \\#://../../examples/frontend.sec-signal-api.yml }}}
+
+networks:
+  backend:
