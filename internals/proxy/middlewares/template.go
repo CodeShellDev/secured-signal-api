@@ -10,6 +10,7 @@ import (
 	jsonutils "github.com/codeshelldev/gotl/pkg/jsonutils"
 	query "github.com/codeshelldev/gotl/pkg/query"
 	request "github.com/codeshelldev/gotl/pkg/request"
+	"github.com/codeshelldev/gotl/pkg/stringutils"
 	templating "github.com/codeshelldev/gotl/pkg/templating"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
@@ -73,6 +74,25 @@ func templateHandler(next http.Handler) http.Handler {
 			}
 		}
 
+		if req.URL.Path != "" {
+			var modified bool
+			var templated bool
+
+			req.URL.Path, bodyData, modified, templated, err = TemplatePath(req.URL, bodyData, variables)
+
+			if err != nil {
+				logger.Error("Error Templating Path: ", err.Error())
+			}
+
+			if modified {
+				logger.Debug("Applied Path Templating: ", req.URL.Path)
+			}
+
+			if templated {
+				modifiedBody = true
+			}
+		}
+
 		if modifiedBody {
 			body.Data = bodyData
 
@@ -85,20 +105,6 @@ func templateHandler(next http.Handler) http.Handler {
 			}
 
 			logger.Debug("Applied Body Templating: ", body.Data)
-		}
-
-		if req.URL.Path != "" {
-			var modified bool
-
-			req.URL.Path, modified, err = TemplatePath(req.URL, variables)
-
-			if err != nil {
-				logger.Error("Error Templating Path: ", err.Error())
-			}
-
-			if modified {
-				logger.Debug("Applied Path Templating: ", req.URL.Path)
-			}
 		}
 
 		next.ServeHTTP(w, req)
@@ -208,26 +214,55 @@ func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES ma
 	return templatedData, modified, nil
 }
 
-func TemplatePath(reqUrl *url.URL, VARIABLES any) (string, bool, error) {
+func TemplatePath(reqUrl *url.URL, data map[string]any, VARIABLES any) (string, map[string]any, bool, bool, error) {
 	var modified bool
+	var modifiedBody bool
 
 	reqPath, err := url.PathUnescape(reqUrl.Path)
 
 	if err != nil {
-		return reqUrl.Path, modified, err
+		return reqUrl.Path, data, false, false, err
 	}
 
 	reqPath, err = templating.RenderNormalizedTemplate("path", reqPath, VARIABLES)
 
 	if err != nil {
-		return reqUrl.Path, modified, err
+		return reqUrl.Path, data, false, false, err
 	}
+
+	parts := strings.Split(reqPath, "/")
+	newParts := []string{}
+
+	for _, part := range parts {
+		newParts = append(newParts, part)
+		
+		keyValuePair := strings.SplitN(part, "=", 2)
+
+		if len(keyValuePair) != 2 {
+			continue
+		}
+
+		keyWithoutPrefix, match := strings.CutPrefix(keyValuePair[0], "@")
+		
+		if !match {
+			continue
+		}
+
+		value := stringutils.ToType(keyValuePair[1])
+
+		data[keyWithoutPrefix] = value
+		modifiedBody = true
+
+		newParts = newParts[:len(newParts) - 1]
+	}
+
+	reqPath = strings.Join(newParts, "/")
 
 	if reqUrl.Path != reqPath {
 		modified = true
 	}
 
-	return reqPath, modified, nil
+	return reqPath, data, modified, modifiedBody, nil
 }
 
 func TemplateQuery(reqUrl *url.URL, data map[string]any, VARIABLES any) (string, map[string]any, bool, error) {
