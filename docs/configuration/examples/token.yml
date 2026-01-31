@@ -7,6 +7,8 @@ service:
 
 api:
   tokens: [token1, token2]
+  auth:
+    methods: [bearer, basic, body, path] # add path auth
 
 settings:
   message:

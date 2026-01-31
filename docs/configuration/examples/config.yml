@@ -8,6 +8,13 @@ service:
 api:
   url: http://signal-api:8080
   tokens: [token1, token2]
+  auth:
+    methods: [bearer, basic, body]
+    tokens:
+      - set: [pathToken1, pathToken2]
+        methods: [path]
+      - set: [queryAndBodyToken]
+        methods: [body, query]
 
 settings:
   message:
@@ -47,4 +54,6 @@ settings:
     fieldPolicies:
       "@number":
         - value: "+123400003"
+          action: block
+        - value: "+123400004"
           action: block
