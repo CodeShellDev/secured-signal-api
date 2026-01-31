@@ -16,8 +16,8 @@ github.com/codeshelldev/gotl/pkg/pretty v0.0.9 h1:YgAZ0QpV+cUCKeLz5T0XFVByM8BXrJ
 github.com/codeshelldev/gotl/pkg/pretty v0.0.9/go.mod h1:2Gk6UBrtkIME2RCSNytS/RJ5lHXYL/MDx0rYRpknobM=
 github.com/codeshelldev/gotl/pkg/query v0.0.3 h1:Zy8k0R5HcJS00OMPRHybgFEiwMg7ceLyv6bA0G7NOfs=
 github.com/codeshelldev/gotl/pkg/query v0.0.3/go.mod h1:kKaPOKXluIid3qeS7xzrmfq3NxIa8/PhKYHM6GRbwJw=
-github.com/codeshelldev/gotl/pkg/request v0.0.4 h1:QyuKTJd/jGrG0XYkFyIc8JmfS4kMlqeTj6kpsYtbXfI=
-github.com/codeshelldev/gotl/pkg/request v0.0.4/go.mod h1:vCXIZ2n/XxvEVInBQv9eIh0kQ2353V+WymL8kZ9yrOU=
+github.com/codeshelldev/gotl/pkg/request v0.0.6 h1:NySoIrdWv/5RUUufyXTodGmT6mc71VbjlQ+Wcthixp8=
+github.com/codeshelldev/gotl/pkg/request v0.0.6/go.mod h1:vCXIZ2n/XxvEVInBQv9eIh0kQ2353V+WymL8kZ9yrOU=
 github.com/codeshelldev/gotl/pkg/stringutils v0.0.3 h1:7k/HMnX7me8Kchm41I/M6dp3wXI0XORI3oyS87O0Viw=
 github.com/codeshelldev/gotl/pkg/stringutils v0.0.3/go.mod h1:/dWlzYoTj23LmpFs+Bpal4tfUDbOVeApIgkLv9gTgUE=
 github.com/codeshelldev/gotl/pkg/templating v0.0.3 h1:PAz6VN8yGBuZIdR/sDM+TmW1OFykl+I7/Zwa07uMgYA=
