@@ -246,6 +246,12 @@ These endpoints are blocked by default due to security risks.
 > 1. Matching uses [regex](https://regex101.com)
 > 2. On compile error exact match is used instead
 
+> [!WARNING]
+> Remember that some symbols have special meanings in regex, a good rule of thumb is:
+>
+> - If it is a special character, it probably needs to be escaped (`/`) if you are not looking to use regex
+> - Otherwise test your pattern on a [regex testing site](https://regex101.com)
+
 You can modify endpoints by configuring `access.endpoints` in your config:
 
 ```yaml
@@ -328,6 +334,12 @@ Set the wanted action on encounter, available options are `block` and `allow`.
 >
 > 1. [Regex matching](https://regex101.com)
 > 2. On compile error exact match is used as fallback
+
+> [!WARNING]
+> Remember that some symbols have special meanings in regex, a good rule of thumb is:
+>
+> - If it is a special, it probably needs to be escaped (`/`) if you are not looking to use regex
+> - Otherwise test your pattern on a [regex testing site](https://regex101.com)
 
 Supported [placeholder types](#placeholders):
 

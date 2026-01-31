@@ -25,6 +25,12 @@ because of security concerns the following endpoints are blocked:
 > 1. Matching uses [regex](https://regex101.com)
 > 2. On compile error exact match is used instead
 
+> [!WARNING]
+> Remember that some symbols have special meanings in regex, a good rule of thumb is:
+>
+> - If it is a special character, it probably needs to be escaped (`/`) if you are not looking to use regex
+> - Otherwise test your pattern on a [regex testing site](https://regex101.com)
+
 You can modify endpoints by configuring `access.endpoints` in your config:
 
 ```yaml
