@@ -87,7 +87,7 @@ endpoint restrictions, placeholders, flexible configuration
 Get the latest version of the `docker-compose.yaml` file:
 
 ```yaml
-{{{ #://docs/getting-started/examples/docker-compose.yaml }}}
+{{{ #://../../docs/getting-started/examples/docker-compose.yaml }}}
 ```
 
 And add secure tokens to `api.tokens`. See [API Tokens](#api-tokens).
