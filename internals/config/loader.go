@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/configutils"
-	"github.com/codeshelldev/gotl/pkg/logger"
+	log "github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/stringutils"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 
@@ -63,13 +63,13 @@ func Load() {
 
 	InitTokens()
 
-	logger.Info("Finished Loading Configuration")
+	log.Info("Finished Loading Configuration")
 }
 
 func Log() {
-	logger.Dev("Loaded Config:", mainConf.Layer.Get(""))
-	logger.Dev("Loaded Token Configs:", tokenConf.Layer.Get(""))
-	logger.Dev("Parsed Configs: ", ENV)
+	log.Dev("Loaded Config:", mainConf.Layer.Get(""))
+	log.Dev("Loaded Token Configs:", tokenConf.Layer.Get(""))
+	log.Dev("Parsed Configs: ", ENV)
 }
 
 func Clear() {
@@ -102,7 +102,7 @@ func Normalize(id string, config *configutils.Config, path string, structure any
 	old, ok := data.(map[string]any)
 
 	if !ok {
-		logger.Warn("Could not load `"+path+"`")
+		log.Warn("Could not load `"+path+"`")
 		return
 	}
 
@@ -111,10 +111,7 @@ func Normalize(id string, config *configutils.Config, path string, structure any
 	tmpConf.Load(old, "")
 	
 	// Apply transforms to the new config
-	tmpConf.ApplyTransformFuncs(id, structure, "", configutils.TransformOptions{
-		Transforms: transformFuncs,
-		OnUse: onUseFuncs,
-	})
+	tmpConf.ApplyTransformFuncs(id, structure, "", transformFuncs)
 
 	// Lowercase actual config
 	LowercaseKeys(config)
@@ -127,7 +124,7 @@ func Normalize(id string, config *configutils.Config, path string, structure any
 
 func InitReload() {
 	reload := func(path string) {
-		logger.Debug(path, " changed, reloading...")
+		log.Debug(path, " changed, reloading...")
 		Load()
 		Log()
 	}
@@ -142,24 +139,22 @@ func InitConfig() {
 
 	mainConf.Layer.Unmarshal("", &config)
 
-	config.TYPE = structure.MAIN
-
 	ENV.CONFIGS["*"] = &config
 
 	DEFAULT = ENV.CONFIGS["*"]
 }
 
 func LoadDefaults() {
-	logger.Debug("Loading defaults ", ENV.DEFAULTS_PATH)
+	log.Debug("Loading defaults ", ENV.DEFAULTS_PATH)
 	_, err := defaultsConf.LoadFile(ENV.DEFAULTS_PATH, yaml.Parser())
 
 	if err != nil {
-		logger.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
+		log.Warn("Could not Load Defaults", ENV.DEFAULTS_PATH)
 	}
 }
 
 func LoadConfig() {
-	logger.Debug("Loading Config ", ENV.CONFIG_PATH)
+	log.Debug("Loading Config ", ENV.CONFIG_PATH)
 	_, err := userConf.LoadFile(ENV.CONFIG_PATH, yaml.Parser())
 
 	if err != nil {
@@ -171,7 +166,7 @@ func LoadConfig() {
 			return
 		}
 
-		logger.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
+		log.Error("Could not Load Config ", ENV.CONFIG_PATH, ": ", err.Error())
 	}
 }
 

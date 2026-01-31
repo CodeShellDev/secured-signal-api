@@ -1,10 +1,8 @@
 package middlewares
 
 import (
-	"context"
 	"net/http"
 
-	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 )
@@ -13,54 +11,29 @@ type Context struct {
 	Next http.Handler
 }
 
+type authType string
+
+const (
+	Bearer authType = "Bearer"
+	Basic  authType = "Basic"
+	Query  authType = "Query"
+	None   authType = "None"
+)
+
 type contextKey string
 
-func setContext(req *http.Request, key, value any) *http.Request {
-	ctx := context.WithValue(req.Context(), key, value)
-	return req.WithContext(ctx)
-}
-
-func getContext[T any](req *http.Request, key any) T {
-	value, ok := req.Context().Value(key).(T)
-
-	if !ok {
-		var zero T
-		return zero
-	}
-
-	return value
-}
-
-func getLogger(req *http.Request) *logger.Logger {
-	return getContext[*logger.Logger](req, loggerKey)
-}
-
-func getToken(req *http.Request) string {
-	return getContext[string](req, tokenKey)
-}
+const tokenKey contextKey = "token"
 
 func getConfigByReq(req *http.Request) *structure.CONFIG {
-	return getConfig(getToken(req))
-}
+	token := req.Context().Value(tokenKey).(string)
 
-func getConfigWithoutDefaultByReq(req *http.Request) *structure.CONFIG {
-	return getConfigWithoutDefault(getToken(req))
-}
-
-func getConfigWithoutDefault(token string) *structure.CONFIG {
-	conf, exists := config.ENV.CONFIGS[token]
-
-	if !exists {
-		return nil
-	}
-
-	return conf
+	return getConfig(token)
 }
 
 func getConfig(token string) *structure.CONFIG {
-	conf := getConfigWithoutDefault(token)
+	conf, exists := config.ENV.CONFIGS[token]
 
-	if conf == nil {
+	if !exists || conf == nil {
 		conf = config.DEFAULT
 	}
 

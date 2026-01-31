@@ -1,10 +1,7 @@
-api:
-  auth:
-    methods: [bearer, basic, body]
-
 service:
   port: 8880
-  logLevel: info
+
+logLevel: info
 
 settings:
   message:

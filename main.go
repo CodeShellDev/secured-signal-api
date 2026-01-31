@@ -1,14 +1,12 @@
 package main
 
 import (
+	"net/http"
 	"os"
-	"slices"
-	"strings"
 
-	"github.com/codeshelldev/gotl/pkg/logger"
+	log "github.com/codeshelldev/gotl/pkg/logger"
 	config "github.com/codeshelldev/secured-signal-api/internals/config"
 	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
-	httpServer "github.com/codeshelldev/secured-signal-api/internals/server"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 )
 
@@ -17,21 +15,36 @@ var proxy reverseProxy.Proxy
 func main() {
 	logLevel := os.Getenv("LOG_LEVEL")
 
-	logger.Init(logLevel)
+	log.Init(logLevel)
 
 	docker.Init()
 
 	config.Load()
 
-	if config.DEFAULT.SERVICE.LOG_LEVEL != logger.Level() {
-		logger.Init(config.DEFAULT.SERVICE.LOG_LEVEL)
+	if config.DEFAULT.SERVICE.LOG_LEVEL != log.Level() {
+		log.Init(config.DEFAULT.SERVICE.LOG_LEVEL)
 	}
 
-	logger.Info("Initialized Logger with Level of ", logger.Level())
+	log.Info("Initialized Logger with Level of ", log.Level())
 
-	if logger.Level() == "dev" {
-		logger.Dev("Welcome back, Developer!")
-		logger.Dev("CTRL+S config to Print to Console")
+	log.Info(`
+	
+	[1;34m┌────────────────────────────────────────────────┐[0m
+	[1;34m│[0m [1;32m             🎄 Happy Holidays! 🎄            [0m [1;34m│[0m
+	[1;34m│[0m                                                [1;34m│[0m
+	[1;34m│[0m [0;37mThank you for using this project and for all  [0m [1;34m│[0m
+	[1;34m│[0m [0;37mthe downloads, stars, and support this year.  [0m [1;34m│[0m
+	[1;34m│[0m                                                [1;34m│[0m
+	[1;34m│[0m [1;32mYour support truly means a lot — here's to    [0m [1;34m│[0m
+	[1;34m│[0m [1;32man awesome year ahead! ✨                     [0m [1;34m│[0m
+	[1;34m│[0m                                                [1;34m│[0m
+	[1;34m│[0m [1;36m                 - CodeShell                  [0m [1;34m│[0m
+	[1;34m└────────────────────────────────────────────────┘[0m
+	`)
+
+	if log.Level() == "dev" {
+		log.Dev("Welcome back Developer!")
+		log.Dev("CTRL+S config to Print to Console")
 	}
 
 	config.Log()
@@ -40,28 +53,23 @@ func main() {
 
 	handler := proxy.Init()
 
-	logger.Info("Initialized Middlewares")
+	log.Info("Initialized Middlewares")
 
-	ports := []string{}
+	addr := "0.0.0.0:" + config.DEFAULT.SERVICE.PORT
 
-	for _, config := range config.ENV.CONFIGS {
-		port := strings.TrimSpace(config.SERVICE.PORT)
+	log.Info("Server Listening on ", addr)
 
-		if port != "" && !slices.Contains(ports, port) {
-			ports = append(ports, port)
-		}
+	server := &http.Server{
+		Addr:    addr,
+		Handler: handler,
 	}
 
-	server := httpServer.Create(handler, "0.0.0.0", ports...)
-
 	stop := docker.Run(func() {
-		if logger.IsDebug() && len(ports) > 1 {
-			logger.Debug("Server started with ", len(ports), " listeners on ", httpServer.PortsToRangeString(ports))
-		} else {
-			logger.Info("Server listening on ", httpServer.PortsToRangeString(ports))
-		}
+		err := server.ListenAndServe()
 
-		server.ListenAndServer()
+		if err != nil && err != http.ErrServerClosed {
+			log.Fatal("Server error: ", err.Error())
+		}
 	})
 
 	<-stop

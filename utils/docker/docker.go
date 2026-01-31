@@ -2,16 +2,16 @@ package docker
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/codeshelldev/gotl/pkg/docker"
-	"github.com/codeshelldev/gotl/pkg/logger"
-	"github.com/codeshelldev/secured-signal-api/internals/server"
+	log "github.com/codeshelldev/gotl/pkg/logger"
 )
 
 func Init() {
-	logger.Info("Running ", os.Getenv("IMAGE_TAG"), " Image")
+	log.Info("Running ", os.Getenv("IMAGE_TAG"), " Image")
 }
 
 func Run(main func()) chan os.Signal {
@@ -19,15 +19,15 @@ func Run(main func()) chan os.Signal {
 }
 
 func Exit(code int) {
-	logger.Info("Exiting...")
+	log.Info("Exiting...")
 
 	docker.Exit(code)
 }
 
-func Shutdown(server *server.Server) {
-	logger.Info("Shutdown signal received")
+func Shutdown(server *http.Server) {
+	log.Info("Shutdown signal received")
 
-	logger.Sync()
+	log.Sync()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -35,10 +35,10 @@ func Shutdown(server *server.Server) {
 	err := server.Shutdown(ctx)
 
 	if err != nil {
-		logger.Fatal("Server shutdown failed: ", err.Error())
+		log.Fatal("Server shutdown failed: ", err.Error())
 
-		logger.Info("Server exited forcefully")
+		log.Info("Server exited forcefully")
 	} else {
-		logger.Info("Server exited gracefully")
+		log.Info("Server exited gracefully")
 	}
 }

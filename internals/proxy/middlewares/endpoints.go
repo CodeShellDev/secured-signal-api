@@ -2,9 +2,11 @@ package middlewares
 
 import (
 	"net/http"
-	"regexp"
+	"path"
 	"slices"
 	"strings"
+
+	log "github.com/codeshelldev/gotl/pkg/logger"
 )
 
 var Endpoints Middleware = Middleware{
@@ -14,8 +16,6 @@ var Endpoints Middleware = Middleware{
 
 func endpointsHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
-
 		conf := getConfigByReq(req)
 
 		endpoints := conf.SETTINGS.ACCESS.ENDPOINTS
@@ -26,8 +26,8 @@ func endpointsHandler(next http.Handler) http.Handler {
 
 		reqPath := req.URL.Path
 
-		if isEndpointBlocked(reqPath, endpoints) {
-			logger.Warn("Client tried to access blocked endpoint: ", reqPath)
+		if isBlocked(reqPath, endpoints) {
+			log.Warn("User tried to access blocked endpoint: ", reqPath)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -54,19 +54,14 @@ func getEndpoints(endpoints []string) ([]string, []string) {
 }
 
 func matchesPattern(endpoint, pattern string) bool {
-	re, err := regexp.Compile(pattern)
-
-	if err != nil {
-		return endpoint == pattern
-	}
-
-	return re.MatchString(endpoint)
+	ok, _ := path.Match(pattern, endpoint)
+	return ok
 }
 
-func isEndpointBlocked(endpoint string, endpoints []string) bool {
-	if len(endpoints) == 0 || endpoints == nil {
-		// default: allow all
-		return false
+func isBlocked(endpoint string, endpoints []string) bool {
+	if len(endpoints) == 0 {
+		// default: block all
+		return true
 	}
 
 	allowed, blocked := getEndpoints(endpoints)
@@ -87,16 +82,16 @@ func isEndpointBlocked(endpoint string, endpoints []string) bool {
 		return true
 	}
 
-	// allow rules -> default deny
-	if len(allowed) > 0 {
+	// only allowed endpoints -> block anything not allowed
+	if len(allowed) > 0 && len(blocked) == 0 {
 		return true
 	}
-	
-	// only block rules -> default allow
-	if len(blocked) > 0 {
+
+	// only blocked endpoints -> allow anything not blocked
+	if len(blocked) > 0 && len(allowed) == 0 {
 		return false
 	}
 
-	// safety net -> block
+	// no match -> default: block all
 	return true
 }
