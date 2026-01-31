@@ -64,7 +64,7 @@ func mappingHandler(next http.Handler) http.Handler {
 		if modifiedBody {
 			body.Data = bodyData
 
-			err := body.Write(req)
+			err := body.UpdateReq(req)
 
 			if err != nil {
 				logger.Error("Could not write to Request Body: ", err.Error())

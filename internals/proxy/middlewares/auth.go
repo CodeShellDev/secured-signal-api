@@ -108,8 +108,6 @@ var BodyAuth = AuthMethod{
 			return "", nil
 		}
 
-		body.Write(req)
-
 		if body.Empty {
 			return "", nil
 		}
@@ -129,7 +127,7 @@ var BodyAuth = AuthMethod{
 		if isValidToken(tokens, auth) {
 			delete(body.Data, authField)
 
-			body.Write(req)
+			body.UpdateReq(req)
 
 			return auth, nil
 		}
@@ -149,7 +147,7 @@ var QueryAuth = AuthMethod{
 		const oldAuthQuery = "authorization"
 
 		if req.URL.Query().Has("@" + oldAuthQuery) {
-			fullURL, _ := request.ParseRequestURL(req)
+			fullURL, _ := request.ParseReqURL(req)
 			urlWithNewAuthQuery := strings.Replace(fullURL.String(), "@" + oldAuthQuery, "@{s,fg=bright_red}" + oldAuthQuery + "{/}{b,fg=green}" + authQuery + "{/}", 1)
 
 			deprecation.Error(req.URL.String(), deprecation.DeprecationMessage{
