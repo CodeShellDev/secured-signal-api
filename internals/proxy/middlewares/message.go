@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"net/http"
+	"path"
 	"strings"
 
 	request "github.com/codeshelldev/gotl/pkg/request"
@@ -12,8 +13,16 @@ var Message Middleware = Middleware{
 	Use: messageHandler,
 }
 
+const templateMessageEndpoint = "/v2/send"
+
 func messageHandler(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc(templateMessageEndpoint, func(w http.ResponseWriter, req *http.Request) {
+		if req.Method != "POST" {
+			next.ServeHTTP(w, req)
+		}
+
 		logger := getLogger(req)
 
 		conf := getConfigByReq(req)
@@ -41,7 +50,7 @@ func messageHandler(next http.Handler) http.Handler {
 
 		var modifiedBody bool
 
-		if !body.Empty {
+		if !body.Empty && path.Clean(req.URL.Path) == templateMessageEndpoint {
 			bodyData = body.Data
 
 			if messageTemplate != "" {
@@ -76,6 +85,10 @@ func messageHandler(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, req)
 	})
+
+	mux.Handle("/", next)
+
+	return mux
 }
 
 func TemplateMessage(template string, bodyData map[string]any, headerData map[string][]string, variables map[string]any) (map[string]any, error) {
