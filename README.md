@@ -1,4 +1,4 @@
-<img align="center" width="1048" height="512" alt="Secure Proxy for Signal CLI REST API" src="https://github.com/CodeShellDev/secured-signal-api/raw/refs/heads/docs/static/img/banner.png" />
+<img align="center" width="1048" height="512" alt="Secure Proxy for Signal CLI REST API" src="https://github.com/codeshelldev/secured-signal-api/raw/refs/heads/docs/static/img/banner.png" />
 
 <h3 align="center">Secure Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal CLI REST API</a></h3>
 
@@ -46,22 +46,39 @@ endpoint restrictions, placeholders, flexible configuration
 
 ## Contents
 
-Check out the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) for up-to-date instructions and additional content!
+> [!IMPORTANT]
+> Check out the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) for up-to-date instructions and additional content!
+
+> [!WARNING]
+> We are slowly moving away from this README and instead are trying to make the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) the only source of truth
 
 - [Getting Started](#getting-started)
 - [Setup](#setup)
 - [Usage](#usage)
+- [Features](https://codeshelldev.github.io/secured-signal-api/docs/features)
 - [Configuration](#configuration)
   - [Endpoints](#endpoints)
   - [Variables](#variables)
   - [Field Policies](#field-policies)
   - [Field Mappings](#field-mappings)
   - [Message Templates](#message-templates)
-- [Integrations](https://codeshelldev.github.io/secured-signal-api/docs/integrations/compatibility)
+  - [Port Restrictions](https://codeshelldev.github.io/secured-signal-api/docs/configuration/port)
+  - [Hostname Restrictions](https://codeshelldev.github.io/secured-signal-api/docs/configuration/hostnames)
+  - [IP Filter](https://codeshelldev.github.io/secured-signal-api/docs/configuration/ip-filter)
+  - [Rate Limiting](https://codeshelldev.github.io/secured-signal-api/docs/configuration/rate-limiting)
+  - [Trusted Proxies](https://codeshelldev.github.io/secured-signal-api/docs/configuration/trusted-proxies)
+  - [Trusted IPs](https://codeshelldev.github.io/secured-signal-api/docs/configuration/trusted-ips)
+  - [Log Level](https://codeshelldev.github.io/secured-signal-api/docs/configuration/log-level)
+  - [Port](https://codeshelldev.github.io/secured-signal-api/docs/configuration/port)
+  - [Hostnames](https://codeshelldev.github.io/secured-signal-api/docs/configuration/hostnames)
+  - [Auth(-methods)](https://codeshelldev.github.io/secured-signal-api/docs/configuration/auth)
+- [Reverse Proxy](https://codeshelldev.github.io/secured-signal-api/docs/reverse-proxy)
+- [Integrations](https://codeshelldev.github.io/secured-signal-api/docs/integrations)
 - [Contributing](#contributing)
 - [Support](#support)
 - [Help](#help)
 - [License](#license)
+- [Legal](#legal)
 
 ## Getting Started
 
@@ -126,7 +143,7 @@ Before you can send messages via Secured Signal API you must first set up [Signa
 
 ## Usage
 
-Secured Signal API provides 3 ways to authenticate
+Secured Signal API provides 5 ways to authenticate
 
 ### Auth
 
@@ -134,7 +151,12 @@ Secured Signal API provides 3 ways to authenticate
 | :---------- | :--------------------------------------------------------- |
 | Bearer Auth | Add `Authorization: Bearer API_TOKEN` to headers           |
 | Basic Auth  | Add `Authorization: Basic BASE64_STRING` (`api:API_TOKEN`) |
-| Query Auth  | Append `@authorization=API_TOKEN` to request URL           |
+| Query Auth  | Append `@auth=API_TOKEN` to request URL                    |
+| Path Auth   | Prepend request path with `/@auth=API_TOKEN/`              |
+| Body Auth   | Set `auth` to `API_TOKEN` in the request body              |
+
+> [!WARNING]
+> **Query** and **Path** auth are disabled by default and [must be enabled in the config](https://codeshelldev.github.io/secured-signal-api/docs/configuration/auth)
 
 ### Example
 
@@ -174,20 +196,25 @@ You can also combine them:
 }
 ```
 
-#### Query-to-Body Injection
+#### URL-to-Body Injection
 
-In some cases you may not be able to access / modify the request body, in that case specify needed values in the request query:
+In some cases you may not be able to access / modify the request body, in that case specify needed values in the request query or path:
 
-`http://sec-signal-api:8880/?@key=value`
+`http://sec-signal-api:8880/@key2=value2/?@key=value`
 
-> [!IMPORTANT]
-> To differentiate **injection queries** from _regular_ queries, **prefix the key with `@`**.
-> Only keys starting with `@` are injected into the request body
+> [!IMPORTANT] To differentiate **injection queries** from _regular_ queries, **prefix the key with `@`**.
+> Only keys starting with `@` are injected into the request body.
 
 > [!NOTE]
 >
 > - Supported value types include **strings**, **integers**, **arrays**, and **JSON objects**
 > - See [Formatting](https://codeshelldev.github.io/secured-signal-api/docs/usage/formatting) for details on supported structures and syntax
+
+Supported [placeholder types](#placeholders):
+
+| `.` Variables | `@` Body | `#` Headers |
+| ------------- | -------- | ----------- |
+| ❌            | ✅       | ❌          |
 
 ## Configuration
 
@@ -204,13 +231,14 @@ This example config shows all the individual settings that can be applied:
 ```yaml
 # Example Config (all configurations shown)
 service:
+  logLevel: info
   port: 8880
+  hostnames:
+    - mydomain.com
 
 api:
   url: http://signal-api:8080
   tokens: [token1, token2]
-
-logLevel: info
 
 settings:
   message:
@@ -228,15 +256,27 @@ settings:
       "@message": [{ field: "msg", score: 100 }]
 
   access:
+    trustedIPs:
+      - 192.168.1.10
+
+    trustedProxies:
+      - 172.20.0.100
+
+    ipFilter:
+      - 192.168.1.10
+      - 192.168.2.0/24
+      - "!192.168.2.44"
+
     endpoints:
       - "!/v1/about"
       - /v2/send
 
+    rateLimiting:
+      limit: 100
+      period: 1h
+
     fieldPolicies:
-      "@number": {
-        value: "+123400003",
-        action: block
-      }
+      "@number": { value: "+123400003", action: block }
 ```
 
 #### Token Configs
@@ -246,65 +286,31 @@ You can also override the `config.yml` file for each individual token by adding 
 Here is an example:
 
 ```yaml
+# Example Token Config (all configurations shown)
+
+name: abc
+
+service:
+  logLevel: debug
+  port: 1234
+
 api:
   tokens: [LOOOONG_STRING]
 
 settings:
   message:
     fieldMappings: # Disable mappings
-    variables: # Disable variable placeholders
+    variables: # Override variables
+      number: "+123400004"
 
   access:
     endpoints: # Disable sending
       - "!/v2/send"
 ```
 
-### Templating
-
-Secured Signal API uses Go's [standard templating library](https://pkg.go.dev/text/template).
-This means that any valid Go template string will also work in Secured Signal API.
-
-Go's templating library is used in the following features:
-
-- [Message Templates](#message-templates)
-- [Query-to-Body Injection](#query-to-body-injection)
-- [Placeholders](#placeholders)
-
-This makes advanced [Message Templates](#message-templates) like this one possible:
-
-```yaml
-settings:
-  message:
-    template: |
-      {{- $greeting := "Hello" -}}
-      {{ $greeting }}, {{ @name }}!
-      {{ if @age -}}
-      You are {{ @age }} years old.
-      {{- else -}}
-      Age unknown.
-      {{- end }}
-      Your friends:
-      {{- range @friends }}
-      - {{ . }}
-      {{- else }}
-      You have no friends.
-      {{- end }}
-      Profile details:
-      {{- range $key, $value := @profile }}
-      - {{ $key }}: {{ $value }}
-      {{- end }}
-      {{ define "footer" -}}
-      This is the footer for {{ @name }}.
-      {{- end }}
-      {{ template "footer" . -}}
-      ------------------------------------
-      Content-Type: {{ #Content_Type }}
-      Redacted Auth Header: {{ #Authorization }}
-```
-
 ### API Tokens
 
-During authentication Secured Signal API will try to match the given token against the list of tokens inside of the `api.tokens` attribute.
+During authentication Secured Signal API will try to match the given token against the list of tokens inside of the `api.tokens` (or [`api.auth.tokens`](https://codeshelldev.github.io/secured-signal-api/docs/configuration/auth)) attribute.
 
 ```yaml
 api:
@@ -331,12 +337,10 @@ Since Secured Signal API is just a proxy you can use all the [Signal CLI REST AP
 
 These endpoints are blocked by default due to security risks.
 
-> [!NOTE]
-> Matching uses [glob-like patterns](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html):
+> [!IMPORTANT]
 >
-> - `*` matches any sequence of characters
-> - `?` matches a single character
-> - `[abc]` matches one of the characters in the brackets
+> 1. Matching uses [regex](https://regex101.com)
+> 2. On compile error exact match is used instead
 
 You can modify endpoints by configuring `access.endpoints` in your config:
 
@@ -344,10 +348,7 @@ You can modify endpoints by configuring `access.endpoints` in your config:
 settings:
   access:
     endpoints:
-      - "!/v1/register"
-      - "!/v1/unregister"
-      - "!/v1/qrcodelink"
-      - "!/v1/contacts"
+      - "!/v1/receive"
       - /v2/send
 ```
 
@@ -356,11 +357,11 @@ By default adding an endpoint explicitly allows access to it, use `!` to block i
 > [!IMPORTANT]
 > When using `!` to block you must enclose the endpoint with quotes, like in the example above
 
-| Config (Allow) | (Block)        |   Result   |     |                   |     |
-| :------------- | :------------- | :--------: | --- | :---------------: | --- |
-| `/v2/send`     | `unset`        |  **all**   | 🛑  |  **`/v2/send`**   | ✅  |
-| `unset`        | `!/v1/receive` |  **all**   | ✅  | **`/v1/receive`** | 🛑  |
-| `!/v2*`        | `/v2/send`     | **`/v2*`** | 🛑  |  **`/v2/send`**   | ✅  |
+| Allow      | Block          | Result                                    |
+| ---------- | -------------- | ----------------------------------------- |
+| `/v2/send` | —              | **Only** `/v2/send` allowed               |
+| —          | `!/v1/receive` | **All** allowed, **except** `/v1/receive` |
+| `/v2/send` | `!/v2/.*`      | **Only** `/v2/send` allowed               |
 
 ### Variables
 
@@ -413,6 +414,12 @@ settings:
 ```
 
 Set the wanted action on encounter, available options are `block` and `allow`.
+
+> [!IMPORTANT]
+> String fields always try to use
+>
+> 1. [Regex matching](https://regex101.com)
+> 2. On compile error exact match is used as fallback
 
 Supported [placeholder types](#placeholders):
 
