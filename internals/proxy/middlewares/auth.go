@@ -180,6 +180,8 @@ var QueryAuth = AuthMethod{
 var PathAuth = AuthMethod{
 	Name: "Path",
 	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
+		const authPath = "auth"
+
 		parts := strings.Split(req.URL.Path, "/")
 
 		if len(parts) <= 1 {
@@ -194,7 +196,7 @@ var PathAuth = AuthMethod{
 			return "", nil
 		}
 
-		auth, exists := strings.CutPrefix(unescaped, "auth=")
+		auth, exists := strings.CutPrefix(unescaped, "@" + authPath + "=")
 
 		if !exists {
 			return "", nil
