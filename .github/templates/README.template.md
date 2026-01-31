@@ -313,7 +313,11 @@ Configure them by using `access.fieldPolicies` like so:
 settings:
   access:
     fieldPolicies:
-      "@number": { value: "+123400002", action: block }
+      "@number":
+        - value: "+123400002"
+          action: block
+        - value: "+123400003"
+          action: block
 ```
 
 Set the wanted action on encounter, available options are `block` and `allow`.
