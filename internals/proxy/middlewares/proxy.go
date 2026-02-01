@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 )
 
 var InternalProxy Middleware = Middleware{
@@ -35,11 +37,7 @@ func proxyHandler(next http.Handler) http.Handler {
 		
 		conf := getConfigByReq(req)
 
-		rawTrustedProxies := conf.SETTINGS.ACCESS.TRUSTED_PROXIES
-
-		if rawTrustedProxies == nil {
-			rawTrustedProxies = getConfig("").SETTINGS.ACCESS.TRUSTED_PROXIES
-		}
+		rawTrustedProxies := conf.SETTINGS.ACCESS.TRUSTED_PROXIES.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.TRUSTED_PROXIES)
 
         var trusted bool
 		var ip net.IP

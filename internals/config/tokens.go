@@ -49,7 +49,7 @@ func InitTokens() {
 
 	var tokenConfigs []structure.CONFIG
 
-	tokenConf.Layer.Unmarshal("tokenconfigs", &tokenConfigs)
+	tokenConf.Unmarshal("tokenconfigs", &tokenConfigs)
 
 	config := parseTokenConfigs(tokenConfigs)
 
@@ -70,7 +70,7 @@ func InitTokens() {
 
 		// Set Blocked Endpoints on Config to User Layer Value
 		// => effectively ignoring Default Layer
-		DEFAULT.SETTINGS.ACCESS.ENDPOINTS = userConf.Layer.Strings("settings.access.endpoints")
+		userConf.Unmarshal("settings.access.endpoints", &DEFAULT.SETTINGS.ACCESS.ENDPOINTS.Value)
 	}
 
 	if len(apiTokens) > 0 {

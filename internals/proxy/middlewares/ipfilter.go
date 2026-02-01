@@ -3,8 +3,8 @@ package middlewares
 import (
 	"net"
 	"net/http"
-	"slices"
-	"strings"
+
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 )
 
 var IPFilter Middleware = Middleware{
@@ -18,15 +18,17 @@ func ipFilterHandler(next http.Handler) http.Handler {
 
 		conf := getConfigByReq(req)
 
-		ipFilter := conf.SETTINGS.ACCESS.IP_FILTER
+		ipFilter := conf.SETTINGS.ACCESS.IP_FILTER.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.IP_FILTER)
 
-		if ipFilter == nil {
-			ipFilter = getConfig("").SETTINGS.ACCESS.IP_FILTER
-		}
+		logger.Dev(conf.SETTINGS.ACCESS.IP_FILTER)
 
 		ip := getContext[net.IP](req, clientIPKey)
 
-		if isIPBlocked(ip, ipFilter) {
+		if isBlocked("", func(_, try string) bool {
+			tryIP, err := parseIP(try)
+			
+			return tryIP.Contains(ip) && err == nil
+		}, ipFilter) {
 			logger.Warn("Client IP is blocked by filter: ", ip.String())
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -34,62 +36,4 @@ func ipFilterHandler(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, req)
 	})
-}
-
-func getIPNets(ipNets []string) ([]string, []string) {
-	blockedIPNets := []string{}
-	allowedIPNets := []string{}
-
-	for _, ipNet := range ipNets {
-		ip, block := strings.CutPrefix(ipNet, "!")
-
-		if block {
-			blockedIPNets = append(blockedIPNets, ip)
-		} else {
-			allowedIPNets = append(allowedIPNets, ip)
-		}
-	}
-
-	return allowedIPNets, blockedIPNets
-}
-
-func isIPBlocked(ip net.IP, ipfilter []string) (bool) {
-	if len(ipfilter) == 0 || ipfilter == nil {
-		// default: allow all
-		return false
-	}
-
-	rawAllowed, rawBlocked := getIPNets(ipfilter)
-
-	allowed := parseIPsAndIPNets(rawAllowed)
-	blocked := parseIPsAndIPNets(rawBlocked)
-
-	isExplicitlyAllowed := slices.ContainsFunc(allowed, func(try *net.IPNet) bool {
-		return try.Contains(ip)
-	})
-	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try *net.IPNet) bool {
-		return try.Contains(ip)
-	})
-
-	// explicit allow > block
-	if isExplicitlyAllowed {
-		return false
-	}
-	
-	if isExplicitlyBlocked {
-		return true
-	}
-
-	// allow rules -> default deny
-	if len(allowed) > 0 {
-		return true
-	}
-	
-	// only block rules -> default allow
-	if len(blocked) > 0 {
-		return false
-	}
-
-	// safety net -> block
-	return true
 }

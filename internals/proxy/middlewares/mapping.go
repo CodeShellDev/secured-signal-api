@@ -5,6 +5,7 @@ import (
 
 	jsonutils "github.com/codeshelldev/gotl/pkg/jsonutils"
 	request "github.com/codeshelldev/gotl/pkg/request"
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 )
 
@@ -19,16 +20,8 @@ func mappingHandler(next http.Handler) http.Handler {
 
 		conf := getConfigByReq(req)
 
-		variables := conf.SETTINGS.MESSAGE.VARIABLES
-		fieldMappings := conf.SETTINGS.MESSAGE.FIELD_MAPPINGS
-
-		if fieldMappings == nil {
-			fieldMappings = getConfig("").SETTINGS.MESSAGE.FIELD_MAPPINGS
-		}
-
-		if variables == nil {
-			variables = getConfig("").SETTINGS.MESSAGE.VARIABLES
-		}
+		variables := conf.SETTINGS.MESSAGE.VARIABLES.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.VARIABLES)
+		fieldMappings := conf.SETTINGS.MESSAGE.FIELD_MAPPINGS.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.FIELD_MAPPINGS)
 
 		body, err := request.GetReqBody(req)
 

@@ -3,6 +3,8 @@ package middlewares
 import (
 	"net"
 	"net/http"
+
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 )
 
 var InternalClientIP Middleware = Middleware{
@@ -18,11 +20,7 @@ func clientIPHandler(next http.Handler) http.Handler {
 
 		conf := getConfigByReq(req)
 
-		rawTrustedIPs := conf.SETTINGS.ACCESS.TRUSTED_IPS
-
-		if rawTrustedIPs == nil {
-			rawTrustedIPs = getConfig("").SETTINGS.ACCESS.TRUSTED_IPS
-		}
+		rawTrustedIPs := conf.SETTINGS.ACCESS.TRUSTED_IPS.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.TRUSTED_IPS)
 
 		ip := getContext[net.IP](req, clientIPKey)
 

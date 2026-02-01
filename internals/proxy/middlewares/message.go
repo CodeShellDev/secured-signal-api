@@ -3,9 +3,9 @@ package middlewares
 import (
 	"net/http"
 	"path"
-	"strings"
 
 	request "github.com/codeshelldev/gotl/pkg/request"
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 )
 
 var Message Middleware = Middleware{
@@ -21,22 +21,15 @@ func messageHandler(next http.Handler) http.Handler {
 	mux.HandleFunc(templateMessageEndpoint, func(w http.ResponseWriter, req *http.Request) {
 		if req.Method != "POST" {
 			next.ServeHTTP(w, req)
+			return
 		}
 
 		logger := getLogger(req)
 
 		conf := getConfigByReq(req)
 
-		variables := conf.SETTINGS.MESSAGE.VARIABLES
-		messageTemplate := conf.SETTINGS.MESSAGE.TEMPLATE
-
-		if variables == nil {
-			variables = getConfig("").SETTINGS.MESSAGE.VARIABLES
-		}
-
-		if strings.TrimSpace(messageTemplate) == "" {
-			messageTemplate = getConfig("").SETTINGS.MESSAGE.TEMPLATE
-		}
+		variables := conf.SETTINGS.MESSAGE.VARIABLES.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.VARIABLES)
+		messageTemplate := conf.SETTINGS.MESSAGE.TEMPLATE.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.TEMPLATE)
 
 		body, err := request.GetReqBody(req)
 

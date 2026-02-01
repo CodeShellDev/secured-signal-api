@@ -2,8 +2,8 @@ github.com/clipperhouse/stringish v0.1.1 h1:+NSqMOr3GR6k1FdRhhnXrLfztGzuG+VuFDfa
 github.com/clipperhouse/stringish v0.1.1/go.mod h1:v/WhFtE1q0ovMta2+m+UbpZ+2/HEXNWYXQgCt4hdOzA=
 github.com/clipperhouse/uax29/v2 v2.4.0 h1:RXqE/l5EiAbA4u97giimKNlmpvkmz+GrBVTelsoXy9g=
 github.com/clipperhouse/uax29/v2 v2.4.0/go.mod h1:Wn1g7MK6OoeDT0vL+Q0SQLDz/KpfsVRgg6W7ihQeh4g=
-github.com/codeshelldev/gotl/pkg/configutils v0.0.7 h1:54zv82v87xCrilbi7gfVFpC37dIpR4a9PXw8pYs1Few=
-github.com/codeshelldev/gotl/pkg/configutils v0.0.7/go.mod h1:WoWMBB8+84ePRnI2m+kbq1Rw8F/9iCWLHkVBsun3Qjc=
+github.com/codeshelldev/gotl/pkg/configutils v0.0.15-16 h1:cKJFxNj1k0QpQrFhfbKR32oL0Wgsai4eLMeCtLhHekY=
+github.com/codeshelldev/gotl/pkg/configutils v0.0.15-16/go.mod h1:X7wY6s44k0Cxx2oMmJChogB1n1+oR+RqbzmQCCqnN5I=
 github.com/codeshelldev/gotl/pkg/docker v0.0.2 h1:kpseReocEBoSzWe/tOhUrIrOYeAR/inw3EF2/d+N078=
 github.com/codeshelldev/gotl/pkg/docker v0.0.2/go.mod h1:odNnlRw4aO1n2hSkDZIaiuSXIoFoVeatmXtF64Yd33U=
 github.com/codeshelldev/gotl/pkg/ioutils v0.0.2 h1:IRcN2M6H4v59iodw1k7gFX9lirhbVy6RZ4yRtKNcFYg=

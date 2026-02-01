@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 )
 
 var Hostname Middleware = Middleware{
@@ -17,11 +19,7 @@ func hostnameHandler(next http.Handler) http.Handler {
 
 		conf := getConfigByReq(req)
 
-		hostnames := conf.SERVICE.HOSTNAMES
-
-		if hostnames == nil {
-			hostnames = getConfig("").SERVICE.HOSTNAMES
-		}
+		hostnames := conf.SERVICE.HOSTNAMES.OptOrEmpty(config.DEFAULT.SERVICE.HOSTNAMES)
 
 		if len(hostnames) > 0 {
 			URL := getContext[*url.URL](req, originURLKey)

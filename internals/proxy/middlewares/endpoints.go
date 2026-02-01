@@ -5,6 +5,9 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+
+	"github.com/codeshelldev/secured-signal-api/internals/config"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 )
 
 var Endpoints Middleware = Middleware{
@@ -18,15 +21,11 @@ func endpointsHandler(next http.Handler) http.Handler {
 
 		conf := getConfigByReq(req)
 
-		endpoints := conf.SETTINGS.ACCESS.ENDPOINTS
-
-		if endpoints == nil {
-			endpoints = getConfig("").SETTINGS.ACCESS.ENDPOINTS
-		}
+		endpoints := conf.SETTINGS.ACCESS.ENDPOINTS.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.ENDPOINTS)
 
 		reqPath := req.URL.Path
 
-		if isEndpointBlocked(reqPath, endpoints) {
+		if isBlocked(reqPath, matchesPattern, endpoints) {
 			logger.Warn("Client tried to access blocked endpoint: ", reqPath)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -63,19 +62,17 @@ func matchesPattern(endpoint, pattern string) bool {
 	return re.MatchString(endpoint)
 }
 
-func isEndpointBlocked(endpoint string, endpoints []string) bool {
-	if len(endpoints) == 0 || endpoints == nil {
+func isBlocked(test string, matchFunc func(test, try string) bool, allowBlockSlice structure.AllowBlockSlice) bool {
+	if len(allowBlockSlice.Allow) == 0 && len(allowBlockSlice.Block) == 0 {
 		// default: allow all
 		return false
 	}
 
-	allowed, blocked := getEndpoints(endpoints)
-
-	isExplicitlyAllowed := slices.ContainsFunc(allowed, func(try string) bool {
-		return matchesPattern(endpoint, try)
+	isExplicitlyAllowed := slices.ContainsFunc(allowBlockSlice.Allow, func(try string) bool {
+		return matchFunc(test, try)
 	})
-	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try string) bool {
-		return matchesPattern(endpoint, try)
+	isExplicitlyBlocked := slices.ContainsFunc(allowBlockSlice.Allow, func(try string) bool {
+		return matchFunc(test, try)
 	})
 
 	// explicit allow > block
@@ -87,13 +84,13 @@ func isEndpointBlocked(endpoint string, endpoints []string) bool {
 		return true
 	}
 
-	// allow rules -> default deny
-	if len(allowed) > 0 {
+	// allows -> default deny
+	if len(allowBlockSlice.Allow) > 0 {
 		return true
 	}
 	
-	// only block rules -> default allow
-	if len(blocked) > 0 {
+	// only blocks -> default allow
+	if len(allowBlockSlice.Allow) > 0 {
 		return false
 	}
 
