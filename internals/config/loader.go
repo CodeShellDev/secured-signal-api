@@ -10,7 +10,6 @@ import (
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/stringutils"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
-
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
@@ -109,7 +108,7 @@ func Normalize(id string, config *configutils.Config, path string, structure any
 	// Create temporary config
 	tmpConf := configutils.New()
 	tmpConf.Load(old, "")
-	
+
 	// Apply transforms to the new config
 	tmpConf.ApplyTransformFuncs(id, structure, "", configutils.TransformOptions{
 		Transforms: transformFuncs,
@@ -118,7 +117,7 @@ func Normalize(id string, config *configutils.Config, path string, structure any
 
 	// Lowercase actual config
 	LowercaseKeys(config)
-
+	
 	// Load temporary config back into paths
 	config.Layer.Delete(path)
 	
@@ -140,7 +139,7 @@ func InitReload() {
 func InitConfig() {
 	var config structure.CONFIG
 
-	mainConf.Layer.Unmarshal("", &config)
+	mainConf.Unmarshal("", &config)
 
 	config.TYPE = structure.MAIN
 

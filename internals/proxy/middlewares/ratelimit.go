@@ -2,9 +2,9 @@ package middlewares
 
 import (
 	"net/http"
-	"strings"
 	"time"
 
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"golang.org/x/time/rate"
 )
 
@@ -44,35 +44,19 @@ func ratelimitHandler(next http.Handler) http.Handler {
 
 		conf := getConfigByReq(req)
 
-		rateLimiting := conf.SETTINGS.ACCESS.RATE_LIMITING
+		rateLimiting := conf.SETTINGS.ACCESS.RATE_LIMITING.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.RATE_LIMITING)
 
-		limit := rateLimiting.Limit
+		logger.Dev(config.DEFAULT.SETTINGS.ACCESS.RATE_LIMITING.Value.Period)
 
-		if limit == 0 {
-			limit = getConfig("").SETTINGS.ACCESS.RATE_LIMITING.Limit
-		}
-
-		periodStr := rateLimiting.Period
-
-		if strings.TrimSpace(periodStr) == "" {
-			periodStr = conf.SETTINGS.ACCESS.RATE_LIMITING.Period
-		}
-
-		if strings.TrimSpace(periodStr) != "" && limit != 0 {
-			period, err := time.ParseDuration(periodStr)
-
-			if err != nil {
-				logger.Error("Could not parse Duration: ", err.Error())
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-
+		if rateLimiting.Period.Duration != 0 && rateLimiting.Limit != 0 {
 			token := getToken(req)
+
+			logger.Dev(time.Duration(config.DEFAULT.SETTINGS.ACCESS.RATE_LIMITING.Value.Period.Duration).String())
 
 			tokenLimiter, exists := tokenLimiters[token]
 
 			if !exists {
-				tokenLimiter = NewTokenLimiter(limit, period)
+				tokenLimiter = NewTokenLimiter(rateLimiting.Limit, time.Duration(rateLimiting.Period.Duration))
 				tokenLimiters[token] = tokenLimiter
 			}
 

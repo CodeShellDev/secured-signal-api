@@ -3,6 +3,10 @@ package middlewares
 import (
 	"net"
 	"net/http"
+
+	"github.com/codeshelldev/secured-signal-api/internals/config"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	"github.com/codeshelldev/secured-signal-api/utils/netutils"
 )
 
 var InternalClientIP Middleware = Middleware{
@@ -18,16 +22,12 @@ func clientIPHandler(next http.Handler) http.Handler {
 
 		conf := getConfigByReq(req)
 
-		rawTrustedIPs := conf.SETTINGS.ACCESS.TRUSTED_IPS
-
-		if rawTrustedIPs == nil {
-			rawTrustedIPs = getConfig("").SETTINGS.ACCESS.TRUSTED_IPS
-		}
+		rawTrustedIPs := conf.SETTINGS.ACCESS.TRUSTED_IPS.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.TRUSTED_IPS)
 
 		ip := getContext[net.IP](req, clientIPKey)
 
-		trustedIPs := parseIPsAndIPNets(rawTrustedIPs)
-		trusted := isIPInList(ip, trustedIPs)
+		trustedIPs := parseIPsAndNets(rawTrustedIPs)
+		trusted := netutils.IsIPIn(ip, trustedIPs)
 
 		if trusted {
 			logger.Dev("Connection from trusted Client: ", ip.String())
@@ -37,4 +37,14 @@ func clientIPHandler(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, req)
 	})
+}
+
+func parseIPsAndNets(ipNets []structure.IPOrNet) []*net.IPNet {
+    out := []*net.IPNet{}
+
+    for _, ipNet := range ipNets {
+        out = append(out, ipNet.IPNet)
+    }
+
+    return out
 }

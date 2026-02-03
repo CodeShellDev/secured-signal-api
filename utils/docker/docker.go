@@ -7,7 +7,7 @@ import (
 
 	"github.com/codeshelldev/gotl/pkg/docker"
 	"github.com/codeshelldev/gotl/pkg/logger"
-	"github.com/codeshelldev/secured-signal-api/internals/server"
+	httpserver "github.com/codeshelldev/gotl/pkg/server/http"
 )
 
 func Init() {
@@ -24,7 +24,7 @@ func Exit(code int) {
 	docker.Exit(code)
 }
 
-func Shutdown(server *server.Server) {
+func Shutdown(server *httpserver.HttpServer) {
 	logger.Info("Shutdown signal received")
 
 	logger.Sync()

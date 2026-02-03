@@ -1,11 +1,13 @@
 package middlewares
 
 import (
-	"errors"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/codeshelldev/secured-signal-api/internals/config"
+	"github.com/codeshelldev/secured-signal-api/utils/netutils"
 )
 
 var InternalProxy Middleware = Middleware{
@@ -35,11 +37,7 @@ func proxyHandler(next http.Handler) http.Handler {
 		
 		conf := getConfigByReq(req)
 
-		rawTrustedProxies := conf.SETTINGS.ACCESS.TRUSTED_PROXIES
-
-		if rawTrustedProxies == nil {
-			rawTrustedProxies = getConfig("").SETTINGS.ACCESS.TRUSTED_PROXIES
-		}
+		rawTrustedProxies := conf.SETTINGS.ACCESS.TRUSTED_PROXIES.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.TRUSTED_PROXIES)
 
         var trusted bool
 		var ip net.IP
@@ -51,9 +49,8 @@ func proxyHandler(next http.Handler) http.Handler {
 		ip = net.ParseIP(host)
 
 		if len(rawTrustedProxies) != 0 {
-			trustedProxies := parseIPsAndIPNets(rawTrustedProxies)
-
-			trusted = isIPInList(ip, trustedProxies)
+            trustedProxies := parseIPsAndNets(rawTrustedProxies)
+			trusted = netutils.IsIPIn(ip, trustedProxies)
 		}
 
 		if trusted {
@@ -112,50 +109,6 @@ func parseForIP(value string) net.IP {
     }
 
     return net.ParseIP(value)
-}
-
-func parseIP(str string) (*net.IPNet, error) {
-    if !strings.Contains(str, "/") {
-        ip := net.ParseIP(str)
-
-        if ip == nil {
-            return nil, errors.New("invalid ip: " + str)
-        }
-
-        var mask net.IPMask
-
-        if ip.To4() != nil {
-            mask = net.CIDRMask(32, 32) // IPv4 /32
-        } else {
-            mask = net.CIDRMask(128, 128) // IPv6 /128
-        }
-		
-        return &net.IPNet{IP: ip, Mask: mask}, nil
-    }
-
-    _, network, err := net.ParseCIDR(str)
-
-    if err != nil {
-        return nil, err
-    }
-
-    return network, nil
-}
-
-func parseIPsAndIPNets(array []string) []*net.IPNet {
-	ipNets := []*net.IPNet{}
-
-	for _, item := range array {
-		ipNet, err := parseIP(item)
-
-		if err != nil {
-			continue
-		}
-
-		ipNets = append(ipNets, ipNet)
-	}
-
-	return ipNets
 }
 
 func parseXForwardedHeaders(headers http.Header) []ForwardedEntry {
@@ -227,13 +180,4 @@ func parseForwarded(header string) []ForwardedEntry {
     }
 
     return entries
-}
-
-func isIPInList(ip net.IP, list []*net.IPNet) bool {
-	for _, net := range list {
-		if net.Contains(ip) {
-			return true
-		}
-	}
-	return false
 }

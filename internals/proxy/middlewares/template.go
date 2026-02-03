@@ -12,6 +12,7 @@ import (
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/gotl/pkg/stringutils"
 	templating "github.com/codeshelldev/gotl/pkg/templating"
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
 
@@ -26,11 +27,7 @@ func templateHandler(next http.Handler) http.Handler {
 
 		conf := getConfigByReq(req)
 		
-		variables := conf.SETTINGS.MESSAGE.VARIABLES
-
-		if variables == nil {
-			variables = getConfig("").SETTINGS.MESSAGE.VARIABLES
-		}
+		variables := conf.SETTINGS.MESSAGE.VARIABLES.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.VARIABLES)
 
 		body, err := request.GetReqBody(req)
 

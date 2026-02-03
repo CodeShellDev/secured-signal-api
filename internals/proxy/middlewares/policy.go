@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	request "github.com/codeshelldev/gotl/pkg/request"
+	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
@@ -22,11 +23,7 @@ func policyHandler(next http.Handler) http.Handler {
 
 		conf := getConfigByReq(req)
 
-		policies := conf.SETTINGS.ACCESS.FIELD_POLICIES
-
-		if policies == nil {
-			policies = getConfig("").SETTINGS.ACCESS.FIELD_POLICIES
-		}
+		policies := conf.SETTINGS.ACCESS.FIELD_POLICIES.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.FIELD_POLICIES)
 
 		body, err := request.GetReqBody(req)
 
@@ -138,14 +135,14 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 	return false, ""
 }
 
-func isBlockedByPolicy(body map[string]any, headers map[string][]string, policies map[string][]structure.FieldPolicy) (bool, string) {
+func isBlockedByPolicy(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicies) (bool, string) {
 	if len(policies) == 0 || policies == nil {
 		// default: allow all
 		return false, ""
 	}
 
 	for field, policy := range policies {
-		if len(policy) == 0 || policy == nil {
+		if len(policy.Allow) == 0 || len(policy.Block) == 0 {
 			continue
 		}
 
@@ -155,10 +152,8 @@ func isBlockedByPolicy(body map[string]any, headers map[string][]string, policie
 			continue
 		}
 
-		allowed, blocked := getPolicies(policy)
-
-		isExplicitlyAllowed, cause := doPoliciesApply(field, body, headers, allowed)
-		isExplicitlyBlocked, cause := doPoliciesApply(field, body, headers, blocked)
+		isExplicitlyAllowed, cause := doPoliciesApply(field, body, headers, policy.Allow)
+		isExplicitlyBlocked, cause := doPoliciesApply(field, body, headers, policy.Block)
 
 		// explicit allow > block
 		if isExplicitlyAllowed {
@@ -170,12 +165,12 @@ func isBlockedByPolicy(body map[string]any, headers map[string][]string, policie
 		}
 
 		// allow rules -> default deny
-		if len(allowed) > 0 {
+		if len(policy.Allow) > 0 {
 			return true, cause
 		}
 		
 		// only block rules -> default allow
-		if len(blocked) > 0 {
+		if len(policy.Block) > 0 {
 			return false, cause
 		}
 
