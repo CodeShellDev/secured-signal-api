@@ -6,10 +6,11 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
+	httpserver "github.com/codeshelldev/gotl/pkg/server/http"
 	config "github.com/codeshelldev/secured-signal-api/internals/config"
 	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
-	httpServer "github.com/codeshelldev/secured-signal-api/internals/server"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
+	"github.com/codeshelldev/secured-signal-api/utils/stdlog"
 )
 
 var proxy reverseProxy.Proxy
@@ -36,7 +37,7 @@ func main() {
 
 	config.Log()
 
-	proxy = reverseProxy.Create(config.DEFAULT.API.URL)
+	proxy = reverseProxy.Create(config.DEFAULT.API.URL.URL)
 
 	handler := proxy.Init()
 
@@ -52,13 +53,16 @@ func main() {
 		}
 	}
 
-	server := httpServer.Create(handler, "0.0.0.0", ports...)
+	server := httpserver.Create(handler, "0.0.0.0", ports...)
+
+	server.ErrorLog = stdlog.ErrorLog
+	server.InfoLog = stdlog.DebugLog
 
 	stop := docker.Run(func() {
 		if logger.IsDebug() && len(ports) > 1 {
-			logger.Debug("Server started with ", len(ports), " listeners on ", httpServer.PortsToRangeString(ports))
+			logger.Debug("Server started with ", len(ports), " listeners on ", httpserver.PortsToRangeString(ports))
 		} else {
-			logger.Info("Server listening on ", httpServer.PortsToRangeString(ports))
+			logger.Info("Server listening on ", httpserver.PortsToRangeString(ports))
 		}
 
 		server.ListenAndServer()
