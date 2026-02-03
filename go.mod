@@ -10,6 +10,8 @@ require (
 	github.com/codeshelldev/gotl/pkg/pretty v0.0.9
 	github.com/codeshelldev/gotl/pkg/query v0.0.3
 	github.com/codeshelldev/gotl/pkg/request v0.0.6
+	github.com/codeshelldev/gotl/pkg/scheduler v0.0.2
+	github.com/codeshelldev/gotl/pkg/server/http v0.0.2
 	github.com/codeshelldev/gotl/pkg/stringutils v0.0.3
 	github.com/codeshelldev/gotl/pkg/templating v0.0.3
 )
@@ -25,6 +27,7 @@ require (
 	github.com/clipperhouse/uax29/v2 v2.4.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
+	github.com/google/uuid v1.6.0
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/knadh/koanf/providers/confmap v1.0.0 // indirect
 	github.com/knadh/koanf/providers/env/v2 v2.0.0 // indirect

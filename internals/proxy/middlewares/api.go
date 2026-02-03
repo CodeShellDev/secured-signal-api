@@ -1,9 +1,8 @@
 package middlewares
 
 import (
-	"bytes"
-	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -23,11 +22,14 @@ func internalAPIHandler(next http.Handler) http.Handler {
 
 	const aboutEndpoint = "/v1/about"
 	mux.HandleFunc(aboutEndpoint, func(w http.ResponseWriter, req *http.Request) {
-		res, err := redirectRequestToBackend(req, config.DEFAULT.API.URL + aboutEndpoint)
-		
+		ChangeRequestDest(req, config.DEFAULT.API.URL.String() + aboutEndpoint)
+
+		client := &http.Client{}
+		res, err := client.Do(req)
+
 		if err != nil {
-			logger.Error("Error requesting Backend: ", err.Error())
-			http.Error(w, "Internal Server Error ", http.StatusBadGateway)
+			logger.Error("Error requesting backend: ", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
@@ -90,42 +92,14 @@ func isValidSemver(version string) bool {
 	return re.MatchString(version)
 }
 
-func redirectRequestToBackend(req *http.Request, url string) (*http.Response, error) {
-	var body io.Reader
+func ChangeRequestDest(req *http.Request, newDest string) error {
+	newURL, err := url.Parse(newDest)
+	if err != nil {
+		return err
+	}
 
-    if req.Body != nil {
-        bodyBytes, err := io.ReadAll(req.Body)
+	req.URL = newURL
+	req.Host = newURL.Host
 
-        if err != nil {
-            return nil, err
-        }
-        req.Body.Close()
-
-        body = bytes.NewReader(bodyBytes)
-        req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-    }
-
-	return requestBackend(req.Method, url, body, req.Header)
-}
-
-func requestBackend(method, url string, body io.Reader, headers map[string][]string) (*http.Response, error) {
-    backendReq, err := http.NewRequest(method, url, body)
-    if err != nil {
-        return nil, err
-    }
-
-    for key, values := range headers {
-        for _, value := range values {
-            backendReq.Header.Add(key, value)
-        }
-    }
-
-    client := &http.Client{}
-
-    res, err := client.Do(backendReq)
-    if err != nil {
-        return nil, err
-    }
-
-    return res, nil
+	return nil
 }

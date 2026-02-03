@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"regexp"
 	"slices"
-	"strings"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
@@ -35,23 +34,6 @@ func endpointsHandler(next http.Handler) http.Handler {
 	})
 }
 
-func getEndpoints(endpoints []string) ([]string, []string) {
-	blockedEndpoints := []string{}
-	allowedEndpoints := []string{}
-
-	for _, endpoint := range endpoints {
-		endpoint, block := strings.CutPrefix(endpoint, "!")
-
-		if block {
-			blockedEndpoints = append(blockedEndpoints, endpoint)
-		} else {
-			allowedEndpoints = append(allowedEndpoints, endpoint)
-		}
-	}
-
-	return allowedEndpoints, blockedEndpoints
-}
-
 func matchesPattern(endpoint, pattern string) bool {
 	re, err := regexp.Compile(pattern)
 
@@ -71,7 +53,7 @@ func isBlocked(test string, matchFunc func(test, try string) bool, allowBlockSli
 	isExplicitlyAllowed := slices.ContainsFunc(allowBlockSlice.Allow, func(try string) bool {
 		return matchFunc(test, try)
 	})
-	isExplicitlyBlocked := slices.ContainsFunc(allowBlockSlice.Allow, func(try string) bool {
+	isExplicitlyBlocked := slices.ContainsFunc(allowBlockSlice.Block, func(try string) bool {
 		return matchFunc(test, try)
 	})
 
@@ -90,7 +72,7 @@ func isBlocked(test string, matchFunc func(test, try string) bool, allowBlockSli
 	}
 	
 	// only blocks -> default allow
-	if len(allowBlockSlice.Allow) > 0 {
+	if len(allowBlockSlice.Block) > 0 {
 		return false
 	}
 

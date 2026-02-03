@@ -6,9 +6,12 @@ import (
 
 type ENV struct {
 	CONFIG_PATH   		string
+	TOKENS_DIR    		string
+
 	DEFAULTS_PATH 		string
 	FAVICON_PATH  		string
-	TOKENS_DIR    		string
+
+	DB_PATH				string
 	
 	INSECURE      		bool
 
@@ -40,7 +43,7 @@ type SERVICE struct {
 }
 
 type API struct {
-	URL					string						`koanf:"url"             env>aliases:".apiurl"`
+	URL					URL							`koanf:"url"             env>aliases:".apiurl"`
 	// DEPRECATION token, tokens in Token Config
 	// DEPRECATION api.token => api.tokens
 	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken" aliases:"token" token>aliases:".tokens,.token" token>onuse:".tokens,.token,token>>deprecated" onuse:"token>>deprecated" deprecation:".tokens,.token>>{b,fg=yellow}\x60{s}tokens{/}\x60{/} and {b,fg=yellow}\x60{s}token{/}\x60{/} will not be at {b}root{/} anymore\nUse {b,fg=green}\x60api.tokens\x60{/} instead|token>>{b,fg=yellow}\x60{s}api.token{/}\x60{/} will be {u}removed{/} in favor of {b,fg=green}\x60api.tokens\x60{/}"`																					
@@ -79,8 +82,8 @@ type ACCESS struct {
 	FIELD_POLICIES		Opt[map[string]FieldPolicies]`koanf:"fieldpolicies"   childtransform:"default"`
 	RATE_LIMITING		Opt[RateLimiting]			`koanf:"ratelimiting"`
 	IP_FILTER			Opt[AllowBlockSlice]		`koanf:"ipfilter"`
-	TRUSTED_IPS			Opt[[]string]				`koanf:"trustedips"`
-	TRUSTED_PROXIES		Opt[[]string]				`koanf:"trustedproxies"`
+	TRUSTED_IPS			Opt[[]IPOrNet]				`koanf:"trustedips"`
+	TRUSTED_PROXIES		Opt[[]IPOrNet]				`koanf:"trustedproxies"`
 }
 
 type FieldPolicy struct {

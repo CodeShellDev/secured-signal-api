@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
+	"github.com/codeshelldev/secured-signal-api/utils/netutils"
 )
 
 var IPFilter Middleware = Middleware{
@@ -25,7 +26,7 @@ func ipFilterHandler(next http.Handler) http.Handler {
 		ip := getContext[net.IP](req, clientIPKey)
 
 		if isBlocked("", func(_, try string) bool {
-			tryIP, err := parseIP(try)
+			tryIP, err := netutils.ParseIPorNet(try)
 			
 			return tryIP.Contains(ip) && err == nil
 		}, ipFilter) {

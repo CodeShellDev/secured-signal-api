@@ -1,36 +1,26 @@
 package proxy
 
 import (
-	"bytes"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"strings"
 
-	"github.com/codeshelldev/gotl/pkg/ioutils"
 	"github.com/codeshelldev/gotl/pkg/logger"
 	m "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
+	"github.com/codeshelldev/secured-signal-api/utils/stdlog"
 )
 
 type Proxy struct {
 	Use func() *httputil.ReverseProxy
 }
 
-func Create(targetUrl string) Proxy {
-	if strings.TrimSpace(targetUrl) == "" {
+func Create(targetUrl *url.URL) Proxy {
+	if targetUrl == nil {
 		logger.Fatal("Missing API URL")
 		return Proxy{Use: func() *httputil.ReverseProxy {return nil}}
 	}
 
-	url, err := url.Parse(targetUrl)
-
-	if err != nil {
-		logger.Fatal("Invalid API URL: ", targetUrl)
-		return Proxy{Use: func() *httputil.ReverseProxy {return nil}}
-	}
-
-	proxy := httputil.NewSingleHostReverseProxy(url)
+	proxy := httputil.NewSingleHostReverseProxy(targetUrl)
 	proxy.ModifyResponse = func(res *http.Response) error {
 		res.Header.Set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0, private, proxy-revalidate")
 		res.Header.Set("Pragma", "no-cache")
@@ -41,17 +31,7 @@ func Create(targetUrl string) Proxy {
 		return nil
 	}
 
-	w := &ioutils.InterceptWriter{
-		Writer: &bytes.Buffer{},
-		Hook: func(bytes []byte) {
-			msg := string(bytes)
-			msg = strings.TrimSuffix(msg, "\n") 
-
-			logger.Error(msg)
-		},
-	}
-
-	proxy.ErrorLog = log.New(w, "", 0)
+	proxy.ErrorLog = stdlog.ErrorLog
 
 	director := proxy.Director
 
@@ -59,7 +39,7 @@ func Create(targetUrl string) Proxy {
 		director(req)
 
 		req.Header.Add("X-Forwarded-Host", req.Host)
-		req.Host = url.Host
+		req.Host = targetUrl.Host
 	}
 
 	return Proxy{Use: func() *httputil.ReverseProxy {return proxy}}

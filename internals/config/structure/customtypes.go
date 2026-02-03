@@ -5,30 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"time"
 )
-
-type TimeDuration struct {
-	Duration time.Duration
-}
-
-func (timeDuration *TimeDuration) UnmarshalMapstructure(raw any) error {
-	str, ok := raw.(string)
-
-	if !ok {
-		return errors.New("expected string, got " + reflect.TypeOf(raw).String())
-	}
-
-    d, err := time.ParseDuration(str)
-
-	if err != nil {
-		return err
-	}
-
-	timeDuration.Duration = d
-
-	return nil
-}
 
 type AllowBlockSlice struct{
 	Allow	[]string
