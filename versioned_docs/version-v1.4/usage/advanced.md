@@ -7,7 +7,7 @@ title: Advanced
 
 Here you will be explained all the neat tricks and quirks for **Secured Signal API**
 
-## placeholders
+## Placeholders
 
 Placeholders do exactly what you think they do: They **replace** actual values.
 These can be especially **helpful** when managing **variables** across multiple services.
