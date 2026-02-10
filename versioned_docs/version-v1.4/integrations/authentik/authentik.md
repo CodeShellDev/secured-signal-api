@@ -62,7 +62,7 @@ For advanced setups or if you want to manage message content with Secured Signal
 return {
     "recipients": [device.phone_number],
     "token": f"{token}",
-    "number": f"stage.from_number}"
+    "number": f"{stage.from_number}"
 }
 ```
 
