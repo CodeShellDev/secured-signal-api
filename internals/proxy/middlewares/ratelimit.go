@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 	"golang.org/x/time/rate"
 )
 
@@ -33,25 +34,21 @@ var tokenLimiters = map[string]*TokenLimiter{}
 
 func ratelimitHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
+		logger := GetLogger(req)
 
-		trusted := getContext[bool](req, trustedClientKey)
+		trusted := GetContext[bool](req, TrustedClientKey)
 
 		if trusted {
 			next.ServeHTTP(w, req)
 			return
 		}
 
-		conf := getConfigByReq(req)
+		conf := GetConfigByReq(req)
 
 		rateLimiting := conf.SETTINGS.ACCESS.RATE_LIMITING.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.RATE_LIMITING)
 
-		logger.Dev(config.DEFAULT.SETTINGS.ACCESS.RATE_LIMITING.Value.Period)
-
 		if rateLimiting.Period.Duration != 0 && rateLimiting.Limit != 0 {
-			token := getToken(req)
-
-			logger.Dev(time.Duration(config.DEFAULT.SETTINGS.ACCESS.RATE_LIMITING.Value.Period.Duration).String())
+			token := GetToken(req)
 
 			tokenLimiter, exists := tokenLimiters[token]
 

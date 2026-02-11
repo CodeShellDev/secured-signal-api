@@ -6,6 +6,7 @@ import (
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 	"github.com/codeshelldev/secured-signal-api/utils/netutils"
 )
 
@@ -14,17 +15,15 @@ var InternalClientIP Middleware = Middleware{
 	Use: clientIPHandler,
 }
 
-var trustedClientKey contextKey = "isClientTrusted"
-
 func clientIPHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
+		logger := GetLogger(req)
 
-		conf := getConfigByReq(req)
+		conf := GetConfigByReq(req)
 
 		rawTrustedIPs := conf.SETTINGS.ACCESS.TRUSTED_IPS.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.TRUSTED_IPS)
 
-		ip := getContext[net.IP](req, clientIPKey)
+		ip := GetContext[net.IP](req, ClientIPKey)
 
 		trustedIPs := parseIPsAndNets(rawTrustedIPs)
 		trusted := netutils.IsIPIn(ip, trustedIPs)
@@ -33,7 +32,7 @@ func clientIPHandler(next http.Handler) http.Handler {
 			logger.Dev("Connection from trusted Client: ", ip.String())
 		}
 
-		req = setContext(req, trustedClientKey, trusted)
+		req = SetContext(req, TrustedClientKey, trusted)
 
 		next.ServeHTTP(w, req)
 	})

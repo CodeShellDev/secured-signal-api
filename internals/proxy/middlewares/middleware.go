@@ -9,7 +9,7 @@ import (
 
 type Middleware struct {
 	Name string
-	Use func(http.Handler) http.Handler 
+	Use func(next http.Handler) http.Handler 
 }
 
 type Chain struct {

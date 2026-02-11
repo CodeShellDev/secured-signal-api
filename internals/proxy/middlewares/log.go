@@ -8,6 +8,7 @@ import (
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 )
 
 var RequestLogger Middleware = Middleware{
@@ -15,13 +16,11 @@ var RequestLogger Middleware = Middleware{
 	Use: loggingHandler,
 }
 
-const loggerKey contextKey = "logger"
-
 func loggingHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
+		logger := GetLogger(req)
 
-		ip := getContext[net.IP](req, clientIPKey)
+		ip := GetContext[net.IP](req, ClientIPKey)
 
 		if !logger.IsDev() {
 			logger.Info(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
@@ -46,7 +45,7 @@ var InternalMiddlewareLogger Middleware = Middleware{
 
 func middlewareLoggerHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		conf := getConfigWithoutDefaultByReq(req)
+		conf := GetConfigWithoutDefaultByReq(req)
 
 		var logLevel string
 
@@ -64,7 +63,7 @@ func middlewareLoggerHandler(next http.Handler) http.Handler {
 			})
 		}
 
-		req = setContext(req, loggerKey, l)
+		req = SetContext(req, LoggerKey, l)
 
 		next.ServeHTTP(w, req)
 	})

@@ -9,6 +9,7 @@ import (
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
 
@@ -19,9 +20,9 @@ var Policy Middleware = Middleware{
 
 func policyHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
+		logger := GetLogger(req)
 
-		conf := getConfigByReq(req)
+		conf := GetConfigByReq(req)
 
 		policies := conf.SETTINGS.ACCESS.FIELD_POLICIES.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.FIELD_POLICIES)
 
@@ -49,22 +50,6 @@ func policyHandler(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, req)
 	})
-}
-
-func getPolicies(policies []structure.FieldPolicy) ([]structure.FieldPolicy, []structure.FieldPolicy) {
-	blocked := []structure.FieldPolicy{}
-	allowed := []structure.FieldPolicy{}
-
-	for _, policy := range policies {
-		switch policy.Action {
-		case "block":
-			blocked = append(blocked, policy)
-		case "allow":
-			allowed = append(allowed, policy)
-		}
-	}
-
-	return allowed, blocked
 }
 
 func getField(key string, body map[string]any, headers map[string][]string) (any, error) {

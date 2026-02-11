@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 )
 
 var Hostname Middleware = Middleware{
@@ -15,14 +16,14 @@ var Hostname Middleware = Middleware{
 
 func hostnameHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
+		logger := GetLogger(req)
 
-		conf := getConfigByReq(req)
+		conf := GetConfigByReq(req)
 
 		hostnames := conf.SERVICE.HOSTNAMES.OptOrEmpty(config.DEFAULT.SERVICE.HOSTNAMES)
 
 		if len(hostnames) > 0 {
-			URL := getContext[*url.URL](req, originURLKey)
+			URL := GetContext[*url.URL](req, OriginURLKey)
 
 			hostname := URL.Hostname()
 

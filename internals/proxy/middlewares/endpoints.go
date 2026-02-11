@@ -7,6 +7,7 @@ import (
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 )
 
 var Endpoints Middleware = Middleware{
@@ -16,9 +17,9 @@ var Endpoints Middleware = Middleware{
 
 func endpointsHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
+		logger := GetLogger(req)
 
-		conf := getConfigByReq(req)
+		conf := GetConfigByReq(req)
 
 		endpoints := conf.SETTINGS.ACCESS.ENDPOINTS.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.ENDPOINTS)
 
