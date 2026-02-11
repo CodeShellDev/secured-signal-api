@@ -19,6 +19,7 @@ var AboutEndpoint = Endpoint{
 
 func aboutHandler(mux *http.ServeMux) *http.ServeMux {
 	mux.HandleFunc("GET /v1/about", func(w http.ResponseWriter, req *http.Request) {
+		req.RequestURI = ""
 		common.ChangeRequestDest(req, config.DEFAULT.API.URL.String() + "/v1/about")
 
 		client := &http.Client{}
