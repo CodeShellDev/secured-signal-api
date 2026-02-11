@@ -13,6 +13,10 @@ ENV FAVICON_PATH=/app/data/favicon.ico
 ENV CONFIG_PATH=/config/config.yml
 ENV TOKENS_DIR=/config/tokens
 
+ENV DB_PATH=/db/db.sqlite3
+
+ENV CGO_ENABLED=1
+
 ARG TARGETOS
 ARG TARGETARCH
 

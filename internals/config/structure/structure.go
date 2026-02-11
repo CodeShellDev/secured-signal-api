@@ -1,7 +1,7 @@
 package structure
 
 import (
-	. "github.com/codeshelldev/gotl/pkg/configutils/types"
+	t "github.com/codeshelldev/gotl/pkg/configutils/types"
 )
 
 type ENV struct {
@@ -37,7 +37,7 @@ const (
 )
 
 type SERVICE struct {
-	HOSTNAMES			Opt[[]string]				`koanf:"hostnames"       env>aliases:".hostnames"`
+	HOSTNAMES			t.Opt[[]string]				`koanf:"hostnames"       env>aliases:".hostnames"`
 	PORT				string						`koanf:"port"            env>aliases:".port"`
 	LOG_LEVEL			string						`koanf:"loglevel"        env>aliases:".loglevel"`
 }
@@ -51,7 +51,7 @@ type API struct {
 }
 
 type AUTH struct {
-	METHODS				Opt[[]string]				`koanf:"methods"         env>aliases:".authmethods"`
+	METHODS				t.Opt[[]string]				`koanf:"methods"         env>aliases:".authmethods"`
 	// DEPRECATION auth.token => auth.tokens
 	TOKENS				[]Token						`koanf:"tokens"          aliases:"token" onuse:"token>>deprecated" deprecation:"{b,fg=yellow}\x60{s}api.auth.token{/}\x60{/} will be removed\nUse {b,fg=green}\x60api.auth.tokens\x60{/} instead"`
 }
@@ -67,9 +67,9 @@ type SETTINGS struct {
 }
 
 type MESSAGE struct {
-	VARIABLES         	Opt[map[string]any]			`koanf:"variables"       childtransform:"upper"`
-	FIELD_MAPPINGS      Opt[map[string][]FieldMapping]`koanf:"fieldmappings"   childtransform:"default"`
-	TEMPLATE  			Opt[string]					`koanf:"template"`
+	VARIABLES         	t.Opt[map[string]any]		`koanf:"variables"       childtransform:"upper"`
+	FIELD_MAPPINGS      t.Opt[map[string][]FieldMapping]`koanf:"fieldmappings"   childtransform:"default"`
+	TEMPLATE  			t.Opt[string]				`koanf:"template"`
 }
 
 type FieldMapping struct {
@@ -78,12 +78,12 @@ type FieldMapping struct {
 }
 
 type ACCESS struct {
-	ENDPOINTS			Opt[AllowBlockSlice]		`koanf:"endpoints"`
-	FIELD_POLICIES		Opt[map[string]FieldPolicies]`koanf:"fieldpolicies"   childtransform:"default"`
-	RATE_LIMITING		Opt[RateLimiting]			`koanf:"ratelimiting"`
-	IP_FILTER			Opt[AllowBlockSlice]		`koanf:"ipfilter"`
-	TRUSTED_IPS			Opt[[]IPOrNet]				`koanf:"trustedips"`
-	TRUSTED_PROXIES		Opt[[]IPOrNet]				`koanf:"trustedproxies"`
+	ENDPOINTS			t.Opt[AllowBlockSlice]		`koanf:"endpoints"`
+	FIELD_POLICIES		t.Opt[map[string]FieldPolicies]`koanf:"fieldpolicies"   childtransform:"default"`
+	RATE_LIMITING		t.Opt[RateLimiting]			`koanf:"ratelimiting"`
+	IP_FILTER			t.Opt[AllowBlockSlice]		`koanf:"ipfilter"`
+	TRUSTED_IPS			t.Opt[[]IPOrNet]			`koanf:"trustedips"`
+	TRUSTED_PROXIES		t.Opt[[]IPOrNet]			`koanf:"trustedproxies"`
 }
 
 type FieldPolicy struct {

@@ -18,6 +18,7 @@ var ENV *structure.ENV = &structure.ENV{
 	DEFAULTS_PATH: 	os.Getenv("DEFAULTS_PATH"),
 	TOKENS_DIR:    	os.Getenv("TOKENS_DIR"),
 	FAVICON_PATH:  	os.Getenv("FAVICON_PATH"),
+	DB_PATH: 		os.Getenv("DB_PATH"),
 	INSECURE:      	false,
 
 	CONFIGS:       	map[string]*structure.CONFIG{},

@@ -41,6 +41,9 @@ export DEFAULTS_PATH=$DIR/data/defaults.yml
 export FAVICON_PATH=$DIR/data/favicon.ico
 export CONFIG_PATH=$DIR/.dev/config.yml
 export TOKENS_DIR=$DIR/.dev/tokens
+export DB_PATH=$DIR/.dev/db/db.sqlite3
+
+export CGO_ENABLED=1
 
 export API_URL=http://127.0.0.1:8881
 
