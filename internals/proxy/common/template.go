@@ -68,24 +68,24 @@ func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES ma
 
 	headers = cleanHeaders(headers)
 
-	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to "".header_key_Var" and ".body_key_Var"
-	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "body_key_", body)
+	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to "".Header_Var" and ".Body_Var"
+	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "Body_", body)
 
 	if err != nil {
 		return body, false, err
 	}
 
-	normalizedBody, err = normalizeData(requestkeys.HeaderPrefix, "header_key_", normalizedBody)
+	normalizedBody, err = normalizeData(requestkeys.HeaderPrefix, "Header_", normalizedBody)
 
 	if err != nil {
 		return body, false, err
 	}
 
-	// Prefix Body Data with body_key_
-	prefixedBody := prefixData("body_key_", normalizedBody)
+	// Prefix Body Data with Body_
+	prefixedBody := prefixData("Body_", normalizedBody)
 
-	// Prefix Header Data with header_key_
-	prefixedHeaders := prefixData("header_key_", request.ParseHeaders(headers))
+	// Prefix Header Data with Header_
+	prefixedHeaders := prefixData("Header_", request.ParseHeaders(headers))
 
 	variables := map[string]any{}
 
