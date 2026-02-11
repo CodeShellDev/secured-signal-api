@@ -60,14 +60,6 @@ func cleanHeaders(headers map[string][]string) map[string][]string {
 		cleanedHeaders[cleanedKey] = value
 	}
 
-	authHeader, ok := cleanedHeaders["Authorization"]
-
-	if !ok {
-		authHeader = []string{"UNKNOWN REDACTED"}
-	}
-
-	cleanedHeaders["Authorization"] = []string{strings.Split(authHeader[0], ` `)[0] + " REDACTED"}
-
 	return cleanedHeaders
 }
 
