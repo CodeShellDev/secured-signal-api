@@ -282,7 +282,7 @@ func authHandler(next http.Handler) http.Handler {
 				req = SetContext(req, TokenKey, token)
 			} else {
 				// BREAKING Query & Path auth disabled (default)
-				if (method.Name == "Path" || method.Name == "Query") && len(*conf.API.AUTH.METHODS.Value) == 0 {
+				if (method.Name == "Path" || method.Name == "Query") && conf.API.AUTH.METHODS.Value == nil {
 					deprecation.Error(method.Name, deprecation.DeprecationMessage{
 						Message: "{b}Query{/} and {b}Path{/} auth are {u}disabled{/} by default\nTo be able to use them they must first be enabled",
 						Fix: "\n{b}Add{/} {b,fg=green}`" + strings.ToLower(method.Name) + "`{/} to {i}`api.auth.methods`{/}:" + 
