@@ -45,7 +45,7 @@ func prefixData(prefix string, data map[string]any) map[string]any {
 	res := map[string]any{}
 
 	for key, value := range data {
-		res[prefix+key] = value
+		res[prefix + key] = value
 	}
 
 	return res
@@ -68,24 +68,28 @@ func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES ma
 
 	headers = cleanHeaders(headers)
 
-	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to ".Header_Var" and ".Body_Var"
-	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "Body_", body)
+	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to ".header.Var" and ".body.Var"
+	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "body.", body)
 
 	if err != nil {
 		return body, false, err
 	}
 
-	normalizedBody, err = normalizeData(requestkeys.HeaderPrefix, "Header_", normalizedBody)
+	normalizedBody, err = normalizeData(requestkeys.HeaderPrefix, "header.", normalizedBody)
 
 	if err != nil {
 		return body, false, err
 	}
 
 	// Prefix Body Data with Body_
-	prefixedBody := prefixData("Body_", normalizedBody)
+	prefixedBody := map[string]any{
+		"body": normalizedBody,
+	}
 
 	// Prefix Header Data with Header_
-	prefixedHeaders := prefixData("Header_", request.ParseHeaders(headers))
+	prefixedHeaders := map[string]any{
+		"header": request.ParseHeaders(headers),
+	}
 
 	variables := map[string]any{}
 
