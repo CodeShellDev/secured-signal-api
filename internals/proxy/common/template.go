@@ -68,7 +68,7 @@ func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES ma
 
 	headers = cleanHeaders(headers)
 
-	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to "".Header_Var" and ".Body_Var"
+	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to ".Header_Var" and ".Body_Var"
 	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "Body_", body)
 
 	if err != nil {
