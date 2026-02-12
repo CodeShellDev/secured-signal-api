@@ -14,14 +14,17 @@ These can be especially **helpful** when managing **variables** across multiple 
 
 ### How to Use
 
-| Scope                                  | Example             |
-| :------------------------------------- | :------------------ |
-| Body                                   | `{{@data.key}}`     |
-| Header (except `Authorization`)        | `{{#Content_Type}}` |
-| [Variable](../configuration/variables) | `{{.VAR}}`          |
+| Scope                                  | Example                                                                      |
+| :------------------------------------- | :--------------------------------------------------------------------------- |
+| Body                                   | **Short:** `{{@data.key}}`<br/>**Standard:** `{{.body.data.key}}`            |
+| Header                                 | **Short:** `{{#Content_Type}}`<br/>**Standard:** `{{.headers.Content_Type}}` |
+| [Variable](../configuration/variables) | **`{{.VAR}}`**                                                               |
 
 > [!NOTE]
 > Formatting rules (capitalization, escaping, and typing) are defined in [Formatting](./formatting)
+
+> [!TIP]
+> Sometimes using the **Stable** placeholder mode is better, for example: `{{ index . ".body.data.key" }}`
 
 ### Where to Use
 
