@@ -1,0 +1,9 @@
+{
+	"status": "pending|queued",
+
+	"method": "POST",
+	"url": "http://signal-cli-rest-api:8080/v2/send",
+
+	"created_at": "{unix_timestamp}",
+	"run_at": "{unix_timestamp}"
+}
