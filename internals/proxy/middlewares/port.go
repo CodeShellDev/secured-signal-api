@@ -5,6 +5,8 @@ import (
 	"net"
 	"net/http"
 	"strings"
+
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 )
 
 var Port Middleware = Middleware{
@@ -14,9 +16,9 @@ var Port Middleware = Middleware{
 
 func portHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
+		logger := GetLogger(req)
 
-		conf := getConfigByReq(req)
+		conf := GetConfigByReq(req)
 
 		allowedPort := conf.SERVICE.PORT
 
@@ -29,7 +31,7 @@ func portHandler(next http.Handler) http.Handler {
 
 		if err != nil {
 			logger.Error("Could not get Port: ", err.Error())
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 

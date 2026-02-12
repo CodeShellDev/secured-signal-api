@@ -8,7 +8,9 @@ import (
 	"github.com/codeshelldev/gotl/pkg/logger"
 	httpserver "github.com/codeshelldev/gotl/pkg/server/http"
 	config "github.com/codeshelldev/secured-signal-api/internals/config"
+	"github.com/codeshelldev/secured-signal-api/internals/db"
 	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
+	"github.com/codeshelldev/secured-signal-api/internals/scheduler"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	"github.com/codeshelldev/secured-signal-api/utils/stdlog"
 )
@@ -36,6 +38,10 @@ func main() {
 	}
 
 	config.Log()
+
+	db.Init()
+
+	scheduler.Start()
 
 	proxy = reverseProxy.Create(config.DEFAULT.API.URL.URL)
 
@@ -70,5 +76,6 @@ func main() {
 
 	<-stop
 
+	db.Close()
 	docker.Shutdown(server)
 }

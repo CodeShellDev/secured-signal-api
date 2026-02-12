@@ -12,6 +12,7 @@ import (
 	"github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 	"github.com/codeshelldev/secured-signal-api/utils/deprecation"
 )
 
@@ -19,9 +20,6 @@ var Auth Middleware = Middleware{
 	Name: "Auth",
 	Use: authHandler,
 }
-
-const tokenKey contextKey = "token"
-const isAuthKey contextKey = "isAuthenticated"
 
 type AuthMethod struct {
 	Name string
@@ -273,18 +271,18 @@ func authHandler(next http.Handler) http.Handler {
 		if token == "" {
 			onUnauthorized(w)
 
-			req = setContext(req, isAuthKey, false)
+			req = SetContext(req, IsAuthKey, false)
 		} else {
-			conf := getConfigWithoutDefault(token)
+			conf := GetConfigWithoutDefault(token)
 
 			allowedMethods := conf.API.AUTH.METHODS.OptOrEmpty(config.DEFAULT.API.AUTH.METHODS)
 
 			if isAuthMethodAllowed(method, token, conf.API.TOKENS, allowedMethods, conf.API.AUTH.TOKENS) {
-				req = setContext(req, isAuthKey, true)
-				req = setContext(req, tokenKey, token)
+				req = SetContext(req, IsAuthKey, true)
+				req = SetContext(req, TokenKey, token)
 			} else {
 				// BREAKING Query & Path auth disabled (default)
-				if (method.Name == "Path" || method.Name == "Query") && len(*conf.API.AUTH.METHODS.Value) == 0 {
+				if (method.Name == "Path" || method.Name == "Query") && conf.API.AUTH.METHODS.Value == nil {
 					deprecation.Error(method.Name, deprecation.DeprecationMessage{
 						Message: "{b}Query{/} and {b}Path{/} auth are {u}disabled{/} by default\nTo be able to use them they must first be enabled",
 						Fix: "\n{b}Add{/} {b,fg=green}`" + strings.ToLower(method.Name) + "`{/} to {i}`api.auth.methods`{/}:" + 
@@ -297,7 +295,7 @@ func authHandler(next http.Handler) http.Handler {
 
 				onUnauthorized(w)
 
-				req = setContext(req, isAuthKey, false)
+				req = SetContext(req, IsAuthKey, false)
 			}
 		}
 
@@ -312,7 +310,7 @@ var InternalAuthRequirement Middleware = Middleware{
 
 func authRequirementHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		isAuthenticated := getContext[bool](req, isAuthKey)
+		isAuthenticated := GetContext[bool](req, IsAuthKey)
 
 		if !isAuthenticated {
 			return

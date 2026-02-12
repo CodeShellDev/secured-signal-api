@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 	"github.com/codeshelldev/secured-signal-api/utils/netutils"
 )
 
@@ -14,10 +15,6 @@ var InternalProxy Middleware = Middleware{
 	Name: "_Proxy",
 	Use: proxyHandler,
 }
-
-const trustedProxyKey contextKey = "isProxyTrusted"
-const clientIPKey contextKey = "clientIP"
-const originURLKey contextKey = "originURL"
 
 type ForwardedEntry struct {
 	For		string
@@ -33,9 +30,9 @@ type OriginInfo	struct {
 
 func proxyHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
+		logger := GetLogger(req)
 		
-		conf := getConfigByReq(req)
+		conf := GetConfigByReq(req)
 
 		rawTrustedProxies := conf.SETTINGS.ACCESS.TRUSTED_PROXIES.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.TRUSTED_PROXIES)
 
@@ -72,15 +69,15 @@ func proxyHandler(next http.Handler) http.Handler {
 		originURL, err := url.Parse(originUrl)
 
 		if err != nil {
-			logger.Error("Could not parse Url: ", originUrl)
-			http.Error(w, "Bad Request: invalid Url", http.StatusBadRequest)
+			logger.Error("Could not parse url: ", originUrl)
+			http.Error(w, "Bad Request: invalid url", http.StatusBadRequest)
 			return
 		}
 
-        req = setContext(req, trustedProxyKey, trusted)
-		req = setContext(req, originURLKey, originURL)
+        req = SetContext(req, TrustedProxyKey, trusted)
+		req = SetContext(req, OriginURLKey, originURL)
 
-		req = setContext(req, clientIPKey, ip)
+		req = SetContext(req, ClientIPKey, ip)
 
 		next.ServeHTTP(w, req)
 	})

@@ -29,7 +29,7 @@ const (
 func normalizeMessage(msg string) string {
 	msg = strings.TrimSuffix(msg, "\n")
 
-	msg = strings.ToLower(msg[:1]) + msg[1:]
+	msg = strings.ToUpper(msg[:1]) + msg[1:]
 
 	return msg
 }
@@ -42,10 +42,10 @@ var writer = &ioutils.InterceptWriter{
 			return
 		}
 
-		msg = normalizeMessage(msg)
-
 		level, _ := strconv.Atoi(msg[len(logLevelPrefix):len(logLevelPrefix) + 1])
 		msg = msg[len(logLevelPrefix) + 1:]
+
+		msg = normalizeMessage(msg)
 
 		switch (logLevel(level)) {
 		case FATAL:

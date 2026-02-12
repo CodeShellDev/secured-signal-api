@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 	"github.com/codeshelldev/secured-signal-api/utils/netutils"
 )
 
@@ -15,15 +16,13 @@ var IPFilter Middleware = Middleware{
 
 func ipFilterHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger := getLogger(req)
+		logger := GetLogger(req)
 
-		conf := getConfigByReq(req)
+		conf := GetConfigByReq(req)
 
 		ipFilter := conf.SETTINGS.ACCESS.IP_FILTER.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.IP_FILTER)
 
-		logger.Dev(conf.SETTINGS.ACCESS.IP_FILTER)
-
-		ip := getContext[net.IP](req, clientIPKey)
+		ip := GetContext[net.IP](req, ClientIPKey)
 
 		if isBlocked("", func(_, try string) bool {
 			tryIP, err := netutils.ParseIPorNet(try)
