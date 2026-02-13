@@ -8,6 +8,7 @@ import (
 
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 	"github.com/codeshelldev/secured-signal-api/internals/scheduler"
 )
@@ -28,6 +29,8 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 
 		variables := conf.SETTINGS.MESSAGE.VARIABLES.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.VARIABLES)
 		messageTemplate := conf.SETTINGS.MESSAGE.TEMPLATE.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.TEMPLATE)
+
+		scheduling := conf.SETTINGS.MESSAGE.SCHEDULING.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.SCHEDULING)
 
 		body, err := request.GetReqBody(req)
 
@@ -74,7 +77,7 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 			logger.Debug("Applied Message Templating: ", body.Data)
 		}
 
-		sendAtStr, ok := bodyData[sendAtField].(string)
+			sendAtStr, ok := bodyData[sendAtField].(string)
 
 		if ok && bodyData[messageField] != "" && bodyData[messageField] != nil {
 			delete(bodyData, sendAtField)
@@ -83,7 +86,29 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 
 			body.UpdateReq(req)
 
-			tm, err := handleScheduledMessage(sendAtStr, w, req)
+			if !scheduling.Enabled {
+				logger.Warn("Client tried scheduling message")
+				WriteError(w, http.StatusForbidden, "scheduling is disabled")
+				return
+			}
+
+			tm, err := parseTimestamp(sendAtStr)
+
+			if err != nil {
+				logger.Warn("Could not parse timestamp: ", err.Error())
+				WriteError(w, http.StatusBadRequest, "invalid timestamp: " + err.Error())
+				return
+			}
+
+			if scheduling.MaxHorizon.Set {
+				if tm.After(time.Now().Add(scheduling.MaxHorizon.Value.Duration)) {
+					logger.Warn("Request scheduled too far in the future: ", time.Until(tm).String())
+					WriteError(w, http.StatusBadRequest, "invalid timestamp: " + "timestamp to far in the future")
+					return
+				}
+			}
+
+			err = handleScheduledMessage(tm, w, req)
 
 			if err != nil {
 				logger.Warn("Could not schedule request: ", err.Error())
@@ -99,28 +124,42 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 	return mux
 }
 
-func handleScheduledMessage(sendAtStr string, w http.ResponseWriter, req *http.Request) (time.Time, error) {
-	sendAt, err := strconv.Atoi(sendAtStr)
+func getSendCapabilities(conf *structure.CONFIG) []string {
+	out := []string{}
+
+	scheduling := conf.SETTINGS.MESSAGE.SCHEDULING.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.SCHEDULING)
+
+	if scheduling.Enabled {
+		out = append(out, "scheduling")
+	}
+	
+	return out
+}
+
+func parseTimestamp(str string) (time.Time, error) {
+	sendAt, err := strconv.Atoi(str)
 
 	if err != nil {
-		WriteError(w, http.StatusBadRequest, "invalid timestamp: invalid unix number string")
-		return time.Time{}, errors.New("invalid timestamp")
+		return time.Time{}, errors.New("invalid number string")
 	}
 
 	tm := time.Unix(int64(sendAt), 0)
 
 	if tm.Before(time.Now()) {
-		WriteError(w, http.StatusBadRequest, "invalid timestamp: time lies in the past")
 		return time.Time{}, errors.New("timestamp expired")
 	}
 
+	return tm, nil
+}
+
+func handleScheduledMessage(tm time.Time, w http.ResponseWriter, req *http.Request) (error) {
 	ChangeRequestDest(req, config.DEFAULT.API.URL.String() + req.URL.Path)
 
 	reqID, err := scheduler.ScheduleRequest(tm, req)
 
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return time.Time{}, err
+		return err
 	}
 
 	res := request.Body{
@@ -133,7 +172,7 @@ func handleScheduledMessage(sendAtStr string, w http.ResponseWriter, req *http.R
 
 	res.Write(w)
 
-	return tm, nil
+	return nil
 }
 
 func TemplateMessage(template string, bodyData map[string]any, headerData map[string][]string, variables map[string]any) (map[string]any, error) {

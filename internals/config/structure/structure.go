@@ -70,6 +70,12 @@ type MESSAGE struct {
 	VARIABLES         	t.Opt[map[string]any]		`koanf:"variables"       childtransform:"upper"`
 	FIELD_MAPPINGS      t.Opt[map[string][]FieldMapping]`koanf:"fieldmappings"   childtransform:"default"`
 	TEMPLATE  			t.Opt[string]				`koanf:"template"`
+	SCHEDULING			t.Opt[Scheduling]			`koanf:"scheduling"`
+}
+
+type Scheduling struct {
+	Enabled				bool						`koanf:"enabled"`
+	MaxHorizon			t.Opt[TimeDuration]			`koanf:"maxhorizon"`
 }
 
 type FieldMapping struct {

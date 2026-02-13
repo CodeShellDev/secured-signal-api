@@ -9,7 +9,7 @@ import (
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
-	"github.com/codeshelldev/secured-signal-api/internals/proxy/common"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 )
 
 var AboutEndpoint = Endpoint{
@@ -20,7 +20,9 @@ var AboutEndpoint = Endpoint{
 func aboutHandler(mux *http.ServeMux) *http.ServeMux {
 	mux.HandleFunc("GET /v1/about", func(w http.ResponseWriter, req *http.Request) {
 		req.RequestURI = ""
-		common.ChangeRequestDest(req, config.DEFAULT.API.URL.String() + "/v1/about")
+		ChangeRequestDest(req, config.DEFAULT.API.URL.String() + "/v1/about")
+
+		conf := GetConfigByReq(req)
 
 		client := &http.Client{}
 		res, err := client.Do(req)
@@ -56,9 +58,7 @@ func aboutHandler(mux *http.ServeMux) *http.ServeMux {
 				"version": version,
 				"auth_required": !config.ENV.INSECURE,
 				"capabilities": map[string]any{
-					"v2/send": []string{
-						"scheduling",
-					},
+					"v2/send": getSendCapabilities(conf),
 				},
 			}
 
