@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -11,11 +12,15 @@ import (
 	"github.com/codeshelldev/gotl/pkg/jsonutils"
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/request"
+	scheduling "github.com/codeshelldev/gotl/pkg/scheduler"
 	"github.com/codeshelldev/secured-signal-api/internals/db"
 	"github.com/google/uuid"
 )
 
 var rsdb *db.RequestSchedulerDB
+
+var reqscheduler = scheduling.New()
+var cancel context.CancelFunc
 
 const limit = 5
 const withinTime = 5 * time.Minute
@@ -24,7 +29,16 @@ const recoveryThreshold = 10 * time.Minute
 
 const doneStaleThreshold = 24 * time.Hour
 
+func Stop() {
+	cancel()
+}
+
 func StartRequestScheduler() {
+	var ctx context.Context
+	ctx, cancel = context.WithCancel(context.Background())
+
+	go reqscheduler.Run(ctx)
+
 	rsdb = db.NewRequestSchedulerDB()
 
 	rsdb.CleanupDones(doneStaleThreshold)
@@ -36,7 +50,7 @@ func StartRequestScheduler() {
 		for range ticker.C {
 			rsdb.RecoverStales(recoveryThreshold)
 
-			if scheduler.Len() < limit {
+			if reqscheduler.Len() < limit {
 				UpdateQueue()
 			}
 		}
@@ -44,7 +58,7 @@ func StartRequestScheduler() {
 }
 
 func UpdateQueue() {
-	requests, _ := rsdb.FetchNext(limit, withinTime)
+	requests, _ := rsdb.FetchNext(limit - reqscheduler.Len(), withinTime)
 
 	for _, req := range requests {
 		AddToQueue(req)
@@ -55,24 +69,36 @@ func AddToQueue(req *db.ScheduledRequest) {
 	rsdb.SetStatus(req.ID, db.STATUS_QUEUED)
 	rsdb.Claim(req.ID)
 
-	scheduler.AddAt(req.RunAt, func() {
+	reqscheduler.AddAtWithID(req.ID, req.RunAt, func() {
 		HandleScheduledRequest(req)
 	})
 }
 
 func OnRequestScheduled(req *db.ScheduledRequest) {
-	next, exists := scheduler.PeekTime()
+	id, latest, exists := reqscheduler.Latest()
 
-	if exists {
-		if req.RunAt.Before(next) {
-			// add earliest job (current)
-			AddToQueue(req)
+	if !exists {
+		return
+	}
 
-			// remove latest job
-			scheduler.Pop()
+	// get next request
+	nexts, _ := rsdb.FetchNext(1, 0)
 
-			rsdb.SetStatus(req.ID, db.STATUS_PENDING)
-		}
+	if len(nexts) != 1 {
+		return
+	}
+
+	// check if current request runs before the latest heap request
+	// and if the next request in the db is also the current request
+	if req.RunAt.Before(latest) && req.ID == nexts[0].ID {
+		// add current job (earlier than latest)
+		AddToQueue(req)
+
+		// remove latest job
+		reqscheduler.Cancel(id)
+
+		// mark removed request as pending (not queued anymore)
+		rsdb.SetStatus(id, db.STATUS_PENDING)
 	}
 }
 

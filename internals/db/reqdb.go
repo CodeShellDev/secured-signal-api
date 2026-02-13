@@ -214,16 +214,31 @@ func (s *RequestSchedulerDB) CleanupDones(threshold time.Duration) error {
 func (s *RequestSchedulerDB) FetchNext(amount int, within time.Duration) ([]*ScheduledRequest, error) {
 	minRunAt := time.Now().Add(within).Unix()
 
-	rows, err := s.db.Query(`
-		SELECT id, method, url, created_at, run_at, request_headers, request_body
-		FROM scheduled_requests
-        WHERE status = ? AND run_at <= ?
-		ORDER BY run_at ASC
-		LIMIT ?`,
-		STATUS_PENDING,
-		minRunAt,
-		amount,
-	)
+	var err error
+	var rows *sql.Rows
+
+	if within == 0 {
+		rows, err = s.db.Query(`
+			SELECT id, method, url, created_at, run_at, request_headers, request_body
+			FROM scheduled_requests
+			WHERE status = ?
+			ORDER BY run_at ASC
+			LIMIT ?`,
+			STATUS_PENDING,
+			amount,
+		)
+	} else {
+		rows, err = s.db.Query(`
+			SELECT id, method, url, created_at, run_at, request_headers, request_body
+			FROM scheduled_requests
+			WHERE status = ? AND run_at <= ?
+			ORDER BY run_at ASC
+			LIMIT ?`,
+			STATUS_PENDING,
+			minRunAt,
+			amount,
+		)
+	}
 
 	if err != nil {
 		return nil, err
