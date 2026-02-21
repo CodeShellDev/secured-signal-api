@@ -213,16 +213,9 @@ components:
         status:
           type: string
           description: |
-            <details>
-
-            <summary>Status of scheduled request</summary>
-            - `done`: successfully send
-            - `failed`: failed to send
             - `running`: request is currently running
             - `queued`: request is in the scheduler's queued
             - `pending`: request is waiting to be picked up by the scheduler (currently in db)
-
-            </details>
 
         method:
           enum:
