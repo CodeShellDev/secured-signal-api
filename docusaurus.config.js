@@ -6,8 +6,25 @@ import remark_directive from "remark-directive"
 import remark_prettierIgnore from "./plugins/remark-prettier-ignore/index.js"
 
 import goplater from "./plugins/goplater/index.js"
+import getOpenAPIConfig from "./plugins/openapi-versioning/index.mjs"
 
 const baseUrl = "/secured-signal-api/"
+
+/** @type {import('@docusaurus/plugin-content-docs').Options} */
+const docsOptions = {
+	editUrl: "https://github.com/codeshelldev/secured-signal-api/tree/docs",
+	beforeDefaultRemarkPlugins: [
+		[
+			remark_githubAlertsToDirectives,
+			{
+				mapping: {
+					CAUTION: "danger",
+				},
+			},
+		],
+	],
+	remarkPlugins: [remark_gfm, remark_directive, remark_prettierIgnore],
+}
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -22,7 +39,7 @@ const config = {
 	url: "https://codeshelldev.github.io",
 
 	baseUrl: baseUrl,
-	deploymentBranch: "docs-build",
+	deploymentBranch: "docs",
 	trailingSlash: false,
 
 	organizationName: "codeshelldev",
@@ -42,7 +59,52 @@ const config = {
 		},
 	},
 
-	themes: ["@docusaurus/theme-mermaid"],
+	themes: ["@docusaurus/theme-mermaid", "docusaurus-theme-openapi-docs"],
+
+	plugins: [
+		[
+			"@docusaurus/plugin-content-docs",
+			/** @type {import('@docusaurus/plugin-content-docs').Options} */
+			({
+				id: "integrations",
+				path: "integrations",
+				routeBasePath: "integrations",
+				sidebarPath: "./sidebars.js",
+				...docsOptions,
+			}),
+		],
+		[
+			"@docusaurus/plugin-content-docs",
+			/** @type {import('@docusaurus/plugin-content-docs').Options} */
+			({
+				id: "api",
+				path: "api/generated",
+				routeBasePath: "api",
+				sidebarPath: "./api/sidebars.js",
+				docItemComponent: "@theme/ApiItem",
+				...docsOptions,
+			}),
+		],
+		[
+			"docusaurus-plugin-openapi-docs",
+			{
+				id: "openapi",
+				docsPluginId: "api",
+				config: getOpenAPIConfig({
+					versionsPath: "api/versions.json",
+					specPath: "api/openapi.yaml",
+					outputDir: "api/generated",
+					hideSendButton: true,
+					showSchemas: false,
+					showInfoPage: false,
+					sidebarOptions: {
+						groupPathsBy: "tag",
+						categoryLinkSource: "tag",
+					},
+				}),
+			},
+		],
+	],
 
 	presets: [
 		[
@@ -51,22 +113,15 @@ const config = {
 			({
 				docs: {
 					sidebarPath: "./sidebars.js",
-					editUrl:
-						"https://github.com/codeshelldev/secured-signal-api/tree/docs",
-					beforeDefaultRemarkPlugins: [
-						[
-							remark_githubAlertsToDirectives,
-							{
-								mapping: {
-									CAUTION: "danger",
-								},
-							},
-						],
-					],
-					remarkPlugins: [remark_gfm, remark_directive, remark_prettierIgnore],
+					...docsOptions,
 				},
 				theme: {
-					customCss: ["./src/css/custom.css", "./src/css/alerts.css"],
+					customCss: [
+						"./src/css/custom.css",
+						"./src/css/alerts.css",
+						"./src/css/method-badges.css",
+						"./src/css/openapi.css",
+					],
 				},
 				sitemap: {
 					lastmod: "date",
@@ -94,14 +149,36 @@ const config = {
 				items: [
 					{
 						type: "docSidebar",
+						docsPluginId: "default",
 						sidebarId: "documentationSidebar",
-						position: "left",
-						label: "Documentation",
+						label: "Docs",
+					},
+					{
+						type: "docSidebar",
+						docsPluginId: "api",
+						sidebarId: "apiSidebar",
+						label: "API",
+					},
+					{
+						type: "docSidebar",
+						docsPluginId: "integrations",
+						sidebarId: "integrationsSidebar",
+						label: "Integrations",
 					},
 					{
 						type: "docsVersionDropdown",
+						docsPluginId: "default",
 						position: "right",
-						dropdownActiveClassDisabled: true,
+					},
+					{
+						type: "docsVersionDropdown",
+						docsPluginId: "api",
+						position: "right",
+					},
+					{
+						type: "docsVersionDropdown",
+						docsPluginId: "integrations",
+						position: "right",
 					},
 					{
 						href: "https://github.com/codeshelldev/secured-signal-api",
@@ -114,19 +191,10 @@ const config = {
 				style: "dark",
 				links: [
 					{
-						title: "Docs",
-						items: [
-							{
-								label: "Documentation",
-								to: "/docs/about",
-							},
-						],
-					},
-					{
 						title: "Community",
 						items: [
 							{
-								label: "Github Discussions",
+								label: "GitHub Discussions",
 								href: "https://github.com/codeshelldev/secured-signal-api/discussions",
 							},
 						],

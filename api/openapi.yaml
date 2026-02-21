@@ -1,0 +1,441 @@
+openapi: "3.0.0"
+
+info:
+  version: ""
+  description: ""
+  title: Secured Signal API
+
+paths:
+  /v1/about:
+    get:
+      description: Returns general information about the underlying API as well as about **Secured Signal API**.
+      summary: List API information
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/client.About"
+      tags:
+        - General
+
+  /v2/send:
+    post:
+      description: Send a signal message via the API.
+      summary: Send message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/api.SendMessageV2"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api.SendMessageResponse"
+        "202":
+          description: Accepted (message scheduled)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api.ScheduledMessageResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api.SendMessageError"
+      tags:
+        - Messages
+
+  /v1/schedule/{id}:
+    get:
+      description: Get information about scheduled request.
+      summary: Get scheduled request
+      parameters:
+        - description: Request ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api.GetScheduledRequestResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api.GetScheduledRequestError"
+        "500":
+          description: Internal Server Error
+      tags:
+        - Messages
+
+    delete:
+      description: Cancel scheduled request.
+      summary: Cancel scheduled request
+      parameters:
+        - description: Request ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: No Content (request canceled)
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api.CancelScheduledRequestError"
+      tags:
+        - Messages
+
+tags:
+  - description: Some general endpoints
+    name: General
+  - description: Register and link Devices
+    name: Devices
+  - description: List registered and linked accounts
+    name: Accounts
+  - description: Create, List and Delete Signal Groups
+    name: Groups
+  - description: Send and Receive Signal Messages
+    name: Messages
+  - description: List and Delete Attachments
+    name: Attachments
+  - description: Update Profile
+    name: Profiles
+  - description: List and Trust Identities
+    name: Identities
+  - description: React to messages
+    name: Reactions
+  - description: Send receipts for messages
+    name: Receipts
+  - description: Search the Signal Service
+    name: Search
+  - description: List and Install Sticker Packs
+    name: Sticker Packs
+
+components:
+  schemas:
+    api.SendMessageError:
+      type: object
+      properties:
+        account:
+          type: string
+        challenge_tokens:
+          items:
+            type: string
+          type: array
+        error:
+          type: string
+      required:
+        - error
+
+    api.SendMessageResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: unix_timestamp
+      required:
+        - timestamp
+
+    api.ScheduledMessageResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID for the scheduled request
+          format: uuid
+      required:
+        - id
+
+    api.GetScheduledRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    api.CancelScheduledRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    api.GetScheduledRequestResponse:
+      type: object
+      discriminator:
+        propertyName: status
+        mapping:
+          done: "#/components/schemas/api.GetScheduledRequestResponseDone"
+          failed: "#/components/schemas/api.GetScheduledRequestResponseFailed"
+          running: "#/components/schemas/api.GetScheduledRequestResponseNotFinished"
+          queued: "#/components/schemas/api.GetScheduledRequestResponseNotFinished"
+          pending: "#/components/schemas/api.GetScheduledRequestResponseNotFinished"
+      example:
+        status: done
+        method: POST
+        # TODO change type to INT
+        created_at: "1767222000"
+        # TODO change type to INT
+        run_at: "1893452400"
+        response_body:
+          # TODO change type to INT
+          timestamp: "1767222060"
+        response_headers:
+          Content-Type: application/json
+        # TODO change type to INT
+        finished_at: "1767222060"
+        response_status_code: 200
+
+    api.GetScheduledRequestResponseNotFinished:
+      type: object
+      properties:
+        status:
+          type: string
+          description: |
+            <details>
+
+            <summary>Status of scheduled request</summary>
+            - `done`: successfully send
+            - `failed`: failed to send
+            - `running`: request is currently running
+            - `queued`: request is in the scheduler's queued
+            - `pending`: request is waiting to be picked up by the scheduler (currently in db)
+
+            </details>
+
+        method:
+          enum:
+            - POST
+            - DELETE
+            - OPTIONS
+            - PUT
+            - GET
+          type: string
+        url:
+          type: string
+          format: url
+        created_at:
+          # TODO change type to INT
+          type: string
+          description: Timestamp of creation
+          format: unix_timestamp
+        run_at:
+          # TODO change type to INT
+          type: string
+          description: Timestamp at which the request will be fired
+          format: unix_timestamp
+      required:
+        - status
+        - method
+        - url
+        - created_at
+        - run_at
+
+    api.GetScheduledRequestResponseFinished:
+      allOf:
+        - $ref: "#/components/schemas/api.GetScheduledRequestResponseNotFinished"
+      type: object
+      properties:
+        finished_at:
+          # TODO change type to INT
+          type: string
+          description: Timestamp at which the scheduled request finished
+          format: unix_timestamp
+        response_status_code:
+          type: integer
+      required:
+        - finished_at
+        - response_status_code
+
+    api.GetScheduledRequestResponseFailed:
+      allOf:
+        - $ref: "#/components/schemas/api.GetScheduledRequestResponseFinished"
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - finished_at
+        - response_status_code
+        - error
+
+    api.GetScheduledRequestResponseDone:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/api.GetScheduledRequestResponseFinished"
+      required:
+        - finished_at
+        - response_status_code
+        - response_body
+        - response_headers
+      properties:
+        response_body:
+          type: object
+          additionalProperties:
+            type: string
+        response_headers:
+          type: object
+          additionalProperties:
+            type: string
+
+    api.SendMessageV2:
+      type: object
+      properties:
+        base64_attachments:
+          example:
+            - <BASE64 ENCODED DATA>
+            - data:<MIME-TYPE>;base64<comma><BASE64 ENCODED DATA>
+            - data:<MIME-TYPE>;filename=<FILENAME>;base64<comma><BASE64 ENCODED DATA>
+          items:
+            type: string
+          type: array
+        send_at:
+          # TODO change type to INT
+          type: string
+          description: Timestamp at which the message should be send
+          format: unix_timestamp
+        edit_timestamp:
+          type: integer
+          description: Timestamp of original message to edit
+          format: unix_timestamp
+        link_preview:
+          $ref: "#/components/schemas/data.LinkPreviewType"
+        mentions:
+          items:
+            $ref: "#/components/schemas/data.MessageMention"
+          type: array
+        message:
+          type: string
+        notify_self:
+          type: boolean
+        number:
+          type: string
+          format: phone_number
+        quote_author:
+          type: string
+        quote_mentions:
+          items:
+            $ref: "#/components/schemas/data.MessageMention"
+          type: array
+        quote_message:
+          type: string
+        quote_timestamp:
+          type: integer
+          description: Timestamp of original message to quote
+          format: unix_timestamp
+        recipients:
+          items:
+            type: string
+          type: array
+        sticker:
+          type: string
+        text_mode:
+          enum:
+            - normal
+            - styled
+          type: string
+          default: normal
+          description: |
+            Add formatting to messages with `styled` mode: \*_italic_\*, **\*\*bold\*\***, \~~strikethrough~\~, ||spoiler||, \``monospace`\`
+        view_once:
+          type: boolean
+      required:
+        - message
+        - recipients
+        - number
+
+    data.LinkPreviewType:
+      type: object
+      properties:
+        base64_thumbnail:
+          type: string
+        description:
+          type: string
+        title:
+          type: string
+        url:
+          type: string
+
+    data.MessageMention:
+      type: object
+      properties:
+        author:
+          type: string
+        length:
+          type: integer
+          description: |
+            Defines length of mention bound: `start+length`
+        start:
+          type: integer
+          description: |
+            Defines lower bound of range `start`
+
+    client.About:
+      type: object
+      properties:
+        build:
+          type: integer
+        mode:
+          type: string
+        version:
+          type: string
+        versions:
+          type: array
+          items:
+            type: string
+        capabilities:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            /v2/send/:
+              - mentions
+              - quotes
+        secured-signal-api:
+          type: object
+          description: Information about **Secured Signal API**
+          properties:
+            version:
+              type: string
+              description: Version extracted from the image tag with semver formatting (if invalid, then `version` is empty)
+            auth_required:
+              type: boolean
+              description: Is authentication required for accessing the API?
+            capabilities:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+              example:
+                /v2/send/:
+                  - scheduling
+      required:
+        - build
+        - mode
+        - version
+        - versions
+        - capabilities

@@ -1,5 +1,7 @@
 ---
 title: Home Assistant
+sidebar_custom_props:
+  icon: https://upload.wikimedia.org/wikipedia/commons/a/ab/New_Home_Assistant_logo.svg
 ---
 
 # Home Assistant

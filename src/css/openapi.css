@@ -1,0 +1,8 @@
+.openapi-right-panel__container {
+	display: none;
+}
+
+.openapi-left-panel__container {
+	border-right: none !important;
+	--ifm-col-width: unset;
+}

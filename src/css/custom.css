@@ -26,3 +26,20 @@
 	--ifm-color-primary-lighter: #26e2ff;
 	--ifm-color-primary-lightest: #4de7ff;
 }
+
+/* Icons for sidebar items via `sidebar_custom_props.icon` in frontmatter */
+.theme-doc-sidebar-menu .menu__link[data-custom-icon] {
+	display: flex;
+	align-items: center;
+}
+
+.theme-doc-sidebar-menu .menu__link[data-custom-icon]::before {
+	content: "";
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	margin-right: 6px;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-image: var(--var-custom-icon-url);
+}

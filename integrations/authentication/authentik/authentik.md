@@ -1,5 +1,7 @@
 ---
 title: Authentik
+sidebar_custom_props:
+  icon: https://raw.githubusercontent.com/goauthentik/authentik/refs/heads/main/web/icons/icon.png
 ---
 
 # Authentik

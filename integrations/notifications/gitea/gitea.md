@@ -1,5 +1,7 @@
 ---
 title: Gitea
+sidebar_custom_props:
+  icon: https://raw.githubusercontent.com/go-gitea/gitea/refs/heads/main/assets/logo.svg
 ---
 
 # Gitea
