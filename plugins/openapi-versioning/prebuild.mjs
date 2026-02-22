@@ -134,6 +134,12 @@ async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 
 	let versionsArray = await getVersionsAsync(versionsPath)
 
+	const generateDir = pluginConfig.outputDir
+	const outputDir = path.relative(consts.GENERATED_PREFIX, generateDir)
+
+	// ensure outputDir exists
+	await fs.mkdir(outputDir, { recursive: true })
+
 	// generate all versioned API docs
 	for (const v of versionsArray) {
 		files.push(path.resolve(ROOT, v.specPath))
@@ -201,19 +207,11 @@ async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 	// generate NEXT API docs
 	files.push(path.resolve(ROOT, specPath))
 
-	const generateDir = pluginConfig.outputDir
-	const outputDir = path.relative(consts.GENERATED_PREFIX, generateDir)
-
-	// ensure outputDir exists
-	await fs.mkdir(outputDir, { recursive: true })
-
 	if (!onlyWatch) {
 		console.log(`\nGenerating NEXT API docs for ${pluginId}...`)
 		try {
 			await fs.rm(generateDir, { recursive: true, force: true })
 			await fs.mkdir(generateDir, { recursive: true })
-
-			await fs.mkdir(outputDir, { recursive: true })
 
 			await execAsync(`npm run docusaurus gen-api-docs ${versionsPath}`)
 
