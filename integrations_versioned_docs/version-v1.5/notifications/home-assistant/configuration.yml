@@ -1,0 +1,7 @@
+notify:
+  - name: signal
+    platform: signal_messenger
+    url: "http://sec-signal-api:8880/@auth=API_TOKEN"
+    number: "{{.NUMBER}}"
+    recipients:
+      - "+123400002" # tip: use a placeholder instead
