@@ -89,7 +89,9 @@ Check `SMS-based Authenticators` and add your `signal-authentication-setup` stag
 
 ## Register
 
-After completing the setup, you can finally go to `https://authentik.domain.com/if/flow/<your-slug>` and finish the `SMS Authenticator` setup.
+After completing the setup, you can finally go to `https://authentik.domain.com/if/flow/<your-slug>` to register your own `SMS Authenticator`.
+
+![SMS Authenticator Setup](/integrations/authentik/register.png)
 
 ## Sources
 
