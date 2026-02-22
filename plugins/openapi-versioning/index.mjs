@@ -3,12 +3,14 @@ import path from "path"
 
 import docusaurusConfig from "../../docusaurus.config.js"
 
+import consts from "./consts.mjs"
+
 export default function parse({
 	specPath,
 	outputDir,
 	versionsPath,
 	...options
-}) {
+} = {}) {
 	const ROOT = process.cwd()
 
 	const resolvedVersionsPath = versionsPath
@@ -23,7 +25,7 @@ export default function parse({
 
 		versions[entry.version] = {
 			specPath: entry.specPath,
-			outputDir: entry.outputDir,
+			outputDir: path.resolve(consts.GENERATED_PREFIX, entry.outputDir),
 			label: entry.label,
 			baseUrl: entry.baseUrl,
 		}
@@ -32,7 +34,7 @@ export default function parse({
 	return {
 		[resolvedVersionsPath]: {
 			specPath,
-			outputDir,
+			outputDir: path.resolve(consts.GENERATED_PREFIX, outputDir),
 			label: "next",
 			version: "next",
 			baseUrl: `/${outputDir.replace(/\/$/, "")}`,

@@ -55,12 +55,14 @@ async function updateVersionsJson(
 	}
 
 	if (!versions.some((v) => v.version === version)) {
+		const relativePath = `${pluginId}_versioned_docs/version-${version}`
+
 		versions.push({
 			version,
 			specPath: relativeSpecPath,
-			outputDir: `${pluginId}_versioned_docs/version-${version}`,
+			outputDir: relativePath,
 			label: version,
-			baseUrl: `/${pluginId}_versioned_docs/version-${version}`,
+			baseUrl: `/${relativePath}`,
 		})
 
 		await fs.writeFile(versionsPath, JSON.stringify(versions, null, 2))
@@ -93,13 +95,10 @@ async function updateApiVersions(version) {
 async function main() {
 	const { pluginId, version } = parseArg()
 
-	const { versionsPath, pluginConfig } = await getConfig(pluginId)
+	const { versionsPath, generateDir, pluginConfig } = await getConfig(pluginId)
 	if (!pluginConfig) process.exit(1)
 
-	const { versionedFilename, relativeSpecPath } = await duplicateSpec(
-		pluginConfig,
-		version,
-	)
+	const { relativeSpecPath } = await duplicateSpec(pluginConfig, version)
 
 	await updateVersionsJson(versionsPath, pluginId, version, relativeSpecPath)
 

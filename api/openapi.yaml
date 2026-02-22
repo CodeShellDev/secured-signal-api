@@ -216,7 +216,6 @@ components:
             - `running`: request is currently running
             - `queued`: request is in the scheduler's queued
             - `pending`: request is waiting to be picked up by the scheduler (currently in db)
-
         method:
           enum:
             - POST

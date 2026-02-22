@@ -3,6 +3,10 @@ import path from "path"
 import { promisify } from "util"
 import { exec } from "child_process"
 
+import chokidar from "chokidar"
+
+import consts from "./consts.mjs"
+
 import { getConfig, getVersionsAsync, getPluginOptions } from "./index.mjs"
 
 const execAsync = promisify(exec)
@@ -54,7 +58,7 @@ export async function mergeSidebarFromPlugin(
 	}
 
 	// load sidebar.ts
-	const sidebarTsPath = path.join(ROOT, sidebarTsDir, "sidebar.ts")
+	const sidebarTsPath = path.join(sidebarTsDir, "sidebar.ts")
 	let sidebarTs = {}
 	try {
 		const module = await import(sidebarTsPath)
@@ -87,6 +91,7 @@ export async function overwriteSidebarJson(
 
 	await fs.mkdir(path.dirname(outPath), { recursive: true })
 	await fs.writeFile(outPath, JSON.stringify(merged, null, 2), "utf8")
+
 	console.log(`✔ Overwrote JSON sidebar: ${path.basename(outPath)}`)
 }
 
@@ -115,7 +120,7 @@ export async function overwriteSidebarJs(
 	console.log(`✔ Overwrote JS sidebar: ${path.basename(outPath)}`)
 }
 
-async function prebuildPlugin(pluginId) {
+async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 	const ROOT = process.cwd()
 
 	const { versionsPath, pluginConfig } = await getConfig(pluginId)
@@ -124,39 +129,52 @@ async function prebuildPlugin(pluginId) {
 		process.exit(1)
 	}
 
-	const outputDir = pluginConfig.outputDir
+	const specPath = pluginConfig.specPath
+	const files = []
 
 	let versionsArray = await getVersionsAsync(versionsPath)
 
-	// ensure outputDir exists
-	await fs.mkdir(outputDir, { recursive: true })
-
 	// generate all versioned API docs
 	for (const v of versionsArray) {
+		files.push(path.resolve(ROOT, v.specPath))
+
+		if (onlyWatch) {
+			continue
+		}
+
 		console.log(`\nGenerating versioned API docs: ${v.version}...`)
+
+		const genDir = path.resolve(consts.GENERATED_PREFIX, v.outputDir)
 		const dir = path.resolve(ROOT, v.outputDir)
+
 		try {
-			await fs.rm(dir, { recursive: true, force: true })
-			await fs.mkdir(dir, { recursive: true })
-			await fs.writeFile(path.join(dir, ".process"), "")
+			await fs.rm(genDir, { recursive: true, force: true })
+			await fs.mkdir(genDir, { recursive: true })
+
 			await execAsync(
 				`npm run docusaurus gen-api-docs:version ${versionsPath}:${v.version}`,
 			)
+
 			await overwriteSidebarJson(
 				pluginId,
-				v.outputDir,
+				genDir,
 				path.resolve(
 					ROOT,
 					`${pluginId}_versioned_sidebars/version-${v.version}-sidebars.json`,
 				),
 				`version-${v.version}/`,
 			)
+
+			await fs.cp(genDir, dir, {
+				errorOnExist: false,
+				force: true,
+				recursive: true,
+			})
+
 			console.log(`✔ Version ${v.version} docs generated`)
 		} catch (err) {
 			console.error(`Error generating version ${v.version}:`, err.stderr || err)
 		}
-
-		await fs.rm(path.join(dir, ".process"))
 	}
 
 	if (versionsArray.length != 0) {
@@ -172,20 +190,40 @@ async function prebuildPlugin(pluginId) {
 	}
 
 	// generate NEXT API docs
-	console.log(`\nGenerating NEXT API docs for ${pluginId}...`)
-	try {
-		await fs.rm(outputDir, { recursive: true, force: true })
-		await fs.mkdir(outputDir, { recursive: true })
-		await execAsync(`npm run docusaurus gen-api-docs ${versionsPath}`)
-		const { sidebarPath } = await getPluginOptions(pluginId)
-		await overwriteSidebarJs(
-			pluginId,
-			outputDir,
-			path.resolve(ROOT, sidebarPath),
-		)
-		console.log("✔ NEXT docs generated")
-	} catch (err) {
-		console.error("Error generating NEXT docs:", err.stderr || err)
+	files.push(path.resolve(ROOT, specPath))
+
+	const generateDir = pluginConfig.outputDir
+	const outputDir = path.relative(consts.GENERATED_PREFIX, generateDir)
+
+	// ensure outputDir exists
+	await fs.mkdir(outputDir, { recursive: true })
+
+	if (!onlyWatch) {
+		console.log(`\nGenerating NEXT API docs for ${pluginId}...`)
+		try {
+			await fs.rm(generateDir, { recursive: true, force: true })
+			await fs.mkdir(generateDir, { recursive: true })
+
+			await execAsync(`npm run docusaurus gen-api-docs ${versionsPath}`)
+
+			const { sidebarPath } = await getPluginOptions(pluginId)
+
+			await overwriteSidebarJs(
+				pluginId,
+				generateDir,
+				path.resolve(ROOT, sidebarPath),
+			)
+
+			await fs.cp(generateDir, outputDir, {
+				errorOnExist: false,
+				force: true,
+				recursive: true,
+			})
+
+			console.log("✔ NEXT docs generated")
+		} catch (err) {
+			console.error("Error generating NEXT docs:", err.stderr || err)
+		}
 	}
 
 	if (versionsArray.length != 0) {
@@ -201,13 +239,22 @@ async function prebuildPlugin(pluginId) {
 	}
 
 	console.log(`\n✅ Prebuild complete for ${pluginId}`)
+
+	if (onlyWatch && files.length != 0) {
+		const watcher = chokidar.watch(files)
+
+		watcher.on("change", async () => {
+			await prebuildPlugin(pluginId)
+		})
+	}
 }
 
 const pluginId = process.argv[2]
+const flag1 = process.argv[3]
 
 if (!pluginId) {
 	console.error("Usage: npm run prebuild-api <pluginId>")
 	process.exit(1)
 }
 
-prebuildPlugin(pluginId)
+prebuildPlugin(pluginId, { onlyWatch: flag1 == "--only-watch" })
