@@ -22,7 +22,7 @@ It's designed for developers who want to:
 
 ## Key Features
 
-- 🔒 **Access Control** — Protect your Signal API with [**token-based authentication**](./usage#auth), [**endpoint restrictions**](./features#endpoints) and [**IP filters**](./features#ip-filter).
+- 🔒 **Access Control** — Protect your Signal API with [**token-based authentication**](./usage#auth), [**endpoint restrictions**](./features#endpoints) and [**IP filters**](./features#ip-filters).
 - 🧩 **Full Compatibility** — 100% protocol-compatible; all requests are still handled by your existing Signal CLI REST API.
 - ⚙️ **Configurable Proxy Behavior** — Define templates and limits via YAML or environment variables.
 - 🧠 **Message Templates** — Use [**variables**](./configuration/variables) and [**placeholders**](./features#placeholders) to standardize common message formats.
