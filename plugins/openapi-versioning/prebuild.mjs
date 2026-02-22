@@ -115,7 +115,7 @@ export async function overwriteSidebarJs(
 		`const sidebars = ${JSON.stringify(merged, null, 2)};\n\n` +
 		`export default sidebars;\n`
 
-	await fs.mkdir(path.dirname(outPath), { recursive: true })
+	await fs.mkdir(path.dirname(outPath), { recursive: true, cleanup: false })
 	await fs.writeFile(outPath, code, "utf8")
 	console.log(`✔ Overwrote JS sidebar: ${path.basename(outPath)}`)
 }
@@ -151,9 +151,16 @@ async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 			await fs.rm(genDir, { recursive: true, force: true })
 			await fs.mkdir(genDir, { recursive: true })
 
+			await fs.mkdir(dir, { recursive: true })
+			const processFile = path.join(dir, ".process")
+			await fs.writeFile(processFile, "")
+
 			await execAsync(
 				`npm run docusaurus gen-api-docs:version ${versionsPath}:${v.version}`,
 			)
+
+			const segments = consts.GENERATED_PREFIX.split(path.sep).filter(Boolean)
+			const idPath = segments.slice(1).join(path.sep)
 
 			await overwriteSidebarJson(
 				pluginId,
@@ -162,7 +169,7 @@ async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 					ROOT,
 					`${pluginId}_versioned_sidebars/version-${v.version}-sidebars.json`,
 				),
-				`version-${v.version}/`,
+				`${idPath}/${pluginId}_versioned_docs/version-${v.version}/`,
 			)
 
 			await fs.cp(genDir, dir, {
@@ -170,6 +177,8 @@ async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 				force: true,
 				recursive: true,
 			})
+
+			await fs.rm(processFile, { force: true })
 
 			console.log(`✔ Version ${v.version} docs generated`)
 		} catch (err) {
@@ -238,7 +247,7 @@ async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 		}
 	}
 
-	console.log(`\n✅ Prebuild complete for ${pluginId}`)
+	console.log(`\nPrebuild complete for ${pluginId}`)
 
 	if (onlyWatch && files.length != 0) {
 		const watcher = chokidar.watch(files)
@@ -247,14 +256,23 @@ async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 			await prebuildPlugin(pluginId)
 		})
 	}
+
+	console.log(`\nDone.`)
 }
 
 const pluginId = process.argv[2]
-const flag1 = process.argv[3]
 
 if (!pluginId) {
 	console.error("Usage: npm run prebuild-api <pluginId>")
 	process.exit(1)
 }
 
-prebuildPlugin(pluginId, { onlyWatch: flag1 == "--only-watch" })
+let onlyWatch = false
+
+if (process.argv.length > 2) {
+	const flags = process.argv.slice(3)
+
+	onlyWatch = flags.includes("--only-watch")
+}
+
+prebuildPlugin(pluginId, { onlyWatch })

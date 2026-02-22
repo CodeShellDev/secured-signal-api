@@ -1,9 +1,9 @@
 import fs from "fs"
 import path from "path"
 
-import docusaurusConfig from "../../docusaurus.config.js"
-
 import consts from "./consts.mjs"
+
+import docusaurusConfig from "../../docusaurus.config.js"
 
 export default function parse({
 	specPath,
