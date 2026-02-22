@@ -1,9 +1,0 @@
-{
-  "secured-signal-api": {
-    "version": "1.5.0",
-    "auth_required": true,
-    "capabilities": {
-      "v2/send": ["scheduling"]
-    }
-  }
-}
