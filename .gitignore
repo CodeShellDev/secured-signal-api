@@ -28,3 +28,12 @@ yarn-error.log*
 # Allow .github
 !.github
 !.prettierignore
+
+# Generated api files
+api_versioned_docs
+api_versioned_sidebars
+api/generated
+
+# NPM
+
+!.npmrc

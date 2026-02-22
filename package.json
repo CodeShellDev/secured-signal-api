@@ -4,9 +4,16 @@
 	"private": true,
 	"scripts": {
 		"docusaurus": "docusaurus",
-		"start": "docusaurus start --no-open",
-		"version": "docusaurus docs:version",
+		"start": "concurrently --raw \"npm run prestart:watch\" \"docusaurus start --no-open\"",
 		"build": "docusaurus build",
+		"prebuild": "npm run gen-api-docs > /dev/null 2>&1",
+		"prestart": "npm run gen-api-docs > /dev/null 2>&1",
+		"prestart:watch": "npm run watch-api-docs > /dev/null 2>&1",
+		"gen-api-docs": "node --no-warnings ./plugins/openapi-versioning/prebuild.mjs api",
+		"watch-api-docs": "node --no-warnings ./plugins/openapi-versioning/prebuild.mjs api --only-watch",
+		"version-api": "node --no-warnings ./plugins/openapi-versioning/create.mjs api",
+		"version-docs": "docusaurus docs:version",
+		"version-integrations": "docusaurus docs:version:integrations",
 		"swizzle": "docusaurus swizzle",
 		"deploy": "docusaurus deploy",
 		"clear": "docusaurus clear",
@@ -21,6 +28,8 @@
 		"@docusaurus/theme-mermaid": "^3.9.2",
 		"@mdx-js/react": "^3.0.0",
 		"clsx": "^2.0.0",
+		"docusaurus-plugin-openapi-docs": "^4.7.1",
+		"docusaurus-theme-openapi-docs": "^4.7.1",
 		"prism-react-renderer": "^2.3.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
@@ -31,7 +40,9 @@
 	"devDependencies": {
 		"@docusaurus/module-type-aliases": "3.9.2",
 		"@docusaurus/types": "3.9.2",
-		"baseline-browser-mapping": "^2.9.11"
+		"baseline-browser-mapping": "^2.9.11",
+		"chokidar": "^5.0.0",
+		"concurrently": "^9.2.1"
 	},
 	"browserslist": {
 		"production": [

@@ -24,4 +24,3 @@ settings:
       {{ template "footer" . -}}
       ------------------------------------
       Content-Type: {{ #Content_Type }}
-      Redacted Auth Header: {{ #Authorization }}
