@@ -12,7 +12,7 @@ Here's how you can use **Secured Signal API** as a notification service for [Git
 
 ### 1. Message Template
 
-Because Gitea's webhook data is very _clustered_, we need to use [**Message Templates**](../configuration/message-template) to ensure correct message rendering.
+Because Gitea's webhook data is very _clustered_, we need to use [**Message Templates**](/docs/configuration/message-template) to ensure correct message rendering.
 
 Here is an example:
 
