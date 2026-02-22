@@ -213,6 +213,8 @@ async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 			await fs.rm(generateDir, { recursive: true, force: true })
 			await fs.mkdir(generateDir, { recursive: true })
 
+			await fs.mkdir(outputDir, { recursive: true })
+
 			await execAsync(`npm run docusaurus gen-api-docs ${versionsPath}`)
 
 			const { sidebarPath } = await getPluginOptions(pluginId)
