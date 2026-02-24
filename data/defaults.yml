@@ -29,9 +29,15 @@ settings:
           { field: data, score: 1 },
         ]
 
-    variables:
-      recipients: ${RECIPIENTS}
-      number: ${NUMBER}
+    templating:
+      body: true
+      path: true
+      query: true
+
+    injecting:
+      urlToBody:
+        query: true
+        path: true
 
   access:
     endpoints:
