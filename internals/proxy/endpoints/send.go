@@ -3,7 +3,6 @@ package endpoints
 import (
 	"errors"
 	"net/http"
-	"strconv"
 	"time"
 
 	request "github.com/codeshelldev/gotl/pkg/request"
@@ -77,7 +76,7 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 			logger.Debug("Applied Message Templating: ", body.Data)
 		}
 
-			sendAtStr, ok := bodyData[sendAtField].(string)
+		sendAt, ok := bodyData[sendAtField].(float64)
 
 		if ok && bodyData[messageField] != "" && bodyData[messageField] != nil {
 			delete(bodyData, sendAtField)
@@ -92,7 +91,7 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 				return
 			}
 
-			tm, err := parseTimestamp(sendAtStr)
+			tm, err := parseTimestamp(int(sendAt))
 
 			if err != nil {
 				logger.Warn("Could not parse timestamp: ", err.Error())
@@ -136,13 +135,7 @@ func getSendCapabilities(conf *structure.CONFIG) []string {
 	return out
 }
 
-func parseTimestamp(str string) (time.Time, error) {
-	sendAt, err := strconv.Atoi(str)
-
-	if err != nil {
-		return time.Time{}, errors.New("invalid number string")
-	}
-
+func parseTimestamp(sendAt int) (time.Time, error) {
 	tm := time.Unix(int64(sendAt), 0)
 
 	if tm.Before(time.Now()) {
