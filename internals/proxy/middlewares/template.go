@@ -19,7 +19,12 @@ func templateHandler(next http.Handler) http.Handler {
 
 		conf := GetConfigByReq(req)
 		
+		templating := conf.SETTINGS.MESSAGE.TEMPLATING.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.TEMPLATING)
+		injecting := conf.SETTINGS.MESSAGE.INJECTING.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.INJECTING)
+
 		variables := conf.SETTINGS.MESSAGE.VARIABLES.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.VARIABLES)
+
+		urlToBody := injecting.URLToBody.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.INJECTING.Value.URLToBody)
 
 		body, err := request.GetReqBody(req)
 
@@ -29,19 +34,17 @@ func templateHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		bodyData := map[string]any{}
-
 		var modifiedBody bool
 
-		if !body.Empty {
+		if !body.Empty && templating.Body {
 			var modified bool
 
-			headerData := request.GetReqHeaders(req)
+			headers := request.GetReqHeaders(req)
 
-			bodyData, modified, err = TemplateBody(body.Data, headerData, variables)
+			body.Data, modified, err = GetTemplatedBody(body.Data, headers, variables)
 
 			if err != nil {
-				logger.Error("Error Templating JSON: ", err.Error())
+				logger.Error("Error Templating Body: ", err.Error())
 			}
 
 			if modified {
@@ -50,41 +53,55 @@ func templateHandler(next http.Handler) http.Handler {
 		}
 
 		if req.URL.RawQuery != "" {
-			var modified bool
+			if templating.Query {
+				oldRawQuery := req.URL.RawQuery
 
-			req.URL.RawQuery, bodyData, modified, err = TemplateQuery(req.URL, bodyData, variables)
+				req.URL.RawQuery, err = TemplateQuery(req.URL.RawQuery, variables)
 
-			if err != nil {
-				logger.Error("Error Templating Query: ", err.Error())
+				if err != nil {
+					logger.Error("Error Templating Query: ", err.Error())
+				}
+
+				if req.URL.RawQuery != oldRawQuery {
+					logger.Debug("Applied Query Templating: ", req.URL.RawQuery)
+				}
 			}
 
-			if modified {
-				modifiedBody = true
+			if urlToBody.Query {
+				modified := InjectQueryIntoBody(req.URL.Query(), body.Data)
+
+				if modified {
+					modifiedBody = true
+				}
 			}
 		}
 
 		if req.URL.Path != "" {
-			var modified bool
-			var templated bool
+			if templating.Path {
+				oldPath := req.URL.Path
 
-			req.URL.Path, bodyData, modified, templated, err = TemplatePath(req.URL, bodyData, variables)
+				req.URL.Path, err = TemplatePath(req.URL.Path, variables)
 
-			if err != nil {
-				logger.Error("Error Templating Path: ", err.Error())
+				if err != nil {
+					logger.Error("Error Templating Path: ", err.Error())
+				}
+
+				if req.URL.Path != oldPath {
+					logger.Debug("Applied Path Templating: ", req.URL.Path)
+				}
 			}
 
-			if modified {
-				logger.Debug("Applied Path Templating: ", req.URL.Path)
-			}
+			if urlToBody.Path {
+				var modified bool
+				req.URL.Path, modified = InjectPathIntoBody(req.URL.Path, body.Data)
 
-			if templated {
-				modifiedBody = true
+				if modified {
+					modifiedBody = true
+				}
 			}
 		}
 
 		if modifiedBody {
-			body.Data = bodyData
-
 			err := body.UpdateReq(req)
 
 			if err != nil {

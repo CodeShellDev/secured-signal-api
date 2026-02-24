@@ -33,12 +33,9 @@ func mappingHandler(next http.Handler) http.Handler {
 		}
 
 		var modifiedBody bool
-		var bodyData map[string]any
 
 		if !body.Empty {
-			bodyData = body.Data
-
-			aliasData := processFieldMappings(fieldMappings, bodyData)
+			aliasData := processFieldMappings(fieldMappings, body.Data)
 
 			for key, value := range aliasData {
 				prefix := key[:1]
@@ -47,7 +44,7 @@ func mappingHandler(next http.Handler) http.Handler {
 
 				switch prefix {
 				case "@":
-					bodyData[keyWithoutPrefix] = value
+					body.Data[keyWithoutPrefix] = value
 					modifiedBody = true
 				case ".":
 					variables[keyWithoutPrefix] = value
@@ -56,8 +53,6 @@ func mappingHandler(next http.Handler) http.Handler {
 		}
 
 		if modifiedBody {
-			body.Data = bodyData
-
 			err := body.UpdateReq(req)
 
 			if err != nil {
@@ -73,7 +68,7 @@ func mappingHandler(next http.Handler) http.Handler {
 	})
 }
 
-func processFieldMappings(aliases map[string][]structure.FieldMapping, data map[string]any) map[string]any {
+func processFieldMappings(aliases map[string][]structure.FMapping, data map[string]any) map[string]any {
 	aliasData := map[string]any{}
 
 	for key, alias := range aliases {
@@ -87,7 +82,7 @@ func processFieldMappings(aliases map[string][]structure.FieldMapping, data map[
 	return aliasData
 }
 
-func getData(key string, aliases []structure.FieldMapping, data map[string]any) (string, any) {
+func getData(key string, aliases []structure.FMapping, data map[string]any) (string, any) {
 	var best int
 	var value any
 
@@ -106,7 +101,7 @@ func getData(key string, aliases []structure.FieldMapping, data map[string]any) 
 	return key, value
 }
 
-func processFieldMapping(alias structure.FieldMapping, data map[string]any) (any, int, bool) {
+func processFieldMapping(alias structure.FMapping, data map[string]any) (any, int, bool) {
 	aliasKey := alias.Field
 
 	value, ok := jsonutils.GetByPath(aliasKey, data)

@@ -27,7 +27,7 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 		conf := GetConfigByReq(req)
 
 		variables := conf.SETTINGS.MESSAGE.VARIABLES.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.VARIABLES)
-		messageTemplate := conf.SETTINGS.MESSAGE.TEMPLATE.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.TEMPLATE)
+		templating := conf.SETTINGS.MESSAGE.TEMPLATING.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.TEMPLATING)
 
 		scheduling := conf.SETTINGS.MESSAGE.SCHEDULING.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.SCHEDULING)
 
@@ -39,32 +39,29 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 			return
 		}
 
-		bodyData := map[string]any{}
-
 		var modifiedBody bool
 
 		if !body.Empty {
-			bodyData = body.Data
+			if templating.MessageTemplate != "" {
+				headers := request.GetReqHeaders(req)
 
-			if messageTemplate != "" {
-				headerData := request.GetReqHeaders(req)
-
-				newData, err := TemplateMessage(messageTemplate, bodyData, headerData, variables)
+				templatedMessage, err := GetTemplatedMessage(templating.MessageTemplate, body.Data, headers, variables)
 
 				if err != nil {
 					logger.Error("Error Templating Message: ", err.Error())
 				}
 
-				if newData[messageField] != bodyData[messageField] && newData[messageField] != "" && newData[messageField] != nil {
-					bodyData = newData
+				if templatedMessage != body.Data[messageField] && templatedMessage != "" {
+					body.Data[messageField] = templatedMessage
+
+					logger.Debug("Applied Message Templating: \n", templatedMessage)
+
 					modifiedBody = true
 				}
 			}
 		}
 
 		if modifiedBody {
-			body.Data = bodyData
-
 			err := body.UpdateReq(req)
 
 			if err != nil {
@@ -72,16 +69,12 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-
-			logger.Debug("Applied Message Templating: ", body.Data)
 		}
 
-		sendAt, ok := bodyData[sendAtField].(float64)
+		sendAt, ok := body.Data[sendAtField].(float64)
 
-		if ok && bodyData[messageField] != "" && bodyData[messageField] != nil {
-			delete(bodyData, sendAtField)
-
-			body.Data = bodyData
+		if ok && body.Data[messageField] != "" && body.Data[messageField] != nil {
+			delete(body.Data, sendAtField)
 
 			body.UpdateReq(req)
 
@@ -168,18 +161,16 @@ func handleScheduledMessage(tm time.Time, w http.ResponseWriter, req *http.Reque
 	return nil
 }
 
-func TemplateMessage(template string, bodyData map[string]any, headerData map[string][]string, variables map[string]any) (map[string]any, error) {
-	bodyData["message_template"] = template
+func GetTemplatedMessage(template string, body map[string]any, headers map[string][]string, VARIABLES map[string]any) (string, error) {
+	var bodyCopy map[string]any
 
-	data, _, err := TemplateBody(bodyData, headerData, variables)
+	request.CopyMap(bodyCopy, body)
+
+	data, _, err := GetTemplatedBody(bodyCopy, headers, VARIABLES)
 
 	if err != nil || data == nil {
-		return bodyData, err
+		return "", err
 	}
 
-	data[messageField] = data["message_template"]
-
-	delete(data, "message_template")
-
-	return data, nil
+	return data["message_template"].(string), nil
 }

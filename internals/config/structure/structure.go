@@ -25,8 +25,7 @@ type CONFIG struct {
 	NAME				string						`koanf:"name"`
 	SERVICE				SERVICE 					`koanf:"service"`
 	API					API						    `koanf:"api"`
-	// DEPRECATION overrides in Token Config
-	SETTINGS      		SETTINGS					`koanf:"settings"        token>aliases:"overrides" token>onuse:".overrides>>deprecated"       deprecation:"{b,fg=yellow}\x60{s}overrides{/}\x60{/} is no longer needed in {b}Token Configs{/}\nUse {b,fg=green}\x60settings\x60{/} instead"`
+	SETTINGS      		SETTINGS					`koanf:"settings"`
 }
 
 type ConfigType string
@@ -44,16 +43,13 @@ type SERVICE struct {
 
 type API struct {
 	URL					URL							`koanf:"url"             env>aliases:".apiurl"`
-	// DEPRECATION token, tokens in Token Config
-	// DEPRECATION api.token => api.tokens
-	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens,.apitoken" aliases:"token" token>aliases:".tokens,.token" token>onuse:".tokens,.token,token>>deprecated" onuse:"token>>deprecated" deprecation:".tokens,.token>>{b,fg=yellow}\x60{s}tokens{/}\x60{/} and {b,fg=yellow}\x60{s}token{/}\x60{/} will not be at {b}root{/} anymore\nUse {b,fg=green}\x60api.tokens\x60{/} instead|token>>{b,fg=yellow}\x60{s}api.token{/}\x60{/} will be {u}removed{/} in favor of {b,fg=green}\x60api.tokens\x60{/}"`																					
+	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens"`																					
 	AUTH				AUTH						`koanf:"auth"`
 }
 
 type AUTH struct {
 	METHODS				t.Opt[[]string]				`koanf:"methods"         env>aliases:".authmethods"`
-	// DEPRECATION auth.token => auth.tokens
-	TOKENS				[]Token						`koanf:"tokens"          aliases:"token" onuse:"token>>deprecated" deprecation:"{b,fg=yellow}\x60{s}api.auth.token{/}\x60{/} will be removed\nUse {b,fg=green}\x60api.auth.tokens\x60{/} instead"`
+	TOKENS				[]Token						`koanf:"tokens"`
 }
 
 type Token struct {
@@ -68,9 +64,26 @@ type SETTINGS struct {
 
 type MESSAGE struct {
 	VARIABLES         	t.Opt[map[string]any]		`koanf:"variables"       childtransform:"upper"`
-	FIELD_MAPPINGS      t.Opt[map[string][]FieldMapping]`koanf:"fieldmappings"   childtransform:"default"`
-	TEMPLATE  			t.Opt[string]				`koanf:"template"`
+	FIELD_MAPPINGS      t.Opt[map[string][]FMapping]`koanf:"fieldmappings"   childtransform:"default"`
+	TEMPLATING  		t.Opt[Templating]			`koanf:"templating"`
 	SCHEDULING			t.Opt[Scheduling]			`koanf:"scheduling"`
+	INJECTING			t.Opt[Injecting]			`koanf:"injecting"`
+}
+
+type Injecting struct {
+	URLToBody			t.Opt[URLToBody]			`koanf:"urltobody"`
+}
+
+type URLToBody struct {
+	Path				bool						`koanf:"path"`
+	Query				bool						`koanf:"query"`
+}
+
+type Templating struct {
+	MessageTemplate		string						`koanf:"messagetemplate"`
+	Body				bool						`koanf:"body"`
+	Query				bool						`koanf:"query"`
+	Path				bool						`koanf:"path"`
 }
 
 type Scheduling struct {
@@ -78,14 +91,14 @@ type Scheduling struct {
 	MaxHorizon			t.Opt[TimeDuration]			`koanf:"maxhorizon"`
 }
 
-type FieldMapping struct {
+type FMapping struct {
 	Field 				string 						`koanf:"field"`
 	Score 				int    						`koanf:"score"`
 }
 
 type ACCESS struct {
 	ENDPOINTS			t.Opt[AllowBlockSlice]		`koanf:"endpoints"`
-	FIELD_POLICIES		t.Opt[map[string]FieldPolicies]`koanf:"fieldpolicies"   childtransform:"default"`
+	FIELD_POLICIES		t.Opt[map[string]FPolicies] `koanf:"fieldpolicies"   childtransform:"default"`
 	RATE_LIMITING		t.Opt[RateLimiting]			`koanf:"ratelimiting"`
 	IP_FILTER			t.Opt[AllowBlockSlice]		`koanf:"ipfilter"`
 	TRUSTED_IPS			t.Opt[[]IPOrNet]			`koanf:"trustedips"`

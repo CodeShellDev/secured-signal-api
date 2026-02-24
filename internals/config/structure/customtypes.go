@@ -39,12 +39,12 @@ func (splitter *AllowBlockSlice) UnmarshalMapstructure(raw any) error {
 	return nil
 }
 
-type FieldPolicies struct{
+type FPolicies struct{
 	Allow	[]FieldPolicy
 	Block	[]FieldPolicy
 }
 
-func (splitter *FieldPolicies) UnmarshalMapstructure(raw any) error {
+func (splitter *FPolicies) UnmarshalMapstructure(raw any) error {
     slice, ok := raw.([]any)
 
     if !ok {

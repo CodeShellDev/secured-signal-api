@@ -34,13 +34,9 @@ func policyHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		if body.Empty {
-			body.Data = map[string]any{}
-		}
+		headers := request.GetReqHeaders(req)
 
-		headerData := request.GetReqHeaders(req)
-
-		shouldBlock, field := isBlockedByPolicy(body.Data, headerData, policies)
+		shouldBlock, field := isBlockedByPolicy(body.Data, headers, policies)
 
 		if shouldBlock {
 			logger.Warn("Client tried to use blocked field: ", field)
@@ -120,7 +116,7 @@ func doPoliciesApply(key string, body map[string]any, headers map[string][]strin
 	return false, ""
 }
 
-func isBlockedByPolicy(body map[string]any, headers map[string][]string, policies map[string]structure.FieldPolicies) (bool, string) {
+func isBlockedByPolicy(body map[string]any, headers map[string][]string, policies map[string]structure.FPolicies) (bool, string) {
 	if len(policies) == 0 || policies == nil {
 		// default: allow all
 		return false, ""

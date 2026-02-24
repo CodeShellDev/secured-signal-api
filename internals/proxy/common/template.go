@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/jsonutils"
-	"github.com/codeshelldev/gotl/pkg/query"
 	"github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/gotl/pkg/stringutils"
 	"github.com/codeshelldev/gotl/pkg/templating"
@@ -63,29 +62,35 @@ func cleanHeaders(headers map[string][]string) map[string][]string {
 	return cleanedHeaders
 }
 
-func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES map[string]any) (map[string]any, bool, error) {
+func GetTemplatedBody(body map[string]any, headers map[string][]string, VARIABLES map[string]any) (map[string]any, bool, error) {
 	var modified bool
 
-	headers = cleanHeaders(headers)
+	var headersCopy map[string][]string
+	var bodyCopy map[string]any
+
+	request.CopyHeaders(headersCopy, headers)
+	request.CopyMap(bodyCopy, body)
+
+	headersCopy = cleanHeaders(headersCopy)
 
 	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to ".Header_Var" and ".Body_Var"
-	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "Body_", body)
+	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "Body_", bodyCopy)
 
 	if err != nil {
-		return body, false, err
+		return bodyCopy, false, err
 	}
 
 	normalizedBody, err = normalizeData(requestkeys.HeaderPrefix, "Header_", normalizedBody)
 
 	if err != nil {
-		return body, false, err
+		return bodyCopy, false, err
 	}
 
 	// Prefix Body Data with Body_
 	prefixedBody := prefixData("Body_", normalizedBody)
 
 	// Prefix Header Data with Header_
-	prefixedHeaders := prefixData("Header_", request.ParseHeaders(headers))
+	prefixedHeaders := prefixData("Header_", request.ParseHeaders(headersCopy))
 
 	variables := map[string]any{}
 
@@ -96,10 +101,10 @@ func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES ma
 	templatedData, err := templating.RenderJSON(normalizedBody, variables)
 
 	if err != nil {
-		return body, false, err
+		return bodyCopy, false, err
 	}
 
-	beforeStr := jsonutils.ToJson(body)
+	beforeStr := jsonutils.ToJson(bodyCopy)
 	afterStr := jsonutils.ToJson(templatedData)
 
 	modified = beforeStr != afterStr
@@ -107,23 +112,26 @@ func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES ma
 	return templatedData, modified, nil
 }
 
-func TemplatePath(reqUrl *url.URL, data map[string]any, VARIABLES any) (string, map[string]any, bool, bool, error) {
-	var modified bool
-	var modifiedBody bool
-
-	reqPath, err := url.PathUnescape(reqUrl.Path)
+func TemplatePath(path string, VARIABLES any) (string, error) {
+	reqPath, err := url.PathUnescape(path)
 
 	if err != nil {
-		return reqUrl.Path, data, false, false, err
+		return path, err
 	}
 
 	reqPath, err = templating.RenderNormalizedTemplate("path", reqPath, VARIABLES)
 
 	if err != nil {
-		return reqUrl.Path, data, false, false, err
+		return path, err
 	}
 
-	parts := strings.Split(reqPath, "/")
+	return reqPath, nil
+}
+
+func InjectPathIntoBody(path string, data map[string]any) (string, bool) {
+	var modified bool
+
+	parts := strings.Split(path, "/")
 	newParts := []string{}
 
 	for _, part := range parts {
@@ -144,32 +152,26 @@ func TemplatePath(reqUrl *url.URL, data map[string]any, VARIABLES any) (string, 
 		value := stringutils.ToType(keyValuePair[1])
 
 		data[keyWithoutPrefix] = value
-		modifiedBody = true
+		modified = true
 
 		newParts = newParts[:len(newParts) - 1]
 	}
 
-	reqPath = strings.Join(newParts, "/")
-
-	if reqUrl.Path != reqPath {
-		modified = true
-	}
-
-	return reqPath, data, modified, modifiedBody, nil
+	return strings.Join(newParts, "/"), modified
 }
 
-func TemplateQuery(reqUrl *url.URL, data map[string]any, VARIABLES any) (string, map[string]any, bool, error) {
+func TemplateQuery(rawQuery string, VARIABLES any) (string, error) {
+	decodedQuery, _ := url.QueryUnescape(rawQuery)
+
+	templatedQuery, err := templating.RenderNormalizedTemplate("query", decodedQuery, VARIABLES)
+
+	return templatedQuery, err
+}
+
+func InjectQueryIntoBody(query url.Values, data map[string]any) bool {
 	var modified bool
 
-	decodedQuery, _ := url.QueryUnescape(reqUrl.RawQuery)
-
-	templatedQuery, _ := templating.RenderNormalizedTemplate("query", decodedQuery, VARIABLES)
-
-	originalQueryData := reqUrl.Query()
-
-	addedData, _ := query.ParseTypedQuery(templatedQuery)
-
-	for key, val := range addedData {
+	for key, val := range data {
 		keyWithoutPrefix, match := strings.CutPrefix(key, "@")
 
 		if !match {
@@ -178,12 +180,10 @@ func TemplateQuery(reqUrl *url.URL, data map[string]any, VARIABLES any) (string,
 
 		data[keyWithoutPrefix] = val
 
-		originalQueryData.Del(key)
+		query.Del(key)
 
 		modified = true
 	}
 
-	reqRawQuery := originalQueryData.Encode()
-
-	return reqRawQuery, data, modified, nil
+	return modified
 }
