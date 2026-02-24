@@ -36,19 +36,19 @@ const (
 )
 
 type SERVICE struct {
-	HOSTNAMES			t.Opt[[]string]				`koanf:"hostnames"       env>aliases:".hostnames"`
-	PORT				string						`koanf:"port"            env>aliases:".port"`
-	LOG_LEVEL			string						`koanf:"loglevel"        env>aliases:".loglevel"`
+	HOSTNAMES			t.Opt[[]string]				`koanf:"hostnames"          env>aliases:".hostnames"`
+	PORT				string						`koanf:"port"               env>aliases:".port"`
+	LOG_LEVEL			string						`koanf:"loglevel"           env>aliases:".loglevel"`
 }
 
 type API struct {
-	URL					URL							`koanf:"url"             env>aliases:".apiurl"`
-	TOKENS				[]string					`koanf:"tokens"          env>aliases:".apitokens"`																					
+	URL					URL							`koanf:"url"                env>aliases:".apiurl"`
+	TOKENS				[]string					`koanf:"tokens"             env>aliases:".apitokens"`
 	AUTH				AUTH						`koanf:"auth"`
 }
 
 type AUTH struct {
-	METHODS				t.Opt[[]string]				`koanf:"methods"         env>aliases:".authmethods"`
+	METHODS				t.Opt[[]string]				`koanf:"methods"            env>aliases:".authmethods"`
 	TOKENS				[]Token						`koanf:"tokens"`
 }
 
@@ -63,9 +63,9 @@ type SETTINGS struct {
 }
 
 type MESSAGE struct {
-	VARIABLES         	t.Opt[map[string]any]		`koanf:"variables"       childtransform:"upper"`
-	FIELD_MAPPINGS      t.Opt[map[string][]FMapping]`koanf:"fieldmappings"   childtransform:"default"`
-	TEMPLATING  		t.Opt[Templating]			`koanf:"templating"`
+	VARIABLES         	t.Opt[map[string]any]		`koanf:"variables"          childtransform:"upper"`
+	FIELD_MAPPINGS      t.Opt[map[string][]FMapping]`koanf:"fieldmappings"      childtransform:"default"`
+	TEMPLATING  		t.Opt[Templating]			`koanf:"templating"         aliases:"template"          onuse:"template>>broken"    breaking:"{b,fg=red}\x60{s}settings.message.template{/}\x60{/} has been moved\n Use {b,fg=green}\x60settings.message.templating.messageTemplate\x60{/} instead"`
 	SCHEDULING			t.Opt[Scheduling]			`koanf:"scheduling"`
 	INJECTING			t.Opt[Injecting]			`koanf:"injecting"`
 }
@@ -98,7 +98,7 @@ type FMapping struct {
 
 type ACCESS struct {
 	ENDPOINTS			t.Opt[AllowBlockSlice]		`koanf:"endpoints"`
-	FIELD_POLICIES		t.Opt[map[string]FPolicies] `koanf:"fieldpolicies"   childtransform:"default"`
+	FIELD_POLICIES		t.Opt[map[string]FPolicies] `koanf:"fieldpolicies"      childtransform:"default"`
 	RATE_LIMITING		t.Opt[RateLimiting]			`koanf:"ratelimiting"`
 	IP_FILTER			t.Opt[AllowBlockSlice]		`koanf:"ipfilter"`
 	TRUSTED_IPS			t.Opt[[]IPOrNet]			`koanf:"trustedips"`
