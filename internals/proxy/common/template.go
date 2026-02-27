@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/jsonutils"
+	queryutils "github.com/codeshelldev/gotl/pkg/query"
 	"github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/gotl/pkg/stringutils"
 	"github.com/codeshelldev/gotl/pkg/templating"
@@ -65,8 +66,8 @@ func cleanHeaders(headers map[string][]string) map[string][]string {
 func GetTemplatedBody(body map[string]any, headers map[string][]string, VARIABLES map[string]any) (map[string]any, bool, error) {
 	var modified bool
 
-	var headersCopy map[string][]string
-	var bodyCopy map[string]any
+	bodyCopy := map[string]any{}
+	headersCopy := map[string][]string{}
 
 	request.CopyHeaders(headersCopy, headers)
 	request.CopyMap(bodyCopy, body)
@@ -147,7 +148,7 @@ func InjectPathIntoBody(path string, data map[string]any) (string, bool) {
 			continue
 		}
 
-		keyWithoutPrefix, match := strings.CutPrefix(keyValuePair[0], "@")
+		keyWithoutPrefix, match := strings.CutPrefix(keyValuePair[0], requestkeys.BodyPrefix)
 		
 		if !match {
 			continue
@@ -175,8 +176,12 @@ func TemplateQuery(rawQuery string, VARIABLES any) (string, error) {
 func InjectQueryIntoBody(query url.Values, data map[string]any) bool {
 	var modified bool
 
-	for key, val := range data {
-		keyWithoutPrefix, match := strings.CutPrefix(key, "@")
+	decodedQuery, _ := url.QueryUnescape(query.Encode())
+
+	parsedQuery, _ := queryutils.ParseTypedQuery(decodedQuery)
+
+	for key, val := range parsedQuery {
+		keyWithoutPrefix, match := strings.CutPrefix(key, requestkeys.BodyPrefix)
 
 		if !match {
 			continue

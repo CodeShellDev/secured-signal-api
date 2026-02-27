@@ -20,7 +20,7 @@ var SendEnpoint = Endpoint{
 const messageField = "message"
 const sendAtField = "send_at"
 
-func sendHandler(mux *http.ServeMux) *http.ServeMux {
+func sendHandler(mux *http.ServeMux, next http.Handler) *http.ServeMux {
 	mux.HandleFunc("POST /v2/send", func(w http.ResponseWriter, req *http.Request) {
 		logger := GetLogger(req)
 
@@ -38,6 +38,8 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 			http.Error(w, "Bad Request: invalid body", http.StatusBadRequest)
 			return
 		}
+
+		body.EnsureNotNil()
 
 		var modifiedBody bool
 
@@ -111,6 +113,8 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 
 			return
 		}
+
+		next.ServeHTTP(w, req)
 	})
 
 	return mux
@@ -162,7 +166,11 @@ func handleScheduledMessage(tm time.Time, w http.ResponseWriter, req *http.Reque
 }
 
 func GetTemplatedMessage(template string, body map[string]any, headers map[string][]string, VARIABLES map[string]any) (string, error) {
-	var bodyCopy map[string]any
+	const templatedSuffix = "_template"
+
+	bodyCopy := map[string]any{
+		messageField + templatedSuffix: template,
+	}
 
 	request.CopyMap(bodyCopy, body)
 
@@ -172,5 +180,5 @@ func GetTemplatedMessage(template string, body map[string]any, headers map[strin
 		return "", err
 	}
 
-	return data["message_template"].(string), nil
+	return data[messageField + templatedSuffix].(string), nil
 }

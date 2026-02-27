@@ -15,7 +15,7 @@ var ScheduleEndpoint = Endpoint{
 	Handler: scheduleHandler,
 }
 
-func scheduleHandler(mux *http.ServeMux) *http.ServeMux {
+func scheduleHandler(mux *http.ServeMux, next http.Handler) *http.ServeMux {
 	mux.HandleFunc("DELETE /v1/schedule/{id}", func(w http.ResponseWriter, req *http.Request) {
 		id := req.PathValue("id")
 

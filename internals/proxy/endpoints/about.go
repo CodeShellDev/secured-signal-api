@@ -17,7 +17,7 @@ var AboutEndpoint = Endpoint{
 	Handler: aboutHandler,
 }
 
-func aboutHandler(mux *http.ServeMux) *http.ServeMux {
+func aboutHandler(mux *http.ServeMux, next http.Handler) *http.ServeMux {
 	mux.HandleFunc("GET /v1/about", func(w http.ResponseWriter, req *http.Request) {
 		req.RequestURI = ""
 		ChangeRequestDest(req, config.DEFAULT.API.URL.String() + "/v1/about")
@@ -40,6 +40,8 @@ func aboutHandler(mux *http.ServeMux) *http.ServeMux {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
+
+		body.EnsureNotNil()
 
 		for key, values := range res.Header {
 			for _, value := range values {
