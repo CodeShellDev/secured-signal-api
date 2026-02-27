@@ -1,16 +1,15 @@
 module github.com/codeshelldev/secured-signal-api
 
-go 1.25.6
+go 1.26.0
 
 require (
 	github.com/codeshelldev/gotl/pkg/configutils v0.0.16
 	github.com/codeshelldev/gotl/pkg/docker v0.0.2
-	github.com/codeshelldev/gotl/pkg/ioutils v0.0.2
 	github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2
-	github.com/codeshelldev/gotl/pkg/logger v0.0.8
+	github.com/codeshelldev/gotl/pkg/logger v0.0.18
 	github.com/codeshelldev/gotl/pkg/pretty v0.0.10
 	github.com/codeshelldev/gotl/pkg/query v0.0.4
-	github.com/codeshelldev/gotl/pkg/request v0.0.8
+	github.com/codeshelldev/gotl/pkg/request v0.0.10
 	github.com/codeshelldev/gotl/pkg/scheduler v0.0.9
 	github.com/codeshelldev/gotl/pkg/server/http v0.0.3
 	github.com/codeshelldev/gotl/pkg/stringutils v0.0.8
@@ -23,7 +22,7 @@ require (
 )
 
 require (
-	github.com/clipperhouse/uax29/v2 v2.6.0 // indirect
+	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/google/uuid v1.6.0
@@ -32,7 +31,7 @@ require (
 	github.com/knadh/koanf/providers/env/v2 v2.0.0 // indirect
 	github.com/knadh/koanf/providers/file v1.2.1 // indirect
 	github.com/knadh/koanf/v2 v2.3.2 // indirect
-	github.com/mattn/go-runewidth v0.0.19 // indirect
+	github.com/mattn/go-runewidth v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.34
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect

@@ -14,6 +14,7 @@ type ENV struct {
 	DB_PATH				string
 	
 	INSECURE      		bool
+	REDACT_TOKENS		bool
 
 	TOKENS				[]string
 

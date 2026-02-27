@@ -19,7 +19,10 @@ var ENV *structure.ENV = &structure.ENV{
 	TOKENS_DIR:    	os.Getenv("TOKENS_DIR"),
 	FAVICON_PATH:  	os.Getenv("FAVICON_PATH"),
 	DB_PATH: 		os.Getenv("DB_PATH"),
+
 	INSECURE:      	false,
+
+	REDACT_TOKENS:  strings.EqualFold(os.Getenv("REDACT_TOKENS"), "true") || os.Getenv("REDACT_TOKENS") == "1",
 
 	CONFIGS:       	map[string]*structure.CONFIG{},
 }

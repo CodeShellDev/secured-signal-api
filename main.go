@@ -12,25 +12,25 @@ import (
 	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
 	"github.com/codeshelldev/secured-signal-api/internals/scheduler"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
-	"github.com/codeshelldev/secured-signal-api/utils/stdlog"
+	"github.com/codeshelldev/secured-signal-api/utils/logging"
 )
 
 var proxy reverseProxy.Proxy
 
 func main() {
-	logLevel := os.Getenv("LOG_LEVEL")
-
-	logger.Init(logLevel)
+	logging.Init(os.Getenv("LOG_LEVEL"))
 
 	docker.Init()
 
 	config.Load()
 
 	if config.DEFAULT.SERVICE.LOG_LEVEL != logger.Level() {
-		logger.Init(config.DEFAULT.SERVICE.LOG_LEVEL)
+		logging.Init(config.DEFAULT.SERVICE.LOG_LEVEL)
 	}
 
 	logger.Info("Initialized Logger with Level of ", logger.Level())
+
+	logging.Setup()
 
 	if logger.Level() == "dev" {
 		logger.Dev("Welcome back, Developer!")
@@ -61,8 +61,8 @@ func main() {
 
 	server := httpserver.Create(handler, "0.0.0.0", ports...)
 
-	server.ErrorLog = stdlog.ErrorLog
-	server.InfoLog = stdlog.DebugLog
+	server.ErrorLog = logger.StdError()
+	server.InfoLog = logger.StdInfo()
 
 	stop := docker.Run(func() {
 		if logger.IsDebug() && len(ports) > 1 {
