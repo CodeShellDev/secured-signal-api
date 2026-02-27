@@ -34,6 +34,8 @@ func policyHandler(next http.Handler) http.Handler {
 			return
 		}
 
+		body.EnsureNotNil()
+
 		headers := request.GetReqHeaders(req)
 
 		shouldBlock, field := isBlockedByPolicy(body.Data, headers, policies)

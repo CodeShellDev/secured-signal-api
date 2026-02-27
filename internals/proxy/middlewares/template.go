@@ -34,6 +34,8 @@ func templateHandler(next http.Handler) http.Handler {
 			return
 		}
 
+		body.EnsureNotNil()
+
 		var modifiedBody bool
 
 		if !body.Empty && templating.Body {

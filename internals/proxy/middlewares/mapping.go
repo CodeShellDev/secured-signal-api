@@ -8,6 +8,7 @@ import (
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
+	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
 
 var Mapping Middleware = Middleware{
@@ -32,6 +33,8 @@ func mappingHandler(next http.Handler) http.Handler {
 			return
 		}
 
+		body.EnsureNotNil()
+
 		var modifiedBody bool
 
 		if !body.Empty {
@@ -43,7 +46,7 @@ func mappingHandler(next http.Handler) http.Handler {
 				keyWithoutPrefix := key[1:]
 
 				switch prefix {
-				case "@":
+				case requestkeys.BodyPrefix:
 					body.Data[keyWithoutPrefix] = value
 					modifiedBody = true
 				case ".":

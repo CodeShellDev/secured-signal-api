@@ -13,6 +13,7 @@ import (
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
+	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
 
 var Auth Middleware = Middleware{
@@ -36,7 +37,7 @@ var BearerAuth = AuthMethod{
 			return "", nil
 		}
 
-		if strings.ToLower(headerParts[0]) == "bearer" {
+		if strings.EqualFold(headerParts[0], "bearer") {
 			req.Header.Del("Authorization")
 
 			if isValidToken(tokens, headerParts[1]) {
@@ -65,7 +66,7 @@ var BasicAuth = AuthMethod{
 			return "", nil
 		}
 
-		if strings.ToLower(headerParts[0]) == "basic" {
+		if strings.EqualFold(headerParts[0], "basic") {
 			req.Header.Del("Authorization")
 
 			base64Bytes, err := base64.StdEncoding.DecodeString(headerParts[1])
@@ -83,7 +84,7 @@ var BasicAuth = AuthMethod{
 
 			user, password := parts[0], parts[1]
 
-			if strings.ToLower(user) == "api" && isValidToken(tokens, password) {
+			if strings.EqualFold(user, "api") && isValidToken(tokens, password) {
 				return password, nil
 			}
 
@@ -138,7 +139,7 @@ var QueryAuth = AuthMethod{
 	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		const authQuery = "auth"
 
-		auth := req.URL.Query().Get("@" + authQuery)
+		auth := req.URL.Query().Get(requestkeys.BodyPrefix + authQuery)
 
 		if strings.TrimSpace(auth) == "" {
 			return "", nil
@@ -147,7 +148,7 @@ var QueryAuth = AuthMethod{
 		if isValidToken(tokens, auth) {
 			query := req.URL.Query()
 
-			query.Del("@" + authQuery)
+			query.Del(requestkeys.BodyPrefix + authQuery)
 
 			req.URL.RawQuery = query.Encode()
 
