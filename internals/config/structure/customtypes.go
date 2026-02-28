@@ -1,9 +1,26 @@
 package structure
 
 import (
+	"errors"
+
 	g "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
 )
+
 type StringMatchList []g.StringMatchRule
+
+func (m StringMatchList) TestRules() error {
+	var errs []error
+
+	for _, rule := range m {
+		err := rule.Test()
+
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	return errors.Join(errs...)
+}
 
 func (m StringMatchList) FindMatchRule(str string) (g.StringMatchRule, error) {
 	for _, rule := range m {

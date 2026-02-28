@@ -24,6 +24,7 @@ func (timeDuration *TimeDuration) UnmarshalMapstructure(raw any) error {
     d, err := time.ParseDuration(str)
 
 	if err != nil {
+		logger.Fatal("Invalid duration ", str, ": ", err.Error())
 		return err
 	}
 
@@ -45,6 +46,7 @@ func (ipNet *IPOrNet) UnmarshalMapstructure(raw any) error {
 	ip, err := netutils.ParseIPorNet(str)
 
 	if err != nil {
+		logger.Fatal("Invalid IP ", str, ": ", err.Error())
 		return err
 	}
 
@@ -66,6 +68,7 @@ func (Url *URL) UnmarshalMapstructure(raw any) error {
 	u, err := url.Parse(str)
 
 	if err != nil {
+		logger.Fatal("Invalid URL ", str, ": ", err.Error())
 		return err
 	}
 
