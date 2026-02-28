@@ -32,12 +32,15 @@ settings:
   message:
     fieldMappings:
       "@message":
-        [
-          { field: "msg", score: 80 },
-          { field: "data.message", score: 79 },
-          { field: "array[0].message", score: 78 },
-        ]
-      ".NUMBER": [{ field: "phone_number", score: 100 }]
+        - field: "msg"
+          score: 80
+        - field: "data.message"
+          score: 79
+        - field: "array[0].message"
+           score: 78
+      ".NUMBER":
+        - field: "phone_number"
+          score: 100
 ```
 
 > [!NOTE]

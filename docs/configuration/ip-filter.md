@@ -49,12 +49,9 @@ By default, adding an IP or range explicitly allows it, use `!` to block it inst
 
 ### Rules
 
-- Default: **allow all**
-- Allow rules exist: default **block**
-- Only block rules exist: default **allow**
-- Explicit allow **overrides** block
+- IPv4 and IPv6 rules may be mixed
 
-* IPv4 and IPv6 rules may be mixed
+{{{ #://../templates/block-rules.md.tmpl }}}
 
 ## Clients behind Proxies
 
