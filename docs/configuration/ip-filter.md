@@ -22,16 +22,13 @@ You can modify IP access rules by configuring `access.ipFilter` in your config:
 settings:
   access:
     ipFilter:
-      - "!123.456.78.9"
-      - "!234.567.89.0/24"
-      - 192.168.1.10
-      - 10.0.0.0/24
+      allowed:
+        - 192.168.1.10
+        - 10.0.0.0/24
+      blocked:
+        - 123.456.78.9
+        - 234.567.89.0/24
 ```
-
-By default, adding an IP or range explicitly allows it, use `!` to block it instead.
-
-> [!NOTE]
-> When using `!` to block an IP or range, you must enclose it in quotes
 
 **Supports:**
 
@@ -40,12 +37,12 @@ By default, adding an IP or range explicitly allows it, use `!` to block it inst
 
 ## Behavior
 
-| Allow          | Block                    | Result                                        |
-| -------------- | ------------------------ | --------------------------------------------- |
-| `192.168.1.10` | —                        | **Only** `192.168.1.10` allowed               |
-| —              | `!123.456.78.9`          | **All** allowed, **except** `123.456.78.9`    |
-| `10.0.0.0/24`  | `!10.0.0.10`             | `10.0.0.0/24` allowed, **except** `10.0.0.10` |
-| —              | `!0.0.0.0/0`<br/>`!::/0` | All IPv4 & IPv6 blocked                       |
+| Allow          | Block                  | Result                                        |
+| -------------- | ---------------------- | --------------------------------------------- |
+| `192.168.1.10` | —                      | **Only** `192.168.1.10` allowed               |
+| —              | `123.456.78.9`         | **All** allowed, **except** `123.456.78.9`    |
+| `10.0.0.0/24`  | `10.0.0.10`            | `10.0.0.0/24` allowed, **except** `10.0.0.10` |
+| —              | `0.0.0.0/0`<br/>`::/0` | All IPv4 & IPv6 blocked                       |
 
 ### Rules
 
