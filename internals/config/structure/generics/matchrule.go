@@ -176,7 +176,7 @@ func (r MatchRule[T]) Match(value T) (bool, error) {
 		re, err := regexp.Compile(pStr)
 
 		if err != nil {
-			return false, nil
+			return false, errors.New("error during regex compilation of " + pStr + ": " + err.Error())
 		}
 		
 		return re.MatchString(vStr), nil
