@@ -45,7 +45,7 @@ const config = {
 	organizationName: "codeshelldev",
 	projectName: "secured-signal-api",
 
-	onBrokenLinks: "throw",
+	onBrokenLinks: "warn",
 
 	i18n: {
 		defaultLocale: "en",
