@@ -147,13 +147,13 @@ Secured Signal API provides 5 ways to authenticate
 
 ### Auth
 
-| Method      | Example                                                    |
-| :---------- | :--------------------------------------------------------- |
-| Bearer Auth | Add `Authorization: Bearer API_TOKEN` to headers           |
-| Basic Auth  | Add `Authorization: Basic BASE64_STRING` (`api:API_TOKEN`) |
-| Query Auth  | Append `@auth=API_TOKEN` to request URL                    |
-| Path Auth   | Prepend request path with `/@auth=API_TOKEN/`              |
-| Body Auth   | Set `auth` to `API_TOKEN` in the request body              |
+| Method      | Example                                                                                                      |
+| :---------- | :----------------------------------------------------------------------------------------------------------- |
+| Bearer Auth | `Authorization: Bearer API_TOKEN` (header)                                                                   |
+| Basic Auth  | `Authorization: Basic base64(api:API_TOKEN)` (header)<br/>`http://api:API_TOKEN@host:port` (client specific) |
+| Query Auth  | `http://host:port/abc?@auth=API_TOKEN` (query parameter)                                                     |
+| Path Auth   | `http://host:port/@auth=API_TOKEN/abc` (path parameter)                                                      |
+| Body Auth   | `auth: "API_TOKEN"` (request body field)                                                                     |
 
 > [!WARNING]
 > **Query** and **Path** auth are disabled by default and [must be enabled in the config](https://codeshelldev.github.io/secured-signal-api/docs/configuration/auth)
@@ -250,18 +250,21 @@ api:
 
 settings:
   message:
-    template: |
-      You've got a Notification:
-      {{@message}} 
-      At {{@data.timestamp}} on {{@data.date}}.
-      Send using {{.NUMBER}}.
+    templating:
+      messageTemplate: |
+        You've got a Notification:
+        {{@message}} 
+        At {{@data.timestamp}} on {{@data.date}}.
+        Send using {{.NUMBER}}.
 
     variables:
       number: "+123400001"
       recipients: ["+123400002", "group.id", "user.id"]
 
     fieldMappings:
-      "@message": [{ field: "msg", score: 100 }]
+      "@message":
+        - field: "msg"
+          score: 100
 
   access:
     trustedIPs:
@@ -271,13 +274,19 @@ settings:
       - 172.20.0.100
 
     ipFilter:
-      - 192.168.1.10
-      - 192.168.2.0/24
-      - "!192.168.2.44"
+      allowed:
+        - 192.168.1.10
+        - 192.168.2.0/24
+      blocked:
+        - 192.168.2.44
 
     endpoints:
-      - "!/v1/about"
-      - /v2/send
+      allowed:
+        - pattern: /v2/send
+      blocked:
+        - pattern: /v1/about
+        - pattern: /v1/receive/[^0]+
+          matchType: regex
 
     rateLimiting:
       limit: 100
@@ -287,7 +296,8 @@ settings:
       "@number":
         - value: "+123400003"
           action: block
-        - value: "+123400004"
+        - value: "+12340000[4-9]"
+          matchType: regex
           action: block
 ```
 
@@ -318,7 +328,9 @@ settings:
       recipients: ["+123400020", "group.id", "user.id"]
 
     fieldMappings: # overwrite @message from main config
-      "@message": [{ field: "msg", score: 100 }]
+      "@message":
+        - field: "msg"
+          score: 100
 
   access:
     trustedIPs: # disable
@@ -326,9 +338,11 @@ settings:
     ipFilter: # disable
 
     endpoints: # overwrite main config endpoints
-      - "!/v1/about"
-      - /v1/receive
-      - /v2/send
+      allowed:
+        - pattern: /v1/receive
+        - pattern: /v2/send
+      blocked:
+        - pattern: /v1/about
 
     rateLimiting:
       limit: 100
