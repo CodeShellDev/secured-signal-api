@@ -24,11 +24,11 @@ This will send `Hello, World!` to `<to>` from `<from>`.
 
 **Secured Signal API** implements 3 auth methods:
 
-| Method      | Example                                                    |
-| :---------- | :--------------------------------------------------------- |
-| Bearer Auth | Add `Authorization: Bearer API_TOKEN` to headers           |
-| Basic Auth  | Add `Authorization: Basic BASE64_STRING` (`api:API_TOKEN`) |
-| Query Auth  | Append `@authorization=API_TOKEN` to request URL           |
+| Method      | Example                                                                                                      |
+| :---------- | :----------------------------------------------------------------------------------------------------------- |
+| Bearer Auth | `Authorization: Bearer API_TOKEN` (header)                                                                   |
+| Basic Auth  | `Authorization: Basic base64(api:API_TOKEN)` (header)<br/>`http://api:API_TOKEN@host:port` (client specific) |
+| Query Auth  | `http://host:port/abc?@auth=API_TOKEN` (query parameter)                                                     |
 
 Example:
 
