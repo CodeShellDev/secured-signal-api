@@ -19,7 +19,8 @@ To be able to use the Signal Messenger integration in Home Assistant you need to
 ```
 
 > [!TIP]
-> If you want to use a list of recipients as placeholder you have to add `/@recipients={{.RECIPIENTS}}` to the `url`:
+> If you want to use a list of recipients as placeholder you have to [inject](/docs/usage/advanced#url-to-body-injection) the `recipients` field from the path into the body.
+> For that, add `/@recipients={{.RECIPIENTS}}` at the of the `url`:
 >
 > ```yaml
 > url: "http://api:API_TOKEN@sec-signal-api:8880/@recipients={{.RECIPIENTS}}"
