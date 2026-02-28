@@ -26,6 +26,7 @@ const (
 	MatchRegex
 	MatchGlob
 	MatchContains
+	MatchIncludes
 	MatchHas
 	MatchPrefix
 	MatchSuffix
@@ -46,6 +47,8 @@ func (m MatchType) ParseEnum(str string) (MatchType, bool) {
 		return MatchGlob, true
 	case "contains":
 		return MatchContains, true
+	case "includes":
+		return MatchIncludes, true
 	case "has":
 		return MatchHas, true
 	case "prefix":
@@ -69,6 +72,8 @@ func (m MatchType) String() string {
 		return "glob"
 	case MatchContains:
 		return "contains"
+	case MatchIncludes:
+		return "includes"
 	case MatchHas:
 		return "has"
 	case MatchPrefix:
@@ -89,6 +94,72 @@ func (r StringMatchRule) Match(str string) (bool, error) {
 	return rule.Match(str)
 }
 
+func (r StringMatchRule) Test() error {
+	rule := MatchRule[string]{
+		Pattern: r.Pattern,
+		MatchType: r.MatchType,
+	}
+
+	return rule.Test()
+}
+
+func (r MatchRule[T]) Test() error {
+	p := any(r.Pattern)
+
+	switch r.MatchType.Value {
+	case MatchEquals:
+		_, ok := p.(string)
+
+		if !ok {
+			return errors.New("pattern must be string to be able to use match type " + r.MatchType.Value.String())
+		}
+	case MatchContains:
+		_, ok := p.(string)
+
+		if !ok {
+			return errors.New("pattern must be string to be able to use match type " + r.MatchType.Value.String())
+		}
+	case MatchPrefix:
+		_, ok := p.(string)
+
+		if !ok {
+			return errors.New("pattern must be string to be able to use match type " + r.MatchType.Value.String())
+		}
+	case MatchSuffix:
+		_, ok := p.(string)
+
+		if !ok {
+			return errors.New("pattern must be string to be able to use match type " + r.MatchType.Value.String())
+		}
+	case MatchRegex:
+		pStr, ok := p.(string)
+
+		if !ok {
+			return errors.New("pattern must be string to be able to use match type " + r.MatchType.Value.String())
+		}
+
+		_, err := regexp.Compile(pStr)
+
+		if err != nil {
+			return errors.New("could not compile " + pStr + " as regex: " + err.Error())
+		}
+	case MatchGlob:
+		pStr, ok := p.(string)
+
+		if !ok {
+			return errors.New("pattern must be string to be able to use match type " + r.MatchType.Value.String())
+		}
+
+		_, err := path.Match(pStr, " ")
+
+		if err != nil {
+			return errors.New("could not compile " + pStr + " as glob-style pattern: " + err.Error())
+		}
+	}
+
+	return nil
+}
+
 func (r MatchRule[T]) Match(value T) (bool, error) {
 	v := any(value)
 	p := any(r.Pattern)
@@ -106,31 +177,30 @@ func (r MatchRule[T]) Match(value T) (bool, error) {
 
 		return strings.EqualFold(vStr, pStr), nil
 	case MatchContains:
-		switch v := v.(type) {
-		case string:
-			pStr, ok := p.(string)
+		vStr, ok1 := v.(string)
+		pStr, ok2 := p.(string)
 
-			if !ok {
-				return false, errors.New("pattern must be string to be able to use matchType contains")
-			}
-
-			return strings.Contains(strings.ToLower(v), strings.ToLower(pStr)), nil
-		default:
-			vVal := reflect.ValueOf(v)
-			if vVal.Kind() == reflect.Slice || vVal.Kind() == reflect.Array {
-				pVal := reflect.ValueOf(p)
-
-				for i := 0; i < vVal.Len(); i++ {
-					if reflect.DeepEqual(vVal.Index(i).Interface(), pVal.Interface()) {
-						return true, nil
-					}
-				}
-
-				return false, nil
-			}
-
-			return false, errors.New("match type contains is not supported for " + vVal.Kind().String() + " type")
+		if !ok1 || !ok2 {
+			return false, errors.New("match type contains is only allowed for strings")
 		}
+
+		return strings.Contains(strings.ToLower(vStr), strings.ToLower(pStr)), nil
+	case MatchIncludes:
+		vVal := reflect.ValueOf(v)
+
+		if vVal.Kind() == reflect.Slice || vVal.Kind() == reflect.Array {
+			pVal := reflect.ValueOf(p)
+
+			for i := 0; i < vVal.Len(); i++ {
+				if reflect.DeepEqual(vVal.Index(i).Interface(), pVal.Interface()) {
+					return true, nil
+				}
+			}
+
+			return false, nil
+		}
+
+		return false, errors.New("match type includes is not supported for type " + vVal.Kind().String())
 	case MatchHas:
 		vVal := reflect.ValueOf(v)
 
@@ -188,7 +258,11 @@ func (r MatchRule[T]) Match(value T) (bool, error) {
 			return false, errors.New("match type glob is only supported for strings")
 		}
 
-		match, _ := path.Match(pStr, vStr)
+		match, err := path.Match(pStr, vStr)
+
+		if err != nil {
+			return false, errors.New("error during glob-style pattern compilation of " + pStr + ": " + err.Error())
+		}
 
 		return match, nil
 	default:
