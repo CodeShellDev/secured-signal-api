@@ -7,7 +7,7 @@ require (
 	github.com/codeshelldev/gotl/pkg/docker v0.0.2
 	github.com/codeshelldev/gotl/pkg/ioutils v0.0.2
 	github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2
-	github.com/codeshelldev/gotl/pkg/logger v0.0.8
+	github.com/codeshelldev/gotl/pkg/logger v0.0.18
 	github.com/codeshelldev/gotl/pkg/pretty v0.0.10
 	github.com/codeshelldev/gotl/pkg/query v0.0.4
 	github.com/codeshelldev/gotl/pkg/request v0.0.8

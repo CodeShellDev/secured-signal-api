@@ -8,8 +8,8 @@ github.com/codeshelldev/gotl/pkg/ioutils v0.0.2 h1:IRcN2M6H4v59iodw1k7gFX9lirhbV
 github.com/codeshelldev/gotl/pkg/ioutils v0.0.2/go.mod h1:WPQYglNqThBatoGaQK0OGx2bwzto1oi0zb1fB9gsaUU=
 github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2 h1:ERsjkaWVrsyUZoEunCEeNYDXhuaIvoSetB8e/zI4Tqo=
 github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2/go.mod h1:oxgKaAoMu6iYVHfgR7AhkK22xbYx4K0KCkyVEfYVoWs=
-github.com/codeshelldev/gotl/pkg/logger v0.0.8 h1:mt8dLt3aEgzCTOLbJ+KuAghwnP6Iv7/VR8tHXxsXuTA=
-github.com/codeshelldev/gotl/pkg/logger v0.0.8/go.mod h1:AFO/snEIfF8YB3+TH6XtFMlhRCAJxItSfyc4ndbwc8E=
+github.com/codeshelldev/gotl/pkg/logger v0.0.18 h1:eQ9F8UXJbdKQ31759VN3tY0UoaczFRjKuMGEhQOZ7D0=
+github.com/codeshelldev/gotl/pkg/logger v0.0.18/go.mod h1:AFO/snEIfF8YB3+TH6XtFMlhRCAJxItSfyc4ndbwc8E=
 github.com/codeshelldev/gotl/pkg/pretty v0.0.10 h1:efoRJfkrk26c5j26qiwCXWPzeG/TfFK9V55Q6Rn+1CM=
 github.com/codeshelldev/gotl/pkg/pretty v0.0.10/go.mod h1:SkyfcVnQp37jV3SMTtnIFc1fyVvorvSskJxOmYvfIHU=
 github.com/codeshelldev/gotl/pkg/query v0.0.4 h1:o2Oagx/s1wfNMqkh6GfR6wpsIVOFSDPIbxe8ABRIXDw=
