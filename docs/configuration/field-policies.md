@@ -17,23 +17,12 @@ settings:
       "@number":
         - value: "+123400002"
           action: block
-        - value: "+123400003"
+        - value: "+12340000[1-9]"
+          matchType: regex
           action: allow
 ```
 
 Set the wanted action on encounter, available options are `block` and `allow`.
-
-> [!IMPORTANT]
-> String fields always try to use
->
-> 1. [Regex matching](https://regex101.com)
-> 2. On compile error exact match is used as fallback
-
-> [!WARNING]
-> Remember that some symbols have special meanings in regex, a good rule of thumb is:
->
-> - If it is a special character, it probably needs to be escaped (`/`) if you are not looking to use regex
-> - Otherwise test your pattern on a [regex testing site](https://regex101.com)
 
 > [!NOTE]
 > Supported [placeholder types](../usage/advanced#placeholders):
@@ -42,20 +31,23 @@ Set the wanted action on encounter, available options are `block` and `allow`.
 > | ------------- | -------- | ----------- |
 > | ❌            | ✅       | ✅          |
 
+## Match Types
+
+Available options for `matchType` are:
+
+{{{ #://../templates/match-rules.md.tmpl }}}
+
 ## Behavior
 
-| Allow               | Block                   | Result                                                                      |
-| ------------------- | ----------------------- | --------------------------------------------------------------------------- |
-| `number=+123400003` | —                       | `number` may **only** be `+123400003`                                       |
-| —                   | `number=+123400002`     | `number` may **not** be `+123400002`                                        |
-| `message=hello`     | `number=+123400002`     | `number` may **not** be `+123400002`<br/> `message` may **only** be `hello` |
-| `number=+123400003` | `number=+12340000[2-9]` | `number` may **not** be `+123400002` through `9` **except** `123400003`     |
+| Allow               | Block                             | Result                                                                      |
+| ------------------- | --------------------------------- | --------------------------------------------------------------------------- |
+| `number=+123400003` | —                                 | `number` may **only** be `+123400003`                                       |
+| —                   | `number=+123400002`               | `number` may **not** be `+123400002`                                        |
+| `message=hello`     | `number=+123400002`               | `number` may **not** be `+123400002`<br/> `message` may **only** be `hello` |
+| `number=+123400003` | `number=+12340000[1-9]` (`regex`) | `number` may **not** be `+123400001` through `9` **except** `123400003`     |
 
 ### Rules
 
 - **Field-scoped** (policies for `a` don't affect policies for `b`)
 
-* Default: **allow all**
-* Allow rules exist: default **block**
-* Only block rules exist: default **allow**
-* Explicit allow **overrides** block
+{{{ #://../templates/block-rules.md.tmpl }}}

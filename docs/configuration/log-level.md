@@ -17,7 +17,7 @@ To change the log level set `service.logLevel` to one of the following levels…
 - `fatal` (**only** fatal errors)
 
 > [!CAUTION]
-> The log level `dev` **can leak data in the logs**
+> The log level `dev` **can leak data in the logs** (by default `REDACT_TOKENS=true`)
 > and must only be used for testing during development
 
 ## Per-Token Logger

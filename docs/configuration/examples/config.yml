@@ -18,18 +18,21 @@ api:
 
 settings:
   message:
-    template: |
-      You've got a Notification:
-      {{@message}} 
-      At {{@data.timestamp}} on {{@data.date}}.
-      Send using {{.NUMBER}}.
+    templating:
+      messageTemplate: |
+        You've got a Notification:
+        {{@message}} 
+        At {{@data.timestamp}} on {{@data.date}}.
+        Send using {{.NUMBER}}.
 
     variables:
       number: "+123400001"
       recipients: ["+123400002", "group.id", "user.id"]
 
     fieldMappings:
-      "@message": [{ field: "msg", score: 100 }]
+      "@message":
+        - field: "msg"
+          score: 100
 
   access:
     trustedIPs:
@@ -39,13 +42,19 @@ settings:
       - 172.20.0.100
 
     ipFilter:
-      - 192.168.1.10
-      - 192.168.2.0/24
-      - "!192.168.2.44"
+      allowed:
+        - 192.168.1.10
+        - 192.168.2.0/24
+      blocked:
+        - 192.168.2.44
 
     endpoints:
-      - "!/v1/about"
-      - /v2/send
+      allowed:
+        - pattern: /v2/send
+      blocked:
+        - pattern: /v1/about
+        - pattern: /v1/receive/[^0]+
+          matchType: regex
 
     rateLimiting:
       limit: 100
@@ -55,5 +64,6 @@ settings:
       "@number":
         - value: "+123400003"
           action: block
-        - value: "+123400004"
+        - value: "+12340000[4-9]"
+          matchType: regex
           action: block

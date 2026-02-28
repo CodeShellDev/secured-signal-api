@@ -18,7 +18,9 @@ settings:
       recipients: ["+123400020", "group.id", "user.id"]
 
     fieldMappings: # overwrite @message from main config
-      "@message": [{ field: "msg", score: 100 }]
+      "@message":
+        - field: "msg"
+          score: 100
 
   access:
     trustedIPs: # disable
@@ -26,9 +28,11 @@ settings:
     ipFilter: # disable
 
     endpoints: # overwrite main config endpoints
-      - "!/v1/about"
-      - /v1/receive
-      - /v2/send
+      allowed:
+        - pattern: /v1/receive
+        - pattern: /v2/send
+      blocked:
+        - pattern: /v1/about
 
     rateLimiting:
       limit: 100
