@@ -14,8 +14,8 @@ github.com/codeshelldev/gotl/pkg/pretty v0.0.10 h1:efoRJfkrk26c5j26qiwCXWPzeG/Tf
 github.com/codeshelldev/gotl/pkg/pretty v0.0.10/go.mod h1:SkyfcVnQp37jV3SMTtnIFc1fyVvorvSskJxOmYvfIHU=
 github.com/codeshelldev/gotl/pkg/query v0.0.4 h1:o2Oagx/s1wfNMqkh6GfR6wpsIVOFSDPIbxe8ABRIXDw=
 github.com/codeshelldev/gotl/pkg/query v0.0.4/go.mod h1:Bg3tFzFq9xButTw0BSfGQhSmfAnFDrJamOcnX6Io4m4=
-github.com/codeshelldev/gotl/pkg/request v0.0.8 h1:sVVt2ADOTgZrna7RsqThwMKxYCuxlBE80s7kV90rARg=
-github.com/codeshelldev/gotl/pkg/request v0.0.8/go.mod h1:ngE6/OksRIclheFGfqJ6/2lBpzCm9sPe4p5JfGIg5kg=
+github.com/codeshelldev/gotl/pkg/request v0.0.10 h1:wIotjU0pBgmd5lE0OSqhejCn+Ld7DnYd+nzzb3f/ApU=
+github.com/codeshelldev/gotl/pkg/request v0.0.10/go.mod h1:ngE6/OksRIclheFGfqJ6/2lBpzCm9sPe4p5JfGIg5kg=
 github.com/codeshelldev/gotl/pkg/scheduler v0.0.9 h1:8IFSPmyQehogwwo9vo3aAo3NxVY5aR8Hzrb8E+hMrDU=
 github.com/codeshelldev/gotl/pkg/scheduler v0.0.9/go.mod h1:sXEpRxbDc/JAN8WDxxq5+UxJf2dOQpKJIZyvORjIJGM=
 github.com/codeshelldev/gotl/pkg/server/http v0.0.3 h1:3232uPB2CljzUJadyrME7p0DaOCGz+vPVfPjnS788SE=
