@@ -4,7 +4,7 @@ title: Scheduling
 
 # Scheduling
 
-Configure scheduling via the [`/v2/send`](/api/send-message) endpoint.
+Configure scheduling via the [`/v2/send`](/api) endpoint.
 
 **Example:**
 
