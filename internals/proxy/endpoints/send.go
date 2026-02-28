@@ -95,7 +95,7 @@ func sendHandler(mux *http.ServeMux, next http.Handler) *http.ServeMux {
 			}
 
 			if scheduling.MaxHorizon.Set {
-				if tm.After(time.Now().Add(scheduling.MaxHorizon.Value.Duration)) {
+				if tm.After(time.Now().Add(time.Duration(*scheduling.MaxHorizon.Value))) {
 					logger.Warn("Request scheduled too far in the future: ", time.Until(tm).String())
 					WriteError(w, http.StatusBadRequest, "invalid timestamp: " + "timestamp to far in the future")
 					return

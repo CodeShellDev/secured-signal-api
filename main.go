@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/url"
 	"os"
 	"slices"
 	"strings"
@@ -43,7 +44,7 @@ func main() {
 
 	scheduler.Start()
 
-	proxy = reverseProxy.Create(config.DEFAULT.API.URL.URL)
+	proxy = reverseProxy.Create((*url.URL)(config.DEFAULT.API.URL))
 
 	handler := proxy.Init()
 

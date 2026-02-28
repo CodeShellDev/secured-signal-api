@@ -3,10 +3,11 @@ package middlewares
 import (
 	"net"
 	"net/http"
+	"slices"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
-	"github.com/codeshelldev/secured-signal-api/utils/netutils"
 )
 
 var IPFilter Middleware = Middleware{
@@ -24,11 +25,7 @@ func ipFilterHandler(next http.Handler) http.Handler {
 
 		ip := GetContext[net.IP](req, ClientIPKey)
 
-		if isBlocked("", func(_, try string) bool {
-			tryIP, err := netutils.ParseIPorNet(try)
-			
-			return tryIP.Contains(ip) && err == nil
-		}, ipFilter) {
+		if isIPBlocked(ip, ipFilter.Allowed, ipFilter.Blocked) {
 			logger.Warn("Client IP is blocked by filter: ", ip.String())
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -36,4 +33,20 @@ func ipFilterHandler(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, req)
 	})
+}
+
+func isIPBlocked(ip net.IP, allowed []generics.IPOrNet, blocked []generics.IPOrNet) bool {
+	isExplicitlyAllowed := slices.ContainsFunc(allowed, func(try generics.IPOrNet) bool {
+		tryIP := net.IPNet(try)
+		
+		return tryIP.Contains(ip)
+	})
+
+	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try generics.IPOrNet) bool {
+		tryIP := net.IPNet(try)
+		
+		return tryIP.Contains(ip)
+	})
+
+	return checkBlockLogic(isExplicitlyAllowed, isExplicitlyBlocked, allowed, blocked)
 }
