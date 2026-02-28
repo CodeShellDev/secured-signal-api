@@ -2,6 +2,7 @@ package deprecation
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/codeshelldev/gotl/pkg/pretty"
 )
@@ -157,4 +158,6 @@ func Error(id string, msg DeprecationMessage) {
 		},
 		msg,
 	)
+
+	os.Exit(1)
 }
