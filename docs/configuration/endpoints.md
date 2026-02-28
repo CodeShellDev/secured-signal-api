@@ -26,6 +26,8 @@ You can modify endpoints by configuring `access.endpoints` in your config:
 settings:
   access:
     endpoints:
+      allowed:
+        - /v2/send
       blocked:
         - pattern: /v1/register
           matchType: prefix
@@ -35,8 +37,6 @@ settings:
           matchType: prefix
         - pattern: /v1/contacts
           matchType: prefix
-      allowed:
-        - /v2/send
 ```
 
 ## Match Types
