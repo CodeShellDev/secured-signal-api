@@ -47,13 +47,13 @@ func ratelimitHandler(next http.Handler) http.Handler {
 
 		rateLimiting := conf.SETTINGS.ACCESS.RATE_LIMITING.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.RATE_LIMITING)
 
-		if rateLimiting.Period.Duration != 0 && rateLimiting.Limit != 0 {
+		if rateLimiting.Period != 0 && rateLimiting.Limit != 0 {
 			token := GetToken(req)
 
 			tokenLimiter, exists := tokenLimiters[token]
 
 			if !exists {
-				tokenLimiter = NewTokenLimiter(rateLimiting.Limit, time.Duration(rateLimiting.Period.Duration))
+				tokenLimiter = NewTokenLimiter(rateLimiting.Limit, time.Duration(rateLimiting.Period))
 				tokenLimiters[token] = tokenLimiter
 			}
 

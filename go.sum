@@ -1,7 +1,7 @@
 github.com/clipperhouse/uax29/v2 v2.7.0 h1:+gs4oBZ2gPfVrKPthwbMzWZDaAFPGYK72F0NJv2v7Vk=
 github.com/clipperhouse/uax29/v2 v2.7.0/go.mod h1:EFJ2TJMRUaplDxHKj1qAEhCtQPW2tJSwu5BF98AuoVM=
-github.com/codeshelldev/gotl/pkg/configutils v0.0.16 h1:iS/Yw2ruYnRGf2zZphI+JFIGkQCECh+AFbJAi0uyXLA=
-github.com/codeshelldev/gotl/pkg/configutils v0.0.16/go.mod h1:Tiu27XQ7D08fcwCHp5tZsDIQwIo6q626+l77k2dse7k=
+github.com/codeshelldev/gotl/pkg/configutils v0.0.17 h1:jm9sO+BTp9BHLRXjpdKCvFVc9YRzvGEoTEnkSYDZUw8=
+github.com/codeshelldev/gotl/pkg/configutils v0.0.17/go.mod h1:Tiu27XQ7D08fcwCHp5tZsDIQwIo6q626+l77k2dse7k=
 github.com/codeshelldev/gotl/pkg/docker v0.0.2 h1:kpseReocEBoSzWe/tOhUrIrOYeAR/inw3EF2/d+N078=
 github.com/codeshelldev/gotl/pkg/docker v0.0.2/go.mod h1:odNnlRw4aO1n2hSkDZIaiuSXIoFoVeatmXtF64Yd33U=
 github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2 h1:ERsjkaWVrsyUZoEunCEeNYDXhuaIvoSetB8e/zI4Tqo=

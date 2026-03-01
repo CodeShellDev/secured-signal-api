@@ -2,8 +2,6 @@ package middlewares
 
 import (
 	"net/http"
-	"regexp"
-	"slices"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
@@ -25,7 +23,15 @@ func endpointsHandler(next http.Handler) http.Handler {
 
 		reqPath := req.URL.Path
 
-		if isBlocked(reqPath, matchesPattern, endpoints) {
+		blocked, err := isEndpointBlocked(reqPath, endpoints.Allowed, endpoints.Blocked)
+
+		if err != nil {
+			logger.Error("Error during blocked endpoint check: ", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return 
+		}
+
+		if blocked {
 			logger.Warn("Client tried to access blocked endpoint: ", reqPath)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -35,45 +41,44 @@ func endpointsHandler(next http.Handler) http.Handler {
 	})
 }
 
-func matchesPattern(endpoint, pattern string) bool {
-	re, err := regexp.Compile(pattern)
+func isEndpointBlocked(endpoint string, allowed structure.StringMatchList, blocked structure.StringMatchList) (bool, error) {
+	isExplicitlyAllowed, err := allowed.Match(endpoint)
 
 	if err != nil {
-		return endpoint == pattern
+		return true, err
 	}
 
-	return re.MatchString(endpoint)
+	isExplicitlyBlocked, err := blocked.Match(endpoint)
+
+	if err != nil {
+		return true, err
+	}
+
+	return checkBlockLogic(isExplicitlyAllowed, isExplicitlyBlocked, allowed, blocked), nil
 }
 
-func isBlocked(test string, matchFunc func(test, try string) bool, allowBlockSlice structure.AllowBlockSlice) bool {
-	if len(allowBlockSlice.Allow) == 0 && len(allowBlockSlice.Block) == 0 {
+func checkBlockLogic[T any](explicitlyAllowed, explicitlyBlocked bool, allowed, blocked []T) bool {
+	if len(allowed) == 0 && len(blocked) == 0 {
 		// default: allow all
 		return false
 	}
 
-	isExplicitlyAllowed := slices.ContainsFunc(allowBlockSlice.Allow, func(try string) bool {
-		return matchFunc(test, try)
-	})
-	isExplicitlyBlocked := slices.ContainsFunc(allowBlockSlice.Block, func(try string) bool {
-		return matchFunc(test, try)
-	})
-
 	// explicit allow > block
-	if isExplicitlyAllowed {
+	if explicitlyAllowed {
 		return false
 	}
-	
-	if isExplicitlyBlocked {
+
+	if explicitlyBlocked {
 		return true
 	}
 
-	// allows -> default deny
-	if len(allowBlockSlice.Allow) > 0 {
+	// allows exist -> default deny
+	if len(allowed) > 0 {
 		return true
 	}
-	
+
 	// only blocks -> default allow
-	if len(allowBlockSlice.Block) > 0 {
+	if len(blocked) > 0 {
 		return false
 	}
 

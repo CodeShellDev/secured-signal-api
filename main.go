@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/url"
 	"os"
 	"slices"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"github.com/codeshelldev/secured-signal-api/internals/scheduler"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	"github.com/codeshelldev/secured-signal-api/utils/logging"
+	runtime "github.com/codeshelldev/secured-signal-api/utils/runtime"
 )
 
 var proxy reverseProxy.Proxy
@@ -23,6 +25,8 @@ func main() {
 	docker.Init()
 
 	config.Load()
+
+	runtime.Test()
 
 	if config.DEFAULT.SERVICE.LOG_LEVEL != logger.Level() {
 		logging.Init(config.DEFAULT.SERVICE.LOG_LEVEL)
@@ -43,7 +47,7 @@ func main() {
 
 	scheduler.Start()
 
-	proxy = reverseProxy.Create(config.DEFAULT.API.URL.URL)
+	proxy = reverseProxy.Create((*url.URL)(config.DEFAULT.API.URL))
 
 	handler := proxy.Init()
 

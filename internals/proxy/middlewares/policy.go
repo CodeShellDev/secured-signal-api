@@ -3,12 +3,11 @@ package middlewares
 import (
 	"errors"
 	"net/http"
-	"reflect"
-	"regexp"
 
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
-	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure/custom"
+	c "github.com/codeshelldev/secured-signal-api/internals/config/structure/custom"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
@@ -38,7 +37,13 @@ func policyHandler(next http.Handler) http.Handler {
 
 		headers := request.GetReqHeaders(req)
 
-		shouldBlock, field := isBlockedByPolicy(body.Data, headers, policies)
+		shouldBlock, field, err := isBlockedByPolicy(body.Data, headers, policies.Compile())
+
+		if err != nil {
+			logger.Error("Could not perform policy checks: ", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return 
+		}
 
 		if shouldBlock {
 			logger.Warn("Client tried to use blocked field: ", field)
@@ -62,70 +67,34 @@ func getField(key string, body map[string]any, headers map[string][]string) (any
 	return nil, errors.New("field not found")
 }
 
-func doPoliciesApply(key string, body map[string]any, headers map[string][]string, policies []structure.FieldPolicy) (bool, string) {
+func doPoliciesApply(key string, body map[string]any, headers map[string][]string, policies []custom.FPolicy) (bool, string, error) {
 	value, err := getField(key, body, headers)
 
 	if err != nil {
-		return false, ""
+		return false, "", nil
 	}
 
 	for _, policy := range policies {
-		switch asserted := value.(type) {
-		case string:
-			policyValue, ok := policy.Value.(string)
+		ok, err := policy.MatchRule.Match(value)
 
-			re, err := regexp.Compile(policyValue)
-
-			if err == nil {
-				if re.MatchString(asserted) {
-					return true, key
-				}
-				continue
-			}
-
-			if ok && asserted == policyValue {
-				return true, key
-			}
-		case int:
-			policyValue, ok := policy.Value.(int)
-
-			if ok && asserted == policyValue {
-				return true, key
-			}
-		case float64:
-			var policyValue float64
-
-			// needed for json
-			switch assertedValue := policy.Value.(type) {
-			case int:
-				policyValue = float64(assertedValue)
-			case float64:
-				policyValue = assertedValue
-			default:
-				continue
-			}
-
-			if asserted == policyValue {
-				return true, key
-			}
-		default:
-			if reflect.DeepEqual(value, policy.Value) {
-				return true, key
-			}
+		if ok {
+			return true, key, err
 		}
 	}
 
-	return false, ""
+	return false, "", nil
 }
 
-func isBlockedByPolicy(body map[string]any, headers map[string][]string, policies map[string]structure.FPolicies) (bool, string) {
-	if len(policies) == 0 || policies == nil {
+func isBlockedByPolicy(body map[string]any, headers map[string][]string, p c.FieldPolicies) (bool, string, error) {
+	policies := map[string]custom.FPolicies(p)
+
+	if len(policies) == 0 {
 		// default: allow all
-		return false, ""
+		return false, "", nil
 	}
 
 	for field, policy := range policies {
-		if len(policy.Allow) == 0 || len(policy.Block) == 0 {
+		if len(policy.Allowed) == 0 && len(policy.Blocked) == 0 {
 			continue
 		}
 
@@ -135,32 +104,21 @@ func isBlockedByPolicy(body map[string]any, headers map[string][]string, policie
 			continue
 		}
 
-		isExplicitlyAllowed, cause := doPoliciesApply(field, body, headers, policy.Allow)
-		isExplicitlyBlocked, cause := doPoliciesApply(field, body, headers, policy.Block)
+		isExplicitlyAllowed, cause, err := doPoliciesApply(field, body, headers, policy.Allowed)
 
-		// explicit allow > block
-		if isExplicitlyAllowed {
-			return false, cause
-		}
-		
-		if isExplicitlyBlocked {
-			return true, cause
+		if err != nil {
+			return true, "", err
 		}
 
-		// allow rules -> default deny
-		if len(policy.Allow) > 0 {
-			return true, cause
-		}
-		
-		// only block rules -> default allow
-		if len(policy.Block) > 0 {
-			return false, cause
+		isExplicitlyBlocked, cause, err := doPoliciesApply(field, body, headers, policy.Blocked)
+
+		if err != nil {
+			return true, "", err
 		}
 
-		// safety net -> block
-		return true, "safety net"
+		return checkBlockLogic(isExplicitlyAllowed, isExplicitlyBlocked, policy.Allowed, policy.Blocked), cause, nil
 	}
 
 	// default: allow all
-	return false, ""
+	return false, "", nil
 }

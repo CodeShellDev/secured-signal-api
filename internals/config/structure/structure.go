@@ -2,6 +2,8 @@ package structure
 
 import (
 	t "github.com/codeshelldev/gotl/pkg/configutils/types"
+	c "github.com/codeshelldev/secured-signal-api/internals/config/structure/custom"
+	g "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
 )
 
 type ENV struct {
@@ -43,7 +45,7 @@ type SERVICE struct {
 }
 
 type API struct {
-	URL					URL							`koanf:"url"                env>aliases:".apiurl"`
+	URL					*g.URL						`koanf:"url"                env>aliases:".apiurl"`
 	TOKENS				[]string					`koanf:"tokens"             env>aliases:".apitokens"`
 	AUTH				AUTH						`koanf:"auth"`
 }
@@ -65,11 +67,13 @@ type SETTINGS struct {
 
 type MESSAGE struct {
 	VARIABLES         	t.Opt[map[string]any]		`koanf:"variables"          childtransform:"upper"`
-	FIELD_MAPPINGS      t.Opt[map[string][]FMapping]`koanf:"fieldmappings"      childtransform:"default"`
+	FIELD_MAPPINGS      t.Opt[FieldMappings]		`koanf:"fieldmappings"      childtransform:"default"`
 	TEMPLATING  		t.Opt[Templating]			`koanf:"templating"         aliases:"template"          onuse:"template>>broken"    breaking:"{b,fg=red}\x60{s}settings.message.template{/}\x60{/} has been moved\n Use {b,fg=green}\x60settings.message.templating.messageTemplate\x60{/} instead"`
 	SCHEDULING			t.Opt[Scheduling]			`koanf:"scheduling"`
 	INJECTING			t.Opt[Injecting]			`koanf:"injecting"`
 }
+
+type FieldMappings = map[string][]FMapping
 
 type Injecting struct {
 	URLToBody			t.Opt[URLToBody]			`koanf:"urltobody"`
@@ -89,7 +93,7 @@ type Templating struct {
 
 type Scheduling struct {
 	Enabled				bool						`koanf:"enabled"`
-	MaxHorizon			t.Opt[TimeDuration]			`koanf:"maxhorizon"`
+	MaxHorizon			t.Opt[g.TimeDuration]		`koanf:"maxhorizon"`
 }
 
 type FMapping struct {
@@ -98,20 +102,32 @@ type FMapping struct {
 }
 
 type ACCESS struct {
-	ENDPOINTS			t.Opt[AllowBlockSlice]		`koanf:"endpoints"`
-	FIELD_POLICIES		t.Opt[map[string]FPolicies] `koanf:"fieldpolicies"      childtransform:"default"`
+	ENDPOINTS			t.Opt[Endpoints] 			`koanf:"endpoints"`
+	FIELD_POLICIES		t.Opt[FieldPolicies] 		`koanf:"fieldpolicies"      childtransform:"default"`
 	RATE_LIMITING		t.Opt[RateLimiting]			`koanf:"ratelimiting"`
-	IP_FILTER			t.Opt[AllowBlockSlice]		`koanf:"ipfilter"`
-	TRUSTED_IPS			t.Opt[[]IPOrNet]			`koanf:"trustedips"`
-	TRUSTED_PROXIES		t.Opt[[]IPOrNet]			`koanf:"trustedproxies"`
+	IP_FILTER			t.Opt[IPFilter]				`koanf:"ipfilter"`
+	TRUSTED_IPS			t.Opt[[]g.IPOrNet]			`koanf:"trustedips"`
+	TRUSTED_PROXIES		t.Opt[[]g.IPOrNet]			`koanf:"trustedproxies"`
 }
 
-type FieldPolicy struct {
-	Value				any						    `koanf:"value"`
+type FieldPolicies = *t.Comp[c.RFieldPolicies, c.FieldPolicies]
+
+type Endpoints struct {
+	Allowed				[]g.StringMatchRule			`koanf:"allowed"`
+	Blocked				[]g.StringMatchRule			`koanf:"blocked"`
+}
+
+type IPFilter struct {
+	Allowed				[]g.IPOrNet					`koanf:"allowed"`
+	Blocked				[]g.IPOrNet					`koanf:"blocked"`
+}
+
+type FPolicy struct {
+	Match				g.MatchRule[any]			`koanf:"match"`
 	Action				string						`koanf:"action"`
 }
 
 type RateLimiting struct {
 	Limit				int							`koanf:"limit"`
-	Period				TimeDuration				`koanf:"period"`
+	Period				g.TimeDuration				`koanf:"period"`
 }
