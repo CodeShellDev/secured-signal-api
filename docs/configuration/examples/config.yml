@@ -21,13 +21,14 @@ settings:
     templating:
       messageTemplate: |
         You've got a Notification:
-        {{@message}} 
-        At {{@data.timestamp}} on {{@data.date}}.
-        Send using {{.NUMBER}}.
+        {{ @message }} 
+        At {{ @data.timestamp }} on {{ @data.date }}.
+        Send using {{ .NUMBER }}.
 
     variables:
       number: "+123400001"
       recipients: ["+123400002", "group.id", "user.id"]
+      text_mode: "${{ .env.TEXT_MODE }}"
 
     fieldMappings:
       "@message":
@@ -51,6 +52,7 @@ settings:
     endpoints:
       allowed:
         - pattern: /v2/send
+        - pattern: /v1/receive/${{ .vars.NUMBER }}
       blocked:
         - pattern: /v1/about
         - pattern: /v1/receive/[^0]+
