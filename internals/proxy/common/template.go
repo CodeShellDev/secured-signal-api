@@ -13,25 +13,37 @@ import (
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
 
+func transformPrefixInto(tmplStr string, prefix string, to string) string {	
+	re, err := regexp.Compile(`{{([^{}]+)}}`)
+
+	if err != nil {
+		return tmplStr
+	}
+
+	varRe, err := regexp.Compile(string(prefix) + `("?[a-zA-Z0-9_.]+"?)`)
+
+	if err != nil {
+		return tmplStr
+	}
+
+	transformed := re.ReplaceAllStringFunc(tmplStr, func(match string) string {
+		return varRe.ReplaceAllStringFunc(match, func(varMatch string) string {
+			varName := varRe.ReplaceAllString(varMatch, "$1")
+
+			return "." + to + "." + varName
+		})
+	})
+
+	return transformed
+}
+
 func normalizeData(fromPrefix, toPrefix string, data map[string]any) (map[string]any, error) {
 	jsonStr := jsonutils.ToJson(data)
 
 	if jsonStr != "" {
-		toVar, err := templating.TransformTemplateKeys(jsonStr, fromPrefix, func(re *regexp.Regexp, match string) string {
-			return re.ReplaceAllStringFunc(match, func(varMatch string) string {
-				varName := re.ReplaceAllString(varMatch, "$1")
+		normalizedTemplate := transformPrefixInto(jsonStr, fromPrefix, toPrefix)
 
-				return "." + toPrefix + varName
-			})
-		})
-
-		if err != nil {
-			return data, err
-		}
-
-		jsonStr = toVar
-
-		normalizedData, err := jsonutils.GetJsonSafe[map[string]any](jsonStr)
+		normalizedData, err := jsonutils.GetJsonSafe[map[string]any](normalizedTemplate)
 
 		if err == nil {
 			data = normalizedData
@@ -41,17 +53,7 @@ func normalizeData(fromPrefix, toPrefix string, data map[string]any) (map[string
 	return data, nil
 }
 
-func prefixData(prefix string, data map[string]any) map[string]any {
-	res := map[string]any{}
-
-	for key, value := range data {
-		res[prefix + key] = value
-	}
-
-	return res
-}
-
-func cleanHeaders(headers map[string][]string) map[string][]string {
+func normalizeHeaders(headers map[string][]string) map[string][]string {
 	cleanedHeaders := map[string][]string{}
 
 	for key, value := range headers {
@@ -72,38 +74,38 @@ func GetTemplatedBody(body map[string]any, headers map[string][]string, VARIABLE
 	request.CopyHeaders(headersCopy, headers)
 	request.CopyMap(bodyCopy, body)
 
-	headersCopy = cleanHeaders(headersCopy)
+	headersCopy = normalizeHeaders(headersCopy)
 
-	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to ".header.Var" and ".body.Var"
-	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "body.", bodyCopy)
+	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to ".headers.Var" and ".body.Var"
+	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "body", bodyCopy)
 
 	if err != nil {
 		return bodyCopy, false, err
 	}
 
-	normalizedBody, err = normalizeData(requestkeys.HeaderPrefix, "header.", normalizedBody)
+	normalizedBody, err = normalizeData(requestkeys.HeaderPrefix, "headers", normalizedBody)
 
 	if err != nil {
 		return bodyCopy, false, err
 	}
 
 	// Prefix Body Data with Body_
-	prefixedBody := map[string]any{
+	nestedBody := map[string]any{
 		"body": normalizedBody,
 	}
 
 	// Prefix Header Data with Header_
-	prefixedHeaders := map[string]any{
-		"header": request.ParseHeaders(headersCopy),
+	nestedHeaders := map[string]any{
+		"headers": request.ParseHeaders(headersCopy),
 	}
 
 	variables := map[string]any{}
 
 	request.CopyMap(variables, VARIABLES)
-	request.CopyMap(variables, prefixedBody)
-	request.CopyMap(variables, prefixedHeaders)
+	request.CopyMap(variables, nestedBody)
+	request.CopyMap(variables, nestedHeaders)
 
-	templatedData, err := templating.RenderJSON(normalizedBody, variables)
+	templatedData, err := templating.TemplateData(normalizedBody, variables)
 
 	if err != nil {
 		return bodyCopy, false, err
@@ -114,7 +116,7 @@ func GetTemplatedBody(body map[string]any, headers map[string][]string, VARIABLE
 
 	modified = beforeStr != afterStr
 
-	return templatedData, modified, nil
+	return templatedData.(map[string]any), modified, nil
 }
 
 func TemplatePath(path string, VARIABLES any) (string, error) {
@@ -124,13 +126,19 @@ func TemplatePath(path string, VARIABLES any) (string, error) {
 		return path, err
 	}
 
-	reqPath, err = templating.RenderNormalizedTemplate("path", reqPath, VARIABLES)
+	templt, err := templating.CreateNormalizedTemplateFromString("path", reqPath)
 
 	if err != nil {
 		return path, err
 	}
 
-	return reqPath, nil
+	templated, err := templating.ExecuteTemplate(templt, VARIABLES)
+
+	if err != nil {
+		return path, err
+	}
+
+	return templated, nil
 }
 
 func InjectPathIntoBody(path string, data map[string]any) (string, bool) {
@@ -168,9 +176,19 @@ func InjectPathIntoBody(path string, data map[string]any) (string, bool) {
 func TemplateQuery(rawQuery string, VARIABLES any) (string, error) {
 	decodedQuery, _ := url.QueryUnescape(rawQuery)
 
-	templatedQuery, err := templating.RenderNormalizedTemplate("query", decodedQuery, VARIABLES)
+	templt, err := templating.CreateNormalizedTemplateFromString("query", decodedQuery)
 
-	return templatedQuery, err
+	if err != nil {
+		return rawQuery, err
+	}
+
+	templated, err := templating.ExecuteTemplate(templt, VARIABLES)
+
+	if err != nil {
+		return rawQuery, err
+	}
+
+	return templated, err
 }
 
 func InjectQueryIntoBody(query url.Values, data map[string]any) bool {
