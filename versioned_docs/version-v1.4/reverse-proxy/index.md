@@ -9,7 +9,7 @@ In this section we will be explaining why a **tls-enabled reverse proxy** is a m
 
 ## Why another Proxy
 
-**Secured Signal API** itself is already a **reverse proxy**, lacking one important feature: **SSL certificates**.
+**Secured Signal API** itself is already a **reverse proxy** at its core, lacking one important feature: **SSL certificates**.
 
 ### SSL Certificates
 

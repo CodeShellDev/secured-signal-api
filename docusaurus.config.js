@@ -29,7 +29,7 @@ const docsOptions = {
 /** @type {import('@docusaurus/types').Config} */
 const config = {
 	title: "Secured Signal API",
-	tagline: "Secure Proxy for Signal CLI REST API",
+	tagline: "Secure API Gateway Proxy for Signal CLI REST API",
 	favicon: "favicon/favicon.ico",
 
 	future: {

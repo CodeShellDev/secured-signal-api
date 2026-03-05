@@ -5,7 +5,7 @@ title: About
 
 # About
 
-**Secured Signal API** is a secure, configurable proxy for [Signal CLI REST API](https://github.com/bbernhard/signal-cli-rest-api).  
+**Secured Signal API** is a secure, configurable API gateway proxy for [Signal CLI REST API](https://github.com/bbernhard/signal-cli-rest-api).  
 It does **not** replace or modify the original API — it sits in front of it, adding a layer of control, authentication, and flexibility for production use.
 
 ## What it Is
