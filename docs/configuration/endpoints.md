@@ -8,7 +8,7 @@ Restrict access to your **Secured Signal API**.
 
 ## Default
 
-Secured Signal API is just a proxy, which means any and all the **Signal CLI REST API** **endpoints are available**,
+Secured Signal API acts as a proxy, this means any and all the **Signal CLI REST API** **endpoints are available**,
 because of security concerns the following endpoints are blocked:
 
 | Endpoint              |                    |
