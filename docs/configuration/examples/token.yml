@@ -29,7 +29,7 @@ settings:
 
     endpoints: # overwrite main config endpoints
       allowed:
-        - pattern: /v1/receive
+        - pattern: /v1/receive/${{ .vars.NUMBER }}
         - pattern: /v2/send
       blocked:
         - pattern: /v1/about
