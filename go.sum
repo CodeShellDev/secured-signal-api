@@ -1,7 +1,7 @@
 github.com/clipperhouse/uax29/v2 v2.7.0 h1:+gs4oBZ2gPfVrKPthwbMzWZDaAFPGYK72F0NJv2v7Vk=
 github.com/clipperhouse/uax29/v2 v2.7.0/go.mod h1:EFJ2TJMRUaplDxHKj1qAEhCtQPW2tJSwu5BF98AuoVM=
-github.com/codeshelldev/gotl/pkg/configutils v0.0.17 h1:jm9sO+BTp9BHLRXjpdKCvFVc9YRzvGEoTEnkSYDZUw8=
-github.com/codeshelldev/gotl/pkg/configutils v0.0.17/go.mod h1:Tiu27XQ7D08fcwCHp5tZsDIQwIo6q626+l77k2dse7k=
+github.com/codeshelldev/gotl/pkg/configutils v0.0.22 h1:6M10jRjTxF+5mVrt+OlXG75O9NTCjJ2dL0OY6U/RPqk=
+github.com/codeshelldev/gotl/pkg/configutils v0.0.22/go.mod h1:2o+D0+pbb7xaNGeESpL0/eWZLmDk6o8yhbaoTK06gMs=
 github.com/codeshelldev/gotl/pkg/docker v0.0.2 h1:kpseReocEBoSzWe/tOhUrIrOYeAR/inw3EF2/d+N078=
 github.com/codeshelldev/gotl/pkg/docker v0.0.2/go.mod h1:odNnlRw4aO1n2hSkDZIaiuSXIoFoVeatmXtF64Yd33U=
 github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2 h1:ERsjkaWVrsyUZoEunCEeNYDXhuaIvoSetB8e/zI4Tqo=
@@ -20,8 +20,8 @@ github.com/codeshelldev/gotl/pkg/server/http v0.0.3 h1:3232uPB2CljzUJadyrME7p0Da
 github.com/codeshelldev/gotl/pkg/server/http v0.0.3/go.mod h1:/asx7ViJtwlBvLgObjI/tejm6lNDN1/B+/6BPImqDfc=
 github.com/codeshelldev/gotl/pkg/stringutils v0.0.8 h1:VKIuEYLJARDmHyhAbcMy1TsdxPdzsKlbQvgr1G4QE7s=
 github.com/codeshelldev/gotl/pkg/stringutils v0.0.8/go.mod h1:892bcYDpOf0sTpXtABQ3m+9MACpWHCVpN3f/mcPr7qo=
-github.com/codeshelldev/gotl/pkg/templating v0.0.4 h1:qIWiqRtkSt/784lOlL7yi29lXx1eGXdacWDIV6euLKI=
-github.com/codeshelldev/gotl/pkg/templating v0.0.4/go.mod h1:J1MfmzI5Smhqtz3+lkMM+vrF1sXiypKRUmFE77JSifU=
+github.com/codeshelldev/gotl/pkg/templating v0.0.16 h1:0dl/NEApCtlm4kyEscQPknx4DwUtl1bsgl3Iyv6jPkM=
+github.com/codeshelldev/gotl/pkg/templating v0.0.16/go.mod h1:MHM4ouEsLNKXRYO+fS9qqpS1SFlL4Z6Q/0kxtS+auLk=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fsnotify/fsnotify v1.9.0 h1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=
@@ -40,8 +40,8 @@ github.com/knadh/koanf/providers/env/v2 v2.0.0 h1:Ad5H3eun722u+FvchiIcEIJZsZ2M6o
 github.com/knadh/koanf/providers/env/v2 v2.0.0/go.mod h1:1g01PE+Ve1gBfWNNw2wmULRP0tc8RJrjn5p2N/jNCIc=
 github.com/knadh/koanf/providers/file v1.2.1 h1:bEWbtQwYrA+W2DtdBrQWyXqJaJSG3KrP3AESOJYp9wM=
 github.com/knadh/koanf/providers/file v1.2.1/go.mod h1:bp1PM5f83Q+TOUu10J/0ApLBd9uIzg+n9UgthfY+nRA=
-github.com/knadh/koanf/v2 v2.3.2 h1:Ee6tuzQYFwcZXQpc2MiVeC6qHMandf5SMUJJNoFp/c4=
-github.com/knadh/koanf/v2 v2.3.2/go.mod h1:gRb40VRAbd4iJMYYD5IxZ6hfuopFcXBpc9bbQpZwo28=
+github.com/knadh/koanf/v2 v2.3.3 h1:jLJC8XCRfLC7n4F+ZKKdBsbq1bfXTpuFhf4L7t94D94=
+github.com/knadh/koanf/v2 v2.3.3/go.mod h1:gRb40VRAbd4iJMYYD5IxZ6hfuopFcXBpc9bbQpZwo28=
 github.com/kr/pretty v0.2.1 h1:Fmg33tUaq4/8ym9TJN1x7sLJnHVwhP33CNkpYV/7rwI=
 github.com/kr/pretty v0.2.1/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfnI=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=

@@ -32,16 +32,24 @@ func TestEndpointRules(conf structure.CONFIG) (error, any) {
 
 	endpoints := conf.SETTINGS.ACCESS.ENDPOINTS.Value
 
-	err := structure.StringMatchList(endpoints.Allowed).TestRules()
-
-	if err != nil {
-		return err, endpoints.Allowed
+	if endpoints == nil {
+		return nil, nil
 	}
 
-	err = structure.StringMatchList(endpoints.Blocked).TestRules()
+	if len(endpoints.Allowed) != 0 {
+		err := structure.StringMatchList(endpoints.Allowed).TestRules()
 
-	if err != nil {
-		return err, endpoints.Blocked
+		if err != nil {
+			return err, endpoints.Allowed
+		}
+	}
+
+	if len(endpoints.Blocked) != 0 {
+		err := structure.StringMatchList(endpoints.Blocked).TestRules()
+
+		if err != nil {
+			return err, endpoints.Blocked
+		}
 	}
 
 	return nil, nil
