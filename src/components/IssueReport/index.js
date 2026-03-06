@@ -13,10 +13,12 @@ export default function IssueReport({ templateUrl, labels = [], title = "" }) {
 
 			const params = new URLSearchParams(window.location.search)
 
-			const version = params.get("version")
+			const version = params.get("v") || params.get("version")
 
 			if (version) {
 				labels.push(version)
+
+				params.set("version", version)
 			}
 
 			params.forEach((value, key) => {
