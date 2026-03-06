@@ -194,17 +194,13 @@ components:
       example:
         status: done
         method: POST
-        # TODO change type to INT
-        created_at: "1767222000"
-        # TODO change type to INT
-        run_at: "1893452400"
+        created_at: 1767222000
+        run_at: 1893452400
         response_body:
-          # TODO change type to INT
-          timestamp: "1767222060"
+          timestamp: 1767222060
         response_headers:
           Content-Type: application/json
-        # TODO change type to INT
-        finished_at: "1767222060"
+        finished_at: 1767222060
         response_status_code: 200
 
     api.GetScheduledRequestResponseNotFinished:
@@ -228,13 +224,11 @@ components:
           type: string
           format: url
         created_at:
-          # TODO change type to INT
-          type: string
+          type: integer
           description: Timestamp of creation
           format: unix_timestamp
         run_at:
-          # TODO change type to INT
-          type: string
+          type: integer
           description: Timestamp at which the request will be fired
           format: unix_timestamp
       required:
@@ -250,8 +244,7 @@ components:
       type: object
       properties:
         finished_at:
-          # TODO change type to INT
-          type: string
+          type: integer
           description: Timestamp at which the scheduled request finished
           format: unix_timestamp
         response_status_code:
@@ -303,8 +296,7 @@ components:
             type: string
           type: array
         send_at:
-          # TODO change type to INT
-          type: string
+          type: integer
           description: Timestamp at which the message should be send
           format: unix_timestamp
         edit_timestamp:
