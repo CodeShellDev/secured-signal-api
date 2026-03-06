@@ -33,14 +33,6 @@ func Init() {
 			box := pretty.NewAutoBox()
 
 			box.Border.Style.Color = pretty.Basic(pretty.BrightBlue)
-			box.Border.Chars = pretty.BorderChars{
-				TopLeft: '+',
-				BottomLeft: '+',
-				TopRight: '+',
-				BottomRight: '+',
-				Horizontal: '─',
-				Vertical: '│',
-			}
 
 			box.MinWidth = 60
 			box.PaddingX = 2
@@ -50,7 +42,7 @@ func Init() {
 				Align: pretty.AlignCenter,
 				Segments: []pretty.Segment{
 					pretty.TextBlockSegment{
-						Text: "🛠️  Pre-release Version 🛠️",
+						Text: "🔬 Pre-Release 🔬",
 						Style: pretty.Style{
 							Bold: true,
 						},
@@ -79,7 +71,7 @@ func Init() {
 				Segments: []pretty.Segment{
 					pretty.InlineSegment{},
 					pretty.StyledTextBlockSegment{
-						Raw: "Encounter {b,fg=blue}issues{/}? Please {b,fg=blue}Report{/} them here:\n{b,u,fg=cyan}https://github.com/codeshelldev/secured-signal-api/issues{/}",
+						Raw: "Encounter {b,fg=blue}issues{/}? Please {b,fg=blue}Report{/} them here:\n\n{b,u,fg=cyan}https://codeshelldev.github.io/secured-signal-api/bug?v=" + VERSION.String() + "{/}",
 					},
 				},
 			})
