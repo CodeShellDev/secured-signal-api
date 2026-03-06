@@ -29,6 +29,9 @@ settings:
           { field: data, score: 1 },
         ]
 
+    scheduling:
+      enabled: true
+
     templating:
       body: true
       path: true
