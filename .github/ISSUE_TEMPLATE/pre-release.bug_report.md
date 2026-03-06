@@ -1,11 +1,3 @@
----
-name: ""
-about: ""
-title: ""
-labels: bug
-assignees: ""
----
-
 ### Description
 
 <!--
@@ -53,7 +45,7 @@ Please specify if token config or not.
 Version inserted automatically
 -->
 
-`VERSION_PLACEHOLDER`
+`${VERSION_PLACEHOLDER}`
 
 ### Additional Context
 
