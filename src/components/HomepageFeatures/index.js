@@ -58,6 +58,7 @@ function Feature({ title, description, Svg }) {
 		</div>
 	)
 }
+
 export default function HomepageFeatures() {
 	return (
 		<section className={styles.features}>

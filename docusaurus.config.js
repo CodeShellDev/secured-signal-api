@@ -47,6 +47,11 @@ const config = {
 
 	onBrokenLinks: "warn",
 
+	customFields: {
+		bug_report:
+			"https://raw.githubusercontent.com/CodeShellDev/secured-signal-api/refs/heads/main/.github/ISSUE_TEMPLATE/external.bug_report.md",
+	},
+
 	i18n: {
 		defaultLocale: "en",
 		locales: ["en"],
