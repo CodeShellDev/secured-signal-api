@@ -4,13 +4,13 @@
 A clear and concise description of what the bug is.
 -->
 
-${DESCRIPTION}
+${[{DESCRIPTION}]}
 
 ### To Reproduce
 
 Steps to reproduce the behavior:
 
-${TO_REPRODUCE}
+${[{TO_REPRODUCE}]}
 
 ### Expected behavior
 
@@ -18,7 +18,7 @@ ${TO_REPRODUCE}
 A clear and concise description of what you expected to happen.
 -->
 
-${EXPECTED_BEHAVIOR}
+${[{EXPECTED_BEHAVIOR}]}
 
 ### Container logs
 
@@ -27,7 +27,7 @@ Add your logs below (in `debug` log level), be sure to redact sensitive informat
 -->
 
 ```
-${CONTAINER_LOGS}
+${[{CONTAINER_LOGS}]}
 ```
 
 ### Config files
@@ -38,7 +38,7 @@ Please specify if token config or not.
 -->
 
 ```yaml
-${MAIN_CONFIG}
+${[{MAIN_CONFIG}]}
 ```
 
 ${ADDITIONAL_CONFIGS}
@@ -49,7 +49,7 @@ ${ADDITIONAL_CONFIGS}
 Add version of build here.
 -->
 
-`${VERSION}`
+`${[{VERSION}]}`
 
 ### Additional Context
 
@@ -57,4 +57,4 @@ Add version of build here.
 Add any other context about the problem here.
 -->
 
-${ADDITIONAL_CONTEXT}
+${[{ADDITIONAL_CONTEXT}]}
