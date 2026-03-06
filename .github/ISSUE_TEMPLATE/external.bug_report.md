@@ -46,10 +46,10 @@ ${ADDITIONAL_CONFIGS}
 ### Version
 
 <!--
-Version inserted automatically
+Add version of build here.
 -->
 
-`${VERSION_PLACEHOLDER}`
+`${VERSION}`
 
 ### Additional Context
 
