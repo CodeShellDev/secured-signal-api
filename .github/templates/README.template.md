@@ -52,9 +52,9 @@ endpoint restrictions, placeholders, flexible configuration
 > [!WARNING]
 > We are slowly moving away from this README and instead are trying to make the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) the only source of truth
 
-- [Getting Started](https://codeshelldev.github.io/secured-signal-api/docs/getting-started/installation)
-- [Usage](https://codeshelldev.github.io/secured-signal-api/docs/usage)
-- [Features](https://codeshelldev.github.io/secured-signal-api/docs/features)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Features](#features)
 - [Configuration](#configuration)
   - [Endpoints Restrictions](https://codeshelldev.github.io/secured-signal-api/docs/configuration/endpoints)
   - [Placeholder Variables](https://codeshelldev.github.io/secured-signal-api/docs/configuration/variables)
@@ -78,6 +78,28 @@ endpoint restrictions, placeholders, flexible configuration
 - [Help](#help)
 - [License](#license)
 - [Legal](#legal)
+
+## Getting Started
+
+### Installation
+
+{{{ #://docs/getting-started/installation.md }}}
+
+### Setup
+
+Once you have installed **Secured Signal API** you can [register or link a signal account](https://codeshelldev.github.io/secured-signal-api/docs/getting-started/setup).
+
+## Usage
+
+{{{ #://docs/usage/index.md }}}
+
+## Features
+
+{{{ #://docs/features/features.md }}}
+
+## Configuration
+
+{{{ #://docs/configuration/index.md }}}
 
 ## Contributing
 
