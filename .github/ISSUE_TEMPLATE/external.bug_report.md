@@ -41,7 +41,7 @@ Please specify if token config or not.
 ${[{MAIN_CONFIG}]}
 ```
 
-${ADDITIONAL_CONFIGS}
+${[{ADDITIONAL_CONFIGS}]}
 
 ### Version
 
