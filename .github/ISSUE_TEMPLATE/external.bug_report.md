@@ -4,19 +4,21 @@
 A clear and concise description of what the bug is.
 -->
 
+${DESCRIPTION}
+
 ### To Reproduce
 
 Steps to reproduce the behavior:
 
-1. Start Container
-2. Send Request
-3. [...]
+${TO_REPRODUCE}
 
 ### Expected behavior
 
 <!--
 A clear and concise description of what you expected to happen.
 -->
+
+${EXPECTED_BEHAVIOR}
 
 ### Container logs
 
@@ -25,7 +27,7 @@ Add your logs below (in `debug` log level), be sure to redact sensitive informat
 -->
 
 ```
-
+${CONTAINER_LOGS}
 ```
 
 ### Config files
@@ -36,8 +38,10 @@ Please specify if token config or not.
 -->
 
 ```yaml
-
+${MAIN_CONFIG}
 ```
+
+${ADDITIONAL_CONFIGS}
 
 ### Version
 
@@ -52,3 +56,5 @@ Version inserted automatically
 <!--
 Add any other context about the problem here.
 -->
+
+${ADDITIONAL_CONTEXT}
