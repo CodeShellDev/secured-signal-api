@@ -78,7 +78,8 @@ func (Url *URL) UnmarshalMapstructure(raw any) error {
 }
 
 func (Url URL) String() string {
-	return Url.String()
+	URL := url.URL(Url)
+	return URL.String()
 }
 
 // Enum is a wrapper for enum types
