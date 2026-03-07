@@ -1,6 +1,6 @@
 module github.com/codeshelldev/secured-signal-api
 
-go 1.25.6
+go 1.26.0
 
 require (
 	github.com/codeshelldev/gotl/pkg/configutils v0.0.16
@@ -14,7 +14,7 @@ require (
 	github.com/codeshelldev/gotl/pkg/scheduler v0.0.9
 	github.com/codeshelldev/gotl/pkg/server/http v0.0.3
 	github.com/codeshelldev/gotl/pkg/stringutils v0.0.8
-	github.com/codeshelldev/gotl/pkg/templating v0.0.4
+	github.com/codeshelldev/gotl/pkg/templating v0.0.16
 )
 
 require (
