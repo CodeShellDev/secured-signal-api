@@ -16,5 +16,6 @@ jobs:
       template: .github/templates/CONTRIBUTING.template.md
       output: CONTRIBUTING.md
       output-branch: docs
+      pr-title: "Automated Docs Contributing Update"
     secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
