@@ -2,6 +2,8 @@ name: Update Contributing
 
 on:
   push:
+    branches:
+      - docs
     paths:
       - .github/templates/CONTRIBUTING.template.md
   workflow_dispatch:
