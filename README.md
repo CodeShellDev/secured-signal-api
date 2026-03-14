@@ -124,11 +124,10 @@ networks:
 
 #### API Tokens
 
-Now head to [configuration](https://codeshelldev.github.io/secured-signal-api/configuration/api-tokens) and define some **API tokens**.
+Now head to [configuration](https://codeshelldev.github.io/secured-signal-api/docs/configuration/api-tokens) and define some **API tokens**.
 
 > [!TIP]
-> This recommendation is part of the [**best practices**](https://codeshelldev.github.io/secured-signal-api/best-practices)
-
+> This recommendation is part of the [**best practices**](https://codeshelldev.github.io/secured-signal-api/docs/best-practices)
 
 ### Setup
 
@@ -136,11 +135,9 @@ Once you have installed **Secured Signal API** you can [register or link a signa
 
 ## Usage
 
-In this section we'll be taking a look at how to use **Secured Signal API**.
-
 ### Basic
 
-Here is a quick command to see if you've correctly followed the [setup instructions](https://codeshelldev.github.io/secured-signal-api/getting-started/setup):
+Here is a quick command to see if you've correctly followed the [setup instructions](https://codeshelldev.github.io/secured-signal-api/docs/getting-started/setup):
 
 ```bash
 curl -X POST \
@@ -164,7 +161,7 @@ This will send `Hello, World!` to `<to>` from `<from>`.
 | Body Auth   | `{ "auth": "API_TOKEN" }` (request body field)                                                               |
 
 > [!WARNING]
-> **Query** and **Path** auth are disabled by default and [must be enabled in the config](https://codeshelldev.github.io/secured-signal-api/configuration/auth.md)
+> **Query** and **Path** auth are disabled by default and [must be enabled in the config](https://codeshelldev.github.io/secured-signal-api/docs/configuration/auth)
 
 **Example:**
 
@@ -176,10 +173,7 @@ curl -X POST \
     'http://sec-signal-api:8880/v2/send'
 ```
 
-
 ## Features
-
-Here are some of the highlights of using **Secured Signal API**.
 
 ### Message Template
 
@@ -222,7 +216,7 @@ settings:
 It can extract needed data from the body and headers to then process them using Go's templating library
 and finally output a message packed with so much information.
 
-Head to [Configuration](https://codeshelldev.github.io/secured-signal-api/configuration/templating#message-template) to see how-to use.
+Head to [Configuration](https://codeshelldev.github.io/secured-signal-api/docs/configuration/templating#message-template) to see how-to use.
 
 ### Placeholders
 
@@ -231,7 +225,7 @@ Head to [Configuration](https://codeshelldev.github.io/secured-signal-api/config
 **Placeholders** are one of the highlights of Secured Signal API,
 these have saved me, and will save many others, much time by, for example, not having to change your phone number in every service separately.
 
-Take a look at the [usage](https://codeshelldev.github.io/secured-signal-api/usage/advanced).
+Take a look at the [usage](https://codeshelldev.github.io/secured-signal-api/docs/usage/advanced).
 
 ### Field Mappings
 
@@ -240,21 +234,21 @@ Take a look at the [usage](https://codeshelldev.github.io/secured-signal-api/usa
 **Field Mappings** are very useful for when your favorite service does not officially support **Secured Signal API** (or Signal CLI REST API).
 With this feature you have the power to do it yourself, just extract what's needed and then integrate with any of the other features.
 
-Interested? [Take a look](https://codeshelldev.github.io/secured-signal-api/configuration/field-mappings).
+Interested? [Take a look](https://codeshelldev.github.io/secured-signal-api/docs/configuration/field-mappings).
 
 ### Field Policies
 
 **Field Policies** are a great way to disallow specific fields or even disallowing fields with unwanted values.
 This is really helpful when trying to block certain numbers from using certain tokens, and therefor mitigating risks of unwanted use of a token.
 
-Find more about this feature [here](https://codeshelldev.github.io/secured-signal-api/configuration/field-policies).
+Find more about this feature [here](https://codeshelldev.github.io/secured-signal-api/docs/configuration/field-policies).
 
 ### Rate Limiting
 
 **Rate Limiting** is used for limiting requests and to stop server overload, because of DDoS attacks, malconfigured clients, or malicious actors.  
 It ensures fair usage per token by controlling how many requests can be processed within a defined period.
 
-Limit those rates [here](https://codeshelldev.github.io/secured-signal-api/configuration/rate-limiting).
+Limit those rates [here](https://codeshelldev.github.io/secured-signal-api/docs/configuration/rate-limiting).
 
 ### Endpoints
 
@@ -262,24 +256,21 @@ Limit those rates [here](https://codeshelldev.github.io/secured-signal-api/confi
 
 **Endpoints** are used for restricting unauthorized access and for ensuring least privilege.
 
-[Let's start blocking then!](https://codeshelldev.github.io/secured-signal-api/configuration/endpoints)
+[Let's start blocking then!](https://codeshelldev.github.io/secured-signal-api/docs/configuration/endpoints)
 
 ### IP Filters
 
 **IP Filters** are used for restricting access to **Secured Signal API** by blocking or specifically allowing IPs and CIDR ranges.
 
-Configure your _mini firewall_ [here](https://codeshelldev.github.io/secured-signal-api/configuration/ip-filter).
-
+Configure your _mini firewall_ [here](https://codeshelldev.github.io/secured-signal-api/docs/configuration/ip-filter).
 
 ## Configuration
-
-Here is how you configure **Secured Signal API**
 
 ### Environment Variables
 
 Whilst being a bit **restrictive** environment variables are a great way to configure Secured Signal API.
 
-Suppose you want to set a new [placeholder](https://codeshelldev.github.io/secured-signal-api/usage/advanced#placeholders) `NUMBER` in your environment…
+Suppose you want to set a new [placeholder](https://codeshelldev.github.io/secured-signal-api/docs/usage/advanced#placeholders) `NUMBER` in your environment…
 
 ```yaml
 environment:
@@ -307,7 +298,7 @@ they are **flexible**, **extensible** and really **easy to use**.
 > Configs also support placeholders, for example:
 > `${{ .env.NUMBER }}` or `${{ .vars.RECIPIENTS }}`
 >
-> - Use `.vars` for placeholders from [variables](https://codeshelldev.github.io/secured-signal-api/variables)
+> - Use `.vars` for placeholders from [variables](https://codeshelldev.github.io/secured-signal-api/docs/variables)
 > - and `.env` for environment variables
 
 > [!NOTE]
@@ -451,7 +442,6 @@ settings:
     fieldPolicies: # disable
 
 ```
-
 
 ## Contributing
 
