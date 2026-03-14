@@ -15,7 +15,7 @@ As you may have seen we use templates almost everywhere in the documentation pag
 And so can you, from simple `+{{{ read "file.txt" }}}` to complex reusable functions like in [functions.inc.gtmpl](./docs/templates/functions.inc.gtmpl).
 
 We use [**goplater**](https://github.com/codeshelldev/goplater) <img align="center" width="32" height="32" src="https://github.com/codeshelldev/goplater/raw/refs/heads/main/logo/goplater.png"> for this, since it includes almost every possible function you can think of
-and was developed for exactly this use case (by @CodeShellDev).
+and was developed for exactly this use case (by [@CodeShellDev](https://github.com/codeshelldev)).
 
 **Example applications:**
 
