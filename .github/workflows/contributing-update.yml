@@ -13,7 +13,7 @@ jobs:
     uses: codeshelldev/gh-actions/.github/workflows/templating.yml@main
     name: Contributing
     with:
-      template: .github/templates/CONTRIBUTING.template.md
+      template: ".github/templates/CONTRIBUTING.template.md"
       output: CONTRIBUTING.md
       output-branch: docs
       pr-title: "Automated Docs Contributing Update"
