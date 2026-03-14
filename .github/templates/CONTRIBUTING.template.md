@@ -6,7 +6,7 @@ Well then you have come to the right place! 😁
 
 ## Tips & Tricks
 
-> Why spend five minutes doing something when you can automate it in an hour 🤡
+> Why spend 5 mins doing something when you can automate it in an hour 🤡
 
 ### Templates
 
