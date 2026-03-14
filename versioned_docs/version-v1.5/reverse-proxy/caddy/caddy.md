@@ -19,7 +19,7 @@ Before moving on you must have
 Add Caddy to your `docker-compose.yaml` file.
 
 ```yaml
-{{{ #://./examples/caddy.docker-compose.yaml }}}
++{{{ read "./examples/caddy.docker-compose.yaml" }}}
 ```
 
 ## Setup
@@ -27,7 +27,7 @@ Add Caddy to your `docker-compose.yaml` file.
 Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your Caddy container.
 
 ```nginx
-{{{ #://./examples/Caddyfile }}}
++{{{ read "./examples/Caddyfile" }}}
 ```
 
 ## Configuration

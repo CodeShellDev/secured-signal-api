@@ -23,21 +23,26 @@ export default function goplater(
 
 	const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "goplater-"))
 	const inputFile = file.path
-	const outputFile = path.join(tmpDir, `output.${path.extname(file.path)}`)
+	const outputFile = path.join(tmpDir, `output${path.extname(file.path)}`)
 
 	const args = ["template", inputFile, "-s", inputFile, "-o", outputFile]
 
-	execFileSync(options.binary, args, {
-		cwd: process.cwd(),
-		encoding: "utf-8",
-	})
+	let output
+	try {
+		output = execFileSync(options.binary, args, {
+			cwd: process.cwd(),
+			encoding: "utf-8",
+		})
+	} catch (err) {
+		console.error(`Error templating: ${err}`)
+	}
 
 	if (fs.pathExistsSync(outputFile)) {
 		const processed = fs.readFileSync(outputFile, "utf-8")
 
 		file.content = processed
 	} else {
-		console.warn(`Processed file not found: ${outputFile}, skipping`)
+		console.warn(`Error templating: ${output}`)
 	}
 
 	fs.removeSync(tmpDir)

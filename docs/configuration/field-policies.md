@@ -24,18 +24,13 @@ settings:
 
 Set the wanted action on encounter, available options are `block` and `allow`.
 
-> [!NOTE]
-> Supported [placeholder types](../usage/advanced#placeholders):
->
-> | `.` Variables | `@` Body | `#` Headers |
-> | ------------- | -------- | ----------- |
-> | ❌            | ✅       | ✅          |
++{{{ readArgs "../templates/request-keys.md.gtmpl" "body" "headers" }}}
 
 ## Match Types
 
 Available options for `matchType` are:
 
-{{{ #://../templates/match-rules.md.tmpl }}}
++{{{ read "../templates/match-rules.md.gtmpl" }}}
 
 ## Behavior
 
@@ -50,4 +45,4 @@ Available options for `matchType` are:
 
 - **Field-scoped** (policies for `a` don't affect policies for `b`)
 
-{{{ #://../templates/block-rules.md.tmpl }}}
++{{{ read "../templates/block-rules.md.gtmpl" }}}

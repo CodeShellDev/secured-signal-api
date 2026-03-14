@@ -67,6 +67,7 @@ const config = {
 	themes: ["@docusaurus/theme-mermaid", "docusaurus-theme-openapi-docs"],
 
 	plugins: [
+		"docusaurus-node-polyfills",
 		[
 			"@docusaurus/plugin-content-docs",
 			/** @type {import('@docusaurus/plugin-content-docs').Options} */

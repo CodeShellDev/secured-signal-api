@@ -22,7 +22,7 @@
 		"write-heading-ids": "docusaurus write-heading-ids"
 	},
 	"dependencies": {
-		"@codeshelldev/goplater": "^1.0.14",
+		"@codeshelldev/goplater": "^1.5.1",
 		"@docusaurus/core": "3.9.2",
 		"@docusaurus/preset-classic": "3.9.2",
 		"@docusaurus/theme-mermaid": "^3.9.2",
@@ -42,7 +42,8 @@
 		"@docusaurus/types": "3.9.2",
 		"baseline-browser-mapping": "^2.9.11",
 		"chokidar": "^5.0.0",
-		"concurrently": "^9.2.1"
+		"concurrently": "^9.2.1",
+		"docusaurus-node-polyfills": "^1.0.0"
 	},
 	"browserslist": {
 		"production": [

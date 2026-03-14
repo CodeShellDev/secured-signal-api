@@ -19,13 +19,13 @@ Before moving on you must have
 Add Caddy to your `docker-compose.yaml` file.
 
 ```yaml
-{{{ #://./examples/caddy.docker-compose.yaml }}}
++{{{ read "./examples/caddy.docker-compose.yaml" }}}
 ```
 
 Create a `Caddyfile` in your `docker-compose.yaml` folder and mount it to `/etc/caddy/Caddyfile` in your Caddy container.
 
 ```apacheconf
-{{{ #://./examples/Caddyfile }}}
++{{{ read "./examples/Caddyfile" }}}
 ```
 
 Then spin up your stack:

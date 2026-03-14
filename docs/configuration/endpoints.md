@@ -43,7 +43,7 @@ settings:
 
 Available options for `matchType` are:
 
-{{{ #://../templates/match-rules.string.md.tmpl }}}
++{{{ read "../templates/match-rules.md.gtmpl" }}}
 
 ## Behavior
 
@@ -55,4 +55,4 @@ Available options for `matchType` are:
 
 ### Rules
 
-{{{ #://../templates/block-rules.md.tmpl }}}
++{{{ read "../templates/block-rules.md.gtmpl" }}}

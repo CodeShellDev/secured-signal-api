@@ -1,3 +1,4 @@
++{{{ import "~/docs/templates/functions.inc.gtmpl" }}}
 <img align="center" width="1048" height="512" alt="Secure API Gateway Proxy for Signal CLI REST API" src="https://github.com/codeshelldev/secured-signal-api/raw/refs/heads/docs/static/img/banner.png" />
 
 <h3 align="center">Secure API Gateway Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal CLI REST API</a></h3>
@@ -15,32 +16,27 @@ endpoint restrictions, placeholders, flexible configuration
   <a href="https://github.com/codeshelldev/secured-signal-api/releases">
     <img 
 		src="https://img.shields.io/github/v/release/codeshelldev/secured-signal-api?sort=semver&logo=github&label=Release" 
-		alt="GitHub release"
-	>
+		alt="GitHub release">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/stargazers">
     <img 
 		src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=flat&logo=github&label=Stars" 
-		alt="GitHub stars"
-	>
+		alt="GitHub stars">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
-    <img 
-		src="https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=Image+Size&trim="
-		alt="Docker image size"
-	>
+    <img
+    src='https://img.shields.io/badge/Image%20Size-+{{{ replace ( htmlText ( htmlDocFind ( htmlDecode ( fetch "https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=Image+Size&trim=" ) ) "svg g:nth-of-type(3) text" ) ) " " "%20" }}}-_?color=2344cc11'
+    alt="Docker image Pulls">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
     <img 
 		src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fghcr-badge.elias.eu.org%2Fapi%2Fcodeshelldev%2Fsecured-signal-api%2Fsecured-signal-api&query=downloadCount&label=Pulls&color=2344cc11&logo=docker"
-		alt="Docker image Pulls"
-	>
+		alt="Docker image Pulls">
   </a>
   <a href="./LICENSE">
     <img 
 		src="https://img.shields.io/badge/License-MIT-green.svg"
-		alt="License: MIT"
-	>
+		alt="License: MIT">
   </a>
 </div>
 
@@ -81,25 +77,17 @@ endpoint restrictions, placeholders, flexible configuration
 
 ## Getting Started
 
-### Installation
-
-{{{ #://docs/getting-started/installation.md }}}
++{{{ funcCallArgs "parseDocs" "~/docs/getting-started/installation.md" "### Installation" }}}
 
 ### Setup
 
 Once you have installed **Secured Signal API** you can [register or link a signal account](https://codeshelldev.github.io/secured-signal-api/docs/getting-started/setup).
 
-## Usage
++{{{ funcCallArgs "parseDocs" "~/docs/usage/index.md" "## Usage" }}}
 
-{{{ #://docs/usage/index.md }}}
++{{{ funcCallArgs "parseDocs" "~/docs/features/features.md" "## Features" }}}
 
-## Features
-
-{{{ #://docs/features/features.md }}}
-
-## Configuration
-
-{{{ #://docs/configuration/index.md }}}
++{{{ funcCallArgs "parseDocs" "~/docs/configuration/index.md" "## Configuration" }}}
 
 ## Contributing
 

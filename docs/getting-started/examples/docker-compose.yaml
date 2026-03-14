@@ -12,7 +12,7 @@ services:
         aliases:
           - signal-api
 
-  {{{ \\#://../../examples/frontend.sec-signal-api.yml }}}
++{{{ read "../../examples/frontend.sec-signal-api.yml" }}}
 
 networks:
   backend:

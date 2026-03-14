@@ -8,7 +8,7 @@ title: Installation
 Get the latest version of the `docker-compose.yaml` file:
 
 ```yaml
-{{{ #://./examples/docker-compose.yaml }}}
++{{{ read "./examples/docker-compose.yaml" }}}
 ```
 
 > [!IMPORTANT]

@@ -1,11 +1,24 @@
+
 | Value Type | Match Type |                                       | Notes                                                                                          |
 | ---------- | ---------- | :-----------------------------------: | ---------------------------------------------------------------------------------------------- |
 | string     | `equals`   |          `pattern ~= string`          | case-incensitive                                                                               |
 | string     | `contains` |      `pattern.Contains(string)`       | case-incensitive                                                                               |
 | string     | `prefix`   |     `string.StartsWith(pattern)`      | case-incensitive                                                                               |
 | string     | `suffix`   |      `string.EndsWith(pattern)`       | case-incensitive                                                                               |
-| string     | `regex`    | example: `[^\S]` only non-whitespace | [regex](https://regex101.com)                                                                  |
-| string     | `glob`     |   example: `[abc]` only `a\|b\|c`    | [glob-style pattern](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html) |
+| string     | `regex`    |  example: `[^\S]` only non-whitespace | [regex](https://regex101.com)                                                                  |
+| string     | `glob`     |    example: `[abc]` only `a\|b\|c`    | [glob-style pattern](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html) |
+
++{{{- if includes .args "array" }}} 
+| array      | `includes` |        `array.Includes(value)`        | deep-equals                                                                                    |
++{{{- end }}}
+
++{{{- if or ( includes .args "array" ) ( includes .args "dict" ) }}}
+| any        | `exact`    |          `pattern == value`           | deep-equals                                                                                    |
++{{{- end }}}
+
++{{{- if includes .args "dict" -}}}
+| dict       | `has`      |         `dict.HasKey(value)`          | dict value ignored                                                                             |
++{{{- end }}}
 
 > [!WARNING]
 > Remember that some symbols have special meanings in regex, a good rule of thumb is:

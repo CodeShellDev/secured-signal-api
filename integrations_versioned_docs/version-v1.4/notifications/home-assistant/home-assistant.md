@@ -15,7 +15,7 @@ Instructions on how you can use **Secured Signal API** as a notification service
 To be able to use the Signal Messenger integration in Home Assistant you need to modify or add the following to your `configuration.yml` file:
 
 ```yaml
-{{{ #://./configuration.yml }}}
++{{{ read "./configuration.yml" }}}
 ```
 
 Here we are taking advantage of the `url` field to implement [Basic Auth](/docs/usage#auth) by using `user:password@host:port`.

@@ -19,7 +19,7 @@ Before moving on you must have
 To implement Apache in front of **Secured Signal API** you need to update your `docker-compose.yaml` file.
 
 ```yaml
-{{{ #://./examples/apache.docker-compose.yaml }}}
++{{{ read "./examples/apache.docker-compose.yaml" }}}
 ```
 
 ## Setup
@@ -27,7 +27,7 @@ To implement Apache in front of **Secured Signal API** you need to update your `
 Create a `apache.conf` file in the `docker-compose.yaml` folder and mount it to `/usr/local/apache2/conf.d` in your Apache container.
 
 ```apacheconf
-{{{ #://./examples/apache.conf }}}
++{{{ read "./examples/apache.conf" }}}
 ```
 
 Add your `cert.key` and `cert.crt` into your `certs/` folder and mount it to `/etc/ssl`.

@@ -33,7 +33,7 @@ This will send `Hello, World!` to `<to>` from `<from>`.
 | Body Auth   | `{ "auth": "API_TOKEN" }` (request body field)                                                               |
 
 > [!WARNING]
-> **Query** and **Path** auth are disabled by default and [must be enabled in the config](../configuration/auth.md)
+> **Query** and **Path** auth are disabled by default and [must be enabled in the config](../configuration/auth)
 
 **Example:**
 

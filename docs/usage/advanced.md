@@ -69,9 +69,4 @@ In such cases, using a simple, generic webhook is not possible.
 > - Supported value types include **strings**, **integers**, **arrays**, and **JSON objects**
 > - See [Formatting](./formatting#string-to-type) for details on supported structures and syntax
 
-> [!NOTE]
-> Supported [placeholder types](./advanced#placeholders):
->
-> | `.` Variables | `@` Body | `#` Headers |
-> | ------------- | -------- | ----------- |
-> | ❌            | ✅       | ❌          |
++{{{ readArgs "../templates/request-keys.md.gtmpl" "body" }}}

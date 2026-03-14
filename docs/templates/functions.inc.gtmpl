@@ -1,0 +1,205 @@
++{{{ funcDefine "removeFrontmatter" `
+    {{{ $cleaned := ( regexReplace ( index .args 0 ) "(?s)^---\n.*?\n---\n\n# .*?\n\n" "" ) }}}
+
+    {{{ return 0 $cleaned }}}
+`}}}
+
++{{{ funcDefine "bumpHeadings" `
+    {{{ $content := index .args 0 }}}
+    {{{ $n := index .args 1 }}}
+
+    {{{ $matches := regexFindGroups "(?m)^(#+)(\\s.*)$" $content }}}
+
+    {{{ range $matches }}}
+        {{{ $hashes := index . 1 }}}
+        {{{ $text := index . 2 }}}
+
+        {{{ $level := add (len $hashes) $n }}}
+        {{{ if (lt $level 1) }}}
+            {{{ $level := 1 }}}
+        {{{ end }}}
+
+        {{{ $newHashes := repeat "#" $level }}}
+        {{{ $newHeading := concat $newHashes $text }}}
+
+        {{{ $oldHeading := concat $hashes $text }}}
+        
+        {{{ $content = replace $content $oldHeading $newHeading }}}
+    {{{ end }}}
+
+    {{{ return 0 $content }}}
+`}}}
+
++{{{ funcDefine "headingLevel" `
+    {{{ $line := index .args 0 }}}
+
+    {{{ $matches := regexFindGroups "^(#{1,6})\\s*" $line }}}
+
+    {{{ if (gt (len $matches) 0) }}}
+        {{{ $hashes := index (index $matches 0) 1 }}}
+        {{{ $level := len $hashes }}}
+        {{{ return 0 $level }}}
+    {{{ else }}}
+        {{{ return 0 0 }}}
+    {{{ end }}}
+`}}}
+
++{{{ funcDefine "normalizeLinks" `
+    {{{ $content := index .args 0 }}}
+
+    {{{ $base := "https://codeshelldev.github.io/secured-signal-api/docs/" }}}
+
+    {{{ $matches := regexFindGroups "\\[(.*?)\\]\\(([^)]+)\\)" $content }}}
+
+    {{{ range $matches }}}
+        {{{ $text := index . 1 }}}
+        {{{ $path := index . 2 }}}
+
+        {{{ if (not (startsWith $path "http")) }}}
+            {{{ $clean1 := replace $path "../" "" }}}
+            {{{ $clean := replace $clean1 "./" "" }}}
+
+            {{{ $new := concat $base $clean }}}
+
+            {{{ $oldLink := concat "[" $text "](" $path ")" }}}
+            {{{ $newLink := concat "[" $text "](" $new ")" }}}
+
+            {{{ $content = replace $content $oldLink $newLink }}}
+        {{{ end }}}
+    {{{ end }}}
+
+    {{{ return 0 $content }}}
+`}}}
+
++{{{ funcDefine "parseMarkdownSections" `
+    {{{ $content := index .args 0 }}}
+    {{{ $lines := split $content "\n" }}}
+
+    {{{ $flat := sliceCreate }}}
+    {{{ $nested := sliceCreate }}}
+
+    {{{ $stack := sliceCreate }}}
+    {{{ $currentSection := mapCreate }}}
+
+    # Track whether we are inside a fenced code block
+    {{{ $inCodeBlock := false }}}
+
+    {{{ range $i, $line := $lines }}}
+
+        # Toggle code block
+        {{{ if regexMatch "^\x60\x60\x60" $line }}}
+            {{{ $inCodeBlock = not $inCodeBlock }}}
+        {{{ end }}}
+
+        # Only parse headings if we are NOT inside a code block
+        {{{ if (and (not $inCodeBlock) (gt (funcCallArgs "headingLevel" $line) 0)) }}}
+            {{{ $lvl := funcCallArgs "headingLevel" $line }}}
+
+            # Close previous section if exists
+            {{{ if $currentSection }}}
+                {{{ $flat = slicePush $flat $currentSection }}}
+            {{{ end }}}
+
+            # Create new section
+            {{{ $currentSection = mapCreate }}}
+            {{{ $currentSection = set $currentSection "title" (trim $line) }}}
+            {{{ $currentSection = set $currentSection "level" $lvl }}}
+            {{{ $currentSection = set $currentSection "content" sliceCreate }}}
+
+            # Maintain stack for nested sections
+            {{{ $newStack := sliceCreate }}}
+            {{{ range $j, $parent := $stack }}}
+                {{{ if lt (index $parent "level") $lvl }}}
+                    {{{ $newStack = slicePush $newStack $parent }}}
+                {{{ end }}}
+            {{{ end }}}
+            {{{ $stack = $newStack }}}
+
+            # Attach to parent or nested
+            {{{ if gt (len $stack) 0 }}}
+                {{{ $parent := index $stack (sub (len $stack) 1) }}}
+                {{{ $children := index $parent "children" }}}
+                {{{ if not $children }}}
+                    {{{ $children = sliceCreate }}}
+                {{{ end }}}
+                {{{ $children = slicePush $children $currentSection }}}
+                {{{ $parent = set $parent "children" $children }}}
+            {{{ else }}}
+                {{{ $nested = slicePush $nested $currentSection }}}
+            {{{ end }}}
+
+            {{{ $stack = slicePush $stack $currentSection }}}
+
+        {{{ else }}}
+            # Non-heading lines go into current section content
+            {{{ if $currentSection }}}
+                {{{ $contentSlice := index $currentSection "content" }}}
+                {{{ $contentSlice = slicePush $contentSlice $line }}}
+                {{{ $currentSection = set $currentSection "content" $contentSlice }}}
+            {{{ end }}}
+        {{{ end }}}
+
+    {{{ end }}}
+
+    # Push the last section
+    {{{ if $currentSection }}}
+        {{{ $flat = slicePush $flat $currentSection }}}
+    {{{ end }}}
+
+    {{{ returnAll $flat $nested }}}
+`}}}
+
++{{{ funcDefine "removeIntroduction" `
+    {{{ $content := index .args 0 }}}
+
+    {{{ $out := "" }}}
+
+    {{{ $flat := index ( funcCallArgs "parseMarkdownSections" $content ) 0 }}}
+
+    {{{ echo ( jsonEncode $flat ) }}}
+
+    {{{ if gt ( len $flat ) 1 }}}
+        {{{ range $i, $section := $flat }}}
+            {{{ if ne ( index $section "level" ) 1 }}}
+                {{{ $parts := index $section "content" }}}
+                {{{ $title := index $section "title" }}}
+
+                {{{ $sectionContent := join $parts "\n" }}}
+
+                {{{ $out = append $out ( concat $title "\n" $sectionContent "\n" ) }}}
+            {{{ end }}}
+        {{{ end }}}
+    {{{ else }}}
+        {{{ $out = $content }}}
+    {{{ end }}}
+
+    {{{ return 0 $out }}}
+`}}}
+
++{{{ funcDefine "parseDocs" `
+    {{{ $fileContent := read ( index .args 0 ) }}}
+
+    {{{ $normalized := funcCallArgs "removeFrontmatter" $fileContent }}}
+
+    {{{ $normalized = funcCallArgs "removeIntroduction" $normalized }}}
+
+    {{{ $bumpHeading := 0 }}}
+
+    {{{ if ge ( len .args ) 2 }}}
+        {{{ $rootHeading := index .args 1 }}}
+
+        {{{ $rootHeadingLevel := funcCallArgs "headingLevel" $rootHeading }}}
+
+        {{{ $bumpHeading = sub $rootHeadingLevel 1 }}}
+
+        {{{ $normalized = funcCallArgs "bumpHeadings" $normalized $bumpHeading }}}
+
+        {{{ $normalized = concat $rootHeading "\n\n" $normalized }}}
+    {{{ end }}}
+
+    {{{ $normalized = funcCallArgs "normalizeLinks" $normalized }}}
+
+    {{{ $normalized = trim $normalized }}}
+
+    {{{ return 0 $normalized }}}
+`}}}

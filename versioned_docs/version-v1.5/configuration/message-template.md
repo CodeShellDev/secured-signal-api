@@ -13,7 +13,7 @@ These support Go templates (see [Formatting](../usage/formatting#templates)) and
 Here is an example:
 
 ```yaml
-{{{ #://./examples/message-template.yml }}}
++{{{ read "./examples/message-template.yml" }}}
 ```
 
 > [!NOTE]

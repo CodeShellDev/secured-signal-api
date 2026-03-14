@@ -20,7 +20,7 @@ Before moving on you must have
 To implement Traefik in front of **Secured Signal API** you need to update your `docker-compose.yaml` file.
 
 ```yaml
-{{{ #://./examples/traefik.docker-compose.yaml }}}
++{{{ read "./examples/traefik.docker-compose.yaml" }}}
 ```
 
 To include the Traefik router and service labels.

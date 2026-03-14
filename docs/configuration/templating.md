@@ -38,12 +38,7 @@ These support Go templates (see [Formatting](../usage/formatting#templates)) and
 Here is an example:
 
 ```yaml
-{{{ #://./examples/message-template.yml }}}
++{{{ read "./examples/message-template.yml" }}}
 ```
 
-> [!NOTE]
-> Supported [placeholder types](../usage/advanced#placeholders):
->
-> | `.` Variables | `@` Body | `#` Headers |
-> | ------------- | -------- | ----------- |
-> | ✅            | ✅       | ✅          |
++{{{ readArgs "../templates/request-keys.md.gtmpl" "variables" "body" "headers" }}}

@@ -48,7 +48,7 @@ they are **flexible**, **extensible** and really **easy to use**.
 This example config shows all the individual settings that can be applied:
 
 ```yaml
-{{{ #://./examples/config.yml }}}
++{{{ read "./examples/config.yml" }}}
 ```
 
 ### Token Configs
@@ -69,5 +69,5 @@ Token configs can be used to create **per-token** defined **overrides** and sett
 Here is an example:
 
 ```yaml
-{{{ #://./examples/token.yml }}}
++{{{ read "./examples/token.yml" }}}
 ```

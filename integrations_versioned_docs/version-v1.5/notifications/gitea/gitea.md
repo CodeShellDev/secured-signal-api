@@ -17,7 +17,7 @@ Because Gitea's webhook data is very _clustered_, we need to use [**Message Temp
 Here is an example:
 
 ```yaml
-{{{ #://./message-template.yml }}}
++{{{ read "./message-template.yml" }}}
 ```
 
 Add this to your token config and modify it to your needs.

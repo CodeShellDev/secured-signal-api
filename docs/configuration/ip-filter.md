@@ -48,7 +48,7 @@ settings:
 
 - IPv4 and IPv6 rules may be mixed
 
-{{{ #://../templates/block-rules.md.tmpl }}}
++{{{ read "../templates/block-rules.md.gtmpl" }}}
 
 ## Clients behind Proxies
 

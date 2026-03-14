@@ -43,9 +43,4 @@ settings:
           score: 100
 ```
 
-> [!NOTE]
-> Supported [placeholder types](../usage/advanced#placeholders):
->
-> | `.` Variables | `@` Body | `#` Headers |
-> | ------------- | -------- | ----------- |
-> | ✅            | ✅       | ❌          |
++{{{ readArgs "../templates/request-keys.md.gtmpl" "variables" "body" }}}
