@@ -11,7 +11,7 @@ on:
 jobs:
   contributing:
     uses: codeshelldev/gh-actions/.github/workflows/templating.yml@main
-    name: Readme
+    name: Contributing
     with:
       template: .github/templates/CONTRIBUTING.template.md
       output: CONTRIBUTING.md
