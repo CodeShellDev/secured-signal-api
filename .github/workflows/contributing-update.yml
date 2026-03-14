@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  readme:
+  contributing:
     uses: codeshelldev/gh-actions/.github/workflows/templating.yml@main
     name: Readme
     with:
