@@ -1,6 +1,6 @@
 # Contributing
 
-Want to contribute to our documentation?
+Want to contribute to our documentation? 🎉
 
 Well then you have come to the right place! 😁
 
