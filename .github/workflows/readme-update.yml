@@ -1,11 +1,8 @@
 name: Update README
 
 on:
-  push:
-    branches:
-      - docs
-    paths:
-      - .github/templates/**
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
