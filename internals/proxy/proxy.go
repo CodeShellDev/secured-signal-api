@@ -19,6 +19,10 @@ func Create(targetUrl *url.URL) Proxy {
 		return Proxy{Use: func() *httputil.ReverseProxy {return nil}}
 	}
 
+	modifyResponse := m.NewResponseChain().
+		Use(m.InternalResponseHeaders).
+		Then()
+
 	proxy := &httputil.ReverseProxy{
 		Rewrite: func(req *httputil.ProxyRequest) {
 			req.Out.URL.Scheme = targetUrl.Scheme
@@ -27,15 +31,8 @@ func Create(targetUrl *url.URL) Proxy {
 			
 			req.SetXForwarded()
 		},
-		ModifyResponse: func(res *http.Response) error {
-			res.Header.Set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0, private, proxy-revalidate")
-			res.Header.Set("Pragma", "no-cache")
-			res.Header.Set("Expires", "0")
-			res.Header.Set("Vary", "*")
-			res.Header.Set("Referrer-Policy", "no-referrer")
-			return nil
-		},
 		ErrorLog: logger.StdError(),
+		ModifyResponse: modifyResponse,
 	}
 
 	return Proxy{Use: func() *httputil.ReverseProxy {return proxy}}

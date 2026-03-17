@@ -63,6 +63,11 @@ type Token struct {
 type SETTINGS struct {
 	ACCESS 				ACCESS 						`koanf:"access"`
 	MESSAGE				MESSAGE						`koanf:"message"`
+	HTTP				HTTP						`koanf:"http"`
+}
+
+type HTTP struct {
+	RESPONSE_HEADERS	t.Opt[map[string]string]	`koanf:"responseheaders"`
 }
 
 type MESSAGE struct {
