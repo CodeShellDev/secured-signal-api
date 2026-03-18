@@ -7,6 +7,7 @@ import (
 
 	"github.com/codeshelldev/gotl/pkg/logger"
 	m "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
+	rm "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/response"
 )
 
 type Proxy struct {
@@ -19,8 +20,9 @@ func Create(targetUrl *url.URL) Proxy {
 		return Proxy{Use: func() *httputil.ReverseProxy {return nil}}
 	}
 
-	modifyResponse := m.NewResponseChain().
-		Use(m.InternalResponseHeaders).
+	modifyResponse := rm.NewResponseChain().
+		Use(rm.InternalResponseHooks).
+		Use(rm.InternalResponseHeaders).
 		Then()
 
 	proxy := &httputil.ReverseProxy{
@@ -43,7 +45,8 @@ func (proxy Proxy) Init() http.Handler {
 		Use(m.InternalInsecureAPI).
 		Use(m.Auth).
 		Use(m.InternalMiddlewareLogger).
-		Use(m.InternalProxy).
+		Use(m.InternalProxiesHandler).
+		Use(m.CORS).
 		Use(m.InternalClientIP).
 		Use(m.RequestLogger).
 		Use(m.InternalAuthRequirement).
