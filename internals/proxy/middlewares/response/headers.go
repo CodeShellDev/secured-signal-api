@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"net/http"
@@ -9,10 +9,10 @@ import (
 
 var InternalResponseHeaders = ResponseMiddleware{
 	Name: "_Response_Headers",
-	Use: responseHandler,
+	Use: headersHandler,
 }
 
-func responseHandler(res *http.Response) error {
+func headersHandler(res *http.Response) error {
 	conf := GetConfigByReq(res.Request)
 
 	resHeaders := conf.SETTINGS.HTTP.RESPONSE_HEADERS.OptOrEmpty(config.DEFAULT.SETTINGS.HTTP.RESPONSE_HEADERS)
