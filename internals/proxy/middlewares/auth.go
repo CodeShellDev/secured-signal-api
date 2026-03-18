@@ -263,7 +263,7 @@ func authHandler(next http.Handler) http.Handler {
 
 			allowedMethods := conf.API.AUTH.METHODS.OptOrEmpty(config.DEFAULT.API.AUTH.METHODS)
 
-			if isAuthMethodAllowed(method, token, conf.API.TOKENS, allowedMethods, conf.API.AUTH.TOKENS) {
+			if isAuthMethodAllowed(method, token, allowedMethods, conf.API.AUTH.TOKENS) {
 				req = SetContext(req, IsAuthKey, true)
 				req = SetContext(req, TokenKey, token)
 			} else {
@@ -311,31 +311,21 @@ type AuthToken struct {
 	Methods		[]string
 }
 
-func getTokenMethodMap(rawTokens []string, defaultMethods []string, tokenMethodSet []structure.Token) map[string][]string {
-	tokenMethodMap := map[string][]string{}
-
-	for _, token := range rawTokens {
-		tokenMethodMap[token] = defaultMethods
-	}
-
-	for _, set := range tokenMethodSet {
-		for _, token := range set.Set {
-			tokenMethodMap[token] = set.Methods
-		}
-	}
-
-	return tokenMethodMap
-}
-
-func isAuthMethodAllowed(method AuthMethod, token string, rawTokens []string, defaultMethods []string, tokenMethodSet []structure.Token) bool {
-	if (len(defaultMethods) == 0 || defaultMethods == nil) && (len(tokenMethodSet) == 0 || tokenMethodSet == nil) {
+func isAuthMethodAllowed(method AuthMethod, token string, defaultMethods []string, tokenOverwrites []structure.Token) bool {
+	if len(defaultMethods) == 0 && len(tokenOverwrites) == 0 {
 		// default: allow all
 		return true
 	}
 
-	tokenMethodMap := getTokenMethodMap(rawTokens, defaultMethods, tokenMethodSet)
+	for _, t := range tokenOverwrites {
+		if slices.Contains(t.Set, token) {
+			return slices.ContainsFunc(t.Methods, func(try string) bool {
+				return strings.EqualFold(try, method.Name)
+			})
+		}
+	}
 
-	return slices.ContainsFunc(tokenMethodMap[token], func(try string) bool {
+	return slices.ContainsFunc(defaultMethods, func(try string) bool {
 		return strings.EqualFold(try, method.Name)
 	})
 }
