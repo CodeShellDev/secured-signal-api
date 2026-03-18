@@ -97,6 +97,7 @@ type Templating struct {
 }
 
 type Scheduling struct {
+	// Enabled is needed because this isn't a data-driven setting, but rather a toggle
 	Enabled				bool						`koanf:"enabled"`
 	MaxHorizon			t.Opt[g.TimeDuration]		`koanf:"maxhorizon"`
 }
@@ -113,6 +114,19 @@ type ACCESS struct {
 	IP_FILTER			t.Opt[IPFilter]				`koanf:"ipfilter"`
 	TRUSTED_IPS			t.Opt[[]g.IPOrNet]			`koanf:"trustedips"`
 	TRUSTED_PROXIES		t.Opt[[]g.IPOrNet]			`koanf:"trustedproxies"`
+	CORS				t.Opt[Cors]					`koanf:"cors"`
+}
+
+type Cors struct {
+	Origins				[]Origin					`koanf:"origins"`
+	Methods				t.Opt[[]string]				`koanf:"methods"`
+	Headers				t.Opt[[]string]				`koanf:"headers"`
+}
+
+type Origin struct {
+	URL					g.URL						`koanf:"url"`
+	Methods				t.Opt[[]string]				`koanf:"methods"`
+	Headers				t.Opt[[]string]				`koanf:"headers"`
 }
 
 type FieldPolicies = *t.Comp[c.RFieldPolicies, c.FieldPolicies]

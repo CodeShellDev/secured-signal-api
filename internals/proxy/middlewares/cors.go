@@ -1,0 +1,69 @@
+package middlewares
+
+import (
+	"net/http"
+	"net/url"
+	"strings"
+
+	"github.com/codeshelldev/secured-signal-api/internals/config"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
+	"github.com/codeshelldev/secured-signal-api/utils/urlutils"
+)
+
+var CORS Middleware = Middleware{
+	Name: "CORS",
+	Use: corsHandler,
+}
+
+func corsHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		conf := GetConfigByReq(req)
+
+		cors := conf.SETTINGS.ACCESS.CORS.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.CORS)
+
+		defaultMethods := cors.Methods.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.CORS.Value.Methods)
+		defaultHeaders := cors.Headers.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.CORS.Value.Headers)
+
+		if len(cors.Origins) == 0 {
+			next.ServeHTTP(w, req)
+			return
+		}
+
+		origin := req.Header.Get("Origin")
+		originURL, err := url.Parse(origin)
+
+		var matchingOrigin *structure.Origin
+
+		if err == nil {
+			for _, o := range cors.Origins {
+				if urlutils.NormalizeURL(originURL) == urlutils.NormalizeURL((*url.URL)(&o.URL)) {
+					matchingOrigin = &o
+				}
+			}
+		}
+
+		if matchingOrigin == nil {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		if req.Method == "OPTIONS" {
+			methods := matchingOrigin.Methods.ValueOrFallback(defaultMethods)
+			headers := matchingOrigin.Headers.ValueOrFallback(defaultHeaders)
+
+			w.Header().Set("Access-Control-Allow-Methods", strings.Join(methods, ","))
+			w.Header().Set("Access-Control-Allow-Headers", strings.Join(headers, ","))
+
+			w.WriteHeader(http.StatusNoContent)
+
+			return
+		}
+
+		next.ServeHTTP(w, req)
+	})
+}
