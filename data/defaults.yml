@@ -59,3 +59,8 @@ settings:
           matchType: prefix
         - pattern: /v1/contacts
           matchType: prefix
+
+    cors:
+      methods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+      headers:
+        ["Content-Type", "Authorization", "Accept", "Accept-Language", "Origin"]
