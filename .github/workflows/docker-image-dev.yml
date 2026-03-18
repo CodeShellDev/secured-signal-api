@@ -21,9 +21,10 @@ on:
           - beta
           - alpha
           - dev
+          - feat
 
 env:
-  TYPES: "rc,beta,alpha,dev"
+  TYPES: "rc,beta,alpha,dev,feat"
 
   TYPE: ${{ inputs.type }}
   BASE_TAG: ${{ inputs.base-tag }}
