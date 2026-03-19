@@ -34,8 +34,8 @@ ENV REDACT_TOKENS=true
 WORKDIR /app
 
 RUN mkdir -p $(dirname ${CONFIG_PATH}) \
-             $(dirname ${TOKENS_DIR}) \
-             $(dirname ${DB_PATH})
+    $(dirname ${TOKENS_DIR}) \
+    $(dirname ${DB_PATH})
 
 COPY --from=builder /app/app .
 
