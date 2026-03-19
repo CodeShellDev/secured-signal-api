@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/gob"
+	"os"
+	"path/filepath"
 
 	_ "embed"
 
@@ -19,6 +21,8 @@ var schema string
 
 func Init() {
 	var err error
+
+	os.MkdirAll(filepath.Dir(config.ENV.DB_PATH), 0755)
 
 	db, err = sql.Open("sqlite", config.ENV.DB_PATH)
 
