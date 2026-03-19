@@ -15,6 +15,7 @@ node_modules
 
 # Dev folders
 .dev
+dev-env.sh
 *.local.*
 
 # Editor config
