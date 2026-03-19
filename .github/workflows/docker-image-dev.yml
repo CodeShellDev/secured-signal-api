@@ -190,5 +190,6 @@ jobs:
         latest=false
       tags: |
         type=raw,value=${{ needs.resolve-tag.outputs.image_tag }}
+      cgo-enabled: true
     secrets:
       GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
