@@ -1,3 +1,10 @@
+FROM golang:1.26-alpine AS builder
+
+WORKDIR /app
+COPY . .
+
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o app .
+
 FROM alpine:3.22
 RUN apk --no-cache add ca-certificates
 
@@ -15,19 +22,12 @@ ENV TOKENS_DIR=/config/tokens
 
 ENV DB_PATH=/db/db.sqlite3
 
-ENV CGO_ENABLED=1
-
 ENV REDACT_TOKENS=true
-
-ARG TARGETOS
-ARG TARGETARCH
 
 WORKDIR /app
 
-COPY . .
+COPY --from=builder /app/app .
 
-COPY dist/${TARGETOS}/${TARGETARCH}/app .
-
-RUN rm dist/ -r
+COPY data/ /app/data/
 
 CMD ["./app"]

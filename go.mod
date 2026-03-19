@@ -1,6 +1,6 @@
 module github.com/codeshelldev/secured-signal-api
 
-go 1.26.0
+go 1.26.1
 
 require (
 	github.com/codeshelldev/gotl/pkg/configutils v0.0.22
