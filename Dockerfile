@@ -11,8 +11,8 @@ RUN go mod download
 COPY . .
 
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
-    go build -ldflags="-s -w" -o /app .
-    
+    go build -ldflags="-s -w" -o /app/app .
+
 FROM alpine:3.22
 
 RUN apk --no-cache add ca-certificates
