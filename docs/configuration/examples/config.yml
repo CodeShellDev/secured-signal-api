@@ -17,6 +17,10 @@ api:
         methods: [body, query]
 
 settings:
+  http:
+    responseHeaders:
+      X-Custom: "xyz"
+
   message:
     templating:
       messageTemplate: |
@@ -69,3 +73,11 @@ settings:
         - value: "+12340000[4-9]"
           matchType: regex
           action: block
+
+    cors:
+      methods: [GET, POST]
+      headers: ["Content-Type", "Accept-Language"]
+      origins:
+        - url: "https://domain.com"
+          methods: [GET]
+          headers: ["Content-Type"]

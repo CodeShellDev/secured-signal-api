@@ -11,6 +11,10 @@ api:
     methods: [bearer, basic, body, path] # add path auth
 
 settings:
+  http:
+    responseHeaders: # overwrite response headers
+      X-Custom: "Lorem Ipsum Dolor"
+
   message:
     template: # disable
     variables: # overwrite main config variables
@@ -39,3 +43,5 @@ settings:
       period: 10h # overwrite main config period
 
     fieldPolicies: # disable
+
+    cors: # disable
