@@ -21,9 +21,10 @@ on:
           - beta
           - alpha
           - dev
+          - feat
 
 env:
-  TYPES: "rc,beta,alpha,dev"
+  TYPES: "rc,beta,alpha,dev,feat"
 
   TYPE: ${{ inputs.type }}
   BASE_TAG: ${{ inputs.base-tag }}
@@ -113,7 +114,7 @@ jobs:
           echo "COUNT=$COUNT" >> "$GITHUB_ENV"
 
       - name: Login to Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -181,7 +182,7 @@ jobs:
 
   update:
     needs: resolve-tag
-    uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
+    uses: codeshelldev/gh-actions/.github/workflows/docker-image.yml@main
     name: Development Image
     with:
       registry: ghcr.io

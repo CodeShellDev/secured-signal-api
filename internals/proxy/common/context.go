@@ -12,3 +12,5 @@ const TrustedClientKey contextKey = "isClientTrusted"
 const TrustedProxyKey contextKey = "isProxyTrusted"
 const ClientIPKey contextKey = "clientIP"
 const OriginURLKey contextKey = "originURL"
+
+const ResponseHooksKey contextKey = "responseHooks"
