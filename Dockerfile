@@ -1,4 +1,7 @@
-FROM golang:1.26-alpine AS builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:1.26-alpine AS builder
+
+ARG TARGETOS
+ARG TARGETARCH
 
 WORKDIR /app
 
@@ -7,8 +10,9 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -ldflags="-w -s" -o app .
-
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+    go build -ldflags="-s -w" -o /app .
+    
 FROM alpine:3.22
 
 RUN apk --no-cache add ca-certificates
