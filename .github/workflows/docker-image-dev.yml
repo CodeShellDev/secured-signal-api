@@ -182,7 +182,7 @@ jobs:
 
   update:
     needs: resolve-tag
-    uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
+    uses: codeshelldev/gh-actions/.github/workflows/docker-image.yml@main
     name: Development Image
     with:
       registry: ghcr.io
@@ -190,6 +190,5 @@ jobs:
         latest=false
       tags: |
         type=raw,value=${{ needs.resolve-tag.outputs.image_tag }}
-      cgo-enable: true
     secrets:
       GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
