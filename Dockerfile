@@ -21,8 +21,6 @@ ARG IMAGE_TAG
 ENV IMAGE_TAG=$IMAGE_TAG
 LABEL org.opencontainers.image.version=$IMAGE_TAG
 
-ENV SERVICE__PORT=8880
-
 ENV DEFAULTS_PATH=/app/data/defaults.yml
 ENV FAVICON_PATH=/app/data/favicon.ico
 
@@ -34,6 +32,10 @@ ENV DB_PATH=/db/db.sqlite3
 ENV REDACT_TOKENS=true
 
 WORKDIR /app
+
+RUN mkdir -p $(dirname ${CONFIG_PATH}) \
+             $(dirname ${TOKENS_DIR}) \
+             $(dirname ${DB_PATH})
 
 COPY --from=builder /app/app .
 
