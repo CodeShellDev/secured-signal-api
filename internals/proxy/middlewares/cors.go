@@ -3,6 +3,7 @@ package middlewares
 import (
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
@@ -31,6 +32,12 @@ func corsHandler(next http.Handler) http.Handler {
 		}
 
 		origin := req.Header.Get("Origin")
+
+		if origin == "" {
+			next.ServeHTTP(w, req)
+			return
+		}
+
 		originURL, err := url.Parse(origin)
 
 		var matchingOrigin *structure.Origin
@@ -50,14 +57,49 @@ func corsHandler(next http.Handler) http.Handler {
 
 		w.Header().Set("Access-Control-Allow-Origin", origin)
 
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-
+		// CORS preflight request
 		if req.Method == "OPTIONS" {
-			methods := matchingOrigin.Methods.ValueOrFallback(defaultMethods)
-			headers := matchingOrigin.Headers.ValueOrFallback(defaultHeaders)
+			requestedMethod := req.Header.Get("Access-Control-Request-Method")
 
-			w.Header().Set("Access-Control-Allow-Methods", strings.Join(methods, ","))
-			w.Header().Set("Access-Control-Allow-Headers", strings.Join(headers, ","))
+			if requestedMethod != "" {
+				allowedMethods := matchingOrigin.Methods.ValueOrFallback(defaultMethods)
+
+				if len(allowedMethods) != 0 {
+					// only set if any (matching) methods
+					w.Header().Set("Access-Control-Allow-Methods", strings.Join(allowedMethods, ","))
+				}
+			}
+
+			requestedHeaders := req.Header.Get("Access-Control-Request-Headers")
+
+			if requestedHeaders != "" {
+				allowedHeaders := matchingOrigin.Headers.ValueOrFallback(defaultHeaders)
+
+				matchingHeaders := []string{}
+
+				// echo back allowed and requested headers
+				for header := range strings.SplitSeq(requestedHeaders, ",") {
+					header = strings.TrimSpace(header)
+
+					var match string
+
+					if slices.ContainsFunc(allowedHeaders, func(allowed string) bool {
+						if strings.EqualFold(header, allowed) {
+							match = allowed
+							return true
+						}
+
+						return false
+					}) {
+						matchingHeaders = append(matchingHeaders, match)
+					}
+				}
+
+				if len(matchingHeaders) != 0 {
+					// only set if any (matching) headers
+					w.Header().Set("Access-Control-Allow-Headers", strings.Join(matchingHeaders, ","))
+				}
+			}
 
 			w.WriteHeader(http.StatusNoContent)
 
