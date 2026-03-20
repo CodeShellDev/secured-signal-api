@@ -22,11 +22,7 @@ settings:
             headers: ["Content-Type"]
 ```
 
+The `cors.methods` and `cors.headers` settings act as **defaults** for origins, that do not **overwrite** `methods` or `headers`.
+
 > [!NOTE]
-> The `Access-Control-Allow-Credentials` header is automatically set to `true`
-
-**Defaults** can be set under `cors.methods` and `cors.headers`, when adding origins under `cors.origins` **overwrites** can be defined
-under `methods` and `headers` like in the example above.
-
-> [!IMPORTANT]
-> The `cors.methods` setting maps to `Access-Control-Allow-Methods` and `cors.headers` to `Access-Control-Allow-Headers`
+> Defaults for `cors.methods` and `cors.headers` are **already** defined as in the above
