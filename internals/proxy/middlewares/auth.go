@@ -255,8 +255,6 @@ func authHandler(next http.Handler) http.Handler {
 		method, token, _ := authChain.Eval(w, req, tokens)
 
 		if token == "" {
-			onUnauthorized(w)
-
 			req = SetContext(req, IsAuthKey, false)
 		} else {
 			conf := GetConfigWithoutDefault(token)
@@ -268,8 +266,6 @@ func authHandler(next http.Handler) http.Handler {
 				req = SetContext(req, TokenKey, token)
 			} else {
 				logger.Warn("Client tried using disabled auth method: ", method.Name)
-
-				onUnauthorized(w)
 
 				req = SetContext(req, IsAuthKey, false)
 			}
@@ -289,6 +285,7 @@ func authRequirementHandler(next http.Handler) http.Handler {
 		isAuthenticated := GetContext[bool](req, IsAuthKey)
 
 		if !isAuthenticated {
+			onUnauthorized(w)
 			return
 		}
 

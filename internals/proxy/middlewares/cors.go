@@ -38,19 +38,9 @@ func corsHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		originURL, err := url.Parse(origin)
+		matchingOrigin, allowed := isCORSOriginAllowed(origin, cors.Origins)
 
-		var matchingOrigin *structure.Origin
-
-		if err == nil {
-			for _, o := range cors.Origins {
-				if urlutils.NormalizeURL(originURL) == urlutils.NormalizeURL((*url.URL)(&o.URL)) {
-					matchingOrigin = &o
-				}
-			}
-		}
-
-		if matchingOrigin == nil {
+		if !allowed {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -108,4 +98,20 @@ func corsHandler(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, req)
 	})
+}
+
+func isCORSOriginAllowed(origin string, allowed []structure.Origin) (structure.Origin, bool) {
+	originURL, err := url.Parse(origin)
+
+	var matchingOrigin *structure.Origin
+
+	if err == nil {
+		for _, o := range allowed {
+			if urlutils.NormalizeURL(originURL) == urlutils.NormalizeURL((*url.URL)(&o.URL)) {
+				matchingOrigin = &o
+			}
+		}
+	}
+
+	return *matchingOrigin, matchingOrigin != nil
 }
