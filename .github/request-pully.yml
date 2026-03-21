@@ -2,6 +2,6 @@ commands:
   build:
     messages:
       cmd_started: "Hey you've started a command!"
-      cmd_completed: "Command completed!"
+      cmd_completed: "Command completed! Here is your image: {{image_tag}}."
     workflow_file: pr-build.yml
     staff_only: true
