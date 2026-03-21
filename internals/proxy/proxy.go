@@ -46,9 +46,9 @@ func (proxy Proxy) Init() http.Handler {
 		Use(m.Auth).
 		Use(m.InternalMiddlewareLogger).
 		Use(m.InternalProxiesHandler).
-		Use(m.CORS).
 		Use(m.InternalClientIP).
 		Use(m.RequestLogger).
+		Use(m.CORS).
 		Use(m.InternalAuthRequirement).
 		Use(m.Port).
 		Use(m.Hostname).
