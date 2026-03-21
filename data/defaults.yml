@@ -63,4 +63,10 @@ settings:
     cors:
       methods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
       headers:
-        ["Content-Type", "Authorization", "Accept", "Accept-Language", "Origin"]
+        [
+          "Content-Type",
+          "Content-Language",
+          "Authorization",
+          "Accept",
+          "Accept-Language",
+        ]
