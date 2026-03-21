@@ -1,0 +1,7 @@
+commands:
+  build:
+    messages:
+      cmd_started: "Hey you've started a command!"
+      cmd_completed: "Command completed!"
+    workflow_file: pully-test.yml
+    staff_only: true
