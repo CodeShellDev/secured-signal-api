@@ -1,0 +1,29 @@
+name: PR Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          echo "Building PR ${{ github.event.inputs.pr_number }}"
+          IMAGE_TAG="pr-${{ github.event.inputs.pr_number }}"
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Write outputs
+        run: |
+          echo "image_tag=pr-${{ inputs.pr_number }}" > output.txt
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: output.txt
