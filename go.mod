@@ -19,7 +19,7 @@ require (
 require (
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/knadh/koanf/parsers/yaml v1.1.0
-	golang.org/x/time v0.14.0
+	golang.org/x/time v0.15.0
 	modernc.org/sqlite v1.47.0
 )
 
@@ -41,8 +41,8 @@ require (
 	github.com/knadh/koanf/providers/confmap v1.0.0 // indirect
 	github.com/knadh/koanf/providers/env/v2 v2.0.0 // indirect
 	github.com/knadh/koanf/providers/file v1.2.1 // indirect
-	github.com/knadh/koanf/v2 v2.3.3 // indirect
-	github.com/mattn/go-runewidth v0.0.20 // indirect
+	github.com/knadh/koanf/v2 v2.3.4 // indirect
+	github.com/mattn/go-runewidth v0.0.21 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
