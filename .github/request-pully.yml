@@ -3,5 +3,5 @@ commands:
     messages:
       cmd_started: "Hey you've started a command!"
       cmd_completed: "Command completed!"
-    workflow_file: pully-test.yml
+    workflow_file: pr-build.yml
     staff_only: true
