@@ -100,7 +100,7 @@ func corsHandler(next http.Handler) http.Handler {
 	})
 }
 
-func isCORSOriginAllowed(origin string, allowed []structure.Origin) (structure.Origin, bool) {
+func isCORSOriginAllowed(origin string, allowed []structure.Origin) (*structure.Origin, bool) {
 	originURL, err := url.Parse(origin)
 
 	var matchingOrigin *structure.Origin
@@ -113,5 +113,5 @@ func isCORSOriginAllowed(origin string, allowed []structure.Origin) (structure.O
 		}
 	}
 
-	return *matchingOrigin, matchingOrigin != nil
+	return matchingOrigin, matchingOrigin != nil
 }
