@@ -1,4 +1,4 @@
-name: PR Build
+name: Build PR Image
 
 on:
   workflow_dispatch:
