@@ -25,6 +25,11 @@ func mappingHandler(next http.Handler) http.Handler {
 		variables := conf.SETTINGS.MESSAGE.VARIABLES.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.VARIABLES)
 		fieldMappings := conf.SETTINGS.MESSAGE.FIELD_MAPPINGS.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.FIELD_MAPPINGS)
 
+		if len(fieldMappings) == 0 {
+			next.ServeHTTP(w, req)
+			return
+		}
+
 		body, err := request.GetReqBody(req)
 
 		if err != nil {

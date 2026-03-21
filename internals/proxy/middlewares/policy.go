@@ -25,6 +25,11 @@ func policyHandler(next http.Handler) http.Handler {
 
 		policies := conf.SETTINGS.ACCESS.FIELD_POLICIES.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.FIELD_POLICIES)
 
+		if policies == nil {
+			next.ServeHTTP(w, req)
+			return
+		}
+
 		body, err := request.GetReqBody(req)
 
 		if err != nil {

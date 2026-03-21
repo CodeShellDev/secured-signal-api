@@ -23,6 +23,11 @@ func ipFilterHandler(next http.Handler) http.Handler {
 
 		ipFilter := conf.SETTINGS.ACCESS.IP_FILTER.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.IP_FILTER)
 
+		if len(ipFilter.Allowed) == 0 && len(ipFilter.Blocked) == 0 {
+			next.ServeHTTP(w, req)
+			return
+		}
+
 		ip := GetContext[net.IP](req, ClientIPKey)
 
 		if isIPBlocked(ip, ipFilter.Allowed, ipFilter.Blocked) {

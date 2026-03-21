@@ -22,22 +22,25 @@ func hostnameHandler(next http.Handler) http.Handler {
 
 		hostnames := conf.SERVICE.HOSTNAMES.OptOrEmpty(config.DEFAULT.SERVICE.HOSTNAMES)
 
-		if len(hostnames) > 0 {
-			URL := GetContext[*url.URL](req, OriginURLKey)
+		if len(hostnames) == 0 {
+			next.ServeHTTP(w, req)
+			return
+		}
 
-			hostname := URL.Hostname()
+		URL := GetContext[*url.URL](req, OriginURLKey)
 
-			if hostname == "" {
-				logger.Error("Encountered empty hostname")
-				http.Error(w, "Bad Request: invalid hostname", http.StatusBadRequest)
-				return
-			}
+		hostname := URL.Hostname()
 
-			if !slices.Contains(hostnames, hostname) {
-				logger.Warn("Client tried using Token with wrong hostname")
-				onUnauthorized(w)
-				return
-			}
+		if hostname == "" {
+			logger.Error("Encountered empty hostname")
+			http.Error(w, "Bad Request: invalid hostname", http.StatusBadRequest)
+			return
+		}
+
+		if !slices.Contains(hostnames, hostname) {
+			logger.Warn("Client tried using Token with wrong hostname")
+			onUnauthorized(w)
+			return
 		}
 
 		next.ServeHTTP(w, req)

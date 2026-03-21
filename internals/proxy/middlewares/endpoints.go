@@ -21,6 +21,11 @@ func endpointsHandler(next http.Handler) http.Handler {
 
 		endpoints := conf.SETTINGS.ACCESS.ENDPOINTS.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.ENDPOINTS)
 
+		if len(endpoints.Allowed) == 0 && len(endpoints.Blocked) == 0 {
+			next.ServeHTTP(w, req)
+			return
+		}
+
 		reqPath := req.URL.Path
 
 		blocked, err := isEndpointBlocked(reqPath, endpoints.Allowed, endpoints.Blocked)
