@@ -182,7 +182,7 @@ jobs:
 
   update:
     needs: resolve-tag
-    uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
+    uses: codeshelldev/gh-actions/.github/workflows/docker-image.yml@main
     name: Development Image
     with:
       registry: ghcr.io
