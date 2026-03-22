@@ -8,7 +8,7 @@ on:
         type: string
 
 env:
-  BASE_TAG: pr-${{ inputs.pr_number }}-
+  BASE_TAG: pr${{ inputs.pr_number }}-
   COUNT: 1
 
 jobs:
@@ -101,13 +101,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      
+
       - name: Write outputs
         run: |
           echo "image_tag=pr-${{ needs.resolve-tag.outputs.image_tag }}" > output.txt
-      
+
       - uses: actions/upload-artifact@v4
         with:
           name: build-output
           path: output.txt
-      
