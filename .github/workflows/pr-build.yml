@@ -8,7 +8,7 @@ on:
         type: string
 
 env:
-  BASE_TAG: pr#${{ inputs.pr_number }}-
+  BASE_TAG: pr-${{ inputs.pr_number }}-
   COUNT: 1
 
 jobs:
