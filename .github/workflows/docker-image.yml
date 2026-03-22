@@ -39,7 +39,7 @@ jobs:
   update:
     needs: check
     if: needs.check.outputs.continue == 'true'
-    uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
+    uses: codeshelldev/gh-actions/.github/workflows/docker-image.yml@main
     name: Stable Image
     with:
       registry: ghcr.io
