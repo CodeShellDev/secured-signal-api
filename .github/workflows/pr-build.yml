@@ -104,7 +104,7 @@ jobs:
 
       - name: Write outputs
         run: |
-          echo "image_tag=pr-${{ needs.resolve-tag.outputs.image_tag }}" > output.txt
+          echo "image_tag=${{ needs.resolve-tag.outputs.image_tag }}" > output.txt
 
       - uses: actions/upload-artifact@v4
         with:
