@@ -7,23 +7,106 @@ on:
         required: true
         type: string
 
+env:
+  BASE_TAG: pr#${{ inputs.pr_number }}-
+  COUNT: 0
+
 jobs:
-  build:
+  resolve-tag:
     runs-on: ubuntu-latest
+    name: Image Tag
+    outputs:
+      image_tag: ${{ steps.resolve.outputs.image_tag }}
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Login to Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_PCKG_TOKEN }}
 
-      - name: Build Docker image
+      - name: Resolve Image Tag
+        id: resolve
         run: |
-          echo "Building PR ${{ github.event.inputs.pr_number }}"
-          IMAGE_TAG="pr-${{ github.event.inputs.pr_number }}"
-          echo "image_tag=$IMAGE_TAG" >> $GITHUB_ENV
+          set -euo pipefail
 
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ] && [ "$COUNT" -ne -1 ]; then
+            echo "❌ Invalid count: $COUNT. May only be > 0."
+            exit 1
+          fi
+
+          PREFIX="${{ env.BASE_TAG }}"
+
+          IMAGE=${{ github.repository_owner }}/${{ github.event.repository.name }}
+
+          TOKEN="$(
+            curl "https://ghcr.io/token?scope=repository:${IMAGE}:pull" |
+            awk -F'"' '$0=$4'
+          )"
+
+          TAGS=$(curl -fsSL \
+            -H "Authorization: Bearer ${TOKEN}" \
+            "https://ghcr.io/v2/${IMAGE}/tags/list" \
+            | jq -r '.tags[]?')
+
+          if [ -z "$COUNT" ] || [ "$COUNT" -eq -1 ]; then
+            MAX=0
+            for tag in $TAGS; do
+              if [[ "$tag" == ${PREFIX}* ]]; then
+                NUM="${tag#$PREFIX}"
+                if [[ "$NUM" =~ ^[0-9]+$ ]]; then
+                  (( NUM > MAX )) && MAX=$NUM
+                fi
+              fi
+            done
+
+            COUNT=$((MAX + 1))
+          fi
+
+          FINAL_TAG=${PREFIX}${COUNT}
+
+          if echo "$TAGS" | grep -qx "$FINAL_TAG"; then
+            echo "⚠️ Tag $FINAL_TAG already exists."
+
+            if [ "${GITHUB_ACTOR}" != "${{ github.repository_owner }}" ]; then
+              echo "🚨 User $GITHUB_ACTOR is not allowed to overwrite existing image."
+              exit 1
+            else
+              echo "User $GITHUB_ACTOR is the owner - allowed to proceed."
+            fi
+          fi
+
+          echo "Resolved tag: $FINAL_TAG"
+          echo "image_tag=$FINAL_TAG" >> "$GITHUB_OUTPUT"
+
+  update:
+    needs: resolve-tag
+    uses: codeshelldev/gh-actions/.github/workflows/docker-image-go.yml@main
+    name: Development Image
+    with:
+      registry: ghcr.io
+      flavor: |
+        latest=false
+      tags: |
+        type=raw,value=${{ needs.resolve-tag.outputs.image_tag }}
+    secrets:
+      GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
+
+  output:
+    needs: [resolve-tag, update]
+    runs-on: ubuntu-latest
+    name: Output Image Tag
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
       - name: Write outputs
         run: |
-          echo "image_tag=pr-${{ inputs.pr_number }}" > output.txt
+          echo "image_tag=pr-${{ needs.resolve-tag.outputs.image_tag }}" > output.txt
       
       - uses: actions/upload-artifact@v4
         with:
           name: build-output
           path: output.txt
+      
