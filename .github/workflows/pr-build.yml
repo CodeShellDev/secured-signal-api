@@ -90,6 +90,7 @@ jobs:
         latest=false
       tags: |
         type=raw,value=${{ needs.resolve-tag.outputs.image_tag }}
+      ref: refs/pull/${{ inputs.pr_number }}/merge
     secrets:
       GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
 
