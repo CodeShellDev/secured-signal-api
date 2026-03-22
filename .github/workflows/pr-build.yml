@@ -9,7 +9,7 @@ on:
 
 env:
   BASE_TAG: pr${{ inputs.pr_number }}-
-  COUNT: 1
+  COUNT: -1
 
 jobs:
   resolve-tag:
