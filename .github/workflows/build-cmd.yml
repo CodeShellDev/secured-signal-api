@@ -39,15 +39,17 @@ jobs:
     name: Image Tag
     outputs:
       image_tag: ${{ steps.resolve.outputs.image_tag }}
+      ref: ${{ steps.parse.outputs.ref }}
 
     steps:
       - name: Parse Arguments
+        id: parse
         run: |
           set -euo pipefail
 
           if [[ "${{ inputs.origin }}" == "pull_request" ]]; then
             REF="refs/pull/${{ inputs.number }}/merge"
-            BASE_TAG="pr-${{inputs.number}}-"
+            BASE_TAG="pr-${{ inputs.number }}-"
           elif [[ "${{ inputs.origin }}" == "issue" ]]; then
             BRANCH=$(printf "%s" '${{ inputs.args }}' | jq -r ".[0]")
 
@@ -63,8 +65,9 @@ jobs:
             BASE_TAG="ci-${BRANCH}-"
           fi
 
-          echo "REF=$REF" >> $GITHUB_ENV
           echo "BASE_TAG=$BASE_TAG" >> $GITHUB_ENV
+
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
 
       - name: Login to Registry
         uses: docker/login-action@v3
@@ -135,6 +138,7 @@ jobs:
         latest=false
       tags: |
         type=raw,value=${{ needs.resolve-tag.outputs.image_tag }}
+      ref: ${{ needs.resolve-tag.outputs.ref }}
     secrets:
       GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
 
