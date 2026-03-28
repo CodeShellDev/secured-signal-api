@@ -7,13 +7,13 @@ commands:
           cmd_started: |
             🚀 Build for PR #{number} started.
           cmd_completed: |
-            ✅ Build PR #{number} completed.
+            ✅ Build for PR #{number} completed.
             @{username}, @{author} your image is ready at:
             ```
             ghcr.io/codeshelldev/secured-signal-api:{{image_tag}}
             ```
           cmd_failed: |
-            ❌ Build PR #{number} failed, please verify this @{username}.
+            ❌ Build for PR #{number} failed, please verify this @{username}.
             ```python
             {errors}
             ```
