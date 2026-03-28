@@ -20,8 +20,9 @@ on:
         type: string
 
       raw_args:
-        required: true
+        required: false
         type: string
+        default: ""
 
       origin:
         required: true
