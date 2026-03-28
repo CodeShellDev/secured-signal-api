@@ -1,7 +1,19 @@
 commands:
+  pr:
+    ignore: true
+    subcommands:
+      build:
+        messages:
+          cmd_started: "🚀 Build for PR #{number} started."
+          cmd_completed: "✅ Build completed.\n```\nghcr.io/codeshelldev/secured-signal-api:{{image_tag}}\n```"
+          cmd_failed: "❌ Build failed.\n```python\n{errors}\n```"
+
+        workflow_file: build-cmd.yml
+        access: admin, maintain
+
   build:
     messages:
-      cmd_started: "🚀 Build for #{number} started."
+      cmd_started: "🚀 Build started."
       cmd_completed: "✅ Build completed.\n```\nghcr.io/codeshelldev/secured-signal-api:{{image_tag}}\n```"
       cmd_failed: "❌ Build failed.\n```python\n{errors}\n```"
 
