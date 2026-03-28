@@ -51,7 +51,7 @@ jobs:
           elif [[ "${{ inputs.origin }}" == "issue" ]]; then
             BRANCH=$(printf "%s" "${{ inputs.args }}" | jq -r ".[0]")
 
-            if [[ -z "$BRANCH" ]]; then
+            if [[ -z "$BRANCH" || "$BRANCH" == "null" ]]; then
                 echo "::error::Missing argument branch at index 0 in command."
               exit 1
             fi
