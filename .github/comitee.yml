@@ -6,4 +6,4 @@ commands:
       cmd_failed: "❌ Build failed.\n```python\n{errors}\n```"
 
     workflow_file: pr-build.yml
-    access: maintain
+    access: admin, maintain
