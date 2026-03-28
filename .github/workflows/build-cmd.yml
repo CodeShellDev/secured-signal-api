@@ -51,8 +51,8 @@ jobs:
           elif [[ "${{ inputs.origin }}" == "issue" ]]; then
             BRANCH=$(printf "%s" "${{ inputs.args }}" | jq -r ".[0]")
 
-            if [[ "$BRANCH" == "" ]]; then
-              echo "##[error]Missing argument branch at index 0 in command."
+            if [[ -z "$BRANCH" ]]; then
+                echo "::error::Missing argument branch at index 0 in command."
               exit 1
             fi
 
@@ -76,7 +76,7 @@ jobs:
           set -euo pipefail
 
           if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ] && [ "$COUNT" -ne -1 ]; then
-            echo "##[error]Invalid count: $COUNT. May only be > 0."
+            echo "::error::Invalid count: $COUNT. May only be > 0."
             exit 1
           fi
 
@@ -111,10 +111,10 @@ jobs:
           FINAL_TAG=${PREFIX}${COUNT}
 
           if echo "$TAGS" | grep -qx "$FINAL_TAG"; then
-            echo "##[warn]Tag $FINAL_TAG already exists."
+            echo "::warn::Tag $FINAL_TAG already exists."
 
             if [ "${GITHUB_ACTOR}" != "${{ github.repository_owner }}" ]; then
-              echo "##[error]User $GITHUB_ACTOR is not allowed to overwrite existing image."
+              echo "::error::User $GITHUB_ACTOR is not allowed to overwrite existing image."
               exit 1
             else
               echo "User $GITHUB_ACTOR is the owner – allowed to proceed."
