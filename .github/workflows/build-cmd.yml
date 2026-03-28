@@ -29,7 +29,6 @@ on:
         type: string
 
 env:
-  REF: ""
   BASE_TAG: ""
   COUNT: -1
 
@@ -47,22 +46,26 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [[ "${{ inputs.origin }}" == "pull_request" ]]; then
+          ARGS='${{ inputs.args }}'
+          BRANCH=$(echo "$ARGS" | jq -r '.[0]')
+
+          normalize_branch() {
+            echo "$1" \
+              | tr '[:upper:]' '[:lower:]' \
+              | sed -E 's/[^a-z0-9_.-]+/-/g' \
+              | sed -E 's/-+/-/g' \
+              | sed -E 's/^-+|-+$//g'
+          }
+
+          if [[ -n "$BRANCH" && "$BRANCH" != "null" ]]; then
+            BRANCH="$(normalize_branch "$BRANCH")"
+            REF="refs/heads/$BRANCH"
+            BASE_TAG="ci-${BRANCH}-"
+          elif [[ "${{ inputs.origin }}" == "pull_request" ]]; then
             REF="refs/pull/${{ inputs.number }}/merge"
             BASE_TAG="pr-${{ inputs.number }}-"
           elif [[ "${{ inputs.origin }}" == "issue" ]]; then
-            BRANCH=$(printf "%s" '${{ inputs.args }}' | jq -r ".[0]")
-
-            if [[ -z "$BRANCH" || "$BRANCH" == "null" ]]; then
-              echo "::error::Missing argument branch at index 0 in command." && exit 1
-            fi
-
-            BRANCH=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]')
-            BRANCH=$(echo "$BRANCH" | sed -E 's/[^a-z0-9_.-]+/-/g')
-            BRANCH=$(echo "$BRANCH" | sed -E 's/-+/-/g')
-
-            REF="refs/head/${BRANCH}"
-            BASE_TAG="ci-${BRANCH}-"
+            echo "::error::Missing branch argument at index 0 in command." && exit 1
           fi
 
           echo "BASE_TAG=$BASE_TAG" >> $GITHUB_ENV
