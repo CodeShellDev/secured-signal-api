@@ -13,7 +13,7 @@ commands:
 
   build:
     messages:
-      cmd_started: "🚀 Build for `{arg[0]}` started, please wait @{username}."
+      cmd_started: "🚀 Build for `{args[0]}` started, please wait @{username}."
       cmd_completed: "✅ Build completed.\n```\nghcr.io/codeshelldev/secured-signal-api:{{image_tag}}\n```"
       cmd_failed: "❌ Build failed.\n```python\n{errors}\n```"
 
