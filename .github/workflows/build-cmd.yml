@@ -11,7 +11,7 @@ on:
         required: true
         type: string
 
-      user:
+      username:
         required: true
         type: string
 
