@@ -49,7 +49,7 @@ jobs:
             REF="refs/pull/${{ inputs.number }}/merge"
             BASE_TAG="pr-${{inputs.number}}-"
           elif [[ "${{ inputs.origin }}" == "issue" ]]; then
-            BRANCH=$(printf "%s" "${{ inputs.args }}" | jq -r ".[0]")
+            BRANCH=$(printf "%s" '${{ inputs.args }}' | jq -r ".[0]")
 
             if [[ -z "$BRANCH" || "$BRANCH" == "null" ]]; then
               echo "::error::Missing argument branch at index 0 in command." && exit 1
