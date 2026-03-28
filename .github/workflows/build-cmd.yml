@@ -58,8 +58,15 @@ jobs:
           }
 
           if [[ -n "$BRANCH" && "$BRANCH" != "null" ]]; then
-            BRANCH="$(normalize_branch "$BRANCH")"
             REF="refs/heads/$BRANCH"
+            CUSTOM_NAME=$(echo "$ARGS" | jq -r '.[1]')
+
+            if [[ -n "$CUSTOM_NAME" && "$CUSTOM_NAME" != "null" ]]; then
+              BRANCH="$CUSTOM_NAME"
+            fi
+
+            BRANCH="$(normalize_branch "$BRANCH")"
+
             BASE_TAG="ci-${BRANCH}-"
           elif [[ "${{ inputs.origin }}" == "pull_request" ]]; then
             REF="refs/pull/${{ inputs.number }}/merge"
