@@ -2,7 +2,7 @@ commands:
   build:
     messages:
       cmd_started: "🚀 Build for #{number} started."
-      cmd_completed: "✅ Build completed: `ghcr.io/codeshelldev/secured-signal-api:{{image_tag}}`."
+      cmd_completed: "✅ Build completed.\n```ghcr.io/codeshelldev/secured-signal-api:{{image_tag}}```"
       cmd_failed: "❌ Build failed.\n```python\n{errors}\n```"
 
     workflow_file: build-cmd.yml
