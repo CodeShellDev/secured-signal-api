@@ -1,0 +1,9 @@
+commands:
+  build:
+    messages:
+      cmd_started: "🚀 Build for #{pr_number} started."
+      cmd_completed: "✅ Build completed: `ghcr.io/codeshelldev/secured-signal-api:{{image_tag}}`."
+      cmd_failed: "❌ Build failed.\n```python\n{errors}\n```"
+
+    workflow_file: pr-build.yml
+    access: maintain
