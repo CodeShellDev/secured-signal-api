@@ -55,6 +55,10 @@ jobs:
               echo "::error::Missing argument branch at index 0 in command." && exit 1
             fi
 
+            BRANCH=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]')
+            BRANCH=$(echo "$BRANCH" | sed -E 's/[^a-z0-9_.-]+/-/g')
+            BRANCH=$(echo "$BRANCH" | sed -E 's/-+/-/g')
+
             REF="refs/head/${BRANCH}"
             BASE_TAG="ci-${BRANCH}-"
           fi
