@@ -5,17 +5,17 @@ commands:
       build:
         messages:
           cmd_started: "🚀 Build for PR #{number} started."
-          cmd_completed: "✅ Build completed.\n```\nghcr.io/codeshelldev/secured-signal-api:{{image_tag}}\n```"
-          cmd_failed: "❌ Build failed.\n```python\n{errors}\n```"
+          cmd_completed: '✅ Build PR #{number} completed.\n@{username}, @{author} your <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M22 7.7c0-.6-.4-1.2-.8-1.5l-6.3-3.9a1.72 1.72 0 0 0-1.7 0l-10.3 6c-.5.2-.9.8-.9 1.4v6.6c0 .5.4 1.2.8 1.5l6.3 3.9a1.72 1.72 0 0 0 1.7 0l10.3-6c.5-.3.9-1 .9-1.5Z" fill="#4a85b0"/><path d="M10 21.9V14L2.1 9.1M10 14l11.9-6.9M14 19.8v-8.1m4 5.8V9.4" fill="#4a85b0"/></g></svg> image is ready at :\n```\nghcr.io/codeshelldev/secured-signal-api:{{image_tag}}\n```'
+          cmd_failed: "❌ Build PR #{number} failed, please verify this @{username}.\n```python\n{errors}\n```"
 
         workflow_file: build-cmd.yml
         access: admin, maintain
 
   build:
     messages:
-      cmd_started: "🚀 Build for `{args[0]}` started, please wait @{username}."
-      cmd_completed: "✅ Build completed.\n```\nghcr.io/codeshelldev/secured-signal-api:{{image_tag}}\n```"
-      cmd_failed: "❌ Build failed.\n```python\n{errors}\n```"
+      cmd_started: "🚀 Build for `{args[0]}` started."
+      cmd_completed: '✅ Build {args[0]} completed.\n@{username}, @{author} your <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M22 7.7c0-.6-.4-1.2-.8-1.5l-6.3-3.9a1.72 1.72 0 0 0-1.7 0l-10.3 6c-.5.2-.9.8-.9 1.4v6.6c0 .5.4 1.2.8 1.5l6.3 3.9a1.72 1.72 0 0 0 1.7 0l10.3-6c.5-.3.9-1 .9-1.5Z" fill="#4a85b0"/><path d="M10 21.9V14L2.1 9.1M10 14l11.9-6.9M14 19.8v-8.1m4 5.8V9.4" fill="#4a85b0"/></g></svg> image is ready at :\n```\nghcr.io/codeshelldev/secured-signal-api:{{image_tag}}\n```'
+      cmd_failed: "❌ Build for `{args[0]}` failed, please verify this @{username}.\n```python\n{errors}\n```"
 
     workflow_file: build-cmd.yml
     access: admin, maintain
