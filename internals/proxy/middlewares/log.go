@@ -9,6 +9,7 @@ import (
 	"github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
+	"github.com/codeshelldev/secured-signal-api/utils/logging"
 )
 
 var RequestLogger Middleware = Middleware{
@@ -58,9 +59,12 @@ func middlewareLoggerHandler(next http.Handler) http.Handler {
 		if strings.TrimSpace(logLevel) != "" {
 			l = logger.Get().Sub(logLevel)
 
-			l.SetTransform(func(content string) string {
+			transforms := logging.DefaultTransforms()
+			transforms = append(transforms, func(content string) string {
 				return conf.NAME + "\t" + content
 			})
+
+			l.SetTransform(logging.Apply(transforms...))
 		}
 
 		req = SetContext(req, LoggerKey, l)

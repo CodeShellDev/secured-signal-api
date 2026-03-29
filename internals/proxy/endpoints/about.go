@@ -2,14 +2,13 @@ package endpoints
 
 import (
 	"net/http"
-	"os"
-	"regexp"
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
+	"github.com/codeshelldev/secured-signal-api/utils/docker"
 )
 
 var AboutEndpoint = Endpoint{
@@ -17,7 +16,7 @@ var AboutEndpoint = Endpoint{
 	Handler: aboutHandler,
 }
 
-func aboutHandler(mux *http.ServeMux) *http.ServeMux {
+func aboutHandler(mux *http.ServeMux, next http.Handler) *http.ServeMux {
 	mux.HandleFunc("GET /v1/about", func(w http.ResponseWriter, req *http.Request) {
 		req.RequestURI = ""
 		ChangeRequestDest(req, config.DEFAULT.API.URL.String() + "/v1/about")
@@ -41,6 +40,8 @@ func aboutHandler(mux *http.ServeMux) *http.ServeMux {
 			return
 		}
 
+		body.EnsureNotNil()
+
 		for key, values := range res.Header {
 			for _, value := range values {
 				w.Header().Add(key, value)
@@ -50,8 +51,8 @@ func aboutHandler(mux *http.ServeMux) *http.ServeMux {
 		if !body.Empty {
 			var version string
 
-			if isValidSemver(os.Getenv("IMAGE_TAG")) {
-				version, _ = strings.CutPrefix(version, "v")
+			if docker.VERSION != nil {
+				version, _ = strings.CutPrefix(docker.VERSION.String(), "v")
 			}
 			
 			payload := map[string]any{
@@ -75,14 +76,4 @@ func aboutHandler(mux *http.ServeMux) *http.ServeMux {
 	})
 
 	return mux
-}
-
-func isValidSemver(version string) bool {
-	re, err := regexp.Compile(`^v?([0-9]+)\.([0-9]+)\.([0-9]+)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$`)
-	
-	if err != nil {
-		return false
-	}
-
-	return re.MatchString(version)
 }

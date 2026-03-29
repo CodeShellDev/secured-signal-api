@@ -1,4 +1,4 @@
-name: Build Image via Command
+name: Build & Push Image via Command
 
 on:
   workflow_dispatch:

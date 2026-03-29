@@ -2,7 +2,6 @@ package endpoints
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/codeshelldev/gotl/pkg/jsonutils"
 	"github.com/codeshelldev/gotl/pkg/request"
@@ -15,7 +14,7 @@ var ScheduleEndpoint = Endpoint{
 	Handler: scheduleHandler,
 }
 
-func scheduleHandler(mux *http.ServeMux) *http.ServeMux {
+func scheduleHandler(mux *http.ServeMux, next http.Handler) *http.ServeMux {
 	mux.HandleFunc("DELETE /v1/schedule/{id}", func(w http.ResponseWriter, req *http.Request) {
 		id := req.PathValue("id")
 
@@ -49,8 +48,8 @@ func scheduleHandler(mux *http.ServeMux) *http.ServeMux {
 			"method": entry.Method,
 			"url": entry.URL,
 
-			"created_at": strconv.Itoa(int(entry.CreatedAt.Unix())),
-			"run_at": strconv.Itoa(int(entry.RunAt.Unix())),
+			"created_at": int(entry.CreatedAt.Unix()),
+			"run_at": int(entry.RunAt.Unix()),
 		})
 
 		if entry.Status != db.STATUS_DONE && entry.Status != db.STATUS_FAILED {
@@ -58,11 +57,11 @@ func scheduleHandler(mux *http.ServeMux) *http.ServeMux {
 			return
 		}
 
-		var finishedAt *string
+		var finishedAt *int
 		if entry.FinishedAt != nil {
 			finished := entry.FinishedAt.Unix()
 
-			tm := strconv.Itoa(int(finished))
+			tm := int(finished)
 			finishedAt = &tm
 		}
 

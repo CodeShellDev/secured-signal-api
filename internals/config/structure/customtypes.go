@@ -2,70 +2,44 @@ package structure
 
 import (
 	"errors"
-	"fmt"
-	"reflect"
-	"strings"
+
+	g "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
 )
 
-type AllowBlockSlice struct{
-	Allow	[]string
-	Block	[]string
-}
+type StringMatchList []g.StringMatchRule
 
-func (splitter *AllowBlockSlice) UnmarshalMapstructure(raw any) error {
-    slice, ok := raw.([]any)
+func (m StringMatchList) TestRules() error {
+	var errs []error
 
-    if !ok {
-		fmt.Println(raw)
-		return errors.New("expected []string, got " + reflect.TypeOf(raw).String())
-    }
+	for _, rule := range m {
+		err := rule.Test()
 
-	for _, item := range slice {
-        str, ok := item.(string)
-
-        if !ok {
-			return errors.New("expected string, got " + reflect.TypeOf(item).String())
-        }
-
-		str, block := strings.CutPrefix(str, "!")
-
-		if block {
-			splitter.Block = append(splitter.Block, str)
-		} else {
-			splitter.Allow = append(splitter.Allow, str)
+		if err != nil {
+			errs = append(errs, err)
 		}
 	}
 
-	return nil
+	return errors.Join(errs...)
 }
 
-type FieldPolicies struct{
-	Allow	[]FieldPolicy
-	Block	[]FieldPolicy
-}
+func (m StringMatchList) FindMatchRule(str string) (g.StringMatchRule, error) {
+	for _, rule := range m {
+		ok, err := rule.Match(str)
 
-func (splitter *FieldPolicies) UnmarshalMapstructure(raw any) error {
-    slice, ok := raw.([]any)
-
-    if !ok {
-		fmt.Println(raw)
-		return errors.New("expected []FieldPolicy, got " + reflect.TypeOf(raw).String())
-    }
-
-	for _, item := range slice {
-        policy, ok := item.(FieldPolicy)
-
-        if !ok {
-			return errors.New("expected string, got " + reflect.TypeOf(item).String())
-        }
-
-		switch strings.ToLower(policy.Action) {
-		case "block":
-			splitter.Block = append(splitter.Block, policy)
-		case "allow":
-			splitter.Allow = append(splitter.Allow, policy)
+		if ok {
+			return rule, err
 		}
 	}
 
-	return nil
+	return g.StringMatchRule{}, nil
+}
+
+func (m StringMatchList) Match(str string) (bool, error) {
+	rule, err := m.FindMatchRule(str)
+
+	if err != nil {
+		return false, err
+	}
+
+	return rule.Pattern != "", nil
 }

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/codeshelldev/secured-signal-api/internals/config"
-	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	"github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 	"github.com/codeshelldev/secured-signal-api/utils/netutils"
 )
@@ -38,11 +38,12 @@ func clientIPHandler(next http.Handler) http.Handler {
 	})
 }
 
-func parseIPsAndNets(ipNets []structure.IPOrNet) []*net.IPNet {
+func parseIPsAndNets(ipNets []generics.IPOrNet) []*net.IPNet {
     out := []*net.IPNet{}
 
     for _, ipNet := range ipNets {
-        out = append(out, ipNet.IPNet)
+		n := net.IPNet(ipNet)
+        out = append(out, &n)
     }
 
     return out

@@ -2,7 +2,6 @@ package config
 
 import (
 	"path/filepath"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -12,22 +11,22 @@ import (
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
+const tokenConfigsPath = "tokenconfigs"
+
 func LoadTokens() {
 	logger.Debug("Loading Configs in ", ENV.TOKENS_DIR)
 
-	err := tokenConf.LoadDir("tokenconfigs", ENV.TOKENS_DIR, ".yml", yaml.Parser(), setTokenConfigName)
+	err := tokenConf.LoadDir(tokenConfigsPath, ENV.TOKENS_DIR, ".yml", yaml.Parser(), setTokenConfigName)
 
 	if err != nil {
 		logger.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
 	}
-
-	tokenConf.TemplateConfig()
 }
 
 func NormalizeTokens() {
-	data := []map[string]any{}
+	data := []any{}
 
-	for _, config := range tokenConf.Layer.Slices("tokenconfigs") {
+	for _, config := range tokenConf.Layer.Slices(tokenConfigsPath) {
 		tmpConf := configutils.New()
 		tmpConf.Load(config.Raw(), "")
 
@@ -37,7 +36,7 @@ func NormalizeTokens() {
 	}
 
 	// Merge token configs together into new temporary config
-	tokenConf.Load(data, "tokenconfigs")
+	tokenConf.Layer.Set(tokenConfigsPath, data)
 }
 
 func InitTokens() {
@@ -47,13 +46,9 @@ func InitTokens() {
 		ENV.CONFIGS[token] = DEFAULT
 	}
 
-	var tokenConfigs []structure.CONFIG
+	configs := parseTokenConfigs(tokenConf)
 
-	tokenConf.Unmarshal("tokenconfigs", &tokenConfigs)
-
-	config := parseTokenConfigs(tokenConfigs)
-
-	for token, config := range config {
+	for token, config := range configs {
 		apiTokens = append(apiTokens, token)
 
 		config.TYPE = structure.TOKEN
@@ -80,13 +75,23 @@ func InitTokens() {
 	ENV.TOKENS = apiTokens
 }
 
-func parseTokenConfigs(configArray []structure.CONFIG) map[string]structure.CONFIG {
+func parseTokenConfigs(config *configutils.Config) map[string]structure.CONFIG {
 	configs := map[string]structure.CONFIG{}
 
-	for _, config := range configArray {
-		tokens := parseAuthTokens(config)
+	for _, c := range config.Layer.Slices(tokenConfigsPath) {
+		tmpConf := configutils.New()
+		tmpConf.Load(c.Raw(), "")
+
+		templateConfigWithVariables(tmpConf)
+		
+		var configData structure.CONFIG
+
+		tmpConf.Unmarshal("", &configData)
+
+		tokens := parseAuthTokens(configData)
+
 		for _, token := range tokens {
-			configs[token] = config
+			configs[token] = configData
 		}
 	}
 
@@ -103,31 +108,12 @@ func parseAuthTokens(config structure.CONFIG) []string {
 	return tokens
 }
 
-func getSchemeTagByPointer(config any, tag string, fieldPointer any) string {
-	v := reflect.ValueOf(config)
-	if v.Kind() == reflect.Pointer {
-		v = v.Elem()
-	}
-
-	fieldValue := reflect.ValueOf(fieldPointer).Elem()
-
-	for i := 0; i < v.NumField(); i++ {
-		if v.Field(i).Addr().Interface() == fieldValue.Addr().Interface() {
-			field := v.Type().Field(i)
-
-			return field.Tag.Get(tag)
-		}
-	}
-
-	return ""
-}
-
 func setTokenConfigName(config *configutils.Config, p string) {
 	schema := structure.CONFIG{
 		NAME: "",
 	}
 
-	nameField := getSchemeTagByPointer(&schema, "koanf", &schema.NAME)
+	nameField := configutils.GetSchemeTagByFieldPointer(&schema, "koanf", &schema.NAME)
 
 	filename := filepath.Base(p)
 	filenameWithoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))

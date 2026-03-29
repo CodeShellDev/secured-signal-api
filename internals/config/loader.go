@@ -19,7 +19,10 @@ var ENV *structure.ENV = &structure.ENV{
 	TOKENS_DIR:    	os.Getenv("TOKENS_DIR"),
 	FAVICON_PATH:  	os.Getenv("FAVICON_PATH"),
 	DB_PATH: 		os.Getenv("DB_PATH"),
+
 	INSECURE:      	false,
+
+	REDACT_TOKENS:  strings.EqualFold(os.Getenv("REDACT_TOKENS"), "true") || os.Getenv("REDACT_TOKENS") == "1",
 
 	CONFIGS:       	map[string]*structure.CONFIG{},
 }
@@ -54,8 +57,6 @@ func Load() {
 	userConf.MergeLayers(envConf.Layer)
 	
 	mainConf.MergeLayers(defaultsConf.Layer, userConf.Layer)
-
-	mainConf.TemplateConfig()
 
 	NormalizeTokens()
 
@@ -140,6 +141,9 @@ func InitReload() {
 func InitConfig() {
 	var config structure.CONFIG
 
+	templateConfigWithVariables(mainConf)
+
+	// after templating reunmarshal
 	mainConf.Unmarshal("", &config)
 
 	config.TYPE = structure.MAIN
@@ -165,8 +169,8 @@ func LoadConfig() {
 	if err != nil {
 		_, fsErr := os.Stat(ENV.CONFIG_PATH)
 
-		// Config File doesn't exist
-		// => User is using Environment
+		// config file doesn't exist
+		// => user is using environment
 		if errors.Is(fsErr, fs.ErrNotExist) {
 			return
 		}
@@ -181,4 +185,24 @@ func normalizeEnv(key string, value string) (string, any) {
 	key = strings.ReplaceAll(key, "_", "")
 
 	return key, stringutils.ToType(value)
+}
+
+func templateConfigWithVariables(config *configutils.Config) {
+	var configData structure.CONFIG
+
+	err := config.Unmarshal("", &configData)
+
+	if err != nil {
+		return
+	}
+
+	var variables map[string]any
+
+	if configData.SETTINGS.MESSAGE.VARIABLES.Set {
+		variables = *configData.SETTINGS.MESSAGE.VARIABLES.Value
+	} else if DEFAULT != nil {
+		variables = DEFAULT.SETTINGS.MESSAGE.VARIABLES.ValueOrFallback(map[string]any{})
+	}
+
+	config.TemplateConfig(variables)
 }

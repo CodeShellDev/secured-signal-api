@@ -7,7 +7,7 @@ import (
 
 	"github.com/codeshelldev/gotl/pkg/logger"
 	m "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares"
-	"github.com/codeshelldev/secured-signal-api/utils/stdlog"
+	rm "github.com/codeshelldev/secured-signal-api/internals/proxy/middlewares/response"
 )
 
 type Proxy struct {
@@ -20,26 +20,21 @@ func Create(targetUrl *url.URL) Proxy {
 		return Proxy{Use: func() *httputil.ReverseProxy {return nil}}
 	}
 
-	proxy := httputil.NewSingleHostReverseProxy(targetUrl)
-	proxy.ModifyResponse = func(res *http.Response) error {
-		res.Header.Set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0, private, proxy-revalidate")
-		res.Header.Set("Pragma", "no-cache")
-		res.Header.Set("Expires", "0")
-		res.Header.Set("Vary", "*")
-		res.Header.Set("Referrer-Policy", "no-referrer")
+	modifyResponse := rm.NewResponseChain().
+		Use(rm.InternalResponseHooks).
+		Use(rm.InternalResponseHeaders).
+		Then()
 
-		return nil
-	}
-
-	proxy.ErrorLog = stdlog.ErrorLog
-
-	director := proxy.Director
-
-	proxy.Director = func(req *http.Request) {
-		director(req)
-
-		req.Header.Add("X-Forwarded-Host", req.Host)
-		req.Host = targetUrl.Host
+	proxy := &httputil.ReverseProxy{
+		Rewrite: func(req *httputil.ProxyRequest) {
+			req.Out.URL.Scheme = targetUrl.Scheme
+			req.Out.URL.Host = targetUrl.Host
+			req.Out.Host = targetUrl.Host
+			
+			req.SetXForwarded()
+		},
+		ErrorLog: logger.StdError(),
+		ModifyResponse: modifyResponse,
 	}
 
 	return Proxy{Use: func() *httputil.ReverseProxy {return proxy}}
@@ -50,9 +45,10 @@ func (proxy Proxy) Init() http.Handler {
 		Use(m.InternalInsecureAPI).
 		Use(m.Auth).
 		Use(m.InternalMiddlewareLogger).
-		Use(m.InternalProxy).
+		Use(m.InternalProxiesHandler).
 		Use(m.InternalClientIP).
 		Use(m.RequestLogger).
+		Use(m.CORS).
 		Use(m.InternalAuthRequirement).
 		Use(m.Port).
 		Use(m.Hostname).

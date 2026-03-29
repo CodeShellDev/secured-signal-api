@@ -32,9 +32,9 @@ var InternalSecureAPI Middleware = Middleware{
 func internalSecureAPIHandler(next http.Handler) http.Handler {
 	mux := http.NewServeMux()
 
-	e.AboutEndpoint.Use(mux)
-	e.SendEnpoint.Use(mux)
-	e.ScheduleEndpoint.Use(mux)
+	e.AboutEndpoint.Use(mux, next)
+	e.SendEnpoint.Use(mux, next)
+	e.ScheduleEndpoint.Use(mux, next)
 
 	mux.Handle("/", next)
 

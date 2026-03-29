@@ -3,7 +3,6 @@ package endpoints
 import (
 	"errors"
 	"net/http"
-	"strconv"
 	"time"
 
 	request "github.com/codeshelldev/gotl/pkg/request"
@@ -21,14 +20,14 @@ var SendEnpoint = Endpoint{
 const messageField = "message"
 const sendAtField = "send_at"
 
-func sendHandler(mux *http.ServeMux) *http.ServeMux {
+func sendHandler(mux *http.ServeMux, next http.Handler) *http.ServeMux {
 	mux.HandleFunc("POST /v2/send", func(w http.ResponseWriter, req *http.Request) {
 		logger := GetLogger(req)
 
 		conf := GetConfigByReq(req)
 
 		variables := conf.SETTINGS.MESSAGE.VARIABLES.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.VARIABLES)
-		messageTemplate := conf.SETTINGS.MESSAGE.TEMPLATE.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.TEMPLATE)
+		templating := conf.SETTINGS.MESSAGE.TEMPLATING.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.TEMPLATING)
 
 		scheduling := conf.SETTINGS.MESSAGE.SCHEDULING.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.SCHEDULING)
 
@@ -40,32 +39,31 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 			return
 		}
 
-		bodyData := map[string]any{}
+		body.EnsureNotNil()
 
 		var modifiedBody bool
 
 		if !body.Empty {
-			bodyData = body.Data
+			if templating.MessageTemplate != "" {
+				headers := request.GetReqHeaders(req)
 
-			if messageTemplate != "" {
-				headerData := request.GetReqHeaders(req)
-
-				newData, err := TemplateMessage(messageTemplate, bodyData, headerData, variables)
+				templatedMessage, err := GetTemplatedMessage(templating.MessageTemplate, body.Data, headers, variables)
 
 				if err != nil {
 					logger.Error("Error Templating Message: ", err.Error())
 				}
 
-				if newData[messageField] != bodyData[messageField] && newData[messageField] != "" && newData[messageField] != nil {
-					bodyData = newData
+				if templatedMessage != body.Data[messageField] && templatedMessage != "" {
+					body.Data[messageField] = templatedMessage
+
+					logger.Debug("Applied Message Templating: \n", templatedMessage)
+
 					modifiedBody = true
 				}
 			}
 		}
 
 		if modifiedBody {
-			body.Data = bodyData
-
 			err := body.UpdateReq(req)
 
 			if err != nil {
@@ -73,16 +71,12 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-
-			logger.Debug("Applied Message Templating: ", body.Data)
 		}
 
-			sendAtStr, ok := bodyData[sendAtField].(string)
+		sendAt, ok := body.Data[sendAtField].(float64)
 
-		if ok && bodyData[messageField] != "" && bodyData[messageField] != nil {
-			delete(bodyData, sendAtField)
-
-			body.Data = bodyData
+		if ok && body.Data[messageField] != "" && body.Data[messageField] != nil {
+			delete(body.Data, sendAtField)
 
 			body.UpdateReq(req)
 
@@ -92,7 +86,7 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 				return
 			}
 
-			tm, err := parseTimestamp(sendAtStr)
+			tm, err := parseTimestamp(int(sendAt))
 
 			if err != nil {
 				logger.Warn("Could not parse timestamp: ", err.Error())
@@ -101,7 +95,7 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 			}
 
 			if scheduling.MaxHorizon.Set {
-				if tm.After(time.Now().Add(scheduling.MaxHorizon.Value.Duration)) {
+				if tm.After(time.Now().Add(time.Duration(*scheduling.MaxHorizon.Value))) {
 					logger.Warn("Request scheduled too far in the future: ", time.Until(tm).String())
 					WriteError(w, http.StatusBadRequest, "invalid timestamp: " + "timestamp to far in the future")
 					return
@@ -119,6 +113,8 @@ func sendHandler(mux *http.ServeMux) *http.ServeMux {
 
 			return
 		}
+
+		next.ServeHTTP(w, req)
 	})
 
 	return mux
@@ -136,13 +132,7 @@ func getSendCapabilities(conf *structure.CONFIG) []string {
 	return out
 }
 
-func parseTimestamp(str string) (time.Time, error) {
-	sendAt, err := strconv.Atoi(str)
-
-	if err != nil {
-		return time.Time{}, errors.New("invalid number string")
-	}
-
+func parseTimestamp(sendAt int) (time.Time, error) {
 	tm := time.Unix(int64(sendAt), 0)
 
 	if tm.Before(time.Now()) {
@@ -175,18 +165,20 @@ func handleScheduledMessage(tm time.Time, w http.ResponseWriter, req *http.Reque
 	return nil
 }
 
-func TemplateMessage(template string, bodyData map[string]any, headerData map[string][]string, variables map[string]any) (map[string]any, error) {
-	bodyData["message_template"] = template
+func GetTemplatedMessage(template string, body map[string]any, headers map[string][]string, VARIABLES map[string]any) (string, error) {
+	const templatedSuffix = "_template"
 
-	data, _, err := TemplateBody(bodyData, headerData, variables)
-
-	if err != nil || data == nil {
-		return bodyData, err
+	bodyCopy := map[string]any{
+		messageField + templatedSuffix: template,
 	}
 
-	data[messageField] = data["message_template"]
+	request.CopyMap(bodyCopy, body)
 
-	delete(data, "message_template")
+	data, _, err := GetTemplatedBody(bodyCopy, headers, VARIABLES)
 
-	return data, nil
+	if err != nil || data == nil {
+		return "", err
+	}
+
+	return data[messageField + templatedSuffix].(string), nil
 }

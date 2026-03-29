@@ -18,5 +18,6 @@ jobs:
     name: Untagged Images
     with:
       registry: ghcr.io
+      cleanup-stales: pr-*,ci-*,*-dev
     secrets:
       GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}

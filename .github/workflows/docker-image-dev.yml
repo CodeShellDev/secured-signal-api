@@ -114,7 +114,7 @@ jobs:
           echo "COUNT=$COUNT" >> "$GITHUB_ENV"
 
       - name: Login to Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}

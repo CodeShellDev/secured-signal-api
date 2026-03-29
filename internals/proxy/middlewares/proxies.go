@@ -11,9 +11,9 @@ import (
 	"github.com/codeshelldev/secured-signal-api/utils/netutils"
 )
 
-var InternalProxy Middleware = Middleware{
-	Name: "_Proxy",
-	Use: proxyHandler,
+var InternalProxiesHandler Middleware = Middleware{
+	Name: "_Proxies_Handler",
+	Use: proxiesHandler,
 }
 
 type ForwardedEntry struct {
@@ -28,7 +28,7 @@ type OriginInfo	struct {
 	Proto	string
 }
 
-func proxyHandler(next http.Handler) http.Handler {
+func proxiesHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		logger := GetLogger(req)
 		
