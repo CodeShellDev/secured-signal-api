@@ -2,7 +2,7 @@ commands:
   help:
     messages:
       cmd_started: |
-        Hello @{username}, I am **comitee**, a command bot!
+        Hello @{username}, I am **comitee**, a command bot 🤖
 
         <details>
           <summary><strong>Available Commands</strong></summary>
