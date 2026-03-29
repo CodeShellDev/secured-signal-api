@@ -19,5 +19,6 @@ jobs:
     with:
       registry: ghcr.io
       cleanup-stales: pr-*,ci-*,*-dev
+      stale-threshold: 15 days
     secrets:
       GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
