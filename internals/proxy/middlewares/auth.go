@@ -21,6 +21,11 @@ var Auth Middleware = Middleware{
 	Use: authHandler,
 }
 
+type AuthAttempt struct {
+	Error error
+	Method *AuthMethod
+}
+
 type AuthMethod struct {
 	Name string
 	Authenticate func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error)
@@ -72,14 +77,14 @@ var BasicAuth = AuthMethod{
 			base64Bytes, err := base64.StdEncoding.DecodeString(headerParts[1])
 
 			if err != nil {
-				logger.Error("Could not decode Basic auth payload: ", err.Error())
-				return "", errors.New("invalid base64 in Basic auth")
+				logger.Error("Could not decode basic auth payload: ", err.Error())
+				return "", errors.New("invalid base64 in basic auth")
 			}
 
 			parts := strings.SplitN(string(base64Bytes), ":", 2)
 
 			if len(parts) != 2 {
-				return "", errors.New("Basic auth must be user:password")
+				return "", errors.New("basic auth must be user:password")
 			}
 
 			user, password := parts[0], parts[1]
@@ -130,7 +135,7 @@ var BodyAuth = AuthMethod{
 			return auth, nil
 		}
 
-		return "", errors.New("invalid Body token")
+		return "", errors.New("invalid body token")
 	},
 }
 
@@ -155,7 +160,7 @@ var QueryAuth = AuthMethod{
 			return auth, nil
 		}
 
-		return "", errors.New("invalid Query token")
+		return "", errors.New("invalid query token")
 	},
 }
 
@@ -190,7 +195,7 @@ var PathAuth = AuthMethod{
 			return auth, nil
 		}
 
-		return "", errors.New("invalid Path token")
+		return "", errors.New("invalid path token")
 	},
 }
 
@@ -218,8 +223,7 @@ func (chain *AuthChain) Eval(w http.ResponseWriter, req *http.Request, tokens []
 		token, err = method.Authenticate(w, req, tokens)
 
 		if err != nil {
-			logger.Warn("Client failed ", method.Name, " auth: ", err.Error())
-			return AuthMethod{}, "", err
+			return method, "", err
 		}
 
 		if token != "" {
@@ -227,9 +231,7 @@ func (chain *AuthChain) Eval(w http.ResponseWriter, req *http.Request, tokens []
 		}
 	}
 
-	logger.Warn("Client failed to provide any auth")
-
-	return AuthMethod{}, "", err
+	return AuthMethod{}, "", errors.New("no auth provided")
 }
 
 func authHandler(next http.Handler) http.Handler {
@@ -252,9 +254,20 @@ func authHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		method, token, _ := authChain.Eval(w, req, tokens)
+		method, token, err := authChain.Eval(w, req, tokens)
 
 		if token == "" {
+			if method.Name != "" {
+				req = SetContext(req, AuthAttemptKey, AuthAttempt{
+					Error: err,
+					Method: &method,
+				})
+			} else {
+				req = SetContext(req, AuthAttemptKey, AuthAttempt{
+					Error: err,
+				})
+			}
+
 			req = SetContext(req, IsAuthKey, false)
 		} else {
 			conf := GetConfigWithoutDefault(token)
@@ -285,6 +298,14 @@ func authRequirementHandler(next http.Handler) http.Handler {
 		isAuthenticated := GetContext[bool](req, IsAuthKey)
 
 		if !isAuthenticated {
+			attempt := GetContext[AuthAttempt](req, AuthAttemptKey)
+
+			if attempt.Method != nil {
+				logger.Warn("Client failed ", attempt.Method.Name, " auth: ", attempt.Error.Error())
+			} else {
+				logger.Warn("Client failed to authenticate: ", attempt.Error.Error())
+			}
+
 			onUnauthorized(w)
 			return
 		}

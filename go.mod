@@ -3,7 +3,7 @@ module github.com/codeshelldev/secured-signal-api
 go 1.26.1
 
 require (
-	github.com/codeshelldev/gotl/pkg/configutils v0.0.22
+	github.com/codeshelldev/gotl/pkg/configutils v0.0.23
 	github.com/codeshelldev/gotl/pkg/docker v0.0.2
 	github.com/codeshelldev/gotl/pkg/jsonutils v0.0.2
 	github.com/codeshelldev/gotl/pkg/logger v0.0.18
@@ -20,7 +20,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	golang.org/x/time v0.15.0
-	modernc.org/sqlite v1.47.0
+	modernc.org/sqlite v1.48.0
 )
 
 require (

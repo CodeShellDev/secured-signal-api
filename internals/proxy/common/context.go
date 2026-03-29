@@ -4,6 +4,7 @@ type contextKey string
 
 const TokenKey contextKey = "token"
 const IsAuthKey contextKey = "isAuthenticated"
+const AuthAttemptKey contextKey = "authenticationAttempt"
 
 const LoggerKey contextKey = "logger"
 
