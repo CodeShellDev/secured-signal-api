@@ -1,18 +1,27 @@
 #!/usr/bin/env bash
 
-###############################################################################
-# This file is version-controlled and shared across developers.
+#═══════════════════════════════════════════════════════════════════════════════#
+#                           DEVELOPMENT ENVIRONMENT                             #
+#═══════════════════════════════════════════════════════════════════════════════#
 #
-# It is used for setting up a developer environment for local testing.
+# Purpose:
+#   Base environment configuration for local development and testing.
+#   This file is shared and version-controlled across all developers.
 #
-# Additionally overrides can be specified in dev-env.local.sh or dev.local.env.
-# Local environment variables may be added in dev.local.env.
+# Overrides (not committed):
+#   - dev-env.local.sh   → shell overrides / custom logic
+#   - dev.local.env      → machine-specific environment variables
 #
-# To successfully load the environment variables this file needs to be sourced.
+# Usage:
+#   This file must be sourced to take effect:
+#     source dev-env.sh
 #
-# Do not commit secrets or machine-specific values.
-###############################################################################
-
+# Guidelines:
+#   - DO NOT add secrets or sensitive data here
+#   - DO NOT add machine-specific values
+#   - Use the override files for local customization
+#
+#═══════════════════════════════════════════════════════════════════════════════#
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
