@@ -27,7 +27,7 @@ settings:
   access:
     endpoints:
       allowed:
-        - /v2/send
+        - pattern: /v2/send
       blocked:
         - pattern: /v1/register
           matchType: prefix
