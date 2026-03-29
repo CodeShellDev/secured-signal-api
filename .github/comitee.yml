@@ -5,9 +5,9 @@ commands:
         Hello @{username}, I am **comitee**, a command bot!
 
         <details>
-          <summary>available commands</summary>
+          <summary>**Available Commands**</summary>
           <br/>
-          
+
           All commands start with `!` and may be restricted by user permissions.
 
           #### `pr build`
