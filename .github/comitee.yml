@@ -9,13 +9,13 @@ commands:
 
           All commands start with `!` and may be restricted by user permissions.
 
-          ### `pr build`
+          #### `pr build`
           
-          Builds the current PR as `pr-<pr_number>-<count>`.
+          Builds the current PR as `pr-pr_number-n`.
 
-          ### `build <branch> (<custom_name>)`
+          #### `build branch [custom_name])`
 
-          Builds branch as `ci-<branch>-<count>` (`ci-<branch>-<custom_name>-<count>`)
+          Builds branch as `ci-branch-n` (`ci-branch-custom_name-n`)
         </details>
 
   pr:
