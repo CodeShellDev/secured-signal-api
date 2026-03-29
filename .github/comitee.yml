@@ -1,22 +1,22 @@
 commands:
   help:
-    cmd_started: |
-      Hello @{username}, I am **comitee**, a command bot!
+    messages:
+      cmd_started: |
+        Hello @{username}, I am **comitee**, a command bot!
 
-      <details>
-        <summary>available commands</summary>
+        <details>
+          <summary>available commands</summary>
 
-        All commands start with `!` and may be restricted by user permissions.
+          All commands start with `!` and may be restricted by user permissions.
 
-        ### `pr build`
-        
-        Builds the current PR as `pr-<pr_number>-<count>`.
+          ### `pr build`
+          
+          Builds the current PR as `pr-<pr_number>-<count>`.
 
-        ### `build <branch> (<custom_name>)`
+          ### `build <branch> (<custom_name>)`
 
-        Builds branch as `ci-<branch>-<count>` (`ci-<branch>-<custom_name>-<count>`)
-
-      </details>
+          Builds branch as `ci-<branch>-<count>` (`ci-<branch>-<custom_name>-<count>`)
+        </details>
 
   pr:
     ignore: true
