@@ -2,9 +2,12 @@ name: Cleanup Untagged Images
 
 on:
   workflow_run:
-    workflows: ["Build & Push Image"]
-    branches:
-      - main
+    workflows:
+      [
+        "Build & Push Image",
+        "Build & Push Dev Image",
+        "Build Image via Command",
+      ]
     types:
       - completed
   workflow_dispatch:
@@ -15,5 +18,6 @@ jobs:
     name: Untagged Images
     with:
       registry: ghcr.io
+      cleanup-stales: pr-*,ci-*,*-dev
     secrets:
       GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
