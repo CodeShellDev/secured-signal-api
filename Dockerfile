@@ -27,7 +27,7 @@ ENV FAVICON_PATH=/app/data/favicon.ico
 ENV CONFIG_PATH=/config/config.yml
 ENV TOKENS_DIR=/config/tokens
 
-ENV DB_PATH=/db/db.sqlite3
+ENV DB_PATH=/db/db.sqlite
 
 ENV REDACT_TOKENS=true
 
