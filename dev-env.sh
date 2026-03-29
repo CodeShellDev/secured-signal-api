@@ -22,6 +22,8 @@
 #   - Use the override files for local customization
 #
 #═══════════════════════════════════════════════════════════════════════════════#
+
+# ANSI codes
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
