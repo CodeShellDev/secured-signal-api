@@ -1,4 +1,4 @@
-name: Cleanup Untagged Images
+name: Cleanup Images
 
 on:
   workflow_run:
@@ -15,7 +15,7 @@ on:
 jobs:
   update:
     uses: codeshelldev/gh-actions/.github/workflows/image-cleanup.yml@main
-    name: Untagged Images
+    name: Images
     with:
       registry: ghcr.io
       cleanup-stales: pr-*,ci-*,*-dev
