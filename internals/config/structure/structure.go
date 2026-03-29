@@ -108,10 +108,10 @@ type FMapping struct {
 }
 
 type ACCESS struct {
-	ENDPOINTS			t.Opt[Endpoints] 			`koanf:"endpoints"`
+	ENDPOINTS			t.Opt[Endpoints] 			`koanf:"endpoints"          onuse:"changed"             changing:"{b,fg=bright_blue}\x60settings.access.endpoints\x60{/} has been split into {b,fg=green}\x60allowed\x60{/} and {b,fg=green}\x60blocked\x60{/}\n\nEndpoints are now subject to the new matching system:\n- {b,fg=green}pattern{/}: {i}/v1/about{/}\n {b,fg=green}matchType: exact{/}"`        
 	FIELD_POLICIES		t.Opt[FieldPolicies] 		`koanf:"fieldpolicies"      childtransform:"default"`
 	RATE_LIMITING		t.Opt[RateLimiting]			`koanf:"ratelimiting"`
-	IP_FILTER			t.Opt[IPFilter]				`koanf:"ipfilter"`
+	IP_FILTER			t.Opt[IPFilter]				`koanf:"ipfilter"           onuse:"changed"             changing:"{b,fg=bright_blue}\x60settings.access.ipFilter\x60{/} has been split into {b,fg=green}\x60allowed\x60{/} and {b,fg=green}\x60blocked\x60{/}"`
 	TRUSTED_IPS			t.Opt[[]g.IPOrNet]			`koanf:"trustedips"`
 	TRUSTED_PROXIES		t.Opt[[]g.IPOrNet]			`koanf:"trustedproxies"`
 	CORS				t.Opt[Cors]					`koanf:"cors"`

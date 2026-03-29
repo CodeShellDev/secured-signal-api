@@ -140,7 +140,7 @@ func Error(id string, msg DeprecationMessage) {
 		pretty.InlineSegment{
 			Items: []pretty.Inline{
 				pretty.Span{
-					Text: "as it has been affected in a ",
+					Text: "as it has been affected by a ",
 				},
 				pretty.Span{
 					Text: "breaking change",
@@ -160,4 +160,39 @@ func Error(id string, msg DeprecationMessage) {
 	)
 
 	os.Exit(1)
+}
+
+func Info(id string, msg DeprecationMessage) {
+	base(id,
+		pretty.TextBlockSegment{
+			Text: "⚠️  Change ⚠️",
+			Style: pretty.Style{
+				Bold: true,
+				Foreground: pretty.Basic(pretty.BrightYellow),
+			},
+		},
+		pretty.TextBlockSegment{
+			Text: "Please check your usage of",
+		},
+		pretty.InlineSegment{
+			Items: []pretty.Inline{
+				pretty.Span{
+					Text: "as it may be impacted by a ",
+				},
+				pretty.Span{
+					Text: "breaking change",
+					Style: pretty.Style{
+						Bold: true,
+					},
+				},
+				pretty.Span{
+					Text: ":",
+				},
+			},
+		},
+		pretty.BorderStyle{
+			Color: pretty.Basic(pretty.Blue),
+		},
+		msg,
+	)
 }
