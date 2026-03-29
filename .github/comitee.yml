@@ -6,7 +6,7 @@ commands:
 
         <details>
           <summary>available commands</summary>
-
+          <br/>
           All commands start with `!` and may be restricted by user permissions.
 
           #### `pr build`
