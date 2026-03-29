@@ -12,6 +12,8 @@
 # Docusaurus
 .docusaurus
 node_modules
+api
+api_versioned_*
 
 # Dev folders
 .dev

@@ -1,0 +1,170 @@
+name: Build Image via Command
+
+on:
+  workflow_dispatch:
+    inputs:
+      number:
+        required: true
+        type: string
+
+      author:
+        required: true
+        type: string
+
+      username:
+        required: true
+        type: string
+
+      args:
+        required: true
+        type: string
+
+      raw_args:
+        required: false
+        type: string
+        default: ""
+
+      origin:
+        required: true
+        type: string
+
+env:
+  BASE_TAG: ""
+  COUNT: -1
+
+jobs:
+  resolve-tag:
+    runs-on: ubuntu-latest
+    name: Image Tag
+    outputs:
+      image_tag: ${{ steps.resolve.outputs.image_tag }}
+      ref: ${{ steps.parse.outputs.ref }}
+
+    steps:
+      - name: Parse Arguments
+        id: parse
+        run: |
+          set -euo pipefail
+
+          ARGS='${{ inputs.args }}'
+          BRANCH=$(echo "$ARGS" | jq -r '.[0]')
+
+          normalize_branch() {
+            echo "$1" \
+              | tr '[:upper:]' '[:lower:]' \
+              | sed -E 's/[^a-z0-9_.-]+/-/g' \
+              | sed -E 's/-+/-/g' \
+              | sed -E 's/^-+|-+$//g'
+          }
+
+          if [[ -n "$BRANCH" && "$BRANCH" != "null" ]]; then
+            REF="refs/heads/$BRANCH"
+            CUSTOM_NAME=$(echo "$ARGS" | jq -r '.[1]')
+
+            if [[ -n "$CUSTOM_NAME" && "$CUSTOM_NAME" != "null" ]]; then
+              BRANCH="$CUSTOM_NAME"
+            fi
+
+            BRANCH="$(normalize_branch "$BRANCH")"
+
+            BASE_TAG="ci-${BRANCH}-"
+          elif [[ "${{ inputs.origin }}" == "pull_request" ]]; then
+            REF="refs/pull/${{ inputs.number }}/merge"
+            BASE_TAG="pr-${{ inputs.number }}-"
+          elif [[ "${{ inputs.origin }}" == "issue" ]]; then
+            echo "::error::Missing branch argument at index 0 in command." && exit 1
+          fi
+
+          echo "BASE_TAG=$BASE_TAG" >> $GITHUB_ENV
+
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+
+      - name: Login to Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_PCKG_TOKEN }}
+
+      - name: Resolve Image Tag
+        id: resolve
+        run: |
+          set -euo pipefail
+
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ] && [ "$COUNT" -ne -1 ]; then
+            echo "::error::Invalid count: $COUNT. May only be > 0." && exit 1
+          fi
+
+          PREFIX="${{ env.BASE_TAG }}"
+
+          IMAGE=${{ github.repository_owner }}/${{ github.event.repository.name }}
+
+          TOKEN="$(
+            curl "https://ghcr.io/token?scope=repository:${IMAGE}:pull" |
+            awk -F'"' '$0=$4'
+          )"
+
+          TAGS=$(curl -fsSL \
+            -H "Authorization: Bearer ${TOKEN}" \
+            "https://ghcr.io/v2/${IMAGE}/tags/list" \
+            | jq -r '.tags[]?')
+
+          if [ -z "$COUNT" ] || [ "$COUNT" -eq -1 ]; then
+            MAX=0
+            for tag in $TAGS; do
+              if [[ "$tag" == ${PREFIX}* ]]; then
+                NUM="${tag#$PREFIX}"
+                if [[ "$NUM" =~ ^[0-9]+$ ]]; then
+                  (( NUM > MAX )) && MAX=$NUM
+                fi
+              fi
+            done
+
+            COUNT=$((MAX + 1))
+          fi
+
+          FINAL_TAG=${PREFIX}${COUNT}
+
+          if echo "$TAGS" | grep -qx "$FINAL_TAG"; then
+            echo "::warn::Tag $FINAL_TAG already exists."
+
+            if [ "${GITHUB_ACTOR}" != "${{ github.repository_owner }}" ]; then
+              echo "::error::User $GITHUB_ACTOR is not allowed to overwrite existing image." && exit 1
+            else
+              echo "User $GITHUB_ACTOR is the owner – allowed to proceed."
+            fi
+          fi
+
+          echo "Resolved tag: $FINAL_TAG"
+          echo "image_tag=$FINAL_TAG" >> "$GITHUB_OUTPUT"
+
+  update:
+    needs: resolve-tag
+    uses: codeshelldev/gh-actions/.github/workflows/docker-image.yml@main
+    name: Development Image
+    with:
+      registry: ghcr.io
+      flavor: |
+        latest=false
+      tags: |
+        type=raw,value=${{ needs.resolve-tag.outputs.image_tag }}
+      ref: ${{ needs.resolve-tag.outputs.ref }}
+    secrets:
+      GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
+
+  output:
+    needs: [resolve-tag, update]
+    runs-on: ubuntu-latest
+    name: Output Image Tag
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Write outputs
+        run: |
+          echo "image_tag=${{ needs.resolve-tag.outputs.image_tag }}" > output.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: output
+          path: output.txt

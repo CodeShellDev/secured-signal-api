@@ -1,0 +1,59 @@
+commands:
+  help:
+    messages:
+      cmd_started: |
+        Hello @{username}, I am **comitee**, a command bot!
+
+        <details>
+          <summary><strong>Available Commands</strong></summary>
+          <br/>
+
+          All commands start with `!` and may be restricted by user permissions.
+
+          #### `pr build`
+          
+          Builds the current PR as `pr-pr_number-n`.
+
+          #### `build branch [custom_name])`
+
+          Builds branch as `ci-branch-n` (`ci-branch-custom_name-n`)
+        </details>
+
+  pr:
+    ignore: true
+    subcommands:
+      build:
+        messages:
+          cmd_started: |
+            🚀 Build for PR #{number} started.
+          cmd_completed: |
+            ✅ Build for PR #{number} completed.
+            @{username}, @{author} your image is ready at:
+
+            ```
+            ghcr.io/codeshelldev/secured-signal-api:{{image_tag}}
+            ```
+          cmd_failed: |
+            ❌ Build for PR #{number} failed, please verify this @{username}.
+            ```python
+            {errors}
+            ```
+
+        workflow_file: build-cmd.yml
+        access: admin, maintain
+
+  build:
+    messages:
+      cmd_started: |
+        🚀 Build for `{args[0]}` started.
+      cmd_completed: |
+        ✅ Build for `{args[0]}` completed.
+
+        @{username}, @{author} your image is ready at:
+        ```
+        ghcr.io/codeshelldev/secured-signal-api:{{image_tag}}
+        ```
+      cmd_failed: "❌ Build for `{args[0]}` failed, please verify this @{username}.\n```python\n{errors}\n```"
+
+    workflow_file: build-cmd.yml
+    access: admin, maintain
