@@ -5,7 +5,7 @@ commands:
         Hello @{username}, I am **comitee**, a command bot!
 
         <details>
-          <summary>**Available Commands**</summary>
+          <summary><strong>Available Commands</strong></summary>
           <br/>
 
           All commands start with `!` and may be restricted by user permissions.
