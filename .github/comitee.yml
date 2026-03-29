@@ -14,7 +14,7 @@ commands:
           
           Builds the current PR as `pr-pr_number-n`.
 
-          #### `build branch [custom_name])`
+          #### `build branch [custom_name]`
 
           Builds branch as `ci-branch-n` (`ci-branch-custom_name-n`)
         </details>
