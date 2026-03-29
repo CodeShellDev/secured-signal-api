@@ -6,32 +6,44 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/jsonutils"
-	"github.com/codeshelldev/gotl/pkg/query"
+	queryutils "github.com/codeshelldev/gotl/pkg/query"
 	"github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/gotl/pkg/stringutils"
 	"github.com/codeshelldev/gotl/pkg/templating"
 	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
 
+func transformPrefixInto(tmplStr string, prefix string, to string) string {	
+	re, err := regexp.Compile(`{{([^{}]+)}}`)
+
+	if err != nil {
+		return tmplStr
+	}
+
+	varRe, err := regexp.Compile(string(prefix) + `("?[a-zA-Z0-9_.]+"?)`)
+
+	if err != nil {
+		return tmplStr
+	}
+
+	transformed := re.ReplaceAllStringFunc(tmplStr, func(match string) string {
+		return varRe.ReplaceAllStringFunc(match, func(varMatch string) string {
+			varName := varRe.ReplaceAllString(varMatch, "$1")
+
+			return "." + to + "." + varName
+		})
+	})
+
+	return transformed
+}
+
 func normalizeData(fromPrefix, toPrefix string, data map[string]any) (map[string]any, error) {
 	jsonStr := jsonutils.ToJson(data)
 
 	if jsonStr != "" {
-		toVar, err := templating.TransformTemplateKeys(jsonStr, fromPrefix, func(re *regexp.Regexp, match string) string {
-			return re.ReplaceAllStringFunc(match, func(varMatch string) string {
-				varName := re.ReplaceAllString(varMatch, "$1")
+		normalizedTemplate := transformPrefixInto(jsonStr, fromPrefix, toPrefix)
 
-				return "." + toPrefix + varName
-			})
-		})
-
-		if err != nil {
-			return data, err
-		}
-
-		jsonStr = toVar
-
-		normalizedData, err := jsonutils.GetJsonSafe[map[string]any](jsonStr)
+		normalizedData, err := jsonutils.GetJsonSafe[map[string]any](normalizedTemplate)
 
 		if err == nil {
 			data = normalizedData
@@ -41,17 +53,7 @@ func normalizeData(fromPrefix, toPrefix string, data map[string]any) (map[string
 	return data, nil
 }
 
-func prefixData(prefix string, data map[string]any) map[string]any {
-	res := map[string]any{}
-
-	for key, value := range data {
-		res[prefix+key] = value
-	}
-
-	return res
-}
-
-func cleanHeaders(headers map[string][]string) map[string][]string {
+func normalizeHeaders(headers map[string][]string) map[string][]string {
 	cleanedHeaders := map[string][]string{}
 
 	for key, value := range headers {
@@ -63,67 +65,86 @@ func cleanHeaders(headers map[string][]string) map[string][]string {
 	return cleanedHeaders
 }
 
-func TemplateBody(body map[string]any, headers map[string][]string, VARIABLES map[string]any) (map[string]any, bool, error) {
+func GetTemplatedBody(body map[string]any, headers map[string][]string, VARIABLES map[string]any) (map[string]any, bool, error) {
 	var modified bool
 
-	headers = cleanHeaders(headers)
+	bodyCopy := map[string]any{}
+	headersCopy := map[string][]string{}
 
-	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to ".Header_Var" and ".Body_Var"
-	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "Body_", body)
+	request.CopyHeaders(headersCopy, headers)
+	request.CopyMap(bodyCopy, body)
+
+	headersCopy = normalizeHeaders(headersCopy)
+
+	// Normalize `keys.BodyPrefix` + "Var" and `keys.HeaderPrefix` + "Var" to ".headers.Var" and ".body.Var"
+	normalizedBody, err := normalizeData(requestkeys.BodyPrefix, "body", bodyCopy)
 
 	if err != nil {
-		return body, false, err
+		return bodyCopy, false, err
 	}
 
-	normalizedBody, err = normalizeData(requestkeys.HeaderPrefix, "Header_", normalizedBody)
+	normalizedBody, err = normalizeData(requestkeys.HeaderPrefix, "headers", normalizedBody)
 
 	if err != nil {
-		return body, false, err
+		return bodyCopy, false, err
 	}
 
 	// Prefix Body Data with Body_
-	prefixedBody := prefixData("Body_", normalizedBody)
+	nestedBody := map[string]any{
+		"body": normalizedBody,
+	}
 
 	// Prefix Header Data with Header_
-	prefixedHeaders := prefixData("Header_", request.ParseHeaders(headers))
+	nestedHeaders := map[string]any{
+		"headers": request.ParseHeaders(headersCopy),
+	}
 
 	variables := map[string]any{}
 
 	request.CopyMap(variables, VARIABLES)
-	request.CopyMap(variables, prefixedBody)
-	request.CopyMap(variables, prefixedHeaders)
+	request.CopyMap(variables, nestedBody)
+	request.CopyMap(variables, nestedHeaders)
 
-	templatedData, err := templating.RenderJSON(normalizedBody, variables)
+	templatedData, err := templating.TemplateData(normalizedBody, variables)
 
 	if err != nil {
-		return body, false, err
+		return bodyCopy, false, err
 	}
 
-	beforeStr := jsonutils.ToJson(body)
+	beforeStr := jsonutils.ToJson(bodyCopy)
 	afterStr := jsonutils.ToJson(templatedData)
 
 	modified = beforeStr != afterStr
 
-	return templatedData, modified, nil
+	return templatedData.(map[string]any), modified, nil
 }
 
-func TemplatePath(reqUrl *url.URL, data map[string]any, VARIABLES any) (string, map[string]any, bool, bool, error) {
+func TemplatePath(path string, VARIABLES any) (string, error) {
+	reqPath, err := url.PathUnescape(path)
+
+	if err != nil {
+		return path, err
+	}
+
+	templt, err := templating.CreateNormalizedTemplateFromString("path", reqPath)
+
+	if err != nil {
+		return path, err
+	}
+
+	templated, err := templating.ExecuteTemplate(templt, VARIABLES)
+
+	if err != nil {
+		return path, err
+	}
+
+	return templated, nil
+}
+
+func InjectPathIntoBody(path string, data map[string]any) (string, bool) {
 	var modified bool
-	var modifiedBody bool
 
-	reqPath, err := url.PathUnescape(reqUrl.Path)
-
-	if err != nil {
-		return reqUrl.Path, data, false, false, err
-	}
-
-	reqPath, err = templating.RenderNormalizedTemplate("path", reqPath, VARIABLES)
-
-	if err != nil {
-		return reqUrl.Path, data, false, false, err
-	}
-
-	parts := strings.Split(reqPath, "/")
+	parts := strings.Split(path, "/")
 	newParts := []string{}
 
 	for _, part := range parts {
@@ -135,7 +156,7 @@ func TemplatePath(reqUrl *url.URL, data map[string]any, VARIABLES any) (string, 
 			continue
 		}
 
-		keyWithoutPrefix, match := strings.CutPrefix(keyValuePair[0], "@")
+		keyWithoutPrefix, match := strings.CutPrefix(keyValuePair[0], requestkeys.BodyPrefix)
 		
 		if !match {
 			continue
@@ -144,33 +165,41 @@ func TemplatePath(reqUrl *url.URL, data map[string]any, VARIABLES any) (string, 
 		value := stringutils.ToType(keyValuePair[1])
 
 		data[keyWithoutPrefix] = value
-		modifiedBody = true
+		modified = true
 
 		newParts = newParts[:len(newParts) - 1]
 	}
 
-	reqPath = strings.Join(newParts, "/")
-
-	if reqUrl.Path != reqPath {
-		modified = true
-	}
-
-	return reqPath, data, modified, modifiedBody, nil
+	return strings.Join(newParts, "/"), modified
 }
 
-func TemplateQuery(reqUrl *url.URL, data map[string]any, VARIABLES any) (string, map[string]any, bool, error) {
+func TemplateQuery(rawQuery string, VARIABLES any) (string, error) {
+	decodedQuery, _ := url.QueryUnescape(rawQuery)
+
+	templt, err := templating.CreateNormalizedTemplateFromString("query", decodedQuery)
+
+	if err != nil {
+		return rawQuery, err
+	}
+
+	templated, err := templating.ExecuteTemplate(templt, VARIABLES)
+
+	if err != nil {
+		return rawQuery, err
+	}
+
+	return templated, err
+}
+
+func InjectQueryIntoBody(query url.Values, data map[string]any) bool {
 	var modified bool
 
-	decodedQuery, _ := url.QueryUnescape(reqUrl.RawQuery)
+	decodedQuery, _ := url.QueryUnescape(query.Encode())
 
-	templatedQuery, _ := templating.RenderNormalizedTemplate("query", decodedQuery, VARIABLES)
+	parsedQuery, _ := queryutils.ParseTypedQuery(decodedQuery)
 
-	originalQueryData := reqUrl.Query()
-
-	addedData, _ := query.ParseTypedQuery(templatedQuery)
-
-	for key, val := range addedData {
-		keyWithoutPrefix, match := strings.CutPrefix(key, "@")
+	for key, val := range parsedQuery {
+		keyWithoutPrefix, match := strings.CutPrefix(key, requestkeys.BodyPrefix)
 
 		if !match {
 			continue
@@ -178,12 +207,10 @@ func TemplateQuery(reqUrl *url.URL, data map[string]any, VARIABLES any) (string,
 
 		data[keyWithoutPrefix] = val
 
-		originalQueryData.Del(key)
+		query.Del(key)
 
 		modified = true
 	}
 
-	reqRawQuery := originalQueryData.Encode()
-
-	return reqRawQuery, data, modified, nil
+	return modified
 }

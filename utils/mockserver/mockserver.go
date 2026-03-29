@@ -48,6 +48,12 @@ func main() {
         fmt.Fprint(w, `{"message":"Hello from mock endpoint"}`)
     })
 
+    http.HandleFunc("/not-found", func(w http.ResponseWriter, req *http.Request) {
+        w.WriteHeader(http.StatusNotFound)
+
+        fmt.Fprint(w, "Not Found")
+    })
+
     logger.Info("Mock server running at http://127.0.0.1:", port)
 
     err = http.ListenAndServe("127.0.0.1:" + port, nil)

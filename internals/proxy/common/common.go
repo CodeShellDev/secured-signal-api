@@ -86,3 +86,15 @@ func WriteError(w http.ResponseWriter, status int, msg string) {
 	w.WriteHeader(status)
 	res.Write(w)
 }
+
+func AddResponseHook(req *http.Request, hook func(res *http.Response) error) *http.Request {
+	hooks := GetResponseHooks(req)
+
+	hooks = append(hooks, hook)
+
+	return SetContext(req, ResponseHooksKey, hooks)
+}
+
+func GetResponseHooks(req *http.Request) []func(*http.Response) error {
+	return GetContext[[]func(*http.Response) error](req, ResponseHooksKey)
+}

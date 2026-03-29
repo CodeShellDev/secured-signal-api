@@ -13,12 +13,17 @@ import (
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
-	"github.com/codeshelldev/secured-signal-api/utils/deprecation"
+	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
 
 var Auth Middleware = Middleware{
 	Name: "Auth",
 	Use: authHandler,
+}
+
+type AuthAttempt struct {
+	Error error
+	Method *AuthMethod
 }
 
 type AuthMethod struct {
@@ -37,7 +42,7 @@ var BearerAuth = AuthMethod{
 			return "", nil
 		}
 
-		if strings.ToLower(headerParts[0]) == "bearer" {
+		if strings.EqualFold(headerParts[0], "bearer") {
 			req.Header.Del("Authorization")
 
 			if isValidToken(tokens, headerParts[1]) {
@@ -66,25 +71,25 @@ var BasicAuth = AuthMethod{
 			return "", nil
 		}
 
-		if strings.ToLower(headerParts[0]) == "basic" {
+		if strings.EqualFold(headerParts[0], "basic") {
 			req.Header.Del("Authorization")
 
 			base64Bytes, err := base64.StdEncoding.DecodeString(headerParts[1])
 
 			if err != nil {
-				logger.Error("Could not decode Basic auth payload: ", err.Error())
-				return "", errors.New("invalid base64 in Basic auth")
+				logger.Error("Could not decode basic auth payload: ", err.Error())
+				return "", errors.New("invalid base64 in basic auth")
 			}
 
 			parts := strings.SplitN(string(base64Bytes), ":", 2)
 
 			if len(parts) != 2 {
-				return "", errors.New("Basic auth must be user:password")
+				return "", errors.New("basic auth must be user:password")
 			}
 
 			user, password := parts[0], parts[1]
 
-			if strings.ToLower(user) == "api" && isValidToken(tokens, password) {
+			if strings.EqualFold(user, "api") && isValidToken(tokens, password) {
 				return password, nil
 			}
 
@@ -130,7 +135,7 @@ var BodyAuth = AuthMethod{
 			return auth, nil
 		}
 
-		return "", errors.New("invalid Body token")
+		return "", errors.New("invalid body token")
 	},
 }
 
@@ -139,21 +144,7 @@ var QueryAuth = AuthMethod{
 	Authenticate: func(w http.ResponseWriter, req *http.Request, tokens []string) (string, error) {
 		const authQuery = "auth"
 
-		auth := req.URL.Query().Get("@" + authQuery)
-
-		// BREAKING @authorization Query
-		const oldAuthQuery = "authorization"
-
-		if req.URL.Query().Has("@" + oldAuthQuery) {
-			fullURL, _ := request.ParseReqURL(req)
-			urlWithNewAuthQuery := strings.Replace(fullURL.String(), "@" + oldAuthQuery, "@{s,fg=bright_red}" + oldAuthQuery + "{/}{b,fg=green}" + authQuery + "{/}", 1)
-
-			deprecation.Error(req.URL.String(), deprecation.DeprecationMessage{
-				Using: "{b,i,bg=red}`@authorization`{/} in the query",
-				Message: "{b,fg=red}`/?@{s}authorization{/}`{/} has been renamed to {b,fg=green}`/?@auth`{}",
-				Fix: "\nChange the {b}url{/} to:\n`" + urlWithNewAuthQuery + "`",
-			})
-		}
+		auth := req.URL.Query().Get(requestkeys.BodyPrefix + authQuery)
 
 		if strings.TrimSpace(auth) == "" {
 			return "", nil
@@ -162,14 +153,14 @@ var QueryAuth = AuthMethod{
 		if isValidToken(tokens, auth) {
 			query := req.URL.Query()
 
-			query.Del("@" + authQuery)
+			query.Del(requestkeys.BodyPrefix + authQuery)
 
 			req.URL.RawQuery = query.Encode()
 
 			return auth, nil
 		}
 
-		return "", errors.New("invalid Query token")
+		return "", errors.New("invalid query token")
 	},
 }
 
@@ -204,7 +195,7 @@ var PathAuth = AuthMethod{
 			return auth, nil
 		}
 
-		return "", errors.New("invalid Path token")
+		return "", errors.New("invalid path token")
 	},
 }
 
@@ -232,8 +223,7 @@ func (chain *AuthChain) Eval(w http.ResponseWriter, req *http.Request, tokens []
 		token, err = method.Authenticate(w, req, tokens)
 
 		if err != nil {
-			logger.Warn("Client failed ", method.Name, " auth: ", err.Error())
-			return AuthMethod{}, "", err
+			return method, "", err
 		}
 
 		if token != "" {
@@ -241,9 +231,7 @@ func (chain *AuthChain) Eval(w http.ResponseWriter, req *http.Request, tokens []
 		}
 	}
 
-	logger.Warn("Client failed to provide any auth")
-
-	return AuthMethod{}, "", err
+	return AuthMethod{}, "", errors.New("no auth provided")
 }
 
 func authHandler(next http.Handler) http.Handler {
@@ -266,10 +254,19 @@ func authHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		method, token, _ := authChain.Eval(w, req, tokens)
+		method, token, err := authChain.Eval(w, req, tokens)
 
 		if token == "" {
-			onUnauthorized(w)
+			if method.Name != "" {
+				req = SetContext(req, AuthAttemptKey, AuthAttempt{
+					Error: err,
+					Method: &method,
+				})
+			} else {
+				req = SetContext(req, AuthAttemptKey, AuthAttempt{
+					Error: err,
+				})
+			}
 
 			req = SetContext(req, IsAuthKey, false)
 		} else {
@@ -277,23 +274,11 @@ func authHandler(next http.Handler) http.Handler {
 
 			allowedMethods := conf.API.AUTH.METHODS.OptOrEmpty(config.DEFAULT.API.AUTH.METHODS)
 
-			if isAuthMethodAllowed(method, token, conf.API.TOKENS, allowedMethods, conf.API.AUTH.TOKENS) {
+			if isAuthMethodAllowed(method, token, allowedMethods, conf.API.AUTH.TOKENS) {
 				req = SetContext(req, IsAuthKey, true)
 				req = SetContext(req, TokenKey, token)
 			} else {
-				// BREAKING Query & Path auth disabled (default)
-				if (method.Name == "Path" || method.Name == "Query") && conf.API.AUTH.METHODS.Value == nil {
-					deprecation.Error(method.Name, deprecation.DeprecationMessage{
-						Message: "{b}Query{/} and {b}Path{/} auth are {u}disabled{/} by default\nTo be able to use them they must first be enabled",
-						Fix: "\n{b}Add{/} {b,fg=green}`" + strings.ToLower(method.Name) + "`{/} to {i}`api.auth.methods`{/}:" + 
-							"\napi.auth.methods: [" + strings.Join(append(allowedMethods, "{b,fg=green}" + strings.ToLower(method.Name) + "{/}"), ", ") + "]",
-						Note: "\n{i}Let us know what you think about this change at\n{i}{u,fg=blue}https://github.com/CodeShellDev/secured-signal-api/discussions/221{/}{/}",
-					})
-				}
-
 				logger.Warn("Client tried using disabled auth method: ", method.Name)
-
-				onUnauthorized(w)
 
 				req = SetContext(req, IsAuthKey, false)
 			}
@@ -313,6 +298,15 @@ func authRequirementHandler(next http.Handler) http.Handler {
 		isAuthenticated := GetContext[bool](req, IsAuthKey)
 
 		if !isAuthenticated {
+			attempt := GetContext[AuthAttempt](req, AuthAttemptKey)
+
+			if attempt.Method != nil {
+				logger.Warn("Client failed ", attempt.Method.Name, " auth: ", attempt.Error.Error())
+			} else {
+				logger.Warn("Client failed to authenticate: ", attempt.Error.Error())
+			}
+
+			onUnauthorized(w)
 			return
 		}
 
@@ -335,31 +329,21 @@ type AuthToken struct {
 	Methods		[]string
 }
 
-func getTokenMethodMap(rawTokens []string, defaultMethods []string, tokenMethodSet []structure.Token) map[string][]string {
-	tokenMethodMap := map[string][]string{}
-
-	for _, token := range rawTokens {
-		tokenMethodMap[token] = defaultMethods
-	}
-
-	for _, set := range tokenMethodSet {
-		for _, token := range set.Set {
-			tokenMethodMap[token] = set.Methods
-		}
-	}
-
-	return tokenMethodMap
-}
-
-func isAuthMethodAllowed(method AuthMethod, token string, rawTokens []string, defaultMethods []string, tokenMethodSet []structure.Token) bool {
-	if (len(defaultMethods) == 0 || defaultMethods == nil) && (len(tokenMethodSet) == 0 || tokenMethodSet == nil) {
+func isAuthMethodAllowed(method AuthMethod, token string, defaultMethods []string, tokenOverwrites []structure.Token) bool {
+	if len(defaultMethods) == 0 && len(tokenOverwrites) == 0 {
 		// default: allow all
 		return true
 	}
 
-	tokenMethodMap := getTokenMethodMap(rawTokens, defaultMethods, tokenMethodSet)
+	for _, t := range tokenOverwrites {
+		if slices.Contains(t.Set, token) {
+			return slices.ContainsFunc(t.Methods, func(try string) bool {
+				return strings.EqualFold(try, method.Name)
+			})
+		}
+	}
 
-	return slices.ContainsFunc(tokenMethodMap[token], func(try string) bool {
+	return slices.ContainsFunc(defaultMethods, func(try string) bool {
 		return strings.EqualFold(try, method.Name)
 	})
 }

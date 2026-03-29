@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/gob"
+	"os"
+	"path/filepath"
 
 	_ "embed"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 var db *sql.DB
@@ -20,7 +22,9 @@ var schema string
 func Init() {
 	var err error
 
-	db, err = sql.Open("sqlite3", config.ENV.DB_PATH)
+	os.MkdirAll(filepath.Dir(config.ENV.DB_PATH), 0755)
+
+	db, err = sql.Open("sqlite", config.ENV.DB_PATH)
 
 	if err != nil {
 		logger.Fatal("Error opening database: ", err.Error())

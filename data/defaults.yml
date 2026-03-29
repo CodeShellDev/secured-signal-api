@@ -29,16 +29,44 @@ settings:
           { field: data, score: 1 },
         ]
 
-    variables:
-      recipients: ${RECIPIENTS}
-      number: ${NUMBER}
+    scheduling:
+      enabled: true
+
+    templating:
+      body: true
+      path: true
+      query: true
+
+    injecting:
+      urlToBody:
+        query: true
+        path: true
 
   access:
     endpoints:
-      - "!/v1/configuration"
-      - "!/v1/devices"
-      - "!/v1/register"
-      - "!/v1/unregister"
-      - "!/v1/qrcodelink"
-      - "!/v1/accounts"
-      - "!/v1/contacts"
+      blocked:
+        - pattern: /v1/configuration
+          matchType: prefix
+        - pattern: /v1/devices
+          matchType: prefix
+        - pattern: /v1/register
+          matchType: prefix
+        - pattern: /v1/unregister
+          matchType: prefix
+        - pattern: /v1/qrcodelink
+          matchType: prefix
+        - pattern: /v1/accounts
+          matchType: prefix
+        - pattern: /v1/contacts
+          matchType: prefix
+
+    cors:
+      methods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+      headers:
+        [
+          "Content-Type",
+          "Content-Language",
+          "Authorization",
+          "Accept",
+          "Accept-Language",
+        ]

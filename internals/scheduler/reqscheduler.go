@@ -161,10 +161,10 @@ func HandleScheduledRequest(req *db.ScheduledRequest) {
 
 	result.Status = &res.StatusCode
 
-	headers := map[string][]string{}
-	request.CopyHeaders(headers, res.Header)
+	headersCopy := map[string][]string{}
+	request.CopyHeaders(headersCopy, res.Header)
 
-	result.Headers = &headers
+	result.Headers = &headersCopy
 
 	bodyCopy := append([]byte(nil), body.Raw...)
 	result.Body = &bodyCopy

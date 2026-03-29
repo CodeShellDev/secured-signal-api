@@ -8,6 +8,7 @@ import (
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
+	"github.com/codeshelldev/secured-signal-api/utils/requestkeys"
 )
 
 var Mapping Middleware = Middleware{
@@ -24,6 +25,11 @@ func mappingHandler(next http.Handler) http.Handler {
 		variables := conf.SETTINGS.MESSAGE.VARIABLES.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.VARIABLES)
 		fieldMappings := conf.SETTINGS.MESSAGE.FIELD_MAPPINGS.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.FIELD_MAPPINGS)
 
+		if len(fieldMappings) == 0 {
+			next.ServeHTTP(w, req)
+			return
+		}
+
 		body, err := request.GetReqBody(req)
 
 		if err != nil {
@@ -32,13 +38,12 @@ func mappingHandler(next http.Handler) http.Handler {
 			return
 		}
 
+		body.EnsureNotNil()
+
 		var modifiedBody bool
-		var bodyData map[string]any
 
 		if !body.Empty {
-			bodyData = body.Data
-
-			aliasData := processFieldMappings(fieldMappings, bodyData)
+			aliasData := processFieldMappings(fieldMappings, body.Data)
 
 			for key, value := range aliasData {
 				prefix := key[:1]
@@ -46,8 +51,8 @@ func mappingHandler(next http.Handler) http.Handler {
 				keyWithoutPrefix := key[1:]
 
 				switch prefix {
-				case "@":
-					bodyData[keyWithoutPrefix] = value
+				case requestkeys.BodyPrefix:
+					body.Data[keyWithoutPrefix] = value
 					modifiedBody = true
 				case ".":
 					variables[keyWithoutPrefix] = value
@@ -56,8 +61,6 @@ func mappingHandler(next http.Handler) http.Handler {
 		}
 
 		if modifiedBody {
-			body.Data = bodyData
-
 			err := body.UpdateReq(req)
 
 			if err != nil {
@@ -73,7 +76,7 @@ func mappingHandler(next http.Handler) http.Handler {
 	})
 }
 
-func processFieldMappings(aliases map[string][]structure.FieldMapping, data map[string]any) map[string]any {
+func processFieldMappings(aliases map[string][]structure.FMapping, data map[string]any) map[string]any {
 	aliasData := map[string]any{}
 
 	for key, alias := range aliases {
@@ -87,7 +90,7 @@ func processFieldMappings(aliases map[string][]structure.FieldMapping, data map[
 	return aliasData
 }
 
-func getData(key string, aliases []structure.FieldMapping, data map[string]any) (string, any) {
+func getData(key string, aliases []structure.FMapping, data map[string]any) (string, any) {
 	var best int
 	var value any
 
@@ -106,7 +109,7 @@ func getData(key string, aliases []structure.FieldMapping, data map[string]any) 
 	return key, value
 }
 
-func processFieldMapping(alias structure.FieldMapping, data map[string]any) (any, int, bool) {
+func processFieldMapping(alias structure.FMapping, data map[string]any) (any, int, bool) {
 	aliasKey := alias.Field
 
 	value, ok := jsonutils.GetByPath(aliasKey, data)
