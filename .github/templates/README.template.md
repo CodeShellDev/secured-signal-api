@@ -1,5 +1,5 @@
 +{{{ import "~/docs/templates/functions.inc.gtmpl" }}}
-<img align="center" width="1048" height="512" alt="Secure API Gateway Proxy for Signal CLI REST API" src="https://github.com/codeshelldev/secured-signal-api/raw/refs/heads/docs/static/img/banner.png" />
+<img align="center" width="1048" height="512" alt="Secure API Gateway Proxy for Signal CLI REST API" src="https://github.com/codeshelldev/secured-signal-api/raw/refs/heads/docs/static/img/brand/banner.png" />
 
 <h3 align="center">Secure API Gateway Proxy for <a href="https://github.com/bbernhard/signal-cli-rest-api">Signal CLI REST API</a></h3>
 
