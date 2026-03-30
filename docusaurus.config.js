@@ -150,7 +150,7 @@ const config = {
 				title: "Secured Signal",
 				logo: {
 					alt: "Logo",
-					src: "img/logo_background.svg",
+					src: "img/brand/logo_background.svg",
 				},
 				items: [
 					{
@@ -215,7 +215,11 @@ const config = {
 						],
 					},
 				],
-				copyright: `Copyright © ${new Date().getFullYear()} CodeShellDev. Built with Docusaurus.`,
+				copyright: `
+				Copyright © ${new Date().getFullYear()} CodeShellDev<br/>
+				Documentation licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> except where otherwise noted<br/>
+				Trademarks, logos and brand assets remain property of their respective owners
+				`,
 			},
 			prism: {
 				theme: prismThemes.oneLight,

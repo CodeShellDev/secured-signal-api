@@ -8,7 +8,7 @@ import Heading from "@theme/Heading"
 import styles from "./index.module.css"
 
 // Homepage Image
-import HomeImage from "@site/static/img/logo_filled.svg"
+import HomeImage from "@site/static/img/brand/logo_filled.svg"
 
 function HomepageHeader() {
 	const { siteConfig } = useDocusaurusContext()

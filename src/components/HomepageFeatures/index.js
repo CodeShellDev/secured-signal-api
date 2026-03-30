@@ -6,7 +6,7 @@ import { useColorMode } from "@docusaurus/theme-common"
 const FeatureList = [
 	{
 		title: "Secure Layer",
-		Svg: require("@site/static/img/features/shield.svg").default,
+		Svg: require("@site/static/img/brand/features/shield.svg").default,
 		description: (
 			<>
 				The main focus of Secured Signal API is to provide a secure layer for
@@ -19,7 +19,7 @@ const FeatureList = [
 	},
 	{
 		title: "Quality of Life",
-		Svg: require("@site/static/img/features/heart.svg").default,
+		Svg: require("@site/static/img/brand/features/heart.svg").default,
 		description: (
 			<>
 				Implements many <a href="docs/features">Quality-of-Life features</a>, to
@@ -29,12 +29,12 @@ const FeatureList = [
 	},
 	{
 		title: "Compatibility in Mind",
-		Svg: require("@site/static/img/features/chain.svg").default,
+		Svg: require("@site/static/img/brand/features/chain.svg").default,
 		description: (
 			<>
 				Secured Signal API was built with{" "}
-				<a href="docs/integrations#the-solution">compatibility in mind</a>, and
-				it supports almost any signal-cli-rest-api-compatible program.
+				<a href="integrations#the-solution">compatibility in mind</a>, and it
+				supports almost any signal-cli-rest-api-compatible program.
 			</>
 		),
 	},
