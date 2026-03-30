@@ -3,24 +3,24 @@
 #═══════════════════════════════════════════════════════════════════════════════#
 #                           DEVELOPMENT ENVIRONMENT                             #
 #═══════════════════════════════════════════════════════════════════════════════#
-#
-# Purpose:
-#   Base environment configuration for local development and testing.
-#   This file is shared and version-controlled across all developers.
-#
-# Overrides (not committed):
-#   - dev-env.local.sh   → shell overrides / custom logic
-#   - dev.local.env      → machine-specific environment variables
-#
-# Usage:
-#   This file must be sourced to take effect:
-#     source dev-env.sh
-#
-# Guidelines:
-#   - DO NOT add secrets or sensitive data here
-#   - DO NOT add machine-specific values
-#   - Use the override files for local customization
-#
+#                                                                               #
+# Purpose:                                                                      #
+#   Base environment configuration for local development and testing.           #
+#   This file is shared and version-controlled across all developers.           #
+#                                                                               #
+# Overrides (not committed):                                                    #
+#   - dev-env.local.sh   → shell overrides / custom logic                       #
+#   - dev.local.env      → machine-specific environment variables               #
+#                                                                               #
+# Usage:                                                                        #
+#   This file must be sourced to take effect:                                   #
+#     source dev-env.sh                                                         #
+#                                                                               #
+# Guidelines:                                                                   #
+#   - DO NOT add secrets or sensitive data here                                 #
+#   - DO NOT add machine-specific values                                        #
+#   - Use the override files for local customization                            #
+#                                                                               #
 #═══════════════════════════════════════════════════════════════════════════════#
 
 # ANSI codes
@@ -29,6 +29,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 END='\033[0m'
+
+# Mockserver source file
+MOCK_SOURCE_FILE=internals/mockserver/mockserver.go
 
 cecho() {
     echo -e "$*"
@@ -44,9 +47,9 @@ cecho() {
 # Get directory path
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-#=-----------------------------------=#
+#─────────────────────────────────────#
 #= Environment Variables & Overrides =#
-#=-----------------------------------=#
+#─────────────────────────────────────#
 
 export DEFAULTS_PATH=$DIR/data/defaults.yml
 export FAVICON_PATH=$DIR/data/favicon.ico
@@ -70,9 +73,9 @@ fi
 
 cecho "${GREEN}Successfully loaded development environment!${END}"
 
-#=-----------------------------------=#
-#=            Mock server            =#
-#=-----------------------------------=#
+#─────────────────────────────────────#
+#═            Mock server            ═#
+#─────────────────────────────────────#
 
 MOCK_PORT="8881"
 
@@ -90,7 +93,7 @@ if [ -f "$MOCK_PID" ]; then
 fi
 
 # Build mockserver
-go build -o "$MOCK_BIN" utils/mockserver/mockserver.go
+go build -o "$MOCK_BIN" "$MOCK_SOURCE_FILE"
 
 set +m
 
@@ -103,5 +106,5 @@ if ! nc -z 127.0.0.1 "$MOCK_PORT" >/dev/null 2>&1; then
 
     echo "Mock server started at http://127.0.0.1:$MOCK_PORT"
 else
-    echo "There is already a Service running at http://127.0.0.1:$MOCK_PORT"
+    echo "There is already a service running at http://127.0.0.1:$MOCK_PORT"
 fi
