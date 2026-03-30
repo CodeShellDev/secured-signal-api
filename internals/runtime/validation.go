@@ -9,15 +9,19 @@ import (
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure/custom"
 )
 
-func Test() {
+func Validate() {
+	ValidateConfig()
+}
+
+func ValidateConfig() {
 	for _, conf := range config.ENV.CONFIGS {
-		err, obj := TestEndpointRules(*conf)
+		err, obj := ValidateEndpointRules(*conf)
 
 		if err != nil {
 			logger.Fatal("Error in endpoint rules: ", err.Error(), obj)
 		}
 
-		err, obj = TestFieldPolicyRules(*conf)
+		err, obj = ValidateFieldPolicyRules(*conf)
 
 		if err != nil {
 			logger.Fatal("Error in field policy rules: ", err.Error(), obj)
@@ -25,7 +29,7 @@ func Test() {
 	}
 }
 
-func TestEndpointRules(conf structure.CONFIG) (error, any) {
+func ValidateEndpointRules(conf structure.CONFIG) (error, any) {
 	if !conf.SETTINGS.ACCESS.ENDPOINTS.Set {
 		return nil, nil
 	}
@@ -55,7 +59,7 @@ func TestEndpointRules(conf structure.CONFIG) (error, any) {
 	return nil, nil
 }
 
-func TestFieldPolicyRules(conf structure.CONFIG) (error, any) {
+func ValidateFieldPolicyRules(conf structure.CONFIG) (error, any) {
 	if !conf.SETTINGS.ACCESS.FIELD_POLICIES.Set {
 		return nil, nil
 	}

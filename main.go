@@ -11,10 +11,10 @@ import (
 	config "github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/db"
 	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
+	runtime "github.com/codeshelldev/secured-signal-api/internals/runtime"
 	"github.com/codeshelldev/secured-signal-api/internals/scheduler"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	"github.com/codeshelldev/secured-signal-api/utils/logging"
-	runtime "github.com/codeshelldev/secured-signal-api/utils/runtime"
 )
 
 var proxy reverseProxy.Proxy
@@ -26,7 +26,7 @@ func main() {
 
 	config.Load()
 
-	runtime.Test()
+	runtime.Validate()
 
 	if config.DEFAULT.SERVICE.LOG_LEVEL != logger.Level() {
 		logging.Init(config.DEFAULT.SERVICE.LOG_LEVEL)
@@ -38,7 +38,7 @@ func main() {
 
 	if logger.Level() == "dev" {
 		logger.Dev("Welcome back, Developer!")
-		logger.Dev("CTRL+S config to Print to Console")
+		logger.Dev("Resave config to trigger reload and print")
 	}
 
 	config.Log()
