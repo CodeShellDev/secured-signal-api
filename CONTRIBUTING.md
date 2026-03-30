@@ -69,22 +69,7 @@ For our API which mostly consists of modified **Signal CLI REST API** endpoints 
 ```
 api
 ├── generated
-│   ├── cancel-scheduled-request.api.mdx
-│   ├── cancel-scheduled-request.ParamsDetails.json
-│   ├── cancel-scheduled-request.RequestSchema.json
-│   ├── cancel-scheduled-request.StatusCodes.json
-│   ├── general.tag.mdx
-│   ├── get-scheduled-request.api.mdx
-│   ├── get-scheduled-request.ParamsDetails.json
-│   ├── get-scheduled-request.RequestSchema.json
-│   ├── get-scheduled-request.StatusCodes.json
-│   ├── list-api-information.api.mdx
-│   ├── list-api-information.RequestSchema.json
-│   ├── list-api-information.StatusCodes.json
-│   ├── messages.tag.mdx
-│   ├── send-message.api.mdx
-│   ├── send-message.RequestSchema.json
-│   ├── send-message.StatusCodes.json
+│   ├── …
 │   └── sidebar.ts
 ├── openapi-v1.5.1.yaml
 ├── openapi.yaml
