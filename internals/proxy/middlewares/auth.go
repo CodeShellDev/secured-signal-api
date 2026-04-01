@@ -300,15 +300,12 @@ func authRequirementHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		isAuthenticated := GetContext[bool](req, IsAuthKey)
 
-		logger.Dev(req.Context())
-
 		if !isAuthenticated {
 			attempt := GetContext[AuthAttempt](req, AuthAttemptKey)
 
 			if attempt.Method != nil {
 				logger.Warn("Client failed ", attempt.Method.Name, " auth: ", attempt.Error.Error())
 			} else {
-				logger.Dev("IsAuth: ", isAuthenticated)
 				logger.Warn("Client failed to authenticate: ", attempt.Error.Error())
 			}
 
