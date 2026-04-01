@@ -119,7 +119,7 @@ func GetTemplatedBody(body map[string]any, headers map[string][]string, VARIABLE
 	return templatedData.(map[string]any), modified, nil
 }
 
-func TemplatePath(path string, VARIABLES any) (string, error) {
+func TemplatePath(path string, VARIABLES map[string]any) (string, error) {
 	reqPath, err := url.PathUnescape(path)
 
 	if err != nil {
@@ -173,22 +173,28 @@ func InjectPathIntoBody(path string, data map[string]any) (string, bool) {
 	return strings.Join(newParts, "/"), modified
 }
 
-func TemplateQuery(rawQuery string, VARIABLES any) (string, error) {
-	decodedQuery, _ := url.QueryUnescape(rawQuery)
+func TemplateQuery(rawQuery string, VARIABLES map[string]any) (string, error) {
+	query, _ := url.ParseQuery(rawQuery)
 
-	templt, err := templating.CreateNormalizedTemplateFromString("query", decodedQuery)
+	newQuery := url.Values{}
 
-	if err != nil {
-		return rawQuery, err
+	for key, value := range query {
+		templt, err := templating.CreateNormalizedTemplateFromString("query", value[0])
+
+		if err != nil {
+			return rawQuery, err
+		}
+
+		templated, err := templating.ExecuteTemplate(templt, VARIABLES)
+
+		if err != nil {
+			return rawQuery, err
+		}
+
+		newQuery.Set(key, templated)
 	}
 
-	templated, err := templating.ExecuteTemplate(templt, VARIABLES)
-
-	if err != nil {
-		return rawQuery, err
-	}
-
-	return templated, err
+	return newQuery.Encode(), nil
 }
 
 func InjectQueryIntoBody(query url.Values, data map[string]any) bool {

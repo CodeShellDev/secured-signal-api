@@ -3,6 +3,7 @@ package middlewares
 import (
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
@@ -23,15 +24,17 @@ func loggingHandler(next http.Handler) http.Handler {
 
 		ip := GetContext[net.IP](req, ClientIPKey)
 
+		decodedQuery, _ := url.QueryUnescape(req.URL.RawQuery)
+
 		if !logger.IsDev() {
-			logger.Info(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
+			logger.Info(ip.String(), " ", req.Method, " ", req.URL.Path, " ", decodedQuery)
 		} else {
 			body, _ := request.GetReqBody(req)
 
 			if body.Data != nil && !body.Empty {
-				logger.Dev(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery, body.Data)
+				logger.Dev(ip.String(), " ", req.Method, " ", req.URL.Path, " ", decodedQuery, body.Data)
 			} else {
-				logger.Info(ip.String(), " ", req.Method, " ", req.URL.Path, " ", req.URL.RawQuery)
+				logger.Info(ip.String(), " ", req.Method, " ", req.URL.Path, " ", decodedQuery)
 			}
 		}
 

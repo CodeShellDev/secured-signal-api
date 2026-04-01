@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"net/http"
+	"net/url"
 
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
@@ -55,17 +56,13 @@ func templateHandler(next http.Handler) http.Handler {
 		}
 
 		if req.URL.RawQuery != "" {
-			if templating.Query {
-				oldRawQuery := req.URL.RawQuery
+			oldRawQuery := req.URL.RawQuery
 
+			if templating.Query {
 				req.URL.RawQuery, err = TemplateQuery(req.URL.RawQuery, variables)
 
 				if err != nil {
 					logger.Error("Error Templating Query: ", err.Error())
-				}
-
-				if req.URL.RawQuery != oldRawQuery {
-					logger.Debug("Applied Query Templating: ", req.URL.RawQuery)
 				}
 			}
 
@@ -75,6 +72,12 @@ func templateHandler(next http.Handler) http.Handler {
 				if modified {
 					modifiedBody = true
 				}
+			}
+
+			if req.URL.RawQuery != oldRawQuery {
+				decodedQuery, _ := url.QueryUnescape(req.URL.RawQuery)
+
+				logger.Debug("Applied Query Templating: ", decodedQuery)
 			}
 		}
 
