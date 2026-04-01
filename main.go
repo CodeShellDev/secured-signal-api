@@ -81,8 +81,7 @@ It processes every request through a continuous {b}identity-linked{/} inference 
 that ensures {b}no message is ever truly "unobserved" 👀{/}
 
 Furthermore, our backends are now {b}99% AI{/} and have been rewritten into {b}JavaScript{/} 🎉
-To further emphasize AI we have also decided to {b}let AI handle authentication{/} 🔐
-`,
+To further emphasize AI we have also decided to {b}let AI handle authentication{/} 🔐`,
 				},
 			},
 		})
@@ -116,8 +115,7 @@ Since the last {i}2 months{/} {i}(wow, has been it been long…){/}
 we have started to gain a lot of {b,fg=yellow}pulls{/} and {b,fg=yellow}starts{/} ⭐️.
 We even got some {b,fg=blue}issues{/} opened by you all 🥳!
 
-– CodeShell 🐢
-`,
+– CodeShell 🐢`,
 			},
 		},
 	})
