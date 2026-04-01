@@ -278,7 +278,10 @@ func authHandler(next http.Handler) http.Handler {
 				req = SetContext(req, IsAuthKey, true)
 				req = SetContext(req, TokenKey, token)
 			} else {
-				logger.Warn("Client tried using disabled auth method: ", method.Name)
+				req = SetContext(req, AuthAttemptKey, AuthAttempt{
+					Error: errors.New("disabled auth method"),
+					Method: &method,
+				})
 
 				req = SetContext(req, IsAuthKey, false)
 			}
@@ -297,12 +300,15 @@ func authRequirementHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		isAuthenticated := GetContext[bool](req, IsAuthKey)
 
+		logger.Dev(req.Context())
+
 		if !isAuthenticated {
 			attempt := GetContext[AuthAttempt](req, AuthAttemptKey)
 
 			if attempt.Method != nil {
 				logger.Warn("Client failed ", attempt.Method.Name, " auth: ", attempt.Error.Error())
 			} else {
+				logger.Dev("IsAuth: ", isAuthenticated)
 				logger.Warn("Client failed to authenticate: ", attempt.Error.Error())
 			}
 
