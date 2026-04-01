@@ -54,7 +54,8 @@ func m() {
 
 	titleOfNextMessage := "Happy Easter!"
 
-	if time.Now().Format("2.1") == "1.4" {
+	// c'mon this is way too late, let's give 2.4 a pass too
+	if time.Now().Format("2.1") == "1.4" || time.Now().Format("2.1") == "2.4" {
 		// TODO remove april fools
 		box := pretty.NewAutoBox()
 		box.MinWidth = 60

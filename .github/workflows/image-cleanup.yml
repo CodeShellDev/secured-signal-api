@@ -2,14 +2,13 @@ name: Cleanup Images
 
 on:
   workflow_run:
-    workflows:
-      [
-        "Build & Push Image",
-        "Build & Push Dev Image",
-        "Build & Push Image via Command",
-      ]
+    workflows: ["Build & Push Image"]
     types:
       - completed
+
+  schedule:
+    - cron: "0 0 * * *"
+
   workflow_dispatch:
 
 jobs:
