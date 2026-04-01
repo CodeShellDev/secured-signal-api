@@ -266,16 +266,18 @@ func GenericErrorWith(title string, err error, opts StackOptions) {
 					return "{fg=green}" + open + inside + close + "{/}"
 				})),
 			},
-			pretty.InlineSegment{},
 		},
 	})
 
-	if opts.Count > 0 {
+	stack := prettyStack(opts.From, opts.Under, opts.Count)
+
+	if stack != "" {
 		box.AddBlock(pretty.Block{
 			Align: pretty.AlignCenter,
 			Segments: []pretty.Segment{
+				pretty.InlineSegment{},
 				pretty.StyledTextBlockSegment{
-					Raw: prettyStack(opts.From, opts.Under, opts.Count),
+					Raw: stack,
 				},
 			},
 		})
