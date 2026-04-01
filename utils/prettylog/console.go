@@ -224,7 +224,21 @@ func BreakingUsage(id string, msg DeprecationMessage) {
 	os.Exit(1)
 }
 
+type StackOptions struct {
+	Under 	int
+	From 	int
+	Count 	int
+}
+
 func GenericError(title string, err error) {
+	GenericErrorWith(title, err, StackOptions{
+		Under: 1,
+		From: 3,
+		Count: 6,
+	})
+}
+
+func GenericErrorWith(title string, err error, opts StackOptions) {
 	box := pretty.NewAutoBox()
 	box.MinWidth = 60
 	box.PaddingX = 2
@@ -256,14 +270,16 @@ func GenericError(title string, err error) {
 		},
 	})
 
-	box.AddBlock(pretty.Block{
-		Align: pretty.AlignCenter,
-		Segments: []pretty.Segment{
-			pretty.StyledTextBlockSegment{
-				Raw: prettyStack(),
+	if opts.Count > 0 {
+		box.AddBlock(pretty.Block{
+			Align: pretty.AlignCenter,
+			Segments: []pretty.Segment{
+				pretty.StyledTextBlockSegment{
+					Raw: prettyStack(opts.From, opts.Under, opts.Count),
+				},
 			},
-		},
-	})
+		})
+	}
 
 	fmt.Println(box.Render())
 

@@ -6,21 +6,32 @@ import (
 	"strings"
 )
 
-func prettyStack() string {
+func prettyStack(from, under, n int) string {
 	lines := strings.Split(string(debug.Stack()), "\n")
 
-	if len(lines) > 0 {
-		lines = lines[7:] // drop first 7 traces
+	if len(lines) >= 7 {
+		lines = lines[7:]
 	}
 
-	firstN := 3
 	frameSize := 2
 
-	limit := firstN * frameSize
+	totalFrames := len(lines) / frameSize
 
-	if len(lines) > limit {
-		lines = lines[:limit]
+	startFrame := under
+	endFrame := totalFrames - from
+
+	startFrame = max(0, startFrame)
+	endFrame = min(endFrame, totalFrames)
+	startFrame = min(startFrame, endFrame)
+
+	if n > 0 && startFrame + n < endFrame {
+		endFrame = startFrame + n
 	}
+
+	lower := startFrame * frameSize
+	upper := endFrame * frameSize
+
+	lines = lines[lower:upper]
 
 	hexCodeRe := regexp.MustCompile(`\+?0x[0-9a-fA-F]+`)
 	pathRe := regexp.MustCompile(`^(.*)/([^/]+)$`)
@@ -43,18 +54,21 @@ func prettyStack() string {
 
 func highlightKeywords(s string) string {
 	keywords := map[string]string{
-		"error":  "fg=red",
-		"failed": "i,fg=red",
-		"map":    "fg=bright_green",
-		"struct": "fg=bright_blue",
-		"slice":  "fg=bright_green",
-		"int":    "fg=blue",
-		"string": "fg=green",
+		"error":  	"fg=red",
+		"panic":  	"b,fg=red",
+		"failed": 	"i,fg=red",
+		"map":    	"fg=bright_green",
+		"struct": 	"fg=bright_blue",
+		"slice":  	"fg=bright_green",
+		"int":    	"fg=blue",
+		"[0-9]+":   "fg=blue",
+		"string": 	"fg=green",
+		"nil": 		"bg=gray",
 	}
 
 	for k, style := range keywords {
-		re := regexp.MustCompile(`\b` + regexp.QuoteMeta(k) + `\b`)
-		s = re.ReplaceAllString(s, "{"+style+"}"+k+"{/}")
+		re := regexp.MustCompile(`\b(` + k + `)\b`)
+		s = re.ReplaceAllString(s, "{"+style+"}$1{/}")
 	}
 
 	return s

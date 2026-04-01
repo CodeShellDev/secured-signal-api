@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"net/url"
 	"os"
 	"slices"
@@ -14,11 +16,36 @@ import (
 	"github.com/codeshelldev/secured-signal-api/internals/scheduler"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	"github.com/codeshelldev/secured-signal-api/utils/logging"
+	"github.com/codeshelldev/secured-signal-api/utils/prettylog"
 )
 
 var proxy reverseProxy.Proxy
 
+func catchPanic(fn func()) {
+	defer func() {
+		r := recover()
+
+		if r != nil {
+			switch v := r.(type) {
+			case error:
+			default:
+				prettylog.GenericErrorWith("{b,fg=red}🚨 PANIC 🚨{/}", errors.New("encountered a panic:\n\n" + fmt.Sprint(v)), prettylog.StackOptions{
+					Count: 8,
+					Under: 2,
+					From: 3,
+				})
+			}
+		}
+	}()
+
+	fn()
+}
+
 func main() {
+	catchPanic(m)
+}
+
+func m() {
 	logging.Init(os.Getenv("LOG_LEVEL"))
 
 	docker.Init()
