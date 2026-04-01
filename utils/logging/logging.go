@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
@@ -52,11 +53,25 @@ func BeginWithCapital(content string) string {
 }
 
 func Redact(redact string) string {
-	if len(redact) <= 6 {
+	if len(redact) <= 1 {
 		return strings.Repeat("*", len(redact))
 	}
 
-	return string(redact[0]) + strings.Repeat("*", len(redact) - 2) + string(redact[len(redact) - 1])
+	left := 2
+	right := 2
+
+	repeatTimes := 10
+
+	revealLeft := string(redact[:left])
+	revealRight := string(redact[len(redact) - right:])
+
+	redactedStr := strings.Repeat("*", repeatTimes)
+
+	if len(redact) - left - right - repeatTimes > 0 {
+		redactedStr = strings.Repeat("*", repeatTimes + 4) + "(" + strconv.Itoa(len(redact)) + ")" + strings.Repeat("*", repeatTimes - 4)
+	}
+
+	return revealLeft + redactedStr + revealRight
 }
 
 func RedactWords(replaceBy rune, words ...string) func(string) string {
