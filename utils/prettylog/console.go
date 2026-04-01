@@ -1,8 +1,9 @@
-package deprecation
+package prettylog
 
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/pretty"
 )
@@ -90,7 +91,15 @@ func base(id string, title, beforeUsing, afterUsing pretty.Segment, borderStyle 
 	fmt.Println(box.Render())
 }
 
-func Warn(id string, msg DeprecationMessage) {
+func Deprecated(id string, msg DeprecationMessage) {
+	if msg.Using == "" {
+		msg.Using = decorateUsingPath("{b,i,bg=red}" + id + "{/}")
+	}
+
+	if msg.Note == "" {
+		msg.Note = "\n{i}Update your config as {b}soon{/} as possible{/}"
+	}
+
 	base(id,
 		pretty.TextBlockSegment{
 			Text: "🚧 Deprecation 🚧",
@@ -125,7 +134,15 @@ func Warn(id string, msg DeprecationMessage) {
 	)
 }
 
-func Error(id string, msg DeprecationMessage) {
+func Breaking(id string, msg DeprecationMessage) {
+	if msg.Using == "" {
+		msg.Using = decorateUsingPath("{b,i,bg=red}" + id + "{/}")
+	}
+
+	if msg.Note == "" {
+		msg.Note = "\n{i}Update your config {b,fg=red}NOW!{/}{/}"
+	}
+
 	base(id,
 		pretty.TextBlockSegment{
 			Text: "🚨 Breaking Change 🚨",
@@ -162,13 +179,21 @@ func Error(id string, msg DeprecationMessage) {
 	os.Exit(1)
 }
 
-func Info(id string, msg DeprecationMessage) {
+func BreakingUsage(id string, msg DeprecationMessage) {
+	if msg.Using == "" {
+		msg.Using = decorateUsingPath("{b,i,bg=red}" + id + "{/}")
+	}
+
+	if msg.Note == "" {
+		msg.Note = "\n{i}Update your config {b,fg=red}NOW!{/}{/}"
+	}
+
 	base(id,
 		pretty.TextBlockSegment{
-			Text: "⚠️  Change ⚠️",
+			Text: "🚨 Breaking Change 🚨",
 			Style: pretty.Style{
 				Bold: true,
-				Foreground: pretty.Basic(pretty.BrightYellow),
+				Foreground: pretty.Basic(pretty.BrightRed),
 			},
 		},
 		pretty.TextBlockSegment{
@@ -177,7 +202,7 @@ func Info(id string, msg DeprecationMessage) {
 		pretty.InlineSegment{
 			Items: []pretty.Inline{
 				pretty.Span{
-					Text: "as it may be impacted by a ",
+					Text: "as it has been affected by a ",
 				},
 				pretty.Span{
 					Text: "breaking change",
@@ -191,8 +216,69 @@ func Info(id string, msg DeprecationMessage) {
 			},
 		},
 		pretty.BorderStyle{
-			Color: pretty.Basic(pretty.Blue),
+			Color: pretty.Basic(pretty.BrightRed),
 		},
 		msg,
 	)
+
+	os.Exit(1)
+}
+
+func GenericError(title string, err error) {
+	box := pretty.NewAutoBox()
+	box.MinWidth = 60
+	box.PaddingX = 2
+	box.PaddingY = 1
+
+	box.Border.Style = pretty.BorderStyle{
+		Color: pretty.Basic(pretty.BrightRed),
+	}
+
+	box.AddBlock(pretty.Block{
+		Align: pretty.AlignCenter,
+		Segments: []pretty.Segment{
+			pretty.StyledTextBlockSegment{
+				Raw: title,
+			},
+			pretty.InlineSegment{},
+		},
+	})
+
+	box.AddBlock(pretty.Block{
+		Align: pretty.AlignCenter,
+		Segments: []pretty.Segment{
+			pretty.StyledTextBlockSegment{
+				Raw: highlightKeywords(transformQuotes(err.Error(), func(open, close, inside string) string {
+					return "{fg=green}" + open + inside + close + "{/}"
+				})),
+			},
+			pretty.InlineSegment{},
+		},
+	})
+
+	box.AddBlock(pretty.Block{
+		Align: pretty.AlignCenter,
+		Segments: []pretty.Segment{
+			pretty.StyledTextBlockSegment{
+				Raw: prettyStack(),
+			},
+		},
+	})
+
+	fmt.Println(box.Render())
+
+	os.Exit(1)
+}
+
+func decorateUsingPath(path string) string {
+	atRoot := !strings.Contains(path, ".")
+
+	if atRoot {
+		usingPrefix := "⇧ "
+		usingSuffix := " (at root)"
+
+		return usingPrefix + path + usingSuffix
+	}
+
+	return path
 }

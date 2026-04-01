@@ -7,9 +7,11 @@ import (
 	"strings"
 
 	"github.com/codeshelldev/gotl/pkg/configutils"
+	"github.com/codeshelldev/gotl/pkg/jsonutils"
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/stringutils"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	"github.com/codeshelldev/secured-signal-api/utils/prettylog"
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
@@ -47,7 +49,7 @@ func Load() {
 
 	LoadTokens()
 
-	NormalizeConfig("", defaultsConf)
+	NormalizeConfig("defaults", defaultsConf)
 	NormalizeConfig("config", userConf)
 
 	envConf.LoadEnv(normalizeEnv)
@@ -70,7 +72,8 @@ func Load() {
 func Log() {
 	logger.Dev("Loaded Config:", mainConf.Layer.Get(""))
 	logger.Dev("Loaded Token Configs:", tokenConf.Layer.Get(""))
-	logger.Dev("Parsed Configs: ", ENV)
+
+	logger.Dev("Parsed Configs: ", jsonutils.GetJson[any](jsonutils.ToJsonSkipIncompatible(ENV)))
 }
 
 func Clear() {
@@ -144,13 +147,19 @@ func InitConfig() {
 	templateConfigWithVariables(mainConf)
 
 	// after templating reunmarshal
-	mainConf.Unmarshal("", &config)
+	err := mainConf.Unmarshal("", &config)
+
+	if err != nil {
+		prettylog.GenericError("{b,fg=bright_red}Config parsing Error{/}", err)
+	}
 
 	config.TYPE = structure.MAIN
 
 	ENV.CONFIGS["*"] = &config
 
 	DEFAULT = ENV.CONFIGS["*"]
+
+	DEFAULT.RAW = mainConf
 }
 
 func LoadDefaults() {

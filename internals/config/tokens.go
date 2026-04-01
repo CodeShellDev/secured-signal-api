@@ -8,6 +8,7 @@ import (
 	"github.com/codeshelldev/gotl/pkg/configutils"
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
+	"github.com/codeshelldev/secured-signal-api/utils/prettylog"
 	"github.com/knadh/koanf/parsers/yaml"
 )
 
@@ -86,9 +87,16 @@ func parseTokenConfigs(config *configutils.Config) map[string]structure.CONFIG {
 		
 		var configData structure.CONFIG
 
-		tmpConf.Unmarshal("", &configData)
+		err := tmpConf.Unmarshal("", &configData)
+
+		if err != nil {
+			prettylog.GenericError("{b,fg=bright_red}Config parsing Error{/}", err)
+			continue
+		}
 
 		tokens := parseAuthTokens(configData)
+
+		configData.RAW = tmpConf
 
 		for _, token := range tokens {
 			configs[token] = configData

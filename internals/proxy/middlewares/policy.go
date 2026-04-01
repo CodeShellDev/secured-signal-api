@@ -25,7 +25,7 @@ func policyHandler(next http.Handler) http.Handler {
 
 		policies := conf.SETTINGS.ACCESS.FIELD_POLICIES.OptOrEmpty(config.DEFAULT.SETTINGS.ACCESS.FIELD_POLICIES)
 
-		if policies == nil {
+		if policies.Value == nil {
 			next.ServeHTTP(w, req)
 			return
 		}
@@ -42,7 +42,7 @@ func policyHandler(next http.Handler) http.Handler {
 
 		headers := request.GetReqHeaders(req)
 
-		shouldBlock, field, err := isBlockedByPolicy(body.Data, headers, policies.Compile())
+		shouldBlock, field, err := isBlockedByPolicy(body.Data, headers, policies.Value.Compile())
 
 		if err != nil {
 			logger.Error("Could not perform policy checks: ", err.Error())

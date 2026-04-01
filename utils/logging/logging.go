@@ -52,7 +52,7 @@ func BeginWithCapital(content string) string {
 }
 
 func Redact(redact string) string {
-	if len(redact) <= 4 {
+	if len(redact) <= 6 {
 		return strings.Repeat("*", len(redact))
 	}
 

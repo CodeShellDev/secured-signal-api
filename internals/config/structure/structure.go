@@ -1,8 +1,8 @@
 package structure
 
 import (
+	"github.com/codeshelldev/gotl/pkg/configutils"
 	t "github.com/codeshelldev/gotl/pkg/configutils/types"
-	c "github.com/codeshelldev/secured-signal-api/internals/config/structure/custom"
 	g "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
 )
 
@@ -25,6 +25,7 @@ type ENV struct {
 
 type CONFIG struct {
 	TYPE				ConfigType
+	RAW					*configutils.Config
 	NAME				string						`koanf:"name"`
 	SERVICE				SERVICE 					`koanf:"service"`
 	API					API						    `koanf:"api"`
@@ -108,10 +109,10 @@ type FMapping struct {
 }
 
 type ACCESS struct {
-	ENDPOINTS			t.Opt[Endpoints] 			`koanf:"endpoints"          onuse:"changed"             changing:"{b,fg=bright_blue}\x60settings.access.endpoints\x60{/} has been split into {b,fg=green}\x60allowed\x60{/} and {b,fg=green}\x60blocked\x60{/}\n\nEndpoints are now subject to the new matching system:\n- {b,fg=green}pattern{/}: {i}/v1/about{/}\n {b,fg=green}matchType: exact{/}"`        
+	ENDPOINTS			t.Opt[Endpoints] 			`koanf:"endpoints"`        
 	FIELD_POLICIES		t.Opt[FieldPolicies] 		`koanf:"fieldpolicies"      childtransform:"default"`
 	RATE_LIMITING		t.Opt[RateLimiting]			`koanf:"ratelimiting"`
-	IP_FILTER			t.Opt[IPFilter]				`koanf:"ipfilter"           onuse:"changed"             changing:"{b,fg=bright_blue}\x60settings.access.ipFilter\x60{/} has been split into {b,fg=green}\x60allowed\x60{/} and {b,fg=green}\x60blocked\x60{/}"`
+	IP_FILTER			t.Opt[IPFilter]				`koanf:"ipfilter"`
 	TRUSTED_IPS			t.Opt[[]g.IPOrNet]			`koanf:"trustedips"`
 	TRUSTED_PROXIES		t.Opt[[]g.IPOrNet]			`koanf:"trustedproxies"`
 	CORS				t.Opt[Cors]					`koanf:"cors"`
@@ -129,8 +130,6 @@ type Origin struct {
 	Headers				t.Opt[[]string]				`koanf:"headers"`
 }
 
-type FieldPolicies = *t.Comp[c.RFieldPolicies, c.FieldPolicies]
-
 type Endpoints struct {
 	Allowed				[]g.StringMatchRule			`koanf:"allowed"`
 	Blocked				[]g.StringMatchRule			`koanf:"blocked"`
@@ -139,11 +138,6 @@ type Endpoints struct {
 type IPFilter struct {
 	Allowed				[]g.IPOrNet					`koanf:"allowed"`
 	Blocked				[]g.IPOrNet					`koanf:"blocked"`
-}
-
-type FPolicy struct {
-	Match				g.MatchRule[any]			`koanf:"match"`
-	Action				string						`koanf:"action"`
 }
 
 type RateLimiting struct {

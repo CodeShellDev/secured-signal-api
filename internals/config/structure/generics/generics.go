@@ -5,9 +5,9 @@ import (
 	"net"
 	"net/url"
 	"reflect"
+	"strings"
 	"time"
 
-	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/secured-signal-api/utils/netutils"
 )
 
@@ -24,7 +24,6 @@ func (timeDuration *TimeDuration) UnmarshalMapstructure(raw any) error {
     d, err := time.ParseDuration(str)
 
 	if err != nil {
-		logger.Fatal("Invalid duration ", str, ": ", err.Error())
 		return err
 	}
 
@@ -46,7 +45,6 @@ func (ipNet *IPOrNet) UnmarshalMapstructure(raw any) error {
 	ip, err := netutils.ParseIPorNet(str)
 
 	if err != nil {
-		logger.Fatal("Invalid IP ", str, ": ", err.Error())
 		return err
 	}
 
@@ -68,7 +66,6 @@ func (Url *URL) UnmarshalMapstructure(raw any) error {
 	u, err := url.Parse(str)
 
 	if err != nil {
-		logger.Fatal("Invalid URL ", str, ": ", err.Error())
 		return err
 	}
 
@@ -83,7 +80,12 @@ func (Url URL) String() string {
 }
 
 // Enum is a wrapper for enum types
-type Enum[T interface{ ParseEnum(string) (T, bool) }] struct {
+type Enum[
+	T interface {
+		ParseEnum(string) (T, bool)
+		Options() []string
+	},
+] struct {
 	Value T
 }
 
@@ -98,8 +100,13 @@ func (e *Enum[T]) UnmarshalMapstructure(raw any) error {
 	value, found := zero.ParseEnum(str)
 
 	if !found {
-		logger.Fatal("Invalid enum: ", str)
-		return errors.New("unsupported enum value: " + str)
+		possibleValues := []string{}
+
+		for _, item := range e.Value.Options() {
+			possibleValues = append(possibleValues, "'" + item + "'")
+		}
+
+		return errors.New("unsupported enum value: '" + str + "',\npossible values: [" + strings.Join(possibleValues, ", ") + "]")
 	}
 
 	e.Value = value

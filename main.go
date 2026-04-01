@@ -11,7 +11,6 @@ import (
 	config "github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/db"
 	reverseProxy "github.com/codeshelldev/secured-signal-api/internals/proxy"
-	runtime "github.com/codeshelldev/secured-signal-api/internals/runtime"
 	"github.com/codeshelldev/secured-signal-api/internals/scheduler"
 	docker "github.com/codeshelldev/secured-signal-api/utils/docker"
 	"github.com/codeshelldev/secured-signal-api/utils/logging"
@@ -26,7 +25,7 @@ func main() {
 
 	config.Load()
 
-	runtime.Validate()
+	config.Validate()
 
 	if config.DEFAULT.SERVICE.LOG_LEVEL != logger.Level() {
 		logging.Init(config.DEFAULT.SERVICE.LOG_LEVEL)

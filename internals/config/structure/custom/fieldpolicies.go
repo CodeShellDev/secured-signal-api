@@ -2,6 +2,7 @@ package custom
 
 import (
 	"errors"
+	"reflect"
 	"strings"
 
 	g "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
@@ -15,15 +16,21 @@ const (
 	FPolicyActionAllow
 )
 
+func (m FPolicyAction) Options() []string {
+	return []string{
+		"allow", "block",
+	}
+}
+
 func (m FPolicyAction) ParseEnum(str string) (FPolicyAction, bool) {
 	str = strings.TrimSpace(str)
 	str = strings.ToLower(str)
 
 	switch str {
-	case "block":
-		return FPolicyActionBlock, true
 	case "allow":
 		return FPolicyActionAllow, true
+	case "block":
+		return FPolicyActionBlock, true
 	default:
 		return -1, false
 	}
@@ -31,10 +38,10 @@ func (m FPolicyAction) ParseEnum(str string) (FPolicyAction, bool) {
 
 func (m FPolicyAction) String() string {
 	switch m {
-	case FPolicyActionBlock:
-		return "block"
 	case FPolicyActionAllow:
 		return "allow"
+	case FPolicyActionBlock:
+		return "block"
 	default:
 		return ""
 	}
@@ -52,7 +59,7 @@ func (r *RFieldPolicies) UnmarshalMapstructure(raw any) error {
 	rawMap, ok := raw.(map[string]any)
 
 	if !ok {
-		return errors.New("expected map input")
+		return errors.New("expected map, got " + reflect.TypeOf(raw).String())
 	}
 
 	result := make(RFieldPolicies, len(rawMap))
@@ -98,7 +105,7 @@ func (r RFPolicy) Compile() FPolicy {
 }
 
 func (r RFieldPolicies) Compile() FieldPolicies {
-	out := make(FieldPolicies)
+	out := FieldPolicies{}
 
 	for field, policies := range r {
 		var allowed []FPolicy

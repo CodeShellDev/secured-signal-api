@@ -32,6 +32,12 @@ const (
 	MatchSuffix
 )
 
+func (m MatchType) Options() []string {
+	return []string{
+		"exact", "equals", "regex", "glob", "contains", "includes", "has", "prefix", "suffix",
+	}
+}
+
 func (m MatchType) ParseEnum(str string) (MatchType, bool) {
 	str = strings.TrimSpace(str)
 	str = strings.ToLower(str)
