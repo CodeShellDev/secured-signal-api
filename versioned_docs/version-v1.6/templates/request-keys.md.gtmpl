@@ -1,0 +1,8 @@
+> [!NOTE]
+> Supported request keys:
+>
+> | `.` Variables | `@` Body | `#` Headers |
+> | ------------- | -------- | ----------- |
+> | +{{{- if includes .args "variables" -}}}✅+{{{- else -}}}❌+{{{- end -}}}
+    | +{{{- if includes .args "body" -}}}✅+{{{- else -}}}❌+{{{- end -}}}
+    | +{{{- if includes .args "headers" -}}}✅+{{{- else -}}}❌+{{{- end -}}} |
