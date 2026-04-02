@@ -203,14 +203,9 @@ const config = {
 								label: "GitHub Discussions",
 								href: "https://github.com/codeshelldev/secured-signal-api/discussions",
 							},
-						],
-					},
-					{
-						title: "More",
-						items: [
 							{
-								label: "GitHub",
-								href: "https://github.com/codeshelldev/secured-signal-api",
+								label: "Matrix Chat",
+								href: "https://matrix.to/#/#secured-signal-api:matrix.org",
 							},
 						],
 					},
