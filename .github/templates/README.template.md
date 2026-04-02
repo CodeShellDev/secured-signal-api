@@ -23,6 +23,11 @@ endpoint restrictions, placeholders, flexible configuration
 		src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=flat&logo=github&label=Stars" 
 		alt="GitHub stars">
   </a>
+  <a href="https://matrix.to/#/#secured-signal-api:matrix.org">
+	  <img 
+		  alt="Matrix" 
+		  src="https://img.shields.io/matrix/secured-signal-api%3Amatrix.org?style=flat&color=blue&logo=matrix&label=Chat">
+  </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
     <img
     src='https://img.shields.io/badge/Image%20Size-+{{{ replace ( htmlText ( htmlDocFind ( htmlDecode ( fetch "https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=Image+Size&trim=" ) ) "svg g:nth-of-type(3) text" ) ) " " "%20" }}}-_?color=2344cc11'
