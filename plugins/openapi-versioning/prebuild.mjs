@@ -140,15 +140,8 @@ async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 	// ensure outputDir exists
 	await fs.mkdir(outputDir, { recursive: true })
 
-	// generate all versioned API docs
 	for (const v of versionsArray) {
 		files.push(path.resolve(ROOT, v.specPath))
-
-		if (onlyWatch) {
-			continue
-		}
-
-		console.log(`\nGenerating versioned API docs: ${v.version}...`)
 
 		const genDir = path.resolve(consts.GENERATED_PREFIX, v.outputDir)
 		const dir = path.resolve(ROOT, v.outputDir)
@@ -160,35 +153,55 @@ async function prebuildPlugin(pluginId, { onlyWatch = false } = {}) {
 			await fs.mkdir(dir, { recursive: true })
 			const processFile = path.join(dir, ".process")
 			await fs.writeFile(processFile, "")
+		} catch {}
+	}
 
-			await execAsync(
-				`npm run docusaurus gen-api-docs:version ${versionsPath}:${v.version}`,
-			)
+	if (!onlyWatch) {
+		// generate all versioned API docs
+		for (const v of versionsArray) {
+			console.log(`\nGenerating versioned API docs: ${v.version}...`)
 
-			const segments = consts.GENERATED_PREFIX.split(path.sep).filter(Boolean)
-			const idPath = segments.slice(1).join(path.sep)
+			const genDir = path.resolve(consts.GENERATED_PREFIX, v.outputDir)
+			const dir = path.resolve(ROOT, v.outputDir)
 
-			await overwriteSidebarJson(
-				pluginId,
-				genDir,
-				path.resolve(
-					ROOT,
-					`${pluginId}_versioned_sidebars/version-${v.version}-sidebars.json`,
-				),
-				`${idPath}/${pluginId}_versioned_docs/version-${v.version}/`,
-			)
+			const processFile = path.join(dir, ".process")
 
-			await fs.cp(genDir, dir, {
-				errorOnExist: false,
-				force: true,
-				recursive: true,
-			})
+			try {
+				await fs.rm(genDir, { recursive: true, force: true })
+				await fs.mkdir(genDir, { recursive: true })
 
-			await fs.rm(processFile, { force: true })
+				await execAsync(
+					`npm run docusaurus gen-api-docs:version ${versionsPath}:${v.version}`,
+				)
 
-			console.log(`✔ Version ${v.version} docs generated`)
-		} catch (err) {
-			console.error(`Error generating version ${v.version}:`, err.stderr || err)
+				const segments = consts.GENERATED_PREFIX.split(path.sep).filter(Boolean)
+				const idPath = segments.slice(1).join(path.sep)
+
+				await overwriteSidebarJson(
+					pluginId,
+					genDir,
+					path.resolve(
+						ROOT,
+						`${pluginId}_versioned_sidebars/version-${v.version}-sidebars.json`,
+					),
+					`${idPath}/${pluginId}_versioned_docs/version-${v.version}/`,
+				)
+
+				await fs.cp(genDir, dir, {
+					errorOnExist: false,
+					force: true,
+					recursive: true,
+				})
+
+				await fs.rm(processFile, { force: true })
+
+				console.log(`✔ Version ${v.version} docs generated`)
+			} catch (err) {
+				console.error(
+					`Error generating version ${v.version}:`,
+					err.stderr || err,
+				)
+			}
 		}
 	}
 
