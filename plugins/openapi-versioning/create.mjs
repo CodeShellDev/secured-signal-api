@@ -86,7 +86,7 @@ async function updateApiVersions(version) {
 	}
 
 	if (!apiVersions.includes(version)) {
-		apiVersions.push(version)
+		apiVersions.unshift(version)
 		await fs.writeFile(apiVersionsPath, JSON.stringify(apiVersions, null, 2))
 		console.log(`✔ Added ${version} to ${path.basename(apiVersionsPath)}`)
 	}

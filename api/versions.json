@@ -1,16 +1,1 @@
-[
-  {
-    "version": "v1.5.1",
-    "specPath": "api/openapi-v1.5.1.yaml",
-    "outputDir": "api_versioned_docs/version-v1.5.1",
-    "label": "v1.5.1",
-    "baseUrl": "/api_versioned_docs/version-v1.5.1"
-  },
-  {
-    "version": "v1.6.0",
-    "specPath": "api/openapi-v1.6.0.yaml",
-    "outputDir": "api_versioned_docs/version-v1.6.0",
-    "label": "v1.6.0",
-    "baseUrl": "/api_versioned_docs/version-v1.6.0"
-  }
-]
+[{"version":"v1.5.1","specPath":"api/openapi-v1.5.1.yaml","outputDir":"api_versioned_docs/version-v1.5.1","label":"v1.5.1","baseUrl":"/api_versioned_docs/version-v1.5.1"},{"version":"v1.6.0","specPath":"api/openapi-v1.6.0.yaml","outputDir":"api_versioned_docs/version-v1.6.0","label":"v1.6.0","baseUrl":"/api_versioned_docs/version-v1.6.0"}]
