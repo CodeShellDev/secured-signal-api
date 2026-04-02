@@ -156,8 +156,6 @@
 
     {{{ $flat := index ( funcCallArgs "parseMarkdownSections" $content ) 0 }}}
 
-    {{{ echo ( jsonEncode $flat ) }}}
-
     {{{ if gt ( len $flat ) 1 }}}
         {{{ range $i, $section := $flat }}}
             {{{ if ne ( index $section "level" ) 1 }}}
