@@ -91,7 +91,7 @@ To further emphasize AI we have also decided to {b}let AI handle authentication{
 
 		fmt.Println(box.Render())
 
-		time.Sleep(5 * time.Second)
+		time.Sleep(3 * time.Second)
 	}
 
 	// TODO remove greeting
@@ -174,7 +174,7 @@ We even got some {b,fg=blue}issues{/} opened by you all 🥳!
 			logger.Info("Server listening on ", httpserver.PortsToRangeString(ports))
 		}
 
-		server.ListenAndServer()
+		catchPanic(server.ListenAndServer)
 	})
 
 	<-stop
