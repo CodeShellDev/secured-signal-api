@@ -1,5 +1,5 @@
 services:
-  +{{{ read "../../../examples/backend.sec-signal-api.yml" }}}
++{{{ read "../../../examples/backend.sec-signal-api.yml" }}}
 
   nginx:
     image: nginx:latest

@@ -108,7 +108,7 @@ Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project
 ## Help
 
 **Are you having problems setting up Secured Signal API?**<br/>
-No worries check out the [discussions](https://github.com/codeshelldev/secured-signal-api/discussions) tab and ask for help.
+No worries check out the [discussions](https://github.com/codeshelldev/secured-signal-api/discussions) tab or our [matrix chat](https://matrix.to/#/#secured-signal-api:matrix.org) and ask for help.
 
 **We are all volunteers**, so please be friendly and patient.
 

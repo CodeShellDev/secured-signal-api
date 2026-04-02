@@ -8,6 +8,8 @@
       API__TOKENS: "[LOOOOOONG_STRING]"
     ports:
       - "8880:8880"
+    volumes:
+      - ./db:/db
     restart: unless-stopped
     networks:
       backend:
