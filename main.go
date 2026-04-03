@@ -7,7 +7,6 @@ import (
 	"os"
 	"slices"
 	"strings"
-	"time"
 
 	"github.com/codeshelldev/gotl/pkg/logger"
 	"github.com/codeshelldev/gotl/pkg/pretty"
@@ -71,7 +70,7 @@ func m() {
 
 Since the last {i}2 months{/} {i}(wow, has been it been long…){/}
 
-we have started to gain a lot of {b,fg=yellow}pulls{/} and {b,fg=yellow}starts{/} ⭐️.
+we have started to gain a lot of {b,fg=yellow}pulls{/} (2K! 🤯) and {b,fg=yellow}starts{/} ⭐️.
 We even got some {b,fg=blue}issues{/} opened by you all 🥳!
 
 – CodeShell 🐢`,
@@ -80,6 +79,34 @@ We even got some {b,fg=blue}issues{/} opened by you all 🥳!
 	})
 
 	fmt.Println(box.Render())
+
+	// TODO remove matrix chat note
+	box2 := pretty.NewAutoBox()
+	box2.MinWidth = 60
+	box2.PaddingX = 2
+	box2.PaddingY = 1
+
+	box2.Border.Style = pretty.BorderStyle{
+		Color: pretty.Basic(pretty.Blue),
+	}
+	box2.AddBlock(pretty.Block{
+		Align: pretty.AlignCenter,
+		Segments: []pretty.Segment{
+			pretty.StyledTextBlockSegment{
+				Raw: `{b,fg=blue}💬 Come have a Chat! 💬{/}
+
+Ask for {b,fg=green}help{/}, share your {b,fg=green}ideas{/} or just {b}chat{/} about {b}SSA{/} and related
+in our new {b}Matrix Chat{/}!
+
+Why Matrix and not Discord? It is the {i}opensource way{/}! 📭️
+
+{b}Come and join the discussion{/}:
+{b,fg=bright_blue}https://matrix.to/#/#secured-signal-api:matrix.org{/}`,
+			},
+		},
+	})
+	
+	fmt.Println(box2.Render())
 
 	config.Load()
 
