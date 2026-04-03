@@ -52,48 +52,6 @@ func m() {
 
 	docker.Init()
 
-	titleOfNextMessage := "Happy Easter!"
-
-	// c'mon this is way too late, let's give 2.4 a pass too
-	if time.Now().Format("2.1") == "1.4" || time.Now().Format("2.1") == "2.4" {
-		// TODO remove april fools
-		box := pretty.NewAutoBox()
-		box.MinWidth = 60
-		box.PaddingX = 2
-		box.PaddingY = 1
-
-		box.Border.Style = pretty.BorderStyle{
-			Color: pretty.Basic(pretty.Blue),
-		}
-		box.AddBlock(pretty.Block{
-			Align: pretty.AlignCenter,
-			Segments: []pretty.Segment{
-				pretty.StyledTextBlockSegment{
-					Raw: `{b}📣 Introducing: {fg=magenta}SSA AI{/} 📣{/}
-
-We are excited to introduce to you our newest {b}solution{/}:
-
-✨ {b,fg=blue}Secured Signal API AI{/} ✨
-
-{b,fg=blue}SSA AI{/} extends the Secured Signal API with
-message handling, intent parsing, and full-stack signal participation
-
-It processes every request through a continuous {b}identity-linked{/} inference mesh 
-that ensures {b}no message is ever truly "unobserved" 👀{/}
-
-Furthermore, our backends are now {b}99% AI{/} and have been rewritten into {b}JavaScript{/} 🎉
-To further emphasize AI we have also decided to {b}let AI handle authentication{/} 🔐`,
-				},
-			},
-		})
-
-		titleOfNextMessage = "APRIL FOOLS – Happy Easter!"
-
-		fmt.Println(box.Render())
-
-		time.Sleep(3 * time.Second)
-	}
-
 	// TODO remove greeting
 	box := pretty.NewAutoBox()
 	box.MinWidth = 60
@@ -107,7 +65,7 @@ To further emphasize AI we have also decided to {b}let AI handle authentication{
 		Align: pretty.AlignCenter,
 		Segments: []pretty.Segment{
 			pretty.StyledTextBlockSegment{
-				Raw: `{b,fg=blue}🐰 ` + titleOfNextMessage + ` 🐰{/}
+				Raw: `{b,fg=blue}🐰 Happy Easter! 🐰{/}
 
 …and {b,fg=red}thank you{/} ❤️  for using {b}Secured Signal API{/}.
 
