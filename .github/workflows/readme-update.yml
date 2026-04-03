@@ -1,8 +1,10 @@
 name: Update README
 
 on:
-  release:
-    types: [published]
+  workflow_run:
+    branches:
+      - main
+    workflows: ["Build & Push Image"]
   workflow_dispatch:
 
 jobs:
