@@ -13,7 +13,7 @@ require (
 	github.com/codeshelldev/gotl/pkg/scheduler v0.0.9
 	github.com/codeshelldev/gotl/pkg/server/http v0.0.3
 	github.com/codeshelldev/gotl/pkg/stringutils v0.0.8
-	github.com/codeshelldev/gotl/pkg/templating v0.0.16
+	github.com/codeshelldev/gotl/pkg/templating v0.0.17-22
 )
 
 require (

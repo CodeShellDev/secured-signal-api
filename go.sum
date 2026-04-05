@@ -20,8 +20,8 @@ github.com/codeshelldev/gotl/pkg/server/http v0.0.3 h1:3232uPB2CljzUJadyrME7p0Da
 github.com/codeshelldev/gotl/pkg/server/http v0.0.3/go.mod h1:/asx7ViJtwlBvLgObjI/tejm6lNDN1/B+/6BPImqDfc=
 github.com/codeshelldev/gotl/pkg/stringutils v0.0.8 h1:VKIuEYLJARDmHyhAbcMy1TsdxPdzsKlbQvgr1G4QE7s=
 github.com/codeshelldev/gotl/pkg/stringutils v0.0.8/go.mod h1:892bcYDpOf0sTpXtABQ3m+9MACpWHCVpN3f/mcPr7qo=
-github.com/codeshelldev/gotl/pkg/templating v0.0.16 h1:0dl/NEApCtlm4kyEscQPknx4DwUtl1bsgl3Iyv6jPkM=
-github.com/codeshelldev/gotl/pkg/templating v0.0.16/go.mod h1:MHM4ouEsLNKXRYO+fS9qqpS1SFlL4Z6Q/0kxtS+auLk=
+github.com/codeshelldev/gotl/pkg/templating v0.0.17-22 h1:0UFaHbt49aExTHVywfHXxd8mvr2NUx8qli9r27Y57Ew=
+github.com/codeshelldev/gotl/pkg/templating v0.0.17-22/go.mod h1:MHM4ouEsLNKXRYO+fS9qqpS1SFlL4Z6Q/0kxtS+auLk=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
