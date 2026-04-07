@@ -75,4 +75,4 @@ Configure your _mini firewall_ [here](./configuration/ip-filter).
 
 **CORS** support allows web applications running in a browser to access the API directly from a different origin.
 
-Learn more about browser integration [here](./configuration/ip-filter).
+Learn more about browser integration [here](./configuration/cors).
