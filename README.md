@@ -30,7 +30,30 @@ endpoint restrictions, placeholders, flexible configuration
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
     <img
-    src='https://img.shields.io/badge/Image%20Size--_?color=2344cc11'
+    src='https://img.shields.io/badge/Image%20Size-<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="136" height="20">
+    <linearGradient id="b" x2="0" y2="100%">
+        <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+        <stop offset="1" stop-opacity=".1"/>
+    </linearGradient>
+    <mask id="anybadge_36190">
+        <rect width="136" height="20" rx="3" fill="#fff"/>
+    </mask>
+    <g mask="url(#anybadge_36190)">
+        <path fill="#555" d="M0 0h75v20H0z"/>
+        <path fill="#44cc11" d="M75 0h61v20H75z"/>
+        <path fill="url(#b)" d="M0 0h136v20H0z"/>
+    </g>
+    <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+        <text x="38.5" y="15" fill="#010101" fill-opacity=".3">Image Size</text>
+        <text x="37.5" y="14">Image Size</text>
+    </g>
+    <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+        <text x="106.5" y="15" fill="#010101" fill-opacity=".3">9.81 MiB</text>
+        <text x="105.5" y="14">9.81 MiB</text>
+    </g>
+</svg>
+-_?color=2344cc11'
     alt="Docker image Pulls">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
