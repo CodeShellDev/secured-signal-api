@@ -28,7 +28,7 @@ func sendHandler(mux *http.ServeMux, next http.Handler) *http.ServeMux {
 		conf := GetConfigByReq(req)
 
 		variables := conf.SETTINGS.MESSAGE.VARIABLES.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.VARIABLES)
-		templating := conf.SETTINGS.MESSAGE.TEMPLATING.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.TEMPLATING)
+		messageTemplate := conf.SETTINGS.MESSAGE.MESSAGE_TEMPLATE.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.MESSAGE_TEMPLATE)
 
 		scheduling := conf.SETTINGS.MESSAGE.SCHEDULING.OptOrEmpty(config.DEFAULT.SETTINGS.MESSAGE.SCHEDULING)
 
@@ -45,10 +45,10 @@ func sendHandler(mux *http.ServeMux, next http.Handler) *http.ServeMux {
 		var modifiedBody bool
 
 		if !body.Empty {
-			if templating.MessageTemplate != "" {
+			if messageTemplate != "" {
 				headers := request.GetReqHeaders(req)
 
-				templatedMessage, err := GetTemplatedMessage(templating.MessageTemplate, body.Data, headers, variables)
+				templatedMessage, err := GetTemplatedMessage(messageTemplate, body.Data, headers, variables)
 
 				if err != nil {
 					logger.Error("Error Templating Message: ", err.Error())
