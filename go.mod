@@ -3,7 +3,7 @@ module github.com/codeshelldev/secured-signal-api
 go 1.26.1
 
 require (
-	github.com/codeshelldev/gotl/pkg/configutils v0.0.26
+	github.com/codeshelldev/gotl/pkg/configutils v0.0.27
 	github.com/codeshelldev/gotl/pkg/docker v0.0.2
 	github.com/codeshelldev/gotl/pkg/jsonutils v0.0.5
 	github.com/codeshelldev/gotl/pkg/logger v0.0.22

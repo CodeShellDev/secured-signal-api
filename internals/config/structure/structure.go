@@ -74,7 +74,7 @@ type HTTP struct {
 type MESSAGE struct {
 	VARIABLES         	t.Opt[map[string]any]		`koanf:"variables"          childtransform:"upper"`
 	FIELD_MAPPINGS      t.Opt[FieldMappings]		`koanf:"fieldmappings"      childtransform:"default"`
-	MESSAGE_TEMPLATE	t.Opt[string]				`koanf:"messagetemplate"    aliases:"template"          onuse:"template>>deprecated"    deprecation:"{b,fg=yellow}\x60{s}settings.message.template{/}\x60{/} has been moved\n Use {b,fg=green}\x60settings.message.messageTemplate\x60{/} instead"`
+	MESSAGE_TEMPLATE	t.Opt[string]				`koanf:"messagetemplate"    aliases:".settings.message.templating.messagetemplate,template"          onuse:".settings.message.templating.messagetemplate,template>>deprecated"    deprecation:".settings.message.templating.messagetemplate>>{b,fg=yellow}\x60{s}settings.message.templating.messageTemplate{/}\x60{/} has been moved\n Use {b,fg=green}\x60settings.message.messageTemplate\x60{/} instead|template>>{b,fg=yellow}\x60{s}settings.message.template{/}\x60{/} has been moved\n Use {b,fg=green}\x60settings.message.messageTemplate\x60{/} instead"`
 	TEMPLATING  		t.Opt[Templating]			`koanf:"templating"`
 	SCHEDULING			t.Opt[Scheduling]			`koanf:"scheduling"`
 	INJECTING			t.Opt[Injecting]			`koanf:"injecting"`
