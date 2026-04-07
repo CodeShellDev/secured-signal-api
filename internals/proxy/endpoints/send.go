@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	logging "github.com/codeshelldev/gotl/pkg/logger"
 	request "github.com/codeshelldev/gotl/pkg/request"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
 	"github.com/codeshelldev/secured-signal-api/internals/config/structure"
@@ -56,7 +57,7 @@ func sendHandler(mux *http.ServeMux, next http.Handler) *http.ServeMux {
 				if templatedMessage != body.Data[messageField] && templatedMessage != "" {
 					body.Data[messageField] = templatedMessage
 
-					logger.Debug("Applied Message Templating: \n", templatedMessage)
+					logger.Debug("Applied Message Templating: \n", logging.FormatAsData(templatedMessage))
 
 					modifiedBody = true
 				}
