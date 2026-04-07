@@ -30,7 +30,7 @@ endpoint restrictions, placeholders, flexible configuration
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
     <img
-    src='https://img.shields.io/badge/Image%20Size-+{{{ replace ( htmlText ( htmlDocFind ( htmlDecode ( fetch "https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=Image+Size&trim=" ) ) "svg g:nth-of-type(3) text" ) ) " " "%20" }}}-_?color=2344cc11'
+    src='https://img.shields.io/badge/Image%20Size-+{{{ fetch "https://ghcr-badge.egpl.dev/codeshelldev/secured-signal-api/size?color=%2344cc11&tag=latest&label=Image+Size&trim=" }}}-_?color=2344cc11'
     alt="Docker image Pulls">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
