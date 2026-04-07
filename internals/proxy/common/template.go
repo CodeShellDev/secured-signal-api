@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"net/url"
 	"regexp"
 	"strings"
@@ -105,8 +104,6 @@ func GetTemplatedBody(body map[string]any, headers map[string][]string, VARIABLE
 	request.CopyMap(variables, VARIABLES)
 	request.CopyMap(variables, nestedBody)
 	request.CopyMap(variables, nestedHeaders)
-
-	fmt.Printf("%#v (%T)\n", normalizedBody["alerts"], normalizedBody["alerts"])
 
 	templatedData, err := templating.TemplateData(normalizedBody, variables)
 
