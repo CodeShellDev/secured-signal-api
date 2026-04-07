@@ -249,7 +249,7 @@ func authHandler(next http.Handler) http.Handler {
 			tokens = []string{}
 		}
 
-		if config.ENV.INSECURE || len(tokens) <= 0 {
+		if config.ENV.INSECURE || len(tokens) == 0 {
 			next.ServeHTTP(w, req)
 			return
 		}
@@ -298,6 +298,11 @@ var InternalAuthRequirement Middleware = Middleware{
 
 func authRequirementHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if config.ENV.INSECURE {
+			next.ServeHTTP(w, req)
+			return
+		}
+
 		isAuthenticated := GetContext[bool](req, IsAuthKey)
 
 		if !isAuthenticated {
