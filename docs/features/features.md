@@ -71,7 +71,7 @@ Configure your _mini firewall_ [here](./configuration/ip-filter).
 
 ## CORS
 
-> Enable secure browser access
+> _Enable secure browser access_
 
 **CORS** support allows web applications running in a browser to access the API directly from a different origin.
 
