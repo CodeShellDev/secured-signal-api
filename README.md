@@ -30,7 +30,7 @@ endpoint restrictions, placeholders, flexible configuration
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
     <img
-    src='https://img.shields.io/badge/Image%20Size-9.81 MiB-_?color=2344cc11'
+    src='https://img.shields.io/badge/Image%20Size-9.81%20MiB-_?color=2344cc11'
     alt="Docker image Pulls">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
@@ -49,9 +49,6 @@ endpoint restrictions, placeholders, flexible configuration
 
 > [!IMPORTANT]
 > Check out the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) for up-to-date instructions and additional content!
-
-> [!WARNING]
-> We are slowly moving away from this README and instead are trying to make the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) the only source of truth
 
 - [Getting Started](#getting-started)
 - [Usage](#usage)
@@ -72,6 +69,7 @@ endpoint restrictions, placeholders, flexible configuration
   - [Port](https://codeshelldev.github.io/secured-signal-api/docs/configuration/port)
   - [Hostnames](https://codeshelldev.github.io/secured-signal-api/docs/configuration/hostnames)
   - [Auth Methods](https://codeshelldev.github.io/secured-signal-api/docs/configuration/auth)
+  - [CORS](https://codeshelldev.github.io/secured-signal-api/docs/configuration/cors)
 - [Reverse Proxy](https://codeshelldev.github.io/secured-signal-api/docs/reverse-proxy)
 - [Integrations](https://codeshelldev.github.io/secured-signal-api/docs/integrations)
 - [Contributing](#contributing)
@@ -191,38 +189,35 @@ Look at this complex template for example:
 ```yaml
 settings:
   message:
-    tempalting:
-      messageTemplate: |
-        {{- $greeting := "Hello" -}}
-        {{ $greeting }}, {{ @name }}!
-        {{ if @age -}}
-        You are {{ @age }} years old.
-        {{- else -}}
-        Age unknown.
-        {{- end }}
-        Your friends:
-        {{- range @friends }}
-        - {{ . }}
-        {{- else }}
-        You have no friends.
-        {{- end }}
-        Profile details:
-        {{- range $key, $value := @profile }}
-        - {{ $key }}: {{ $value }}
-        {{- end }}
-        {{ define "footer" -}}
-        This is the footer for {{ @name }}.
-        {{- end }}
-        {{ template "footer" . -}}
-        ------------------------------------
-        Content-Type: {{ #Content_Type }}
+    messageTemplate: |
+      {{- $greeting := "Hello" -}}
+      {{ $greeting }}, {{ @name }}!
+      {{ if @age -}}
+      You are {{ @age }} years old.
+      {{- else -}}
+      Age unknown.
+      {{- end }}
+      Your friends:
+      {{- range @friends }}
+      - {{ . }}
+      {{- else }}
+      You have no friends.
+      {{- end }}
+      Profile details:
+      {{- range $key, $value := @profile }}
+      - {{ $key }}: {{ $value }}
+      {{- end }}
+      {{ define "footer" -}}
+      This is the footer for {{ @name }}.
+      {{- end }}
+      {{ template "footer" . -}}
 
 ```
 
 It can extract needed data from the body and headers to then process them using Go's templating library
 and finally output a message packed with so much information.
 
-Head to [Configuration](https://codeshelldev.github.io/secured-signal-api/docs/configuration/templating#message-template) to see how-to use.
+Head to [Configuration](https://codeshelldev.github.io/secured-signal-api/docs/configuration/message-template) to see how-to use.
 
 ### Placeholders
 
@@ -269,6 +264,14 @@ Limit those rates [here](https://codeshelldev.github.io/secured-signal-api/docs/
 **IP Filters** are used for restricting access to **Secured Signal API** by blocking or specifically allowing IPs and CIDR ranges.
 
 Configure your _mini firewall_ [here](https://codeshelldev.github.io/secured-signal-api/docs/configuration/ip-filter).
+
+### CORS
+
+> _Enable secure browser access_
+
+**CORS** support allows web applications running in a browser to access the API directly from a different origin.
+
+Learn more about browser integration [here](https://codeshelldev.github.io/secured-signal-api/docs/configuration/ip-filter).
 
 ## Configuration
 
@@ -337,12 +340,25 @@ settings:
       X-Custom: "xyz"
 
   message:
+    messageTemplate: |
+      You've got a Notification:
+      {{ @message }} 
+      At {{ @data.timestamp }} on {{ @data.date }}.
+      Send using {{ .NUMBER }}.
+
     templating:
-      messageTemplate: |
-        You've got a Notification:
-        {{ @message }} 
-        At {{ @data.timestamp }} on {{ @data.date }}.
-        Send using {{ .NUMBER }}.
+      body: true
+      query: true
+      path: true
+
+    scheduling:
+      enabled: true
+      maxHorizon: 10d
+
+    injecting:
+      urlToBody:
+        query: true
+        path: true
 
     variables:
       number: "+123400001"
@@ -435,7 +451,11 @@ settings:
       X-Custom: "Lorem Ipsum Dolor"
 
   message:
-    template: # disable
+    scheduling: # disable
+    injecting: # disable
+    templating: # disable
+    messageTemplate: # disable
+
     variables: # overwrite main config variables
       number: "+123400010"
       recipients: ["+123400020", "group.id", "user.id"]
@@ -449,6 +469,8 @@ settings:
     trustedIPs: # disable
     trustedProxies: # disable
     ipFilter: # disable
+    fieldPolicies: # disable
+    cors: # disable
 
     endpoints: # overwrite main config endpoints
       allowed:
@@ -460,10 +482,6 @@ settings:
     rateLimiting:
       limit: 100
       period: 10h # overwrite main config period
-
-    fieldPolicies: # disable
-
-    cors: # disable
 
 ```
 
