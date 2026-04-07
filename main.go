@@ -70,7 +70,7 @@ func m() {
 
 Since the last {i}2 months{/} {i}(wow, has been it been long…){/}
 
-we have started to gain a lot of {b,fg=yellow}pulls{/} (2K! 🤯) and {b,fg=yellow}starts{/} ⭐️.
+we have started to gain a lot of {b,fg=yellow}pulls{/} (2K! 🤯) and {b,fg=yellow}stars{/} ⭐️.
 We even got some {b,fg=blue}issues{/} opened by you all 🥳!
 
 – CodeShell 🐢`,
