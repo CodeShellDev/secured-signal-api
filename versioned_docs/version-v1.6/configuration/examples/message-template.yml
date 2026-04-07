@@ -1,6 +1,6 @@
 settings:
   message:
-    tempalting:
+    templating:
       messageTemplate: |
         {{- $greeting := "Hello" -}}
         {{ $greeting }}, {{ @name }}!
@@ -23,5 +23,3 @@ settings:
         This is the footer for {{ @name }}.
         {{- end }}
         {{ template "footer" . -}}
-        ------------------------------------
-        Content-Type: {{ #Content_Type }}
