@@ -50,9 +50,6 @@ endpoint restrictions, placeholders, flexible configuration
 > [!IMPORTANT]
 > Check out the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) for up-to-date instructions and additional content!
 
-> [!WARNING]
-> We are slowly moving away from this README and instead are trying to make the [**Official Documentation**](https://codeshelldev.github.io/secured-signal-api) the only source of truth
-
 - [Getting Started](#getting-started)
 - [Usage](#usage)
 - [Features](#features)
@@ -72,6 +69,7 @@ endpoint restrictions, placeholders, flexible configuration
   - [Port](https://codeshelldev.github.io/secured-signal-api/docs/configuration/port)
   - [Hostnames](https://codeshelldev.github.io/secured-signal-api/docs/configuration/hostnames)
   - [Auth Methods](https://codeshelldev.github.io/secured-signal-api/docs/configuration/auth)
+  - [CORS](https://codeshelldev.github.io/secured-signal-api/docs/configuration/cors)
 - [Reverse Proxy](https://codeshelldev.github.io/secured-signal-api/docs/reverse-proxy)
 - [Integrations](https://codeshelldev.github.io/secured-signal-api/docs/integrations)
 - [Contributing](#contributing)

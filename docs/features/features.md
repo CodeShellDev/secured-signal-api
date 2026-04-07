@@ -21,7 +21,7 @@ Look at this complex template for example:
 It can extract needed data from the body and headers to then process them using Go's templating library
 and finally output a message packed with so much information.
 
-Head to [Configuration](./configuration/templating#message-template) to see how-to use.
+Head to [Configuration](./configuration/message-template) to see how-to use.
 
 ## Placeholders
 
@@ -68,3 +68,11 @@ Limit those rates [here](./configuration/rate-limiting).
 **IP Filters** are used for restricting access to **Secured Signal API** by blocking or specifically allowing IPs and CIDR ranges.
 
 Configure your _mini firewall_ [here](./configuration/ip-filter).
+
+## CORS
+
+> Enable secure browser access
+
+**CORS** support allows web applications running in a browser to access the API directly from a different origin.
+
+Learn more about browser integration [here](./configuration/ip-filter).

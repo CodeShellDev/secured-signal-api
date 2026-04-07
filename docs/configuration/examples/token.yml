@@ -16,7 +16,11 @@ settings:
       X-Custom: "Lorem Ipsum Dolor"
 
   message:
-    template: # disable
+    scheduling: # disable
+    injecting: # disable
+    templating: # disable
+    messageTemplate: # disable
+
     variables: # overwrite main config variables
       number: "+123400010"
       recipients: ["+123400020", "group.id", "user.id"]
@@ -30,6 +34,8 @@ settings:
     trustedIPs: # disable
     trustedProxies: # disable
     ipFilter: # disable
+    fieldPolicies: # disable
+    cors: # disable
 
     endpoints: # overwrite main config endpoints
       allowed:
@@ -41,7 +47,3 @@ settings:
     rateLimiting:
       limit: 100
       period: 10h # overwrite main config period
-
-    fieldPolicies: # disable
-
-    cors: # disable

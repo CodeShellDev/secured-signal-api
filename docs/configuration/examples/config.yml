@@ -22,12 +22,25 @@ settings:
       X-Custom: "xyz"
 
   message:
+    messageTemplate: |
+      You've got a Notification:
+      {{ @message }} 
+      At {{ @data.timestamp }} on {{ @data.date }}.
+      Send using {{ .NUMBER }}.
+
     templating:
-      messageTemplate: |
-        You've got a Notification:
-        {{ @message }} 
-        At {{ @data.timestamp }} on {{ @data.date }}.
-        Send using {{ .NUMBER }}.
+      body: true
+      query: true
+      path: true
+
+    scheduling:
+      enabled: true
+      maxHorizon: 10d
+
+    injecting:
+      urlToBody:
+        query: true
+        path: true
 
     variables:
       number: "+123400001"
