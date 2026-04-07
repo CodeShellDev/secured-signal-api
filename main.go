@@ -51,7 +51,7 @@ func m() {
 
 	docker.Init()
 
-	// TODO remove greeting
+	// TODO remove matrix chat note
 	box := pretty.NewAutoBox()
 	box.MinWidth = 60
 	box.PaddingX = 2
@@ -61,35 +61,6 @@ func m() {
 		Color: pretty.Basic(pretty.Blue),
 	}
 	box.AddBlock(pretty.Block{
-		Align: pretty.AlignCenter,
-		Segments: []pretty.Segment{
-			pretty.StyledTextBlockSegment{
-				Raw: `{b,fg=blue}🐰 Happy Easter! 🐰{/}
-
-…and {b,fg=red}thank you{/} ❤️  for using {b}Secured Signal API{/}.
-
-Since the last {i}2 months{/} {i}(wow, has been it been long…){/}
-
-we have started to gain a lot of {b,fg=yellow}pulls{/} (2K! 🤯) and {b,fg=yellow}stars{/} ⭐️.
-We even got some {b,fg=blue}issues{/} opened by you all 🥳!
-
-– CodeShell 🐢`,
-			},
-		},
-	})
-
-	fmt.Println(box.Render())
-
-	// TODO remove matrix chat note
-	box2 := pretty.NewAutoBox()
-	box2.MinWidth = 60
-	box2.PaddingX = 2
-	box2.PaddingY = 1
-
-	box2.Border.Style = pretty.BorderStyle{
-		Color: pretty.Basic(pretty.Blue),
-	}
-	box2.AddBlock(pretty.Block{
 		Align: pretty.AlignCenter,
 		Segments: []pretty.Segment{
 			pretty.StyledTextBlockSegment{
@@ -106,7 +77,7 @@ Why Matrix and not Discord? It is the {i}opensource way{/}! 📭️
 		},
 	})
 	
-	fmt.Println(box2.Render())
+	fmt.Println(box.Render())
 
 	config.Load()
 
