@@ -30,7 +30,7 @@ endpoint restrictions, placeholders, flexible configuration
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
     <img
-    src='https://img.shields.io/badge/Image%20Size-9.81%20MiB-_?color=2344cc11'
+    src='https://img.shields.io/badge/Image%20Size--_?color=2344cc11'
     alt="Docker image Pulls">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
@@ -271,7 +271,7 @@ Configure your _mini firewall_ [here](https://codeshelldev.github.io/secured-sig
 
 **CORS** support allows web applications running in a browser to access the API directly from a different origin.
 
-Learn more about browser integration [here](https://codeshelldev.github.io/secured-signal-api/docs/configuration/ip-filter).
+Learn more about browser integration [here](https://codeshelldev.github.io/secured-signal-api/docs/configuration/cors).
 
 ## Configuration
 
