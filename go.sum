@@ -4,10 +4,10 @@ github.com/codeshelldev/gotl/pkg/configutils v0.0.26 h1:FkgTatxXFB0LePi/SnieSNZd
 github.com/codeshelldev/gotl/pkg/configutils v0.0.26/go.mod h1:2o+D0+pbb7xaNGeESpL0/eWZLmDk6o8yhbaoTK06gMs=
 github.com/codeshelldev/gotl/pkg/docker v0.0.2 h1:kpseReocEBoSzWe/tOhUrIrOYeAR/inw3EF2/d+N078=
 github.com/codeshelldev/gotl/pkg/docker v0.0.2/go.mod h1:odNnlRw4aO1n2hSkDZIaiuSXIoFoVeatmXtF64Yd33U=
-github.com/codeshelldev/gotl/pkg/jsonutils v0.0.5-1 h1:KKXBxO+CLxzEQXhLYM/cexKy5QLpODRVwrosYYWuGOI=
-github.com/codeshelldev/gotl/pkg/jsonutils v0.0.5-1/go.mod h1:NJKp0G1fre3QiPqwrfOP01yzZe6VMQy4P/nweNTGsvs=
-github.com/codeshelldev/gotl/pkg/logger v0.0.18 h1:eQ9F8UXJbdKQ31759VN3tY0UoaczFRjKuMGEhQOZ7D0=
-github.com/codeshelldev/gotl/pkg/logger v0.0.18/go.mod h1:AFO/snEIfF8YB3+TH6XtFMlhRCAJxItSfyc4ndbwc8E=
+github.com/codeshelldev/gotl/pkg/jsonutils v0.0.5 h1:1SfCFXZpY5GjPbUrTc1OrU/KDNWU/6xW4S3l6tg0GaE=
+github.com/codeshelldev/gotl/pkg/jsonutils v0.0.5/go.mod h1:NJKp0G1fre3QiPqwrfOP01yzZe6VMQy4P/nweNTGsvs=
+github.com/codeshelldev/gotl/pkg/logger v0.0.22 h1:eAgwgTAoyPceRX1C0uKHzVFHt8Ld5I6nxlPTxSw5fsc=
+github.com/codeshelldev/gotl/pkg/logger v0.0.22/go.mod h1:mvJcCIBYb6TmBQsO+vRqo47txsOq5FV5AMJJ7nlylJs=
 github.com/codeshelldev/gotl/pkg/pretty v0.0.10 h1:efoRJfkrk26c5j26qiwCXWPzeG/TfFK9V55Q6Rn+1CM=
 github.com/codeshelldev/gotl/pkg/pretty v0.0.10/go.mod h1:SkyfcVnQp37jV3SMTtnIFc1fyVvorvSskJxOmYvfIHU=
 github.com/codeshelldev/gotl/pkg/query v0.0.4 h1:o2Oagx/s1wfNMqkh6GfR6wpsIVOFSDPIbxe8ABRIXDw=
@@ -20,8 +20,8 @@ github.com/codeshelldev/gotl/pkg/server/http v0.0.3 h1:3232uPB2CljzUJadyrME7p0Da
 github.com/codeshelldev/gotl/pkg/server/http v0.0.3/go.mod h1:/asx7ViJtwlBvLgObjI/tejm6lNDN1/B+/6BPImqDfc=
 github.com/codeshelldev/gotl/pkg/stringutils v0.0.8 h1:VKIuEYLJARDmHyhAbcMy1TsdxPdzsKlbQvgr1G4QE7s=
 github.com/codeshelldev/gotl/pkg/stringutils v0.0.8/go.mod h1:892bcYDpOf0sTpXtABQ3m+9MACpWHCVpN3f/mcPr7qo=
-github.com/codeshelldev/gotl/pkg/templating v0.0.17-22 h1:0UFaHbt49aExTHVywfHXxd8mvr2NUx8qli9r27Y57Ew=
-github.com/codeshelldev/gotl/pkg/templating v0.0.17-22/go.mod h1:MHM4ouEsLNKXRYO+fS9qqpS1SFlL4Z6Q/0kxtS+auLk=
+github.com/codeshelldev/gotl/pkg/templating v0.0.17 h1:ghFq0TodOUAP+013W51bqIUmeB8889uo+sMAIJ/wiqs=
+github.com/codeshelldev/gotl/pkg/templating v0.0.17/go.mod h1:MHM4ouEsLNKXRYO+fS9qqpS1SFlL4Z6Q/0kxtS+auLk=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
