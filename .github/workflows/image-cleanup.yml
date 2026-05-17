@@ -17,7 +17,7 @@ jobs:
     name: Images
     with:
       registry: ghcr.io
-      cleanup-stales: pr-[0-9]+-[0-9]+,ci-[a-zA-Z0-9._-]+-[0-9]+,[a-zA-Z0-9._-]+-dev[0-9]+
+      cleanup-stales: '^(?:pr-\d+-\d+|ci-[A-Za-z0-9._-]+-\d+|[A-Za-z0-9._-]+-dev\d)$'
       stale-threshold: 15 days
     secrets:
       GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
