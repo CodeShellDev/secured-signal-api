@@ -23,10 +23,10 @@ endpoint restrictions, placeholders, flexible configuration
 		src="https://img.shields.io/github/stars/codeshelldev/secured-signal-api?style=flat&logo=github&label=Stars" 
 		alt="GitHub stars">
   </a>
-  <a href="https://matrix.to/#/#secured-signal-api:matrix.org">
+  <a href="https://matrix.to/#/#codeshelldev.oss.secured-signal-api:matrix.org">
 	  <img 
 		  alt="Matrix" 
-		  src="https://img.shields.io/matrix/codeshelldev.sso.secured-signal-api%3Amatrix.org?style=flat&color=blue&logo=matrix&label=Chat">
+		  src="https://img.shields.io/matrix/codeshelldev.oss.secured-signal-api%3Amatrix.org?style=flat&color=blue&logo=matrix&label=Chat">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
     <img
