@@ -26,7 +26,7 @@ endpoint restrictions, placeholders, flexible configuration
   <a href="https://matrix.to/#/#secured-signal-api:matrix.org">
 	  <img 
 		  alt="Matrix" 
-		  src="https://img.shields.io/matrix/secured-signal-api%3Amatrix.org?style=flat&color=blue&logo=matrix&label=Chat">
+		  src="https://img.shields.io/matrix/codeshelldev.sso.secured-signal-api%3Amatrix.org?style=flat&color=blue&logo=matrix&label=Chat">
   </a>
   <a href="https://github.com/codeshelldev/secured-signal-api/pkgs/container/secured-signal-api">
     <img
@@ -106,7 +106,7 @@ Has this Repo been helpful 👍️ to you? Then consider ⭐️'ing this Project
 ## Help
 
 **Are you having problems setting up Secured Signal API?**<br/>
-No worries check out the [discussions](https://github.com/codeshelldev/secured-signal-api/discussions) tab or our [matrix chat](https://matrix.to/#/#secured-signal-api:matrix.org) and ask for help.
+No worries check out the [discussions](https://github.com/codeshelldev/secured-signal-api/discussions) tab or our [matrix chat](https://matrix.to/#/#codeshelldev.sso.secured-signal-api:matrix.org) and ask for help.
 
 **We are all volunteers**, so please be friendly and patient.
 
