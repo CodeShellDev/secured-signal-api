@@ -205,7 +205,7 @@ const config = {
 							},
 							{
 								label: "Matrix Chat",
-								href: "https://matrix.to/#/#secured-signal-api:matrix.org",
+								href: "https://matrix.to/#/#codeshelldev.oss.secured-signal-api:matrix.org",
 							},
 						],
 					},
