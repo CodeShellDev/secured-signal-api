@@ -26,7 +26,7 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 -->
 
-### Container logs
+### Container Logs
 
 <!--
 Add your logs below (in `debug` log level), be sure to redact sensitive information.
@@ -36,7 +36,7 @@ Add your logs below (in `debug` log level), be sure to redact sensitive informat
 
 ```
 
-### Config files
+### Config Files
 
 <!--
 Add your config(s) below (Use ```yaml ... ```).
