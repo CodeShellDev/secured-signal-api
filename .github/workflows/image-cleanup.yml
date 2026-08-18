@@ -16,15 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     name: Images
 
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - uses: codeshelldev/gh-actions/ghcr-cleanup@v1
         with:
           image: ${{ github.repository }}
           registry: ghcr.io
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PCKG_TOKEN }}
           delete-tags: '^(?:pr-\d+-\d+|ci-[A-Za-z0-9._-]+-\d+|[A-Za-z0-9._-]+-dev\d)$'
           older-than: 15 days
