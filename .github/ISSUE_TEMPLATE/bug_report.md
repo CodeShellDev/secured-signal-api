@@ -20,7 +20,7 @@ Steps to reproduce the behavior:
 2. Send Request
 3. [...]
 
-### Expected behavior
+### Expected Behavior
 
 <!--
 A clear and concise description of what you expected to happen.
