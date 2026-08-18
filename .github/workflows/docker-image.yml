@@ -38,10 +38,16 @@ jobs:
 
   update:
     needs: check
-    if: needs.check.outputs.continue == 'true'
-    uses: codeshelldev/gh-actions/.github/workflows/docker-image.yml@main
-    name: Stable Image
-    with:
-      registry: ghcr.io
-    secrets:
-      GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
+    runs-on: ubuntu-latest
+    name: Image
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: codeshelldev/gh-actions/docker-build-push@v1
+        with:
+          registry: ghcr.io
+          token: ${{ secrets.GITHUB_TOKEN }}

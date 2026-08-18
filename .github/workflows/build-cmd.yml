@@ -140,17 +140,26 @@ jobs:
 
   update:
     needs: resolve-tag
-    uses: codeshelldev/gh-actions/.github/workflows/docker-image.yml@main
+    runs-on: ubuntu-latest
     name: Development Image
-    with:
-      registry: ghcr.io
-      flavor: |
-        latest=false
-      tags: |
-        type=raw,value=${{ needs.resolve-tag.outputs.image_tag }}
-      ref: ${{ needs.resolve-tag.outputs.ref }}
-    secrets:
-      GH_PCKG_TOKEN: ${{ secrets.GH_PCKG_TOKEN }}
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve-tag.outputs.ref }}
+
+      - uses: codeshelldev/gh-actions/docker-build-push@v1
+        with:
+          registry: ghcr.io
+          token: ${{ secrets.GITHUB_TOKEN }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=${{ needs.resolve-tag.outputs.image_tag }}
 
   output:
     needs: [resolve-tag, update]
