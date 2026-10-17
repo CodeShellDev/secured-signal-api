@@ -72,7 +72,7 @@ in our new {b}Matrix Chat{/}!
 Why Matrix and not Discord? It is the {i}opensource way{/}! 📭️
 
 {b}Come and join the discussion{/}:
-{b,fg=bright_blue}https://matrix.to/#/#secured-signal-api:matrix.org{/}`,
+{b,fg=bright_blue}https://matrix.to/#/#codeshelldev.oss.secured-signal-api:matrix.org{/}`,
 			},
 		},
 	})
