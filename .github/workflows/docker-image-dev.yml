@@ -37,24 +37,28 @@ jobs:
       continue: ${{ steps.collect.outputs.continue }}
 
     steps:
-      - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
-        name: Fail if run from main
-        run: |
-          echo "❌ This workflow cannot be run from the main branch."
-          exit 1
-
-      - if: github.event_name == 'release' && github.event.release.target_commitish == 'main'
-        name: Fail if release targets main
-        run: |
-          echo "❌ Releases targeting main are not allowed."
-          exit 1
-
-      - name: Output continue value
+      - name: Check source
         id: collect
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          TARGET: ${{ github.event.release.target_commitish }}
         run: |
-          source continue.txt
-          echo "continue=$continue" >> "$GITHUB_OUTPUT"
-          echo "Got continue=$continue"
+          set -euo pipefail
+
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$REF" == "refs/heads/main" ]]; then
+            echo "❌ This workflow cannot be run from the main branch."
+            exit 1
+          fi
+
+          if [[ "$EVENT_NAME" == "release" && "$TARGET" == "main" ]]; then
+            echo "❌ Releases targeting main are not allowed."
+            echo "continue=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "continue=true" >> "$GITHUB_OUTPUT"
+          echo "Continuing workflow."
 
   resolve-tag:
     needs: check
@@ -67,11 +71,12 @@ jobs:
     steps:
       - if: github.event_name == 'release'
         name: Parse release tag
+        env:
+          TAG: ${{ github.ref_name }}
         run: |
-          TAG="${GITHUB_REF#refs/tags/}"
+          set -euo pipefail
 
           COUNT="${TAG##*[!0-9]}"
-
           TAG_PART="${TAG%"$COUNT"}"
 
           BASE_TAG="${TAG_PART%-*}"
@@ -90,6 +95,9 @@ jobs:
 
       - name: Resolve Image Tag
         id: resolve
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
         run: |
           set -euo pipefail
 
@@ -98,15 +106,14 @@ jobs:
             exit 1
           fi
 
-          ALLOWED_TYPES=(${TYPES//,/ })
+          read -ra ALLOWED_TYPES <<< "${TYPES//,/ }"
           if [[ ! " ${ALLOWED_TYPES[*]} " =~ " ${TYPE} " ]]; then
-            echo "❌ Invalid type: $TYPE. Allowed types are $ALLOWED_TYPES."
+            echo "❌ Invalid type: $TYPE. Allowed types are $TYPES."
             exit 1
           fi
 
           PREFIX="${BASE_TAG}-${TYPE}"
-
-          IMAGE="${{ github.repository_owner }}/${{ github.event.repository.name }}"
+          IMAGE="${REPOSITORY_OWNER}/${REPOSITORY_NAME}"
 
           TOKEN="$(
             curl -fsSL "https://ghcr.io/token?scope=repository:${IMAGE}:pull" |
@@ -137,7 +144,7 @@ jobs:
           if echo "$TAGS" | grep -Fqx "$FINAL_TAG"; then
             echo "⚠️ Tag $FINAL_TAG already exists."
 
-            if [ "${GITHUB_ACTOR}" != "${{ github.repository_owner }}" ]; then
+            if [ "${GITHUB_ACTOR}" != "${REPOSITORY_OWNER}" ]; then
               echo "🚨 User $GITHUB_ACTOR is not allowed to overwrite existing image."
               exit 1
             else
