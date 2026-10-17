@@ -19,9 +19,25 @@ type Testable interface {
 
 func Validate() {
 	for _, config := range ENV.CONFIGS {
+		reportMissingFields(config)
+
 		configutils.WalkSchema(reflect.TypeFor[structure.CONFIG](), reflect.ValueOf(*config), config.RAW.Layer.Get(""), nil, func(path string, field reflect.StructField, raw any, value reflect.Value) {
 			tryTest(path, raw, field.Type, value)
 		})
+	}
+}
+
+func reportMissingFields(config *structure.CONFIG) {
+	fields := config.RAW.FindMissingFields(string(config.TYPE), &structure.CONFIG{}, "")
+
+	name := config.NAME
+
+	if name == "" {
+		name = string(config.TYPE)
+	}
+
+	for _, path := range fields {
+		prettylog.GenericError("{b,fg=red}Config missing field Error{/}", errors.New("required field '" + path + "' missing in " + name))
 	}
 }
 

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"slices"
 
+	g "github.com/codeshelldev/gotl/pkg/configutils/types/generics"
 	"github.com/codeshelldev/secured-signal-api/internals/config"
-	"github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
 	. "github.com/codeshelldev/secured-signal-api/internals/proxy/common"
 )
 
@@ -40,14 +40,14 @@ func ipFilterHandler(next http.Handler) http.Handler {
 	})
 }
 
-func isIPBlocked(ip net.IP, allowed []generics.IPOrNet, blocked []generics.IPOrNet) bool {
-	isExplicitlyAllowed := slices.ContainsFunc(allowed, func(try generics.IPOrNet) bool {
+func isIPBlocked(ip net.IP, allowed []g.IPOrNet, blocked []g.IPOrNet) bool {
+	isExplicitlyAllowed := slices.ContainsFunc(allowed, func(try g.IPOrNet) bool {
 		tryIP := net.IPNet(try)
 		
 		return tryIP.Contains(ip)
 	})
 
-	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try generics.IPOrNet) bool {
+	isExplicitlyBlocked := slices.ContainsFunc(blocked, func(try g.IPOrNet) bool {
 		tryIP := net.IPNet(try)
 		
 		return tryIP.Contains(ip)

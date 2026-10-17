@@ -3,13 +3,13 @@ package structure
 import (
 	t "github.com/codeshelldev/gotl/pkg/configutils/types"
 	c "github.com/codeshelldev/secured-signal-api/internals/config/structure/custom"
-	g "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
+	generics "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
 	"github.com/go-viper/mapstructure/v2"
 )
 
-type StringMatchList []g.StringMatchRule
+type StringMatchList []generics.StringMatchRule
 
-func (m StringMatchList) FindMatchRule(str string) (g.StringMatchRule, error) {
+func (m StringMatchList) FindMatchRule(str string) (generics.StringMatchRule, error) {
 	for _, rule := range m {
 		ok, err := rule.Match(str)
 
@@ -18,7 +18,7 @@ func (m StringMatchList) FindMatchRule(str string) (g.StringMatchRule, error) {
 		}
 	}
 
-	return g.StringMatchRule{}, nil
+	return generics.StringMatchRule{}, nil
 }
 
 func (m StringMatchList) Match(str string) (bool, error) {

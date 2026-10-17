@@ -3,7 +3,8 @@ package structure
 import (
 	"github.com/codeshelldev/gotl/pkg/configutils"
 	t "github.com/codeshelldev/gotl/pkg/configutils/types"
-	g "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
+	g "github.com/codeshelldev/gotl/pkg/configutils/types/generics"
+	. "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
 )
 
 type ENV struct {
@@ -27,26 +28,26 @@ type CONFIG struct {
 	TYPE				ConfigType
 	RAW					*configutils.Config
 	NAME				string						`koanf:"name"`
-	SERVICE				SERVICE 					`koanf:"service"`
-	API					API						    `koanf:"api"`
+	SERVICE				SERVICE 					`koanf:"service"           config>required:"true"`
+	API					API						    `koanf:"api"               config>required:"true"`
 	SETTINGS      		SETTINGS					`koanf:"settings"`
 }
 
 type ConfigType string
 
 const (
-	TOKEN ConfigType = "token"
-	MAIN ConfigType = "main"
+	TOKEN 	ConfigType 	= "token"
+	MAIN 	ConfigType 	= "config"
 )
 
 type SERVICE struct {
 	HOSTNAMES			t.Opt[[]string]				`koanf:"hostnames"          env>aliases:".hostnames"`
-	PORT				string						`koanf:"port"               env>aliases:".port"`
-	LOG_LEVEL			string						`koanf:"loglevel"           env>aliases:".loglevel"`
+	PORT				string						`koanf:"port"               env>aliases:".port"            config>required:"true"`
+	LOG_LEVEL			string						`koanf:"loglevel"           env>aliases:".loglevel"        config>required:"true"`
 }
 
 type API struct {
-	URL					*g.URL						`koanf:"url"                env>aliases:".apiurl"`
+	URL					*g.URL						`koanf:"url"                env>aliases:".apiurl"          config>required:"true"`
 	TOKENS				[]string					`koanf:"tokens"             env>aliases:".apitokens"`
 	AUTH				AUTH						`koanf:"auth"`
 }
@@ -125,14 +126,14 @@ type Cors struct {
 }
 
 type Origin struct {
-	URL					g.URL						`koanf:"url"`
+	URL					g.URL						`koanf:"url"                required:"true"`
 	Methods				t.Opt[[]string]				`koanf:"methods"`
 	Headers				t.Opt[[]string]				`koanf:"headers"`
 }
 
 type Endpoints struct {
-	Allowed				[]g.StringMatchRule			`koanf:"allowed"`
-	Blocked				[]g.StringMatchRule			`koanf:"blocked"`
+	Allowed				[]StringMatchRule			`koanf:"allowed"`
+	Blocked				[]StringMatchRule			`koanf:"blocked"`
 }
 
 type IPFilter struct {
@@ -141,6 +142,6 @@ type IPFilter struct {
 }
 
 type RateLimiting struct {
-	Limit				int							`koanf:"limit"`
-	Period				g.TimeDuration				`koanf:"period"`
+	Limit				int							`koanf:"limit"              required:"true"`
+	Period				g.TimeDuration				`koanf:"period"             required:"true"`
 }

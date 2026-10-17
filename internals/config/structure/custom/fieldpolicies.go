@@ -5,7 +5,8 @@ import (
 	"reflect"
 	"strings"
 
-	g "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
+	g "github.com/codeshelldev/gotl/pkg/configutils/types/generics"
+	. "github.com/codeshelldev/secured-signal-api/internals/config/structure/generics"
 	"github.com/go-viper/mapstructure/v2"
 )
 
@@ -50,7 +51,7 @@ func (m FPolicyAction) String() string {
 type RFPolicy struct {
 	Action		g.Enum[FPolicyAction]	`koanf:"action"`
 	Value		any						`koanf:"value"`
-	MatchType 	g.Enum[g.MatchType] 	`koanf:"matchtype"`
+	MatchType 	g.Enum[MatchType] 		`koanf:"matchtype"`
 }
 
 type RFieldPolicies map[string][]RFPolicy
@@ -84,7 +85,7 @@ func (r *RFieldPolicies) UnmarshalMapstructure(raw any) error {
 
 type FPolicy struct {
 	Action    FPolicyAction
-	MatchRule g.MatchRule[any]
+	MatchRule MatchRule[any]
 }
 
 type FPolicies struct {
@@ -97,7 +98,7 @@ type FieldPolicies map[string]FPolicies
 func (r RFPolicy) Compile() FPolicy {
 	return FPolicy{
 		Action: r.Action.Value,
-		MatchRule: g.MatchRule[any]{
+		MatchRule: MatchRule[any]{
 			MatchType: r.MatchType,
 			Pattern:   r.Value,
 		},

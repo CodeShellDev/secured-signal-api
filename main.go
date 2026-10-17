@@ -81,8 +81,6 @@ Why Matrix and not Discord? It is the {i}opensource way{/}! 📭️
 
 	config.Load()
 
-	config.Validate()
-
 	if config.DEFAULT.SERVICE.LOG_LEVEL != logger.Level() {
 		logging.Init(config.DEFAULT.SERVICE.LOG_LEVEL)
 	}
@@ -97,6 +95,8 @@ Why Matrix and not Discord? It is the {i}opensource way{/}! 📭️
 	}
 
 	config.Log()
+
+	config.Validate()
 
 	db.Init()
 

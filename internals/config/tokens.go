@@ -17,7 +17,7 @@ const tokenConfigsPath = "tokenconfigs"
 func LoadTokens() {
 	logger.Debug("Loading Configs in ", ENV.TOKENS_DIR)
 
-	err := tokenConf.LoadDir(tokenConfigsPath, ENV.TOKENS_DIR, ".yml", yaml.Parser(), setTokenConfigName)
+	err := tokenConf.LoadDir(tokenConfigsPath, ENV.TOKENS_DIR, ".yml", yaml.Parser(), setConfigName)
 
 	if err != nil {
 		logger.Error("Could not Load Configs in ", ENV.TOKENS_DIR, ": ", err.Error())
@@ -116,7 +116,7 @@ func parseAuthTokens(config structure.CONFIG) []string {
 	return tokens
 }
 
-func setTokenConfigName(config *configutils.Config, p string) {
+func setConfigName(config *configutils.Config, p string) {
 	schema := structure.CONFIG{
 		NAME: "",
 	}

@@ -6,16 +6,18 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+
+	g "github.com/codeshelldev/gotl/pkg/configutils/types/generics"
 )
 
 type MatchRule[T any] struct {
 	Pattern   T					`koanf:"value"`
-	MatchType Enum[MatchType]	`koanf:"matchtype"`
+	MatchType g.Enum[MatchType]	`koanf:"matchtype"`
 }
 
 type StringMatchRule struct {
 	Pattern   string			`koanf:"pattern"`
-	MatchType Enum[MatchType]	`koanf:"matchtype"`
+	MatchType g.Enum[MatchType]	`koanf:"matchtype"`
 }
 
 type MatchType int

@@ -144,6 +144,8 @@ func InitReload() {
 func InitConfig() {
 	var config structure.CONFIG
 
+	setConfigName(mainConf, ENV.CONFIG_PATH)
+
 	templateConfigWithVariables(mainConf)
 
 	// after templating reunmarshal
