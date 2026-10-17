@@ -12,32 +12,25 @@ jobs:
       continue: ${{ steps.check.outputs.continue }}
 
     steps:
-      - if: github.event_name == 'release'
-        name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - if: github.event_name == 'release'
-        name: Fail if release not @main
+      - name: Check release target
         id: check
+        env:
+          TARGET: ${{ github.event.release.target_commitish }}
         run: |
           set -euo pipefail
 
-          TAG="${GITHUB_REF#refs/tags/}"
-
-          git fetch origin main:main
-
-          if ! git merge-base --is-ancestor "$TAG" main; then
-            echo "Detected main release. Skipping..."
+          if [ "$TARGET" != "main" ]; then
+            echo "Detected non-main release target '$TARGET'. Skipping..."
             echo "continue=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
+          echo "Release targets main. Continuing..."
           echo "continue=true" >> "$GITHUB_OUTPUT"
 
   update:
     needs: check
+    if: needs.check.outputs.continue == 'true'
     runs-on: ubuntu-latest
     name: Image
 

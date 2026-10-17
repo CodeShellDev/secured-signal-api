@@ -25,7 +25,6 @@ on:
 
 env:
   TYPES: "rc,beta,alpha,dev,feat"
-
   TYPE: ${{ inputs.type }}
   BASE_TAG: ${{ inputs.base-tag }}
   COUNT: -1
@@ -39,47 +38,16 @@ jobs:
 
     steps:
       - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
-        name: Fail if run @main
+        name: Fail if run from main
         run: |
           echo "❌ This workflow cannot be run from the main branch."
-          echo "Please pin to a release, use another branch or commit SHA instead of @main."
           exit 1
 
-      - if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
-        name: Allow if not run @main
+      - if: github.event_name == 'release' && github.event.release.target_commitish == 'main'
+        name: Fail if release targets main
         run: |
-          echo "continue=true" > continue.txt
-
-      - if: github.event_name == 'release'
-        name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - if: github.event_name == 'release'
-        name: Fail if release @main
-        run: |
-          set -euo pipefail
-
-          TAG="${GITHUB_REF#refs/tags/}"
-
-          git fetch origin main:main
-
-          if git merge-base --is-ancestor "$TAG" main; then
-            echo "Detected main release. Skipping..."
-            echo "continue=false" >> continue.txt
-            exit 0
-          fi
-
-          COUNT="${TAG##*[!0-9]}"
-
-          if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ]; then
-            echo "$COUNT is invalid or negative. Skipping..."
-            echo "continue=false" > continue.txt
-            exit 0
-          fi
-
-          echo "continue=true" > continue.txt
+          echo "❌ Releases targeting main are not allowed."
+          exit 1
 
       - name: Output continue value
         id: collect
@@ -125,7 +93,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -z "$COUNT" ] || [ "$COUNT" -lt 0 ] && [ "$COUNT" -ne -1 ]; then
+          if [ -z "$COUNT" ] || { [ "$COUNT" -lt 0 ] && [ "$COUNT" -ne -1 ]; }; then
             echo "❌ Invalid count: $COUNT. May only be > 0."
             exit 1
           fi
@@ -136,13 +104,13 @@ jobs:
             exit 1
           fi
 
-          PREFIX="${{ env.BASE_TAG }}-${{ env.TYPE }}"
+          PREFIX="${BASE_TAG}-${TYPE}"
 
-          IMAGE=${{ github.repository_owner }}/${{ github.event.repository.name }}
+          IMAGE="${{ github.repository_owner }}/${{ github.event.repository.name }}"
 
           TOKEN="$(
-            curl "https://ghcr.io/token?scope=repository:${IMAGE}:pull" |
-            awk -F'"' '$0=$4'
+            curl -fsSL "https://ghcr.io/token?scope=repository:${IMAGE}:pull" |
+            jq -r '.token'
           )"
 
           TAGS=$(curl -fsSL \
@@ -153,8 +121,8 @@ jobs:
           if [ -z "$COUNT" ] || [ "$COUNT" -eq -1 ]; then
             MAX=0
             for tag in $TAGS; do
-              if [[ "$tag" == ${PREFIX}* ]]; then
-                NUM="${tag#$PREFIX}"
+              if [[ "$tag" == "${PREFIX}"* ]]; then
+                NUM="${tag#"$PREFIX"}"
                 if [[ "$NUM" =~ ^[0-9]+$ ]]; then
                   (( NUM > MAX )) && MAX=$NUM
                 fi
@@ -164,9 +132,9 @@ jobs:
             COUNT=$((MAX + 1))
           fi
 
-          FINAL_TAG=${PREFIX}${COUNT}
+          FINAL_TAG="${PREFIX}${COUNT}"
 
-          if echo "$TAGS" | grep -qx "$FINAL_TAG"; then
+          if echo "$TAGS" | grep -Fqx "$FINAL_TAG"; then
             echo "⚠️ Tag $FINAL_TAG already exists."
 
             if [ "${GITHUB_ACTOR}" != "${{ github.repository_owner }}" ]; then
