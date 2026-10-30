@@ -27,12 +27,11 @@ ARG BUILD_TIME
 ARG GIT_COMMIT
 ARG REPOSITORY_URL
 
-LABEL org.opencontainers.image.version=$IMAGE_TAG
-LABEL org.opencontainers.image.created=$BUILD_TIME
-LABEL org.opencontainers.image.revision=$GIT_COMMIT
-
-LABEL org.opencontainers.image.source=$REPOSITORY_URL
-LABEL org.opencontainers.image.url=$REPOSITORY_URL
+LABEL org.opencontainers.image.version=$IMAGE_TAG \
+      org.opencontainers.image.created=$BUILD_TIME \
+      org.opencontainers.image.revision=$GIT_COMMIT \
+      org.opencontainers.image.source=$REPOSITORY_URL \
+      org.opencontainers.image.url=$REPOSITORY_URL 
 
 #===============================#
 #        Build Metadata         #
