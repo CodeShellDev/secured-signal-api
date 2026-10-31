@@ -12,7 +12,7 @@ require (
 	github.com/codeshelldev/gotl/pkg/query v0.0.4
 	github.com/codeshelldev/gotl/pkg/request v0.0.10
 	github.com/codeshelldev/gotl/pkg/scheduler v0.0.9
-	github.com/codeshelldev/gotl/pkg/server/http v0.0.3
+	github.com/codeshelldev/gotl/pkg/server/http v0.0.4
 	github.com/codeshelldev/gotl/pkg/stringutils v0.0.8
 	github.com/codeshelldev/gotl/pkg/templating v0.0.17
 	github.com/go-viper/mapstructure/v2 v2.5.0
